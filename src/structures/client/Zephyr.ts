@@ -2,11 +2,15 @@ import chalk from "chalk";
 import stripAnsi from "strip-ansi";
 import { Client } from "discord.js";
 import config from "../../../config.json";
+import { CommandLib } from "../../lib/command/Command";
 
 export class Zephyr extends Client {
+  commandLib = new CommandLib();
   public async start() {
     const startTime = Date.now();
-    this.on("ready", () => {
+    this.on("ready", async () => {
+      await this.commandLib.setup();
+
       const header = `===== ${chalk.hex(
         `#1fb7cf`
       )`PROJECT: ZEPHYR`} (${chalk.hex(`#1fb7cf`)`${config.version}`}) =====`;
@@ -20,8 +24,15 @@ export class Zephyr extends Client {
           )`${this.guilds.cache.size.toLocaleString()}`} guild(s) / ${chalk.hex(
             "1794E6"
           )`${this.users.cache.size.toLocaleString()}`} user(s)` +
+          `\n- ${chalk.hex(
+            `1794E6`
+          )`${this.commandLib.commands.length}`} commands registered` +
           `\n\n${`=`.repeat(stripAnsi(header).length)}`
       );
+    });
+    this.on("message", async (message) => {
+      if (message.author.bot) return;
+      await this.commandLib.process(message);
     });
     this.login(config.discord.token);
   }
