@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import stripAnsi from "strip-ansi";
-import { Client } from "discord.js";
+import { Client } from "eris";
 import config from "../../../config.json";
 import { CommandLib } from "../../lib/command/CommandLib";
 
@@ -21,19 +21,23 @@ export class Zephyr extends Client {
           }`}ms to start.` +
           `\n- Cached ${chalk.hex(
             "1794E6"
-          )`${this.guilds.cache.size.toLocaleString()}`} guild(s) / ${chalk.hex(
+          )`${this.guilds.size.toLocaleString()}`} guild(s) / ${chalk.hex(
             "1794E6"
-          )`${this.users.cache.size.toLocaleString()}`} user(s)` +
+          )`${this.users.size.toLocaleString()}`} user(s)` +
           `\n- ${chalk.hex(
             `1794E6`
           )`${this.commandLib.commands.length}`} commands registered` +
           `\n\n${`=`.repeat(stripAnsi(header).length)}`
       );
     });
-    this.on("message", async (message) => {
+    this.on("messageCreate", async (message) => {
       if (message.author.bot) return;
       await this.commandLib.process(message);
     });
-    this.login(config.discord.token);
+
+    this.connect();
+  }
+  constructor() {
+    super(config.discord.token);
   }
 }

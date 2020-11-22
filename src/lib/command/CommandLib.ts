@@ -1,7 +1,7 @@
 import { BaseCommand } from "../../structures/command/Command";
 import glob from "glob";
 import { promisify } from "util";
-import { Message } from "discord.js";
+import { Message } from "eris";
 
 export class CommandLib {
   commands: BaseCommand[] = [];

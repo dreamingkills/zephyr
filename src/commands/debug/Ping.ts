@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message } from "eris";
 import { BaseCommand } from "../../structures/command/Command";
 
 export default class Ping extends BaseCommand {
@@ -6,6 +6,6 @@ export default class Ping extends BaseCommand {
   description = "Hello.";
 
   async exec(msg: Message): Promise<void> {
-    await msg.channel.send("Hi.");
+    await msg.channel.createMessage("Hia.");
   }
 }
