@@ -1,0 +1,14 @@
+{
+    "version": "beta-0.0.1",
+    "discord": {
+        "defaultPrefix": "!",
+        "token": ""
+    },
+    "mariadb": {
+        "host": "",
+        "port": 3360,
+        "user": "",
+        "password": "",
+        "database": ""
+    }
+}

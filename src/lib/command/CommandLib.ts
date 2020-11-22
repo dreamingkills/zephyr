@@ -1,4 +1,5 @@
 import { BaseCommand } from "../../structures/command/Command";
+import config from "../../../config.json";
 import glob from "glob";
 import { promisify } from "util";
 import { Message } from "eris";
@@ -20,7 +21,7 @@ export class CommandLib {
   }
 
   async process(message: Message): Promise<void> {
-    const prefix = `!`;
+    const prefix = config.discord.defaultPrefix;
     const commandNameRegExp = new RegExp(
       `^(${prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})(\\S+)`,
       `g`
