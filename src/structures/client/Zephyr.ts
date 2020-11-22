@@ -2,7 +2,7 @@ import chalk from "chalk";
 import stripAnsi from "strip-ansi";
 import { Client } from "discord.js";
 import config from "../../../config.json";
-import { CommandLib } from "../../lib/command/Command";
+import { CommandLib } from "../../lib/command/CommandLib";
 
 export class Zephyr extends Client {
   commandLib = new CommandLib();
