@@ -4,10 +4,11 @@ import glob from "glob";
 import { promisify } from "util";
 import { Message } from "eris";
 import { ProfileService } from "../database/services/game/ProfileService";
+import { Zephyr } from "../../structures/client/Zephyr";
 
 export class CommandLib {
   commands: BaseCommand[] = [];
-  async setup(): Promise<void> {
+  async setup(zephyr: Zephyr): Promise<void> {
     const _glob = promisify(glob);
     const files = await _glob(
       `${require("path").dirname(require.main?.filename)}/commands/**/*.js`
@@ -15,12 +16,12 @@ export class CommandLib {
     for (let f of files) {
       const cmdExport = require(f);
       if (!cmdExport.default) return;
-      const cmd = new cmdExport.default() as BaseCommand;
+      const cmd = new cmdExport.default(zephyr) as BaseCommand;
       this.commands.push(cmd);
     }
   }
 
-  async process(message: Message): Promise<void> {
+  async process(message: Message, zephyr: Zephyr): Promise<void> {
     const prefix = config.discord.defaultPrefix;
     const commandNameRegExp = new RegExp(
       `^(${prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})(\\S+)`,
@@ -38,6 +39,6 @@ export class CommandLib {
 
     const command = commandMatch[0];
     const profile = await ProfileService.getProfile(message.author.id, true);
-    await command.exec(message, profile);
+    await command.run(message, profile, zephyr);
   }
 }

@@ -5,7 +5,7 @@ export class MessageEmbed {
     name: string;
     icon_url?: string;
   };
-  color?: number;
+  color?: number = parseInt("1FB7CF", 16);
 
   public setTitle(title: string): MessageEmbed {
     this.title = title;

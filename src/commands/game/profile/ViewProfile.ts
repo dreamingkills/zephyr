@@ -8,10 +8,10 @@ export default class Ping extends BaseCommand {
   description = "Displays your profile.";
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    console.log(msg.author);
-    const embed = new MessageEmbed()
-      .setColor(`#1FB7CF`)
-      .setAuthor(`${msg.author.tag}`, msg.author.avatarURL);
+    const embed = new MessageEmbed().setAuthor(
+      `Profile | ${msg.author.tag}`,
+      msg.author.avatarURL
+    );
     await msg.channel.createMessage({ embed });
   }
 }

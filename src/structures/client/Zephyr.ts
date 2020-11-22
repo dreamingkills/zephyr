@@ -9,7 +9,7 @@ export class Zephyr extends Client {
   public async start() {
     const startTime = Date.now();
     this.on("ready", async () => {
-      await this.commandLib.setup();
+      await this.commandLib.setup(this);
 
       const header = `===== ${chalk.hex(
         `#1fb7cf`
@@ -32,7 +32,7 @@ export class Zephyr extends Client {
     });
     this.on("messageCreate", async (message) => {
       if (message.author.bot) return;
-      await this.commandLib.process(message);
+      await this.commandLib.process(message, this);
     });
 
     this.connect();
