@@ -3,13 +3,20 @@ import stripAnsi from "strip-ansi";
 import { Client } from "eris";
 import config from "../../../config.json";
 import { CommandLib } from "../../lib/command/CommandLib";
+import { GuildService } from "../../lib/database/services/guild/GuildService";
 
 export class Zephyr extends Client {
   commandLib = new CommandLib();
+  prefixes: { [guildId: string]: string } = {};
+  constructor() {
+    super(config.discord.token);
+  }
+
   public async start() {
     const startTime = Date.now();
     this.on("ready", async () => {
       await this.commandLib.setup(this);
+      await this.cachePrefixes();
 
       const header = `===== ${chalk.hex(
         `#1fb7cf`
@@ -37,7 +44,16 @@ export class Zephyr extends Client {
 
     this.connect();
   }
-  constructor() {
-    super(config.discord.token);
+
+  public async cachePrefixes() {
+    const prefixes = await GuildService.getPrefixes();
+    return (this.prefixes = prefixes);
+  }
+  public getPrefix(guildId?: string): string {
+    if (!guildId) return config.discord.defaultPrefix;
+    return this.prefixes[guildId] ?? config.discord.defaultPrefix;
+  }
+  public setPrefix(guildId: string, prefix: string): void {
+    this.prefixes[guildId] = prefix;
   }
 }

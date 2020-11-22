@@ -1,5 +1,4 @@
 import { BaseCommand } from "../../structures/command/Command";
-import config from "../../../config.json";
 import glob from "glob";
 import { promisify } from "util";
 import { Message } from "eris";
@@ -22,7 +21,8 @@ export class CommandLib {
   }
 
   async process(message: Message, zephyr: Zephyr): Promise<void> {
-    const prefix = config.discord.defaultPrefix;
+    const guild = zephyr.guilds.get(message.guildID!);
+    const prefix = zephyr.getPrefix(guild!.id);
     const commandNameRegExp = new RegExp(
       `^(${prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})(\\S+)`,
       `g`
