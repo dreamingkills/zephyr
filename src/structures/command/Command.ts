@@ -1,11 +1,11 @@
 import { Message } from "discord.js";
 
-interface CommandInterface {
+interface Command {
   names: string[];
   description: string;
   exec(msg: Message): Promise<void>;
 }
-export abstract class Command implements CommandInterface {
+export abstract class BaseCommand implements Command {
   names: string[] = [];
   description: string = "This command has no description!";
   abstract exec(msg: Message): Promise<void>;

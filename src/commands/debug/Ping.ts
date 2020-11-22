@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
-import { Command } from "../../structures/command/Command";
+import { BaseCommand } from "../../structures/command/Command";
 
-export default class Ping extends Command {
+export default class Ping extends BaseCommand {
   names = ["ping"];
   description = "Hello.";
 

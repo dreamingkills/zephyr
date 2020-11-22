@@ -1,10 +1,10 @@
-import { Command } from "../../structures/command/Command";
+import { BaseCommand } from "../../structures/command/Command";
 import glob from "glob";
 import { promisify } from "util";
 import { Message } from "discord.js";
 
 export class CommandLib {
-  commands: Command[] = [];
+  commands: BaseCommand[] = [];
   async setup(): Promise<void> {
     const _glob = promisify(glob);
     const files = await _glob(
@@ -13,7 +13,7 @@ export class CommandLib {
     for (let f of files) {
       const cmdExport = require(f);
       if (!cmdExport.default) return;
-      const cmd = new cmdExport.default() as Command;
+      const cmd = new cmdExport.default() as BaseCommand;
       this.commands.push(cmd);
     }
   }
