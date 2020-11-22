@@ -2,6 +2,7 @@ import { BaseCommand } from "../../structures/command/Command";
 import glob from "glob";
 import { promisify } from "util";
 import { Message } from "eris";
+import { ProfileService } from "../database/services/game/ProfileService";
 
 export class CommandLib {
   commands: BaseCommand[] = [];
@@ -35,6 +36,7 @@ export class CommandLib {
       console.warn(`Duplicate command found: ${commandName}`);
 
     const command = commandMatch[0];
-    await command.exec(message);
+    const profile = await ProfileService.getProfile(message.author.id, true);
+    await command.exec(message, profile);
   }
 }
