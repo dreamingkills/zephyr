@@ -4,17 +4,12 @@ import { ProfileSet } from "../../sql/game/profile/ProfileSet";
 
 export abstract class ProfileService {
   public static async getProfile(
-    discordId: string | number | GameProfile,
+    discordId: string | number,
     autoGenerate?: boolean
   ): Promise<GameProfile> {
-    if (typeof discordId === "string" || typeof discordId === "number") {
-      return await ProfileFetch.getProfileByDiscordId(
-        discordId as string,
-        autoGenerate
-      );
-    }
     return await ProfileFetch.getProfileByDiscordId(
-      (<GameProfile>discordId).discordId
+      discordId as string,
+      autoGenerate
     );
   }
   public static async createProfile(
