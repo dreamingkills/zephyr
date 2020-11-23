@@ -1,5 +1,5 @@
 import { DB, DBClass } from "../../..";
-import { DBProfile, GameProfile } from "../../../../../structures/game/Profile";
+import { Profile, GameProfile } from "../../../../../structures/game/Profile";
 import { NoProfileError } from "../../../../../structures/error/GameError";
 import { ProfileService } from "../../../services/game/ProfileService";
 
@@ -10,7 +10,7 @@ export abstract class ProfileFetch extends DBClass {
   ): Promise<GameProfile> {
     const query = (await DB.query(`SELECT * FROM profile WHERE discord_id=?;`, [
       discordId,
-    ])) as DBProfile[];
+    ])) as Profile[];
     if (query[0]) return new GameProfile({ ...query[0] });
 
     if (autoGenerate) {

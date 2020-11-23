@@ -14,6 +14,6 @@ abstract class BaseGameError extends Error {
              */
 export class NoProfileError extends BaseGameError {
   constructor() {
-    super(`NO Profile Error`);
+    super(`No Profile Error`);
   }
 }

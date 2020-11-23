@@ -2,7 +2,7 @@ import { Message } from "eris";
 import { GuildService } from "../../lib/database/services/guild/GuildService";
 import { BaseCommand } from "../../structures/command/Command";
 
-export default class Ping extends BaseCommand {
+export default class Prefix extends BaseCommand {
   names = ["prefix"];
   description =
     `Changes the prefix of the bot.` +

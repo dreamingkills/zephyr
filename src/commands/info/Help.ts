@@ -1,13 +1,13 @@
 import { Message } from "eris";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
-import { Profile } from "../../structures/game/Profile";
+import { GameProfile } from "../../structures/game/Profile";
 
 export default class Help extends BaseCommand {
   names = ["help"];
   description = "Shows you the help center.";
   usage = ["$CMD$", "$CMD$ [command/topic]"];
-  async exec(msg: Message, _profile: Profile): Promise<void> {
+  async exec(msg: Message, _profile: GameProfile): Promise<void> {
     const guild = this.zephyr.guilds.get(msg.guildID!);
     const prefix = this.zephyr.getPrefix(guild!.id);
 

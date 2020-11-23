@@ -38,7 +38,12 @@ export class CommandLib {
       console.warn(`Duplicate command found: ${commandName}`);
 
     const command = commandMatch[0];
-    const profile = await ProfileService.getProfile(message.author.id, true);
-    await command.run(message, profile, zephyr);
+    try {
+      const profile = await ProfileService.getProfile(message.author.id, true);
+      await command.run(message, profile, zephyr);
+    } catch (e) {
+      await message.channel.createMessage(e.message);
+      if (!e.isClientFacing) console.error(e);
+    }
   }
 }

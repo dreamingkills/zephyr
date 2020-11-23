@@ -6,10 +6,13 @@ import { CommandLib } from "../../lib/command/CommandLib";
 import { GuildService } from "../../lib/database/services/guild/GuildService";
 
 export class Zephyr extends Client {
+  version: string = "beta-0.0.2";
   commandLib = new CommandLib();
   prefixes: { [guildId: string]: string } = {};
+  config: typeof config;
   constructor() {
     super(config.discord.token);
+    this.config = config;
   }
 
   public async start() {
@@ -20,7 +23,7 @@ export class Zephyr extends Client {
 
       const header = `===== ${chalk.hex(
         `#1fb7cf`
-      )`PROJECT: ZEPHYR`} (${chalk.hex(`#1fb7cf`)`${config.version}`}) =====`;
+      )`PROJECT: ZEPHYR`} (${chalk.hex(`#1fb7cf`)`${this.version}`}) =====`;
       console.log(
         header +
           `\n\n- Took ${chalk.hex("1794E6")`${

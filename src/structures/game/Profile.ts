@@ -1,27 +1,24 @@
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
 
-export interface DBProfile {
-  discord_id: string;
-}
 export interface Profile {
-  discordId: string;
+  discord_id: string;
+  bits: number;
+  bits_bank: number;
+  daily_next: number;
 }
-export class GameProfile implements Profile {
+export class GameProfile {
   discordId: string;
-  constructor(data: DBProfile) {
+  bits: number;
+  bitsBank: number;
+  dailyNext: number;
+  constructor(data: Profile) {
     this.discordId = data.discord_id;
+    this.bits = data.bits;
+    this.bitsBank = data.bits_bank;
+    this.dailyNext = data.daily_next;
   }
 
   public async fetch(): Promise<GameProfile> {
     return await ProfileService.getProfile(this.discordId, false);
   }
 }
-
-/*
-CREATE TABLE profile
-(
-    id              INT(11) AUTO_INCREMENT,
-    discord_id      TINYTEXT NOT NULL,
-    PRIMARY KEY(id)
-);
-*/
