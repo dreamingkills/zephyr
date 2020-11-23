@@ -38,6 +38,14 @@ export class CommandLib {
       console.warn(`Duplicate command found: ${commandName}`);
 
     const command = commandMatch[0];
+    if (
+      command.developerOnly &&
+      zephyr.config.developers.indexOf(message.author.id) < 0
+    ) {
+      await message.channel.createMessage("YOU ARE NOT A DEVELOPER");
+      return;
+    }
+
     try {
       const profile = await ProfileService.getProfile(message.author.id, true);
       await command.run(message, profile, zephyr);

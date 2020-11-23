@@ -17,4 +17,28 @@ export abstract class ProfileSet extends DBClass {
     ]);
     return await ProfileService.getProfile(discordId);
   }
+
+  /*
+      Currency
+  */
+  public static async addBits(
+    discordId: string,
+    amount: number
+  ): Promise<GameProfile> {
+    await DB.query(`UPDATE profile SET bits=bits+? WHERE discord_id=?;`, [
+      amount,
+      discordId,
+    ]);
+    return await ProfileService.getProfile(discordId);
+  }
+  public static async removeBits(
+    discordId: string,
+    amount: number
+  ): Promise<GameProfile> {
+    await DB.query(`UPDATE profile SET bits=bits-? WHERE discord_id=?;`, [
+      amount,
+      discordId,
+    ]);
+    return await ProfileService.getProfile(discordId);
+  }
 }

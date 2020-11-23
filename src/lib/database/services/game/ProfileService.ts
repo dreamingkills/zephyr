@@ -23,4 +23,20 @@ export abstract class ProfileService {
   ): Promise<GameProfile> {
     return await ProfileSet.togglePrivateProfile(profile.discordId);
   }
+
+  /*
+      Currency
+  */
+  public static async addBitsToProfile(
+    profile: GameProfile,
+    amount: number
+  ): Promise<GameProfile> {
+    return await ProfileSet.addBits(profile.discordId, amount);
+  }
+  public static async removeBitsToProfile(
+    profile: GameProfile,
+    amount: number
+  ): Promise<GameProfile> {
+    return await ProfileSet.removeBits(profile.discordId, amount);
+  }
 }

@@ -14,8 +14,11 @@ export abstract class BaseCommand implements Command {
   description: string = "This command has no description!";
   usage: string[] = [];
   subcommands: string[] = [];
+  developerOnly: boolean = false;
+
   zephyr!: Zephyr;
   options!: string[];
+
   abstract exec(msg: Message, profile: GameProfile): Promise<void>;
 
   public async run(msg: Message, profile: GameProfile, zephyr: Zephyr) {
