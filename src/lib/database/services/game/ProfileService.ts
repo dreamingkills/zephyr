@@ -17,4 +17,10 @@ export abstract class ProfileService {
   ): Promise<GameProfile> {
     return await ProfileSet.createNewProfile(discordId as string);
   }
+
+  public static async togglePrivateProfile(
+    profile: GameProfile
+  ): Promise<GameProfile> {
+    return await ProfileSet.togglePrivateProfile(profile.discordId);
+  }
 }

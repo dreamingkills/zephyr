@@ -6,6 +6,7 @@ export class MessageEmbed {
     icon_url?: string;
   };
   color?: number = parseInt("1FB7CF", 16);
+  footer?: { text: string };
 
   public setTitle(title: string): MessageEmbed {
     this.title = title;
@@ -25,6 +26,10 @@ export class MessageEmbed {
         this.color = parseInt(color.slice(1), 16);
       } else this.color = parseInt(color, 16);
     } else this.color = color;
+    return this;
+  }
+  public setFooter(footer: string): MessageEmbed {
+    this.footer = { text: footer };
     return this;
   }
 }
