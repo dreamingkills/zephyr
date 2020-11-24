@@ -10,20 +10,22 @@ export default class RemoveBits extends BaseCommand {
   description = `Removes bits from a user's balance.`;
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(msg: Message, profile: GameProfile): Promise<void> {
     if (!msg.mentions[0]) throw new ZephyrError.InvalidMentionError();
     const amountRaw = msg.content.split(" ").filter((c) => !isNaN(parseInt(c)));
     if (!amountRaw[0]) throw new ZephyrError.InvalidAmountError(`bits`);
 
     let targetUser = msg.mentions[0];
     let target = await ProfileService.getProfile(targetUser.id);
-    const amount = parseInt(amountRaw[0]);
+    let amount = parseInt(amountRaw[0]);
+
+    if (profile.bits - amount < 0) amount = profile.bits;
 
     const _target = await ProfileService.removeBitsFromProfile(target, amount);
     const embed = new MessageEmbed()
       .setAuthor(`Add Bits | ${msg.author.tag}`, msg.author.avatarURL)
       .setDescription(
-        `Gave ${this.zephyr.config.discord.emoji.bits}**${amount}** to **${targetUser.tag}**.`
+        `Took ${this.zephyr.config.discord.emoji.bits}**${amount}** from **${targetUser.tag}**.`
       )
       .setFooter(`New balance: ${_target.bits.toLocaleString()}`);
 

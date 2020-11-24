@@ -26,4 +26,8 @@ export abstract class BaseCommand implements Command {
     this.options = msg.content.split(" ").slice(1);
     await this.exec(msg, profile);
   }
+
+  public selfDestruct(): string {
+    return "💥 Self destructing...";
+  }
 }
