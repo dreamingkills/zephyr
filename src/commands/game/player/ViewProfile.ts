@@ -43,9 +43,11 @@ export default class ViewProfile extends BaseCommand {
     const embed = new MessageEmbed()
       .setAuthor(`Profile | ${user.tag}`, msg.author.avatarURL)
       .setDescription(
-        `${
-          this.zephyr.config.discord.emoji.bits
-        }**${target.bits.toLocaleString()}**.` +
+        (target.blurb ? `**Blurb**` : ``) +
+          `\n${target.blurb}\n` +
+          `\n${
+            this.zephyr.config.discord.emoji.bits
+          }**${target.bits.toLocaleString()}**.` +
           `\n— *${target.bitsBank.toLocaleString()} in the bank*`
       )
       .setFooter(`Profile is ${target.private ? `PRIVATE` : `PUBLIC`}`);

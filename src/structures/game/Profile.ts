@@ -3,6 +3,7 @@ import { ProfileService } from "../../lib/database/services/game/ProfileService"
 export interface Profile {
   discord_id: string;
   private: boolean;
+  blurb: string;
   bits: number;
   bits_bank: number;
   daily_last: string;
@@ -11,6 +12,7 @@ export interface Profile {
 export class GameProfile {
   discordId: string;
   private: boolean;
+  blurb: string;
   bits: number;
   bitsBank: number;
   dailyLast: string;
@@ -18,6 +20,7 @@ export class GameProfile {
   constructor(data: Profile) {
     this.discordId = data.discord_id;
     this.private = data.private;
+    this.blurb = data.blurb;
     this.bits = data.bits;
     this.bitsBank = data.bits_bank;
     this.dailyLast = data.daily_last;

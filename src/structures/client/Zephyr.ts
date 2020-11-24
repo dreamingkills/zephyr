@@ -6,7 +6,7 @@ import { CommandLib } from "../../lib/command/CommandLib";
 import { GuildService } from "../../lib/database/services/guild/GuildService";
 
 export class Zephyr extends Client {
-  version: string = "beta-0.0.6";
+  version: string = "beta-0.0.7";
   commandLib = new CommandLib();
   prefixes: { [guildId: string]: string } = {};
   config: typeof config;

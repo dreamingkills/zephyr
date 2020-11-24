@@ -3,6 +3,9 @@ import { ProfileFetch } from "../../sql/game/profile/ProfileFetch";
 import { ProfileSet } from "../../sql/game/profile/ProfileSet";
 
 export abstract class ProfileService {
+  /*
+      Profile
+  */
   public static async getProfile(
     discordId: string | number,
     autoGenerate?: boolean
@@ -21,7 +24,15 @@ export abstract class ProfileService {
   public static async togglePrivateProfile(
     profile: GameProfile
   ): Promise<GameProfile> {
-    return await ProfileSet.togglePrivateProfile(profile.discordId);
+    await ProfileSet.togglePrivateProfile(profile.discordId);
+    return await profile.fetch();
+  }
+  public static async setProfileBlurb(
+    profile: GameProfile,
+    blurb: string
+  ): Promise<GameProfile> {
+    await ProfileSet.setBlurb(profile.discordId, blurb);
+    return await profile.fetch();
   }
 
   /*
