@@ -24,21 +24,35 @@ export abstract class ProfileSet extends DBClass {
   public static async addBits(
     discordId: string,
     amount: number
-  ): Promise<GameProfile> {
+  ): Promise<void> {
     await DB.query(`UPDATE profile SET bits=bits+? WHERE discord_id=?;`, [
       amount,
       discordId,
     ]);
-    return await ProfileService.getProfile(discordId);
+    return;
   }
   public static async removeBits(
     discordId: string,
     amount: number
-  ): Promise<GameProfile> {
+  ): Promise<void> {
     await DB.query(`UPDATE profile SET bits=bits-? WHERE discord_id=?;`, [
       amount,
       discordId,
     ]);
-    return await ProfileService.getProfile(discordId);
+    return;
+  }
+
+  /*
+      Daily
+  */
+  public static async setDailyTimestamp(
+    discordId: string,
+    timestamp: string
+  ): Promise<void> {
+    await DB.query(`UPDATE profile SET daily_last=? WHERE discord_id=?;`, [
+      timestamp,
+      discordId,
+    ]);
+    return;
   }
 }

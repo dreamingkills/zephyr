@@ -6,7 +6,7 @@ import { GameProfile } from "../../structures/game/Profile";
 
 export default class RemoveBits extends BaseCommand {
   names = ["removebits"];
-  description = `Removes bits from a user's balance.` + `**Developer-only**`;
+  description = `Removes bits from a user's balance.`;
   developerOnly = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
@@ -23,7 +23,7 @@ export default class RemoveBits extends BaseCommand {
     let target = await ProfileService.getProfile(targetUser.id);
     const amount = parseInt(amountRaw[0]);
 
-    const _target = await ProfileService.removeBitsToProfile(target, amount);
+    const _target = await ProfileService.removeBitsFromProfile(target, amount);
     const embed = new MessageEmbed()
       .setAuthor(`Add Bits | ${msg.author.tag}`, msg.author.avatarURL)
       .setDescription(

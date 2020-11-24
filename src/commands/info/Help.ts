@@ -17,7 +17,9 @@ export default class Help extends BaseCommand {
     if (query) {
       const findCommand = commands.filter((c) => c.names.includes(query))[0];
       if (findCommand) {
-        let description = `${findCommand.description}\n`;
+        let description = `**${findCommand.names[0]}**\n${findCommand.description}\n`;
+        if (findCommand.developerOnly)
+          description += `**Developer-only command!**\n`;
 
         if (findCommand.usage.length > 1) {
           description +=

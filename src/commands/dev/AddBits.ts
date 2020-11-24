@@ -6,7 +6,7 @@ import { GameProfile } from "../../structures/game/Profile";
 
 export default class AddBits extends BaseCommand {
   names = ["addbits"];
-  description = `Adds bits to a user's balance.` + `**Developer-only**`;
+  description = `Adds bits to a user's balance.`;
   developerOnly = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {

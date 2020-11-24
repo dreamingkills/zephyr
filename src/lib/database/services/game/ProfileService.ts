@@ -31,12 +31,25 @@ export abstract class ProfileService {
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    return await ProfileSet.addBits(profile.discordId, amount);
+    await ProfileSet.addBits(profile.discordId, amount);
+    return await profile.fetch();
   }
-  public static async removeBitsToProfile(
+  public static async removeBitsFromProfile(
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    return await ProfileSet.removeBits(profile.discordId, amount);
+    await ProfileSet.removeBits(profile.discordId, amount);
+    return await profile.fetch();
+  }
+
+  /*
+      Daily
+  */
+  public static async setDailyTimestamp(
+    profile: GameProfile,
+    timestamp: string
+  ): Promise<GameProfile> {
+    await ProfileSet.setDailyTimestamp(profile.discordId, timestamp);
+    return await profile.fetch();
   }
 }
