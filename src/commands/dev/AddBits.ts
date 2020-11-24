@@ -17,6 +17,7 @@ export default class AddBits extends BaseCommand {
     const amountRaw = msg.content.split(" ").filter((c) => !isNaN(parseInt(c)));
     if (!amountRaw[0]) {
       await msg.channel.createMessage("YOU MUST SPECIFY A VALID AMOUNT");
+      return;
     }
 
     let targetUser = msg.mentions[0];
