@@ -290,6 +290,13 @@ end-of-stream@^1.1.0:
   dependencies:
     once "^1.4.0"
 
+eris-collector@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/eris-collector/-/eris-collector-1.0.1.tgz#f23d518723bacd55b6e5a1dafb0902e11e3aafd1"
+  integrity sha512-qAuIP8//rMaTFs/3J7Ggk2tzWuNbFqJsAP8DuT9MLpNYc6f0u+Cifpa06//oxGQOWl4sWY1+0ncJDfRvlz2PMg==
+  dependencies:
+    events "^3.1.0"
+
 eris@0.13.4:
   version "0.13.4"
   resolved "https://registry.yarnpkg.com/eris/-/eris-0.13.4.tgz#06159ff619446046e392e28a70667d73c27aa631"
@@ -304,6 +311,11 @@ escape-goat@^2.0.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/escape-goat/-/escape-goat-2.1.1.tgz#1b2dc77003676c457ec760b2dc68edb648188675"
   integrity sha512-8/uIhbG12Csjy2JEW7D9pHbreaVaS/OpN3ycnyvElTdwM5n6GY6W6e2IPemfvGZeUMqZ9A/3GqIZMgKnBhAw/Q==
+
+events@^3.1.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/events/-/events-3.2.0.tgz#93b87c18f8efcd4202a461aec4dfc0556b639379"
+  integrity sha512-/46HWwbfCX2xTawVfkKLGxMifJYQBWMwY1mjywRtb4c9x8l5NP3KoJtnIOiL1hfdRkIuYhETxQlo62IF8tcnlg==
 
 fill-range@^7.0.1:
   version "7.0.1"

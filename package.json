@@ -5,6 +5,7 @@
     "chalk": "^4.1.0",
     "dayjs": "^1.9.6",
     "eris": "0.13.4",
+    "eris-collector": "^1.0.1",
     "glob": "^7.1.6",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.6",
