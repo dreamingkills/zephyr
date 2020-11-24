@@ -39,3 +39,13 @@ CREATE TABLE card_image
     tier_six        TEXT(64),
     PRIMARY KEY(card_id)
 );
+CREATE TABLE user_card
+(
+    id              INT(11) AUTO_INCREMENT,
+    card_id         INT(11) NOT NULL,
+    serial_number   SMALLINT UNSIGNED NOT NULL,
+    discord_id      VARCHAR(32) NOT NULL,
+    tier            TINYINT UNSIGNED,
+    PRIMARY KEY(id),
+    CONSTRAINT UserCardUnique UNIQUE (serial_number, card_id)
+);

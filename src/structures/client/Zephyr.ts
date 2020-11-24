@@ -8,7 +8,7 @@ import { GameBaseCard } from "../game/BaseCard";
 import { CardService } from "../../lib/database/services/game/CardService";
 
 export class Zephyr extends Client {
-  version: string = "beta-0.1.0";
+  version: string = "beta-0.1.1";
   commandLib = new CommandLib();
   prefixes: { [guildId: string]: string } = {};
   cards: { [cardId: number]: GameBaseCard } = {};

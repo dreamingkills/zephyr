@@ -25,7 +25,8 @@ export default class Stats extends BaseCommand {
     const embed = new MessageEmbed()
       .setAuthor(
         `Stats | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
+        msg.author.dynamicAvatarURL("png"),
+        `https://github.com/olivia-hye/zephyr`
       )
       .addField({
         name: `Memory Usage`,

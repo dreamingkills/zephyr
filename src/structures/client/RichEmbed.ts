@@ -9,6 +9,7 @@ export class MessageEmbed {
   description?: string;
   author?: {
     name: string;
+    url?: string;
     icon_url?: string;
   };
   color?: number = parseInt("1FB7CF", 16);
@@ -23,8 +24,8 @@ export class MessageEmbed {
     this.description = description;
     return this;
   }
-  public setAuthor(name: string, iconUrl?: string): MessageEmbed {
-    this.author = { name, icon_url: iconUrl };
+  public setAuthor(name: string, iconUrl?: string, url?: string): MessageEmbed {
+    this.author = { name, icon_url: iconUrl, url };
     return this;
   }
   public setColor(color: string | number): MessageEmbed {
