@@ -1,12 +1,12 @@
 import chalk from "chalk";
 import stripAnsi from "strip-ansi";
-import { Client, User } from "eris";
+import { Client, TextChannel, User } from "eris";
 import config from "../../../config.json";
 import { CommandLib } from "../../lib/command/CommandLib";
 import { GuildService } from "../../lib/database/services/guild/GuildService";
 
 export class Zephyr extends Client {
-  version: string = "beta-0.0.9";
+  version: string = "beta-0.0.10";
   commandLib = new CommandLib();
   prefixes: { [guildId: string]: string } = {};
   config: typeof config;
@@ -89,5 +89,12 @@ export class Zephyr extends Client {
       this.users.add(user);
       return user;
     } else return findUser;
+  }
+
+  /*
+      Permissions
+  */
+  public checkPermission(permission: string, channel: TextChannel) {
+    return channel.permissionsOf(this.user.id).json[permission];
   }
 }
