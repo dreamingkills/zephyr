@@ -1,7 +1,7 @@
 import { DB, DBClass } from "../../..";
 import { Profile, GameProfile } from "../../../../../structures/game/Profile";
-import { NoProfileError } from "../../../../../structures/error/GameError";
 import { ProfileService } from "../../../services/game/ProfileService";
+import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 
 export abstract class ProfileFetch extends DBClass {
   public static async getProfileByDiscordId(
@@ -15,6 +15,6 @@ export abstract class ProfileFetch extends DBClass {
 
     if (autoGenerate) {
       return await ProfileService.createProfile(discordId);
-    } else throw new NoProfileError();
+    } else throw new ZephyrError.NoProfileError(`<@${discordId}>`);
   }
 }

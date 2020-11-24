@@ -6,7 +6,7 @@ import { CommandLib } from "../../lib/command/CommandLib";
 import { GuildService } from "../../lib/database/services/guild/GuildService";
 
 export class Zephyr extends Client {
-  version: string = "beta-0.0.5";
+  version: string = "beta-0.0.6";
   commandLib = new CommandLib();
   prefixes: { [guildId: string]: string } = {};
   config: typeof config;
@@ -41,7 +41,14 @@ export class Zephyr extends Client {
       );
     });
     this.on("messageCreate", async (message) => {
-      if (message.author.bot) return;
+      // type 0 corresponds to TextChannel
+      if (message.author.bot || message.channel.type !== 0) return;
+
+      // check if we're allowed to send messages to this channel
+      if (!message.channel.permissionsOf(this.user.id).json["sendMessages"])
+        return;
+
+      // go ahead if we're allowed to speak
       await this.commandLib.process(message, this);
     });
 

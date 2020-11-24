@@ -4,6 +4,7 @@ import { promisify } from "util";
 import { Message } from "eris";
 import { ProfileService } from "../database/services/game/ProfileService";
 import { Zephyr } from "../../structures/client/Zephyr";
+import { MessageEmbed } from "../../structures/client/RichEmbed";
 
 export class CommandLib {
   commands: BaseCommand[] = [];
@@ -50,7 +51,13 @@ export class CommandLib {
       const profile = await ProfileService.getProfile(message.author.id, true);
       await command.run(message, profile, zephyr);
     } catch (e) {
-      await message.channel.createMessage(e.message);
+      const embed = new MessageEmbed()
+        .setAuthor(
+          `Error | ${message.author.tag}`,
+          message.author.dynamicAvatarURL("png")
+        )
+        .setDescription(e.message);
+      await message.channel.createMessage({ embed });
       if (!e.isClientFacing) console.error(e);
     }
   }

@@ -3,6 +3,7 @@ import { ProfileService } from "../../lib/database/services/game/ProfileService"
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
+import * as ZephyrError from "../../structures/error/ZephyrError";
 
 export default class AddBits extends BaseCommand {
   names = ["addbits"];
@@ -10,15 +11,9 @@ export default class AddBits extends BaseCommand {
   developerOnly = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    if (!msg.mentions[0]) {
-      await msg.channel.createMessage("YOU MUST MENTION A USER");
-      return;
-    }
+    if (!msg.mentions[0]) throw new ZephyrError.InvalidMentionError();
     const amountRaw = msg.content.split(" ").filter((c) => !isNaN(parseInt(c)));
-    if (!amountRaw[0]) {
-      await msg.channel.createMessage("YOU MUST SPECIFY A VALID AMOUNT");
-      return;
-    }
+    if (!amountRaw[0]) throw new ZephyrError.InvalidAmountError(`bits`);
 
     let targetUser = msg.mentions[0];
     let target = await ProfileService.getProfile(targetUser.id);
