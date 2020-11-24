@@ -7,4 +7,9 @@ export abstract class LeaderboardService {
   ): Promise<GameProfile[]> {
     return await LeaderboardGet.getBitLeaderboard(page);
   }
+  public static async getDailyStreakLeaderboard(
+    page: number = 1
+  ): Promise<GameProfile[]> {
+    return await LeaderboardGet.getDailyStreakLeaderboard(page);
+  }
 }

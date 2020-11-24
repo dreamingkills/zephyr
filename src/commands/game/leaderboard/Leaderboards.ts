@@ -9,7 +9,7 @@ export default class Leaderboards extends BaseCommand {
   description = "Shows you top Zephyr players.";
   usage = ["$CMD$ <board name>"];
 
-  private leaderboardTypes = ["bits"];
+  private leaderboardTypes = ["bits", "daily"];
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     const boardType = this.options[0]?.toLowerCase();
 
@@ -19,6 +19,7 @@ export default class Leaderboards extends BaseCommand {
     );
     let desc = ``;
     if (["bit", "bits", "b"].includes(boardType)) {
+      desc += `**Top players by bits**\n`;
       const board = await LeaderboardService.getBitLeaderboard();
       for (let user of board) {
         const discordUser = await this.zephyr.fetchUser(user.discordId);
@@ -28,6 +29,16 @@ export default class Leaderboards extends BaseCommand {
           `— ${
             this.zephyr.config.discord.emoji.bits
           }**${user.bits.toLocaleString()}**\n`;
+      }
+    } else if (["daily", "d", "streak"].includes(boardType)) {
+      desc += `**Top players by daily streak**\n`;
+      const board = await LeaderboardService.getDailyStreakLeaderboard();
+      for (let user of board) {
+        const discordUser = await this.zephyr.fetchUser(user.discordId);
+        desc +=
+          `\`#${board.indexOf(user) + 1}\` ` +
+          `${user.private ? `*Private User*` : discordUser.tag} ` +
+          `— **${user.dailyStreak} days**\n`;
       }
     } else {
       embed.setDescription(

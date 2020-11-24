@@ -1,3 +1,9 @@
+interface EmbedField {
+  name: string;
+  value: string;
+  inline?: boolean;
+}
+
 export class MessageEmbed {
   title?: string;
   description?: string;
@@ -6,7 +12,8 @@ export class MessageEmbed {
     icon_url?: string;
   };
   color?: number = parseInt("1FB7CF", 16);
-  footer?: { text: string };
+  footer?: { text: string; icon_url?: string };
+  fields: EmbedField[] = [];
 
   public setTitle(title: string): MessageEmbed {
     this.title = title;
@@ -28,8 +35,16 @@ export class MessageEmbed {
     } else this.color = color;
     return this;
   }
-  public setFooter(footer: string): MessageEmbed {
-    this.footer = { text: footer };
+  public setFooter(footer: string, iconUrl?: string): MessageEmbed {
+    this.footer = { text: footer, icon_url: iconUrl };
+    return this;
+  }
+  public addField(field: {
+    name: string;
+    value: string;
+    inline?: boolean;
+  }): MessageEmbed {
+    this.fields.push(field);
     return this;
   }
 }

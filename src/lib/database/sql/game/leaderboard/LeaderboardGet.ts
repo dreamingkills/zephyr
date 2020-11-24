@@ -11,4 +11,14 @@ export abstract class LeaderboardGet extends DBClass {
     )) as Profile[];
     return query.map((p) => new GameProfile(p));
   }
+  public static async getDailyStreakLeaderboard(
+    page: number
+  ): Promise<GameProfile[]> {
+    const offset = page * this.entries - this.entries;
+    const query = (await DB.query(
+      `SELECT * FROM profile ORDER BY daily_streak DESC LIMIT ${this.entries} OFFSET ?`,
+      [offset]
+    )) as Profile[];
+    return query.map((p) => new GameProfile(p));
+  }
 }
