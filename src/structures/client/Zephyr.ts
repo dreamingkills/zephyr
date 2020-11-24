@@ -4,11 +4,14 @@ import { Client, TextChannel, User } from "eris";
 import config from "../../../config.json";
 import { CommandLib } from "../../lib/command/CommandLib";
 import { GuildService } from "../../lib/database/services/guild/GuildService";
+import { GameBaseCard } from "../game/BaseCard";
+import { CardService } from "../../lib/database/services/game/CardService";
 
 export class Zephyr extends Client {
-  version: string = "beta-0.0.10";
+  version: string = "beta-0.1.0";
   commandLib = new CommandLib();
   prefixes: { [guildId: string]: string } = {};
+  cards: { [cardId: number]: GameBaseCard } = {};
   config: typeof config;
   constructor() {
     super(config.discord.token, { restMode: true });
@@ -19,7 +22,6 @@ export class Zephyr extends Client {
     const startTime = Date.now();
     this.on("ready", async () => {
       await this.commandLib.setup(this);
-      await this.cachePrefixes();
 
       const header = `===== ${chalk.hex(
         `#1fb7cf`
@@ -52,15 +54,18 @@ export class Zephyr extends Client {
       await this.commandLib.process(message, this);
     });
 
+    await this.cachePrefixes();
+    await this.cacheCards();
     this.connect();
   }
 
   /*
       Prefix Caching
   */
-  public async cachePrefixes() {
+  public async cachePrefixes(): Promise<void> {
     const prefixes = await GuildService.getPrefixes();
-    return (this.prefixes = prefixes);
+    this.prefixes = prefixes;
+    return;
   }
   public getPrefix(guildId?: string): string {
     if (!guildId) return config.discord.defaultPrefix;
@@ -68,6 +73,21 @@ export class Zephyr extends Client {
   }
   public setPrefix(guildId: string, prefix: string): void {
     this.prefixes[guildId] = prefix;
+    return;
+  }
+
+  /*
+      Card Caching
+  */
+  public async cacheCards(): Promise<void> {
+    const cards = await CardService.getAllCards();
+    for (let card of cards) {
+      this.cards[card.id] = card;
+    }
+    return;
+  }
+  public getCard(id: number): GameBaseCard {
+    return this.cards[id];
   }
 
   /*
