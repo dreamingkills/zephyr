@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import stripAnsi from "strip-ansi";
-import { Client } from "eris";
+import { Client, User } from "eris";
 import config from "../../../config.json";
 import { CommandLib } from "../../lib/command/CommandLib";
 import { GuildService } from "../../lib/database/services/guild/GuildService";
@@ -11,7 +11,7 @@ export class Zephyr extends Client {
   prefixes: { [guildId: string]: string } = {};
   config: typeof config;
   constructor() {
-    super(config.discord.token);
+    super(config.discord.token, { restMode: true });
     this.config = config;
   }
 
@@ -55,6 +55,9 @@ export class Zephyr extends Client {
     this.connect();
   }
 
+  /*
+      Prefix Caching
+  */
   public async cachePrefixes() {
     const prefixes = await GuildService.getPrefixes();
     return (this.prefixes = prefixes);
@@ -65,5 +68,26 @@ export class Zephyr extends Client {
   }
   public setPrefix(guildId: string, prefix: string): void {
     this.prefixes[guildId] = prefix;
+  }
+
+  /*
+      Functions-That-Probably-Should-Be-In-Eris-Anyway-But-Whatever
+  */
+  public async fetchUser(
+    userId: string,
+    ignoreCache: boolean = false
+  ): Promise<User> {
+    if (ignoreCache) {
+      const user = await this.getRESTUser(userId);
+      this.users.add(user);
+      return user;
+    }
+    // check if user is already in cache
+    const findUser = this.users.get(userId);
+    if (!findUser) {
+      const user = await this.getRESTUser(userId);
+      this.users.add(user);
+      return user;
+    } else return findUser;
   }
 }

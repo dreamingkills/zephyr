@@ -21,12 +21,7 @@ export default class ViewProfile extends BaseCommand {
       if (isNaN(parseInt(userId)))
         throw new ZephyrError.InvalidSnowflakeError();
 
-      const guild = this.zephyr.guilds.get(msg.guildID!);
-      const member = await guild?.fetchMembers({ userIDs: [userId] });
-
-      if (!member || !member[0]) throw new ZephyrError.UserNotFoundError();
-
-      user = member[0].user;
+      user = await this.zephyr.fetchUser(userId);
       target = user.id;
     } else {
       user = msg.author;
