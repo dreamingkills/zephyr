@@ -57,13 +57,15 @@ export default class DailyReward extends BaseCommand {
 
     if (last.format(`YYYY-MM-DD`) === todayFormat || last.isAfter(today)) {
       timeUntil = this.timeUntilNextDay(last);
-      embed.setDescription(`You've already claimed your daily reward today.`);
+      embed.setDescription(
+        `${this.zephyr.config.discord.emoji.clock} You've already claimed your daily reward today.`
+      );
     } else {
       await ProfileService.addBitsToProfile(profile, this.bitsReward);
       _profile = await ProfileService.setDailyTimestamp(profile, todayFormat);
       timeUntil = this.timeUntilNextDay(dayjs(_profile.dailyLast));
       embed.setDescription(
-        `You claimed your daily reward and got...` +
+        `${this.zephyr.config.discord.emoji.clock} You claimed your daily reward and got...` +
           `\n— ${this.zephyr.config.discord.emoji.bits}**${
             this.bitsReward
           }** *(new balance: ${_profile.bits.toLocaleString()})*`

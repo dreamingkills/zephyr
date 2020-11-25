@@ -11,7 +11,7 @@ export default class ViewBank extends BaseCommand {
     const embed = new MessageEmbed()
       .setAuthor(`Bank | ${msg.author.tag}`, msg.author.avatarURL)
       .setDescription(
-        `Your bank contains...` +
+        `${this.zephyr.config.discord.emoji.bank} Your bank contains...` +
           `\n— ${
             this.zephyr.config.discord.emoji.bits
           }**${profile.bitsBank.toLocaleString()}**`

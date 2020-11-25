@@ -9,6 +9,7 @@ import {
 } from "../../../../../structures/game/UserCard";
 import { CardReference } from "../../../services/game/CardService";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
+import { Filter, FilterService } from "../../Filters";
 
 export abstract class CardGet extends DBClass {
   public static async getAllCards(): Promise<GameBaseCard[]> {
@@ -35,6 +36,39 @@ export abstract class CardGet extends DBClass {
   /*
       UserCard
   */
+  public static async getUserInventory(
+    discordId: string,
+    options: Filter
+  ): Promise<GameUserCard[]> {
+    let query = `SELECT * FROM user_card WHERE discord_id=${DB.connection.escape(
+      discordId
+    )}`;
+    const queryOptions = FilterService.parseOptions(options);
+    const page = <number>options["page"];
+    query +=
+      (queryOptions.length > 0 ? ` AND` : ``) +
+      queryOptions.join(` AND`) +
+      ` ORDER BY user_card.tier DESC, user_card.serial_number ASC LIMIT 10 OFFSET ${DB.connection.escape(
+        (isNaN(page) ? 1 : page) * 10 - 10
+      )}`;
+
+    const cards = (await DB.query(query + `;`)) as UserCard[];
+    return cards.map((c) => new GameUserCard(c));
+  }
+  public static async getUserInventorySize(
+    discordId: string,
+    options: Filter
+  ): Promise<number> {
+    let query = `SELECT COUNT(*) AS count FROM user_card WHERE discord_id=${DB.connection.escape(
+      discordId
+    )}`;
+    const queryOptions = FilterService.parseOptions(options);
+    query +=
+      (queryOptions.length > 0 ? ` AND` : ``) + queryOptions.join(` AND`);
+
+    const result = (await DB.query(query + `;`)) as { count: number }[];
+    return result[0].count;
+  }
   public static async getUserCardById(id: number): Promise<GameUserCard> {
     const query = (await DB.query(`SELECT * FROM user_card WHERE id=?;`, [
       id,

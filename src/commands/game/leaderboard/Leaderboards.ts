@@ -86,7 +86,7 @@ export default class Leaderboards extends BaseCommand {
     Promise.all([
       board.addReaction(`⏮️`),
       board.addReaction(`◀️`),
-      board.addReaction(`🔢`),
+      // board.addReaction(`🔢`),
       board.addReaction(`▶️`),
       board.addReaction(`⏭️`),
     ]);
