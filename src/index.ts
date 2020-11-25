@@ -1,5 +1,6 @@
 import Eris, { TextChannel } from "eris";
 import { DB } from "./lib/database";
+import { FontLoader } from "./lib/FontLoader";
 import { Zephyr } from "./structures/client/Zephyr";
 
 Object.defineProperty(Eris.User.prototype, "tag", {
@@ -15,4 +16,4 @@ Object.defineProperty(Eris.Message.prototype, "textChannel", {
   },
 });
 
-Promise.all([DB.connect()]).then(() => new Zephyr().start());
+Promise.all([DB.connect(), FontLoader.init()]).then(() => new Zephyr().start());

@@ -15,6 +15,9 @@ export class MessageEmbed {
   color?: number = parseInt("1FB7CF", 16);
   footer?: { text: string; icon_url?: string };
   fields: EmbedField[] = [];
+  image?: {
+    url: string;
+  };
 
   public setTitle(title: string): MessageEmbed {
     this.title = title;
@@ -46,6 +49,10 @@ export class MessageEmbed {
     inline?: boolean;
   }): MessageEmbed {
     this.fields.push(field);
+    return this;
+  }
+  public setImage(url: string): MessageEmbed {
+    this.image = { url };
     return this;
   }
 }

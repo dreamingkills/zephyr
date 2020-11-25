@@ -40,9 +40,10 @@ export abstract class CardGet extends DBClass {
     discordId: string,
     options: Filter
   ): Promise<GameUserCard[]> {
-    let query = `SELECT * FROM user_card WHERE discord_id=${DB.connection.escape(
-      discordId
-    )}`;
+    let query = `SELECT user_card.* FROM user_card 
+                  LEFT JOIN card_base ON user_card.card_id=card_base.id WHERE discord_id=${DB.connection.escape(
+                    discordId
+                  )}`;
     const queryOptions = FilterService.parseOptions(options);
     const page = <number>options["page"];
     query +=
@@ -59,7 +60,7 @@ export abstract class CardGet extends DBClass {
     discordId: string,
     options: Filter
   ): Promise<number> {
-    let query = `SELECT COUNT(*) AS count FROM user_card WHERE discord_id=${DB.connection.escape(
+    let query = `SELECT COUNT(*) AS count FROM user_card LEFT JOIN card_base ON user_card.card_id=card_base.id WHERE discord_id=${DB.connection.escape(
       discordId
     )}`;
     const queryOptions = FilterService.parseOptions(options);
@@ -80,8 +81,8 @@ export abstract class CardGet extends DBClass {
     ref: CardReference
   ): Promise<GameUserCard> {
     const query = (await DB.query(
-      `SELECT user_card.* FROM user_card LEFT JOIN card_base ON card_base.identifier=? WHERE serial_number=?;`,
-      [ref.identifier, ref.serialNumber]
+      `SELECT user_card.* FROM user_card LEFT JOIN card_base ON card_base.id=user_card.card_id WHERE serial_number=? AND card_base.identifier=?;`,
+      [ref.serialNumber, ref.identifier]
     )) as UserCard[];
     if (!query[0]) throw new ZephyrError.UnknownUserCardError(ref);
     return new GameUserCard(query[0]);

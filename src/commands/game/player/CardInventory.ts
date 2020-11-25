@@ -2,7 +2,6 @@ import { Message, PartialEmoji } from "eris";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { Filter } from "../../../lib/database/sql/Filters";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
-//import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { GameUserCard } from "../../../structures/game/UserCard";

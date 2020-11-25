@@ -1,5 +1,10 @@
 # Discord
 config.json
+src/assets/
+cache/
+
+# VSCode
+.VSCodeCounter/
 
 # Logs
 logs

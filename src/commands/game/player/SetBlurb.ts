@@ -4,7 +4,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 
-export default class TogglePrivate extends BaseCommand {
+export default class SetBlurb extends BaseCommand {
   names = ["blurb", "setblurb", "desc", "setdesc"];
   description = "Changes the blurb on your profile.";
 
