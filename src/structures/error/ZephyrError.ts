@@ -2,6 +2,8 @@ import {
   CardReference,
   CardService,
 } from "../../lib/database/services/game/CardService";
+import { GameBaseCard } from "../game/BaseCard";
+import { GameUserCard } from "../game/UserCard";
 
 abstract class ZephyrError extends Error {
   name = "ZephyrError";
@@ -62,6 +64,13 @@ export class UnknownUserCardIdError extends ZephyrError {
 }
 export class UnknownUserCardError extends ZephyrError {
   constructor(ref: CardReference) {
-    super(`**${CardService.parseReference(ref)}** does not exist.`);
+    super(`**${`${ref.identifier}#${ref.serialNumber}`}** does not exist.`);
+  }
+}
+export class NotOwnerOfCardError extends ZephyrError {
+  constructor(card: GameUserCard, base: GameBaseCard) {
+    super(
+      `**${CardService.parseReference(card, base)}** does not belong to you.`
+    );
   }
 }

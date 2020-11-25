@@ -46,6 +46,7 @@ CREATE TABLE user_card
     serial_number   SMALLINT UNSIGNED NOT NULL,
     discord_id      VARCHAR(32) NOT NULL,
     tier            TINYINT UNSIGNED,
+    frame           VARCHAR(32) DEFAULT "white",
     PRIMARY KEY(id),
     CONSTRAINT UserCardUnique UNIQUE (serial_number, card_id)
 );

@@ -3,6 +3,7 @@ import { CardService } from "../../../lib/database/services/game/CardService";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class ViewUserCard extends BaseCommand {
   names = ["card", "show", "view"];
@@ -17,11 +18,31 @@ export default class ViewUserCard extends BaseCommand {
       throw new ZephyrError.InvalidCardReferenceError();
 
     const userCard = await CardService.getUserCardByReference(reference);
+    const baseCard = this.zephyr.getCard(userCard.baseCardId);
+    if (userCard.discordId !== msg.author.id)
+      throw new ZephyrError.NotOwnerOfCardError(userCard, baseCard);
     const image = await CardService.checkCacheForCard(userCard);
 
-    await msg.channel.createMessage("", {
-      file: image,
-      name: "card.png",
-    });
+    const embed = new MessageEmbed()
+      .setAuthor(
+        `Card View | ${msg.author.tag}`,
+        msg.author.dynamicAvatarURL("png")
+      )
+      .setDescription(
+        `\n—${baseCard.group ? ` **${baseCard.group}**` : ""} **${
+          baseCard.name
+        }** ${baseCard.subgroup ? ` (${baseCard.subgroup})` : ``} #${
+          userCard.serialNumber
+        }` +
+          `\n— Tier **${userCard.tier}**` +
+          `\n${baseCard.flavor ? `*${baseCard.flavor}*` : ``}`
+      );
+    await msg.channel.createMessage(
+      { embed },
+      {
+        file: image,
+        name: "card.png",
+      }
+    );
   }
 }

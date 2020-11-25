@@ -16,18 +16,17 @@ export default class CardInventory extends BaseCommand {
     let pad = 0;
     cards.forEach((c) => {
       const card = this.zephyr.getCard(c.baseCardId);
-      const ref = { identifier: card.identifier, serialNumber: c.serialNumber };
-      if (CardService.parseReference(ref).length > pad)
-        pad = CardService.parseReference(ref).length;
+      if (CardService.parseReference(c, card).length > pad)
+        pad = CardService.parseReference(c, card).length;
     });
 
     for (let card of cards) {
       const baseCard = this.zephyr.getCard(card.baseCardId);
       const entry =
-        `\`${CardService.parseReference({
-          identifier: baseCard.identifier,
-          serialNumber: card.serialNumber,
-        }).padStart(pad, " ")}\` ` +
+        `\`${CardService.parseReference(card, baseCard).padStart(
+          pad,
+          " "
+        )}\` ` +
         (baseCard.group ? `**${baseCard.group}** ` : ``) +
         `${baseCard.name} — ` +
         `${this.zephyr.config.discord.emoji.star.repeat(card.tier)}`;
@@ -70,14 +69,13 @@ export default class CardInventory extends BaseCommand {
         `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${size} cards`
       );
     const sent = await msg.channel.createMessage({ embed });
+    if (totalPages < 2) return;
 
-    Promise.all([
-      sent.addReaction(`⏮️`),
-      sent.addReaction(`◀️`),
-      // sent.addReaction(`🔢`),
-      sent.addReaction(`▶️`),
-      sent.addReaction(`⏭️`),
-    ]);
+    if (totalPages > 2) sent.addReaction(`⏮️`);
+    if (totalPages > 1) sent.addReaction(`◀️`);
+    // board.addReaction(`🔢`),
+    if (totalPages > 1) sent.addReaction(`▶️`);
+    if (totalPages > 2) sent.addReaction(`⏭️`);
 
     const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id;

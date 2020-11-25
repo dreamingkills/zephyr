@@ -82,14 +82,13 @@ export default class Leaderboards extends BaseCommand {
     embed.setDescription(await this.getLeaderboard(trueType, page));
     embed.setFooter(`Page ${page} of ${totalPages} • ${totalEntries} entries`);
     const board = await msg.channel.createMessage({ embed });
+    if (totalPages < 2) return;
 
-    Promise.all([
-      board.addReaction(`⏮️`),
-      board.addReaction(`◀️`),
-      // board.addReaction(`🔢`),
-      board.addReaction(`▶️`),
-      board.addReaction(`⏭️`),
-    ]);
+    if (totalPages > 2) board.addReaction(`⏮️`);
+    if (totalPages > 1) board.addReaction(`◀️`);
+    // board.addReaction(`🔢`),
+    if (totalPages > 1) board.addReaction(`▶️`);
+    if (totalPages > 2) board.addReaction(`⏭️`);
 
     const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id;

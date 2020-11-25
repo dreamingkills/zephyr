@@ -12,8 +12,8 @@ export interface CardReference {
 }
 
 export abstract class CardService {
-  public static parseReference(ref: CardReference): string {
-    return `${ref.identifier}#${ref.serialNumber}`;
+  public static parseReference(card: GameUserCard, base: GameBaseCard): string {
+    return `${base.identifier}#${card.serialNumber}`;
   }
 
   public static async getAllCards(): Promise<GameBaseCard[]> {
@@ -76,7 +76,7 @@ export abstract class CardService {
       }
     }
     const overlay = await loadImage(`${dir}/overlay.png`);
-    const frame = await loadImage(`./src/assets/frames/white.png`);
+    const frame = await loadImage(`./src/assets/frames/${card.frame}.png`);
 
     ctx.drawImage(img, 0, 0, 700, 1000);
     ctx.drawImage(frame, 0, 0, 700, 1000);
@@ -108,7 +108,6 @@ export abstract class CardService {
     try {
       return await fs.readFile(`./cache/cards/${card.baseCardId}/${card.id}`);
     } catch (e) {
-      console.log("Recaching ");
       return await this.updateCardCache(card);
     }
   }
