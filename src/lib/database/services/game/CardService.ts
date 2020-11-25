@@ -108,7 +108,7 @@ export abstract class CardService {
     try {
       return await fs.readFile(`./cache/cards/${card.baseCardId}/${card.id}`);
     } catch (e) {
-      console.log("Recaching");
+      console.log("Recaching ");
       return await this.updateCardCache(card);
     }
   }

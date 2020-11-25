@@ -1,7 +1,7 @@
 # Discord
 config.json
 src/assets/
-cache/
+cache/  
 
 # VSCode
 .VSCodeCounter/
