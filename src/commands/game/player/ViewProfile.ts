@@ -38,14 +38,15 @@ export default class ViewProfile extends BaseCommand {
     const embed = new MessageEmbed()
       .setAuthor(`Profile | ${user.tag}`, msg.author.avatarURL)
       .setDescription(
-        (target.blurb ? `**Blurb**` : ``) +
-          `\n${target.blurb}\n` +
-          `\n${
+        `**Blurb**` +
+          `\n${target.blurb || "*No blurb set*"}` +
+          `\n\n— You have ${
             this.zephyr.config.discord.emoji.bits
-          }**${target.bits.toLocaleString()}**.` +
-          `\n— *${target.bitsBank.toLocaleString()} in the bank*`
+          }**${target.bits.toLocaleString()}**.`
       )
-      .setFooter(`Profile is ${target.private ? `PRIVATE` : `PUBLIC`}`);
+      .setFooter(
+        `Your profile is currently ${target.private ? `private` : `public`}.`
+      );
     await msg.channel.createMessage({ embed });
   }
 }

@@ -52,6 +52,20 @@ export abstract class ProfileService {
     await ProfileSet.removeBits(profile.discordId, amount);
     return await profile.fetch();
   }
+  public static async addBitsToBank(
+    profile: GameProfile,
+    amount: number
+  ): Promise<GameProfile> {
+    await ProfileSet.addBitsToBank(profile.discordId, amount);
+    return await profile.fetch();
+  }
+  public static async withdrawBitsFromBank(
+    profile: GameProfile,
+    amount: number
+  ): Promise<GameProfile> {
+    await ProfileSet.withdrawBitsFromBank(profile.discordId, amount);
+    return await profile.fetch();
+  }
 
   /*
       Daily

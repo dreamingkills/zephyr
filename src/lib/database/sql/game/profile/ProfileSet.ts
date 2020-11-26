@@ -52,6 +52,26 @@ export abstract class ProfileSet extends DBClass {
     ]);
     return;
   }
+  public static async addBitsToBank(
+    discordId: string,
+    amount: number
+  ): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET bits_bank=bits_bank+? WHERE discord_id=?;`,
+      [amount, discordId]
+    );
+    return;
+  }
+  public static async withdrawBitsFromBank(
+    discordId: string,
+    amount: number
+  ): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET bits_bank=bits_bank-? WHERE discord_id=?;`,
+      [amount, discordId]
+    );
+    return;
+  }
 
   /*
       Daily

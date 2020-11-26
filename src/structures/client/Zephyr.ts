@@ -8,7 +8,7 @@ import { GameBaseCard } from "../game/BaseCard";
 import { CardService } from "../../lib/database/services/game/CardService";
 
 export class Zephyr extends Client {
-  version: string = "beta-0.1.4";
+  version: string = "beta-0.1.5";
   commandLib = new CommandLib();
   prefixes: { [guildId: string]: string } = {};
   cards: { [cardId: number]: GameBaseCard } = {};
@@ -16,6 +16,7 @@ export class Zephyr extends Client {
   constructor() {
     super(config.discord.token, { restMode: true });
     this.config = config;
+    this.users.limit = 10000;
   }
 
   public async start() {
@@ -43,6 +44,7 @@ export class Zephyr extends Client {
       );
     });
     this.on("messageCreate", async (message) => {
+      await this.fetchUser(message.author.id);
       // type 0 corresponds to TextChannel
       if (message.author.bot || message.channel.type !== 0) return;
 
@@ -108,7 +110,10 @@ export class Zephyr extends Client {
       const user = await this.getRESTUser(userId);
       this.users.add(user);
       return user;
-    } else return findUser;
+    } else {
+      this.users.update(findUser);
+      return findUser;
+    }
   }
 
   /*

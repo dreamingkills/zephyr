@@ -33,6 +33,8 @@ export class GameBaseCard {
   tierFour?: string;
   tierFive?: string;
   tierSix?: string;
+
+  maxTier: number;
   constructor(card: BaseCard) {
     this.id = card.id;
     this.identifier = card.identifier;
@@ -50,5 +52,19 @@ export class GameBaseCard {
     this.tierFour = card.tier_four;
     this.tierFive = card.tier_five;
     this.tierSix = card.tier_six;
+
+    if (card.tier_six) {
+      this.maxTier = 6;
+    } else if (card.tier_five) {
+      this.maxTier = 5;
+    } else if (card.tier_four) {
+      this.maxTier = 4;
+    } else if (card.tier_three) {
+      this.maxTier = 3;
+    } else if (card.tier_two) {
+      this.maxTier = 2;
+    } else {
+      this.maxTier = 1;
+    }
   }
 }

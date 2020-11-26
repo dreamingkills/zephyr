@@ -43,7 +43,8 @@ export default class DevCard extends BaseCommand {
           `\n**Individual Name**: ${card.name}` +
           `\n**Rarity**: ${card.rarity}` +
           `\n**Serial Total**: ${card.serialTotal.toLocaleString()}` +
-          `\n**Serial Limit**: ${card.serialLimit.toLocaleString()}`,
+          `\n**Serial Limit**: ${card.serialLimit.toLocaleString()}` +
+          `\n**Max Tier**: ${card.maxTier}`,
         inline: true,
       })
       .addField({

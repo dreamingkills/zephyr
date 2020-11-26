@@ -5,6 +5,8 @@ import { GameUserCard } from "../../../../structures/game/UserCard";
 import { Filter } from "../../sql/Filters";
 import { CardGet } from "../../sql/game/card/CardGet";
 import fs from "fs/promises";
+import { CardSet } from "../../sql/game/card/CardSet";
+import { Zephyr } from "../../../../structures/client/Zephyr";
 
 export interface CardReference {
   identifier: string;
@@ -23,6 +25,15 @@ export abstract class CardService {
   /*
       UserCards
   */
+  public static async createNewUserCard(
+    card: GameBaseCard,
+    profile: GameProfile,
+    zephyr: Zephyr,
+    price: number = 0,
+    tier?: number
+  ): Promise<GameUserCard> {
+    return await CardSet.createNewUserCard(card, profile, zephyr, price, tier);
+  }
   public static async getUserCardById(id: number): Promise<GameUserCard> {
     return await CardGet.getUserCardById(id);
   }
@@ -85,6 +96,27 @@ export abstract class CardService {
     ctx.font = "35px AlteHaasGroteskBold";
     ctx.fillText(`#${card.serialNumber}`, 75, 878);
 
+    const buf = canvas.toBuffer("image/png");
+    return Buffer.alloc(buf.length, buf, "base64");
+  }
+  public static async generateCardCollage(
+    cards: GameUserCard[]
+  ): Promise<Buffer> {
+    const canvas = createCanvas(cards.length * 250, 333);
+    const ctx = canvas.getContext("2d");
+
+    ctx.font = "14px AlteHaasGroteskBold";
+    for (let card of cards) {
+      const image = await loadImage(
+        `./src/assets/cards/${card.baseCardId}/example_${card.tier}.png`
+      );
+      ctx.drawImage(image, cards.indexOf(card) * 250, 0, 250, 333);
+      ctx.fillText(
+        `#${card.serialNumber}`,
+        cards.indexOf(card) * 250 + 26,
+        293
+      );
+    }
     const buf = canvas.toBuffer("image/png");
     return Buffer.alloc(buf.length, buf, "base64");
   }

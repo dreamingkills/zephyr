@@ -4,12 +4,13 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import dayjs, { Dayjs } from "dayjs";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
+import { Chance } from "chance";
 
 export default class DailyReward extends BaseCommand {
   names = ["daily"];
   description = "Shows you the status of your daily reward.";
 
-  private bitsReward = 5;
+  private bitsReward = { min: 50, max: 100 };
   // private streakMultiplier = 2;
 
   private padIfNotLeading(text: string | number, leading: boolean): string {
@@ -61,14 +62,15 @@ export default class DailyReward extends BaseCommand {
         `${this.zephyr.config.discord.emoji.clock} You've already claimed your daily reward today.`
       );
     } else {
-      await ProfileService.addBitsToProfile(profile, this.bitsReward);
+      const reward = new Chance().integer(this.bitsReward);
+      await ProfileService.addBitsToProfile(profile, reward);
       _profile = await ProfileService.setDailyTimestamp(profile, todayFormat);
       timeUntil = this.timeUntilNextDay(dayjs(_profile.dailyLast));
       embed.setDescription(
         `${this.zephyr.config.discord.emoji.clock} You claimed your daily reward and got...` +
-          `\n— ${this.zephyr.config.discord.emoji.bits}**${
-            this.bitsReward
-          }** *(new balance: ${_profile.bits.toLocaleString()})*`
+          `\n— ${
+            this.zephyr.config.discord.emoji.bits
+          }**${reward}** *(new balance: ${_profile.bits.toLocaleString()})*`
       );
     }
 

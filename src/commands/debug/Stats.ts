@@ -8,7 +8,7 @@ export default class Stats extends BaseCommand {
   description = "Hello.";
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const usedMb = ((process.memoryUsage().heapUsed / 1024 / 1024) * 100) / 100;
+    const usedMb = process.memoryUsage().heapUsed / 1000 / 1000;
     const usedPct = (usedMb / 7983) * 100;
     let ramStatusEmoji: string;
     if (usedPct < 25) {

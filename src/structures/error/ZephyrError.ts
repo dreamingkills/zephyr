@@ -49,6 +49,16 @@ export class PrivateProfileError extends ZephyrError {
     super(`**${user}**'s profile is private.`);
   }
 }
+export class NotEnoughBitsError extends ZephyrError {
+  constructor(_has: number, _needs: number) {
+    super(`You don't have enough bits to do that.`);
+  }
+}
+export class NotEnoughBitsInBankError extends ZephyrError {
+  constructor(_has: number, _needs: number) {
+    super(`You don't have enough bits in your bank to do that.`);
+  }
+}
 /*
     Cards
            */
