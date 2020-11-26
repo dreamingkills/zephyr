@@ -6,6 +6,7 @@ import { CommandLib } from "../../lib/command/CommandLib";
 import { GuildService } from "../../lib/database/services/guild/GuildService";
 import { GameBaseCard } from "../game/BaseCard";
 import { CardService } from "../../lib/database/services/game/CardService";
+import { FontLoader } from "../../lib/FontLoader";
 
 export class Zephyr extends Client {
   version: string = "beta-0.1.5";
@@ -20,6 +21,11 @@ export class Zephyr extends Client {
   }
 
   public async start() {
+    await this.cachePrefixes();
+    await this.cacheCards();
+    const fonts = await FontLoader.init();
+    this.connect();
+
     const startTime = Date.now();
     this.on("ready", async () => {
       await this.commandLib.setup(this);
@@ -40,6 +46,10 @@ export class Zephyr extends Client {
           `\n- ${chalk.hex(
             `1794E6`
           )`${this.commandLib.commands.length}`} commands registered` +
+          `\n- ${chalk.hex(`1794E6`)`${
+            Object.keys(this.cards).length
+          }`} cards registered` +
+          `\n- ${chalk.hex(`1794E6`)`${fonts}`} fonts registered` +
           `\n\n${`=`.repeat(stripAnsi(header).length)}`
       );
     });
@@ -55,10 +65,6 @@ export class Zephyr extends Client {
       // go ahead if we're allowed to speak
       await this.commandLib.process(message, this);
     });
-
-    await this.cachePrefixes();
-    await this.cacheCards();
-    this.connect();
   }
 
   /*
