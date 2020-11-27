@@ -43,7 +43,13 @@ export class CommandLib {
       command.developerOnly &&
       zephyr.config.developers.indexOf(message.author.id) < 0
     ) {
-      await message.channel.createMessage("YOU ARE NOT A DEVELOPER");
+      const embed = new MessageEmbed()
+        .setAuthor(
+          `Error | ${message.author.tag}`,
+          message.author.dynamicAvatarURL("png")
+        )
+        .setDescription(`This command is only usable by the developer.`);
+      await message.channel.createMessage({ embed });
       return;
     }
 

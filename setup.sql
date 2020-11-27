@@ -45,6 +45,7 @@ CREATE TABLE user_card
     card_id         INT(11) NOT NULL,
     serial_number   SMALLINT UNSIGNED NOT NULL,
     discord_id      VARCHAR(32) NOT NULL,
+    original_owner  VARCHAR(32) NOT NULL,
     tier            TINYINT UNSIGNED,
     frame           VARCHAR(32) DEFAULT "white",
     PRIMARY KEY(id),

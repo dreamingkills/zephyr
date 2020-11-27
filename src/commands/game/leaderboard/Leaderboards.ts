@@ -13,19 +13,24 @@ export default class Leaderboards extends BaseCommand {
 
   private leaderboardTypes = ["bits", "daily"];
 
-  private async getLeaderboard(type: string, page: number): Promise<string> {
+  private async getLeaderboard(
+    type: string,
+    page: number,
+    authorId: string
+  ): Promise<string> {
     let leaderboard = "";
     switch (type) {
       case "bits": {
         const board = await LeaderboardService.getBitLeaderboard(page);
         for (let user of board) {
           const discordUser = await this.zephyr.fetchUser(user.discordId);
-          leaderboard +=
-            `\`#${board.indexOf(user) + 1 + (page * 10 - 10)}\` ` +
-            `${user.private ? `*Private User*` : discordUser.tag} ` +
-            `— ${
-              this.zephyr.config.discord.emoji.bits
-            }**${user.bits.toLocaleString()}**\n`;
+          leaderboard += `\`#${board.indexOf(user) + 1 + (page * 10 - 10)}\` `;
+          if (user.private && user.discordId !== authorId) {
+            leaderboard += `*Private User*`;
+          } else leaderboard += discordUser.tag;
+          leaderboard += `— ${
+            this.zephyr.config.discord.emoji.bits
+          }**${user.bits.toLocaleString()}**\n`;
         }
         break;
       }
@@ -79,7 +84,9 @@ export default class Leaderboards extends BaseCommand {
     const totalPages = Math.ceil(totalEntries / 10);
 
     embed.setTitle(title + ` (${1 + 10 * page - 10}-${10 * page})`);
-    embed.setDescription(await this.getLeaderboard(trueType, page));
+    embed.setDescription(
+      await this.getLeaderboard(trueType, page, msg.author.id)
+    );
     embed.setFooter(`Page ${page} of ${totalPages} • ${totalEntries} entries`);
     const board = await msg.channel.createMessage({ embed });
     if (totalPages < 2) return;
@@ -105,7 +112,9 @@ export default class Leaderboards extends BaseCommand {
         if (emoji.name === "⏭️" && page !== totalPages) page = totalPages;
 
         embed.setTitle(title + ` (${1 + 10 * page - 10}-${10 * page})`);
-        embed.setDescription(await this.getLeaderboard(trueType, page));
+        embed.setDescription(
+          await this.getLeaderboard(trueType, page, msg.author.id)
+        );
         embed.setFooter(
           `Page ${page} of ${totalPages} • ${totalEntries} entries`
         );

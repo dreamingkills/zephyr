@@ -9,7 +9,7 @@ import { CardService } from "../../lib/database/services/game/CardService";
 import { FontLoader } from "../../lib/FontLoader";
 
 export class Zephyr extends Client {
-  version: string = "beta-0.1.5";
+  version: string = "beta-0.1.6";
   commandLib = new CommandLib();
   prefixes: { [guildId: string]: string } = {};
   cards: { [cardId: number]: GameBaseCard } = {};
