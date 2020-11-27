@@ -32,6 +32,15 @@ export default class Help extends BaseCommand {
               .join("\n")}` +
             `\n\`\`\``;
         }
+        if (findCommand.subcommands.length > 0) {
+          description +=
+            `\n**Subcommands**` +
+            `\n\`\`\`` +
+            `\n${findCommand.subcommands
+              .map((s) => `${prefix}${findCommand.names[0]} ${s}`)
+              .join("\n")}` +
+            `\n\`\`\``;
+        }
         if (findCommand.names.length > 1) {
           description +=
             `\n**Aliases**` +
@@ -40,15 +49,6 @@ export default class Help extends BaseCommand {
               .slice(1)
               .map((n) => `${prefix}${n}`)
               .join(", ")}` +
-            `\n\`\`\``;
-        }
-        if (findCommand.subcommands.length > 0) {
-          description +=
-            `\n**Subcommands**` +
-            `\n\`\`\`` +
-            `\n${findCommand.subcommands
-              .map((s) => `${prefix}${s}`)
-              .join("\n")}` +
             `\n\`\`\``;
         }
         const embed = new MessageEmbed()

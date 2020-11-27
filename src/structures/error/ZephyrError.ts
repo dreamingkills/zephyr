@@ -59,6 +59,26 @@ export class NotEnoughBitsInBankError extends ZephyrError {
     super(`You don't have enough bits in your bank to do that.`);
   }
 }
+export class WishlistFullError extends ZephyrError {
+  constructor(patron: number, prefix: string) {
+    super(
+      `Your wishlist is full!` +
+        (patron >= 4
+          ? ``
+          : `\nYou can get more slots by donating! Use \`${prefix}patreon\` to find out more!`)
+    );
+  }
+}
+export class WishlistEntryTooLongError extends ZephyrError {
+  constructor() {
+    super(`Wishlist entries must be 12 characters or less.`);
+  }
+}
+export class WishlistEmptyError extends ZephyrError {
+  constructor() {
+    super(`Your wishlist is already empty!`);
+  }
+}
 /*
     Cards
            */

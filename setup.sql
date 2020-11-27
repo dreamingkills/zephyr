@@ -16,6 +16,13 @@ CREATE TABLE profile
     patron          SMALLINT UNSIGNED DEFAULT 0,
     PRIMARY KEY(discord_id)
 );
+CREATE TABLE wishlist
+(
+    id              INT(11) AUTO_INCREMENT,
+    discord_id      VARCHAR(32) NOT NULL,
+    item            TEXT(12),
+    PRIMARY KEY(id)
+);
 CREATE TABLE card_base
 (
     id              INT(11) AUTO_INCREMENT,

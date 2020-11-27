@@ -28,6 +28,32 @@ export abstract class ProfileSet extends DBClass {
     ]);
     return;
   }
+  public static async addToWishlist(
+    discordId: string,
+    text: string
+  ): Promise<void> {
+    await DB.query(`INSERT INTO wishlist (discord_id, item) VALUES (?, ?);`, [
+      discordId,
+      text,
+    ]);
+    return;
+  }
+  public static async removeFromWishlist(
+    discordId: string,
+    num: number
+  ): Promise<void> {
+    await DB.query(
+      `DELETE FROM wishlist WHERE id IN (SELECT id FROM (SELECT id FROM wishlist ORDER BY id ASC LIMIT 1 OFFSET ${
+        num - 1
+      }) x) AND discord_id=?;`,
+      [discordId]
+    );
+    return;
+  }
+  public static async clearWishlist(discordId: string): Promise<void> {
+    await DB.query(`DELETE FROM wishlist WHERE discord_id=?;`, [discordId]);
+    return;
+  }
 
   /*
       Currency
