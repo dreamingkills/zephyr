@@ -27,6 +27,7 @@ export default class DropCards extends BaseCommand {
         card_id: card.id,
         serial_number: card.serialTotal + 1,
         discord_id: "0",
+        original_owner: "0",
         tier,
         frame: "white",
       });
@@ -58,83 +59,90 @@ export default class DropCards extends BaseCommand {
       { file: collage, name: "collage.png" }
     );
 
+    let [one, two, three] = [false, false, false];
+    const takers: string[] = [];
+
     const filter = (_m: Message, emoji: PartialEmoji, userID: string) =>
-      ["1️⃣", "2️⃣", "3️⃣"].includes(emoji.name) && userID !== this.zephyr.user.id;
+      ["1️⃣", "2️⃣", "3️⃣"].includes(emoji.name) &&
+      userID !== this.zephyr.user.id &&
+      !takers.includes(userID);
     const collector = new ReactionCollector(this.zephyr, drop, filter, {
       time: 30000,
     });
-    let [one, two, three] = [false, false, false];
-    const takers: string[] = [];
 
     collector.on(
       "collect",
       async (_m: Message, emoji: PartialEmoji, userID: string) => {
-        if (emoji.name === "1️⃣" && !one && takers.indexOf(userID) < 0) {
-          one = true;
-          takers.push(userID);
+        try {
           const profile = await ProfileService.getProfile(userID);
-          const card = await CardService.createNewUserCard(
-            cards[0],
-            profile,
-            this.zephyr,
-            0,
-            pics[0].tier
-          );
-          await msg.channel.createMessage(
-            `<@${userID}> claimed ` +
-              `**${CardService.parseReference(
-                card,
-                cards[0]
-              )}** — ${this.zephyr.config.discord.emoji.star.repeat(
-                card.tier
-              )}!`
-          );
-        } else if (emoji.name === "2️⃣" && !two && takers.indexOf(userID) < 0) {
-          two = true;
-          takers.push(userID);
-          const profile = await ProfileService.getProfile(userID);
-          const card = await CardService.createNewUserCard(
-            cards[1],
-            profile,
-            this.zephyr,
-            0,
-            pics[1].tier
-          );
-          await msg.channel.createMessage(
-            `<@${userID}> claimed ` +
-              `**${CardService.parseReference(
-                card,
-                cards[1]
-              )}** — ${this.zephyr.config.discord.emoji.star.repeat(
-                card.tier
-              )}!`
-          );
-        } else if (
-          emoji.name === "3️⃣" &&
-          !three &&
-          takers.indexOf(userID) < 0
-        ) {
-          three = true;
-          takers.push(userID);
-          const profile = await ProfileService.getProfile(userID);
-          const card = await CardService.createNewUserCard(
-            cards[2],
-            profile,
-            this.zephyr,
-            0,
-            pics[2].tier
-          );
-          await msg.channel.createMessage(
-            `<@${userID}> claimed ` +
-              `**${CardService.parseReference(
-                card,
-                cards[2]
-              )}** — ${this.zephyr.config.discord.emoji.star.repeat(
-                card.tier
-              )}!`
-          );
-        }
-        if (one && two && three) collector.stop();
+          if (emoji.name === "1️⃣" && !one && takers.indexOf(userID) < 0) {
+            one = true;
+            takers.push(userID);
+            const card = await CardService.createNewUserCard(
+              cards[0],
+              profile,
+              this.zephyr,
+              0,
+              pics[0].tier
+            );
+            await msg.channel.createMessage(
+              `<@${userID}> claimed ` +
+                `**${CardService.parseReference(
+                  card,
+                  cards[0]
+                )}** — ${this.zephyr.config.discord.emoji.star.repeat(
+                  card.tier
+                )}!`
+            );
+          } else if (
+            emoji.name === "2️⃣" &&
+            !two &&
+            takers.indexOf(userID) < 0
+          ) {
+            two = true;
+            takers.push(userID);
+            const card = await CardService.createNewUserCard(
+              cards[1],
+              profile,
+              this.zephyr,
+              0,
+              pics[1].tier
+            );
+            await msg.channel.createMessage(
+              `<@${userID}> claimed ` +
+                `**${CardService.parseReference(
+                  card,
+                  cards[1]
+                )}** — ${this.zephyr.config.discord.emoji.star.repeat(
+                  card.tier
+                )}!`
+            );
+          } else if (
+            emoji.name === "3️⃣" &&
+            !three &&
+            takers.indexOf(userID) < 0
+          ) {
+            three = true;
+            takers.push(userID);
+            const card = await CardService.createNewUserCard(
+              cards[2],
+              profile,
+              this.zephyr,
+              0,
+              pics[2].tier
+            );
+            await msg.channel.createMessage(
+              `<@${userID}> claimed ` +
+                `**${CardService.parseReference(
+                  card,
+                  cards[2]
+                )}** — ${this.zephyr.config.discord.emoji.star.repeat(
+                  card.tier
+                )}!`
+            );
+          }
+          if (one && two && three) collector.stop();
+        } catch {}
       }
     );
     collector.on("end", async () => {
