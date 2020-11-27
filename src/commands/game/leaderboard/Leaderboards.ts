@@ -28,9 +28,9 @@ export default class Leaderboards extends BaseCommand {
           if (user.private && user.discordId !== authorId) {
             leaderboard += `*Private User*`;
           } else leaderboard += discordUser.tag;
-          leaderboard += `— ${
-            this.zephyr.config.discord.emoji.bits
-          }**${user.bits.toLocaleString()}**\n`;
+          leaderboard += `— ${this.zephyr.config.discord.emoji.bits}**${(
+            user.bits + user.bitsBank
+          ).toLocaleString()}**\n`;
         }
         break;
       }
@@ -42,6 +42,19 @@ export default class Leaderboards extends BaseCommand {
             `\`#${board.indexOf(user) + 1 + (page * 10 - 10)}\` ` +
             `${user.private ? `*Private User*` : discordUser.tag} ` +
             `— **${user.dailyStreak.toLocaleString()} days**\n`;
+        }
+        break;
+      }
+      case "cards": {
+        const board = await LeaderboardService.getCardLeaderboard(page);
+        for (let entry of board) {
+          const discordUser = await this.zephyr.fetchUser(
+            entry.profile.discordId
+          );
+          leaderboard +=
+            `\`#${board.indexOf(entry) + 1 + (page * 10 - 10)}\` ` +
+            `${entry.profile.private ? `*Private User*` : discordUser.tag} ` +
+            `— **${entry.count} cards**\n`;
         }
         break;
       }
@@ -69,6 +82,10 @@ export default class Leaderboards extends BaseCommand {
       trueType = "daily";
       totalEntries = await StatisticsService.getNumberOfProfiles();
       title = `Top players by daily streak length`;
+    } else if (["cards", "c", "card"].includes(boardType)) {
+      trueType = "cards";
+      totalEntries = await StatisticsService.getNumberOfProfiles();
+      title = `Top players by card collection`;
     } else {
       embed.setDescription(
         `Please specify a valid leaderboard.\n` +

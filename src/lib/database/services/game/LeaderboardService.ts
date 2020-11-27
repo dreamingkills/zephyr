@@ -12,4 +12,9 @@ export abstract class LeaderboardService {
   ): Promise<GameProfile[]> {
     return await LeaderboardGet.getDailyStreakLeaderboard(page);
   }
+  public static async getCardLeaderboard(
+    page: number = 1
+  ): Promise<{ profile: GameProfile; count: number }[]> {
+    return await LeaderboardGet.getCardLeaderboard(page);
+  }
 }

@@ -24,4 +24,11 @@ export abstract class ProfileGet extends DBClass {
     )) as { id: number; discord_id: string; item: string }[];
     return query.map((i) => i.item);
   }
+  public static async getNumberOfClaims(discordId: string): Promise<number> {
+    const query = (await DB.query(
+      `SELECT COUNT(*) AS count FROM user_card WHERE original_owner=?;`,
+      [discordId]
+    )) as { count: number }[];
+    return query[0].count;
+  }
 }
