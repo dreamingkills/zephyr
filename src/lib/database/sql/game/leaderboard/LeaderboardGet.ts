@@ -26,7 +26,7 @@ export abstract class LeaderboardGet extends DBClass {
   ): Promise<{ profile: GameProfile; count: number }[]> {
     const offset = page * this.entries - this.entries;
     const query = (await DB.query(
-      `SELECT profile.*, COUNT(*) as count FROM user_card LEFT JOIN profile ON user_card.discord_id=profile.discord_id WHERE NOT user_card.discord_id=0 GROUP BY user_card.discord_id ORDER BY count DESC, user_card.discord_id LIMIT ? OFFSET ?;`,
+      `SELECT profile.*, COUNT(*) as count FROM profile LEFT JOIN user_card ON user_card.discord_id=profile.discord_id WHERE NOT user_card.discord_id=0 GROUP BY profile.discord_id ORDER BY count DESC, user_card.discord_id LIMIT ? OFFSET ?;`,
       [this.entries, offset]
     )) as {
       discord_id: string;

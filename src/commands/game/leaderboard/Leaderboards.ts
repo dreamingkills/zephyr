@@ -28,7 +28,7 @@ export default class Leaderboards extends BaseCommand {
           if (user.private && user.discordId !== authorId) {
             leaderboard += `*Private User*`;
           } else leaderboard += discordUser.tag;
-          leaderboard += `— ${this.zephyr.config.discord.emoji.bits}**${(
+          leaderboard += ` — ${this.zephyr.config.discord.emoji.bits}**${(
             user.bits + user.bitsBank
           ).toLocaleString()}**\n`;
         }
@@ -38,10 +38,11 @@ export default class Leaderboards extends BaseCommand {
         const board = await LeaderboardService.getDailyStreakLeaderboard(page);
         for (let user of board) {
           const discordUser = await this.zephyr.fetchUser(user.discordId);
-          leaderboard +=
-            `\`#${board.indexOf(user) + 1 + (page * 10 - 10)}\` ` +
-            `${user.private ? `*Private User*` : discordUser.tag} ` +
-            `— **${user.dailyStreak.toLocaleString()} days**\n`;
+          leaderboard += `\`#${board.indexOf(user) + 1 + (page * 10 - 10)}\` `;
+          if (user.private && user.discordId !== authorId) {
+            leaderboard += `*Private User*`;
+          } else leaderboard += discordUser.tag;
+          leaderboard += ` — **${user.dailyStreak.toLocaleString()} days**\n`;
         }
         break;
       }
@@ -51,10 +52,11 @@ export default class Leaderboards extends BaseCommand {
           const discordUser = await this.zephyr.fetchUser(
             entry.profile.discordId
           );
-          leaderboard +=
-            `\`#${board.indexOf(entry) + 1 + (page * 10 - 10)}\` ` +
-            `${entry.profile.private ? `*Private User*` : discordUser.tag} ` +
-            `— **${entry.count} cards**\n`;
+          leaderboard += `\`#${board.indexOf(entry) + 1 + (page * 10 - 10)}\` `;
+          if (entry.profile.private && entry.profile.discordId !== authorId) {
+            leaderboard += `*Private User*`;
+          } else leaderboard += discordUser.tag;
+          leaderboard += ` — **${entry.count} cards**\n`;
         }
         break;
       }

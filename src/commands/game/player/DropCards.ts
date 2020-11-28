@@ -74,7 +74,7 @@ export default class DropCards extends BaseCommand {
       "collect",
       async (_m: Message, emoji: PartialEmoji, userID: string) => {
         try {
-          const profile = await ProfileService.getProfile(userID);
+          const profile = await ProfileService.getProfile(userID, true);
           if (emoji.name === "1️⃣" && !one && takers.indexOf(userID) < 0) {
             one = true;
             takers.push(userID);

@@ -5,7 +5,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 
 export default class TogglePrivate extends BaseCommand {
-  names = ["private", "priv"];
+  names = ["private", "priv", "public", "pub"];
   description = "Toggles your account between private and public.";
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
