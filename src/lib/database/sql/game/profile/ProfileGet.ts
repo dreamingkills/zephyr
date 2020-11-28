@@ -2,6 +2,7 @@ import { DB, DBClass } from "../../..";
 import { Profile, GameProfile } from "../../../../../structures/game/Profile";
 import { ProfileService } from "../../../services/game/ProfileService";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
+import { GameItem, Item } from "../../../../../structures/game/Item";
 
 export abstract class ProfileGet extends DBClass {
   public static async getProfileByDiscordId(
@@ -27,6 +28,36 @@ export abstract class ProfileGet extends DBClass {
   public static async getNumberOfClaims(discordId: string): Promise<number> {
     const query = (await DB.query(
       `SELECT COUNT(*) AS count FROM user_card WHERE original_owner=?;`,
+      [discordId]
+    )) as { count: number }[];
+    return query[0].count;
+  }
+
+  public static async getItems(
+    discordId: string,
+    page: number
+  ): Promise<GameItem[]> {
+    const query = (await DB.query(
+      `SELECT *, COUNT(*) AS count FROM user_item WHERE discord_id=? GROUP BY item_id ORDER BY item_id ASC LIMIT 10 OFFSET ?;`,
+      [discordId, page * 10 - 10]
+    )) as Item[];
+    return query.map((i) => new GameItem(i));
+  }
+  public static async getItem(
+    discordId: string,
+    itemId: number,
+    name: string
+  ): Promise<GameItem> {
+    const query = (await DB.query(
+      `SELECT *, COUNT(*) AS count FROM user_item WHERE discord_id=? AND item_id=? GROUP BY item_id;`,
+      [discordId, itemId]
+    )) as Item[];
+    if (!query[0]) throw new ZephyrError.NoItemInInventoryError(name);
+    return new GameItem(query[0]);
+  }
+  public static async getNumberOfItems(discordId: string): Promise<number> {
+    const query = (await DB.query(
+      `SELECT COUNT(DISTINCT item_id) AS count FROM user_item WHERE discord_id=?;`,
       [discordId]
     )) as { count: number }[];
     return query[0].count;

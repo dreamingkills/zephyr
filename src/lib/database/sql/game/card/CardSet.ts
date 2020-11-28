@@ -36,4 +36,14 @@ export abstract class CardSet extends DBClass {
       }
     }
   }
+  public static async setCardFrame(
+    card: GameUserCard,
+    frameId: number
+  ): Promise<GameUserCard> {
+    await DB.query(`UPDATE user_card SET frame=? WHERE id=?;`, [
+      frameId,
+      card.id,
+    ]);
+    return await CardService.getUserCardById(card.id);
+  }
 }

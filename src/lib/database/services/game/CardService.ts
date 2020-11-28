@@ -14,8 +14,8 @@ export interface CardReference {
 }
 
 export abstract class CardService {
-  public static parseReference(card: GameUserCard, base: GameBaseCard): string {
-    return `${base.identifier}#${card.serialNumber}`;
+  public static parseReference(card: GameUserCard): string {
+    return `${card.identifier}#${card.serialNumber}`;
   }
 
   public static async getAllCards(): Promise<GameBaseCard[]> {
@@ -87,7 +87,11 @@ export abstract class CardService {
       }
     }
     const overlay = await loadImage(`${dir}/overlay.png`);
-    const frame = await loadImage(`./src/assets/frames/${card.frame}.png`);
+    let frame: Image;
+    if (!card.frameId || !card.frameUrl) {
+      console.log("No Frame");
+      frame = await loadImage(`./src/assets/frames/white.png`);
+    } else frame = await loadImage(card.frameUrl);
 
     ctx.drawImage(img, 0, 0, 700, 1000);
     ctx.drawImage(frame, 0, 0, 700, 1000);
@@ -119,6 +123,14 @@ export abstract class CardService {
     }
     const buf = canvas.toBuffer("image/png");
     return Buffer.alloc(buf.length, buf, "base64");
+  }
+  public static async changeCardFrame(
+    card: GameUserCard,
+    frameId: number
+  ): Promise<Buffer> {
+    const newCard = await CardSet.setCardFrame(card, frameId);
+    console.log(newCard);
+    return await this.updateCardCache(newCard);
   }
 
   /*

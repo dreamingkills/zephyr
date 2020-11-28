@@ -29,7 +29,7 @@ export default class DropCards extends BaseCommand {
         discord_id: "0",
         original_owner: "0",
         tier,
-        frame: "white",
+        identifier: card.identifier,
       });
       pics.push(userCard);
     }
@@ -88,8 +88,7 @@ export default class DropCards extends BaseCommand {
             await msg.channel.createMessage(
               `<@${userID}> claimed ` +
                 `**${CardService.parseReference(
-                  card,
-                  cards[0]
+                  card
                 )}** — ${this.zephyr.config.discord.emoji.star.repeat(
                   card.tier
                 )}!`
@@ -111,8 +110,7 @@ export default class DropCards extends BaseCommand {
             await msg.channel.createMessage(
               `<@${userID}> claimed ` +
                 `**${CardService.parseReference(
-                  card,
-                  cards[1]
+                  card
                 )}** — ${this.zephyr.config.discord.emoji.star.repeat(
                   card.tier
                 )}!`
@@ -134,8 +132,7 @@ export default class DropCards extends BaseCommand {
             await msg.channel.createMessage(
               `<@${userID}> claimed ` +
                 `**${CardService.parseReference(
-                  card,
-                  cards[2]
+                  card
                 )}** — ${this.zephyr.config.discord.emoji.star.repeat(
                   card.tier
                 )}!`
@@ -160,6 +157,8 @@ export default class DropCards extends BaseCommand {
         drop.addReaction("2️⃣"),
         drop.addReaction("3️⃣"),
       ]);
-    } catch {}
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

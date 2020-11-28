@@ -1,3 +1,4 @@
+import { GameItem } from "../../../../structures/game/Item";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { ProfileGet } from "../../sql/game/profile/ProfileGet";
 import { ProfileSet } from "../../sql/game/profile/ProfileSet";
@@ -94,5 +95,37 @@ export abstract class ProfileService {
   ): Promise<GameProfile> {
     await ProfileSet.setDailyTimestamp(profile.discordId, timestamp);
     return await profile.fetch();
+  }
+
+  /*
+      Items
+  */
+  public static async getItems(
+    profile: GameProfile,
+    page: number = 1
+  ): Promise<GameItem[]> {
+    return await ProfileGet.getItems(profile.discordId, page);
+  }
+  public static async getItem(
+    profile: GameProfile,
+    itemId: number,
+    name: string
+  ): Promise<GameItem> {
+    return await ProfileGet.getItem(profile.discordId, itemId, name);
+  }
+  public static async getNumberOfItems(profile: GameProfile): Promise<number> {
+    return await ProfileGet.getNumberOfItems(profile.discordId);
+  }
+  public static async addItem(
+    profile: GameProfile,
+    itemId: number
+  ): Promise<void> {
+    return await ProfileSet.addItem(profile.discordId, itemId);
+  }
+  public static async removeItem(
+    profile: GameProfile,
+    itemId: number
+  ): Promise<void> {
+    return await ProfileSet.removeItem(profile.discordId, itemId);
   }
 }

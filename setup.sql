@@ -55,7 +55,35 @@ CREATE TABLE user_card
     discord_id      VARCHAR(32) NOT NULL,
     original_owner  VARCHAR(32) NOT NULL,
     tier            TINYINT UNSIGNED,
-    frame           VARCHAR(32) DEFAULT "white",
+    frame           INT(11),
     PRIMARY KEY(id),
-    CONSTRAINT UserCardUnique UNIQUE (serial_number, card_id)
+    CONSTRAINT UserCardUnique UNIQUE (serial_number, card_id),
+    FOREIGN KEY (frame) REFERENCES card_frame(id) ON DELETE SET NULL
+);
+
+CREATE TABLE card_frame
+(
+    id              INT(11) AUTO_INCREMENT,
+    frame_name      TEXT(32),
+    frame_url       TEXT(64),
+    shoppable       BOOLEAN DEFAULT 0,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE frame_shop
+(
+
+    frame_id        INT(11) NOT NULL,
+    price           INT UNSIGNED DEFAULT 300,
+    PRIMARY KEY(frame_id),
+    FOREIGN KEY(frame_id) REFERENCES card_frame(id) ON DELETE CASCADE
+);
+
+CREATE TABLE user_item
+(
+    id              INT(11) AUTO_INCREMENT,
+    discord_id      VARCHAR(32) NOT NULL,
+    item_id         INT(11) NOT NULL,
+    PRIMARY KEY(id),
+    FOREIGN KEY(discord_id) REFERENCES profile(discord_id) ON DELETE CASCADE
 );

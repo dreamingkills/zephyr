@@ -14,19 +14,11 @@ export default class CardInventory extends BaseCommand {
   private renderInventory(cards: GameUserCard[]): string {
     let desc: string[] = [];
     let pad = 0;
-    cards.forEach((c) => {
-      const card = this.zephyr.getCard(c.baseCardId);
-      if (CardService.parseReference(c, card).length > pad)
-        pad = CardService.parseReference(c, card).length;
-    });
 
     for (let card of cards) {
       const baseCard = this.zephyr.getCard(card.baseCardId);
       const entry =
-        `\`${CardService.parseReference(card, baseCard).padStart(
-          pad,
-          " "
-        )}\` ` +
+        `\`${CardService.parseReference(card).padStart(pad, " ")}\` ` +
         (baseCard.group ? `**${baseCard.group}** ` : ``) +
         `${baseCard.name} — ` +
         `${this.zephyr.config.discord.emoji.star.repeat(card.tier)}`;
@@ -71,12 +63,6 @@ export default class CardInventory extends BaseCommand {
     const sent = await msg.channel.createMessage({ embed });
     if (totalPages < 2) return;
 
-    if (totalPages > 2) sent.addReaction(`⏮️`);
-    if (totalPages > 1) sent.addReaction(`◀️`);
-    // board.addReaction(`🔢`),
-    if (totalPages > 1) sent.addReaction(`▶️`);
-    if (totalPages > 2) sent.addReaction(`⏭️`);
-
     const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id;
     const collector = new ReactionCollector(this.zephyr, sent, filter, {
@@ -101,5 +87,11 @@ export default class CardInventory extends BaseCommand {
           await sent.removeReaction(emoji.name, userId);
       }
     );
+
+    if (totalPages > 2) sent.addReaction(`⏮️`);
+    if (totalPages > 1) sent.addReaction(`◀️`);
+    // board.addReaction(`🔢`),
+    if (totalPages > 1) sent.addReaction(`▶️`);
+    if (totalPages > 2) sent.addReaction(`⏭️`);
   }
 }

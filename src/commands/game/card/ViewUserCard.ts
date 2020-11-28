@@ -20,7 +20,7 @@ export default class ViewUserCard extends BaseCommand {
     const userCard = await CardService.getUserCardByReference(reference);
     const baseCard = this.zephyr.getCard(userCard.baseCardId);
     if (userCard.discordId !== msg.author.id)
-      throw new ZephyrError.NotOwnerOfCardError(userCard, baseCard);
+      throw new ZephyrError.NotOwnerOfCardError(userCard);
     const image = await CardService.checkCacheForCard(userCard);
 
     const embed = new MessageEmbed()

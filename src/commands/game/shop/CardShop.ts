@@ -7,7 +7,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 
 export default class CardShop extends BaseCommand {
   names = ["cardshop", "cs"];
-  description = "Changes the blurb on your profile.";
+  description = "Shows you what's on sale in the card shop.";
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const subcommand = this.options[0]?.toLowerCase();
@@ -67,7 +67,7 @@ export default class CardShop extends BaseCommand {
           this.zephyr.config.discord.emoji.bits
         }**${profile.bits.toLocaleString()}**.` +
           `\n— Use \`${prefix}cs buy <group name>\` to buy a random card from any group.` +
-          `\nz— Each purchase costs you ${this.zephyr.config.discord.emoji.bits}**300** (excluding sales).` /* +
+          `\n— Each purchase costs you ${this.zephyr.config.discord.emoji.bits}**300** (excluding sales).` /* +
           `\n\n${this.zephyr.config.discord.emoji.clock} **Limited-Time Deals**` +
           `\n**LOONA** — 35% off! *(2d 06h 59s remaining)*` +
           `\n**EXO** — 35% off! *(2d 06h 59s remaining)*`*/

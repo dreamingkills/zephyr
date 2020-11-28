@@ -112,4 +112,28 @@ export abstract class ProfileSet extends DBClass {
     ]);
     return;
   }
+
+  /*
+      Items
+  */
+  public static async addItem(
+    discordId: string,
+    itemId: number
+  ): Promise<void> {
+    await DB.query(
+      `INSERT INTO user_item (discord_id, item_id) VALUES (?, ?);`,
+      [discordId, itemId]
+    );
+    return;
+  }
+  public static async removeItem(
+    discordId: string,
+    itemId: number
+  ): Promise<void> {
+    await DB.query(
+      `DELETE FROM user_item WHERE discord_id=? AND item_id=? LIMIT 1;`,
+      [discordId, itemId]
+    );
+    return;
+  }
 }

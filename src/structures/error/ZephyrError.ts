@@ -2,7 +2,6 @@ import {
   CardReference,
   CardService,
 } from "../../lib/database/services/game/CardService";
-import { GameBaseCard } from "../game/BaseCard";
 import { GameUserCard } from "../game/UserCard";
 
 abstract class ZephyrError extends Error {
@@ -79,6 +78,21 @@ export class WishlistEmptyError extends ZephyrError {
     super(`Your wishlist is already empty!`);
   }
 }
+
+/*
+    Items
+           */
+export class InvalidItemError extends ZephyrError {
+  constructor() {
+    super(`That item doesn't exist.`);
+  }
+}
+export class NoItemInInventoryError extends ZephyrError {
+  constructor(item: string) {
+    super(`You don't have any **${item}**.`);
+  }
+}
+
 /*
     Cards
            */
@@ -98,9 +112,7 @@ export class UnknownUserCardError extends ZephyrError {
   }
 }
 export class NotOwnerOfCardError extends ZephyrError {
-  constructor(card: GameUserCard, base: GameBaseCard) {
-    super(
-      `**${CardService.parseReference(card, base)}** does not belong to you.`
-    );
+  constructor(card: GameUserCard) {
+    super(`**${CardService.parseReference(card)}** does not belong to you.`);
   }
 }

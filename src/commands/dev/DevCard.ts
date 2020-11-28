@@ -65,7 +65,7 @@ export default class DevCard extends BaseCommand {
     const dir = `./src/assets/cards/${card.id}`;
     const img = await loadImage(`${dir}/one.png`);
     const overlay = await loadImage(`${dir}/overlay.png`);
-    const frame = await loadImage(`./src/assets/frames/white.png`);
+    const frame = await loadImage(`./src/assets/frames/frame-white.png`);
 
     ctx.drawImage(img, 0, 0, 700, 1000);
     ctx.drawImage(frame, 0, 0, 700, 1000);

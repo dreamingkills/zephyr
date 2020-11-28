@@ -16,6 +16,11 @@ export interface BaseCard {
   tier_five?: string;
   tier_six?: string;
 }
+export interface Frame {
+  id: number;
+  frame_name: string;
+  frame_url: string;
+}
 export class GameBaseCard {
   id: number;
   identifier: string;
@@ -66,5 +71,15 @@ export class GameBaseCard {
     } else {
       this.maxTier = 1;
     }
+  }
+}
+export class GameFrame {
+  id: number;
+  frameName: string;
+  frameUrl: string;
+  constructor(data: Frame) {
+    this.id = data.id;
+    this.frameName = data.frame_name;
+    this.frameUrl = data.frame_url;
   }
 }

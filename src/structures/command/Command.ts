@@ -23,7 +23,10 @@ export abstract class BaseCommand implements Command {
 
   public async run(msg: Message, profile: GameProfile, zephyr: Zephyr) {
     this.zephyr = zephyr;
-    this.options = msg.content.split(" ").slice(1);
+    this.options = msg.content
+      .split(" ")
+      .slice(1)
+      .filter((v) => v);
     await this.exec(msg, profile);
   }
 

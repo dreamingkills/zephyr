@@ -5,7 +5,11 @@ export interface UserCard {
   discord_id: string;
   original_owner: string;
   tier: number;
-  frame: string;
+  frame_id?: number;
+  frame_name?: string;
+  frame_url?: string;
+
+  identifier: string;
 }
 export class GameUserCard {
   id: number;
@@ -14,7 +18,11 @@ export class GameUserCard {
   discordId: string;
   originalOwner: string;
   tier: number;
-  frame: string;
+  frameId?: number;
+  frameName?: string;
+  frameUrl?: string;
+
+  identifier: string;
   constructor(data: UserCard) {
     this.id = data.id;
     this.baseCardId = data.card_id;
@@ -22,6 +30,10 @@ export class GameUserCard {
     this.discordId = data.discord_id;
     this.originalOwner = data.original_owner;
     this.tier = data.tier;
-    this.frame = data.frame;
+    this.frameId = data.frame_id;
+    this.frameName = data.frame_name;
+    this.frameUrl = data.frame_url;
+
+    this.identifier = data.identifier;
   }
 }
