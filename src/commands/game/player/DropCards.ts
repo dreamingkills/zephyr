@@ -157,8 +157,6 @@ export default class DropCards extends BaseCommand {
         drop.addReaction("2️⃣"),
         drop.addReaction("3️⃣"),
       ]);
-    } catch (e) {
-      console.log(e);
-    }
+    } catch {}
   }
 }

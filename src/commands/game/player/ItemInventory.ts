@@ -78,9 +78,7 @@ export default class ItemInventory extends BaseCommand {
         // board.addReaction(`🔢`),
         if (maxPage > 1) sent.addReaction(`▶️`);
         if (maxPage > 2) sent.addReaction(`⏭️`);
-      } catch (e) {
-        console.log(e);
-      }
+      } catch (e) {}
     }
   }
 }

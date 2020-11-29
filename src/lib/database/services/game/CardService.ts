@@ -127,7 +127,6 @@ export abstract class CardService {
     frameId: number
   ): Promise<Buffer> {
     const newCard = await CardSet.setCardFrame(card, frameId);
-    console.log(newCard);
     return await this.updateCardCache(newCard);
   }
 
