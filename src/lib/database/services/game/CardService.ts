@@ -89,8 +89,7 @@ export abstract class CardService {
     const overlay = await loadImage(`${dir}/overlay.png`);
     let frame: Image;
     if (!card.frameId || !card.frameUrl) {
-      console.log("No Frame");
-      frame = await loadImage(`./src/assets/frames/white.png`);
+      frame = await loadImage(`./src/assets/frames/frame-white.png`);
     } else frame = await loadImage(card.frameUrl);
 
     ctx.drawImage(img, 0, 0, 700, 1000);
@@ -111,9 +110,8 @@ export abstract class CardService {
 
     ctx.font = "14px AlteHaasGroteskBold";
     for (let card of cards) {
-      const image = await loadImage(
-        `./src/assets/cards/${card.baseCardId}/example_${card.tier}.png`
-      );
+      const buf = await this.generateCardImage(card);
+      const image = await loadImage(buf);
       ctx.drawImage(image, cards.indexOf(card) * 250, 0, 250, 333);
       ctx.fillText(
         `#${card.serialNumber}`,

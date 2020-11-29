@@ -6,6 +6,8 @@ import { GameProfile } from "../../../structures/game/Profile";
 import items from "../../../assets/items.json";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import dayjs from "dayjs";
+import { getTimeUntilNextDay } from "../../../lib/ZephyrUtils";
 
 export default class FrameShop extends BaseCommand {
   names = ["frameshop", "fs"];
@@ -82,12 +84,15 @@ export default class FrameShop extends BaseCommand {
     const frames = [];
     for (let frame of shop) {
       frames.push(
-        `Frame: **${frame.frame_name}** — ${
+        `— **${frame.frame_name}** Frame ${
           this.zephyr.config.discord.emoji.bits
         }**${frame.price.toLocaleString()}**`
       );
     }
 
+    const timeUntilNextDay = getTimeUntilNextDay(
+      dayjs(new Date().setHours(0, 0, 0, 0))
+    );
     const prefix = this.zephyr.getPrefix(msg.guildID!);
     const embed = new MessageEmbed()
       .setAuthor(
@@ -97,10 +102,11 @@ export default class FrameShop extends BaseCommand {
       .setDescription(
         `${
           this.zephyr.config.discord.emoji.star
-        } Welcome to the **Frame Shop**. Offers change every 24 hours.\nJust use \`${prefix}fs buy <frame>\` to buy something.\n\n${frames.join(
+        } Welcome to the **Frame Shop**. Offers change every 24 hours.\n\n${frames.join(
           "\n"
-        )}`
-      );
+        )}\n\n**See something you like?**\nUse \`${prefix}fs buy <frame>\` to make a purchase.`
+      )
+      .setFooter(`Shop resets in ${timeUntilNextDay}.`);
     await msg.channel.createMessage({ embed });
   }
 }

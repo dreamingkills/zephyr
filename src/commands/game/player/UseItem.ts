@@ -56,6 +56,31 @@ export default class UseItem extends BaseCommand {
             }\`.`
         );
       await msg.channel.createMessage({ embed });
+      return;
+    } else if (targetItem.type === "COUPON") {
+      const match = targetItem.name.match(/\d+/g);
+      if (!match) throw new ZephyrError.InvalidAmountError("bits");
+      let amount = parseInt(match.join(""));
+
+      if (isNaN(amount)) throw new ZephyrError.InvalidAmountError("bits");
+
+      await ProfileService.removeItem(profile, targetItem.id);
+      const newProfile = await ProfileService.addBitsToProfile(profile, amount);
+      const embed = new MessageEmbed()
+        .setAuthor(
+          `Use Item | ${msg.author.tag}`,
+          msg.author.dynamicAvatarURL("png")
+        )
+        .setDescription(
+          `${this.zephyr.config.discord.emoji.check} You used \`${
+            targetItem.name
+          }\` and received ${
+            this.zephyr.config.discord.emoji.bits
+          }**${amount.toLocaleString()}**` +
+            `\n— You now have **${newProfile.bits.toLocaleString()}** bits.`
+        );
+      await msg.channel.createMessage({ embed });
+      return;
     }
   }
 }
