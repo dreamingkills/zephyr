@@ -75,9 +75,11 @@ export default class Wishlist extends BaseCommand {
       target = await ProfileService.getProfile(msg.mentions[0].id);
       targetUser = msg.mentions[0];
     } else if (this.options[0]?.toLowerCase().split("=")[0] === "id") {
-      const userId = this.options[0]?.toLowerCase().split("=")[1];
+      const userId = parseInt(this.options[0]?.toLowerCase().split("=")[1], 10);
+      if (isNaN(userId)) throw new ZephyrError.InvalidSnowflakeError();
+
+      targetUser = await this.zephyr.fetchUser(userId.toString());
       target = await ProfileService.getProfile(userId);
-      targetUser = await this.zephyr.fetchUser(userId);
     } else {
       target = profile;
       targetUser = msg.author;

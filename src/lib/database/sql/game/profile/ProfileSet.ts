@@ -43,7 +43,7 @@ export abstract class ProfileSet extends DBClass {
     num: number
   ): Promise<void> {
     await DB.query(
-      `DELETE FROM wishlist WHERE id IN (SELECT id FROM (SELECT id FROM wishlist WHERE discord_id="197186779843919877" ORDER BY id ASC LIMIT 1 OFFSET ${
+      `DELETE FROM wishlist WHERE id IN (SELECT id FROM (SELECT id FROM wishlist WHERE discord_id=? ORDER BY id ASC LIMIT 1 OFFSET ${
         num - 1
       }) x);`,
       [discordId]

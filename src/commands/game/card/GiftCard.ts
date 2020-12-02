@@ -1,9 +1,11 @@
-import { Message } from "eris";
+import { Message, PartialEmoji } from "eris";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
+import { ReactionCollector } from "eris-collector";
+import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class GiftCard extends BaseCommand {
   names = ["gift", "give"];
@@ -18,7 +20,7 @@ export default class GiftCard extends BaseCommand {
         serialNumber: parseInt(r.split("#")[1], 10),
       };
     });
-    const cards = [];
+    const cards: GameUserCard[] = [];
     for (let ref of references) {
       if (!ref.identifier || isNaN(ref.serialNumber))
         throw new ZephyrError.InvalidCardReferenceError();
@@ -36,44 +38,37 @@ export default class GiftCard extends BaseCommand {
 
     const gifteeProfile = await ProfileService.getProfile(giftee.id);
 
-    await CardService.transferCardsToUser(cards, gifteeProfile);
-
-    /*const conf = await msg.channel.createMessage(
+    const conf = await msg.channel.createMessage(
       `${this.zephyr.config.discord.emoji.warn} Really gift **${cards.length}** cards to **${giftee.tag}**?`
     );
-    console.log(this.zephyr.config.discord.emojiId.check);
-    const emoji = await this.zephyr.getRESTGuildEmoji(
-      "762137263730720768",
-      "782328785450041344"
-    );
-    await conf.addReaction(emoji.id);
+    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
 
-    const userCard = await CardService.getUserCardByReference(reference);
-    const baseCard = this.zephyr.getCard(userCard.baseCardId);
-    if (userCard.discordId !== msg.author.id)
-      throw new ZephyrError.NotOwnerOfCardError(userCard);
-    const image = await CardService.checkCacheForCard(userCard);
-
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Card View | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(
-        `\n—${baseCard.group ? ` **${baseCard.group}**` : ""} **${
-          baseCard.name
-        }** ${baseCard.subgroup ? ` (${baseCard.subgroup})` : ``} #${
-          userCard.serialNumber
-        }` +
-          `\n— Tier **${userCard.tier}**` +
-          `\n${baseCard.flavor ? `*${baseCard.flavor}*` : ``}`
+    const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
+      userId === msg.author.id &&
+      emoji.id === this.zephyr.config.discord.emojiId.check;
+    const collector = new ReactionCollector(this.zephyr, conf, filter, {
+      time: 30000,
+      max: 1,
+    });
+    collector.on("collect", async () => {
+      await CardService.transferCardsToUser(cards, gifteeProfile);
+      await conf.edit(
+        `${this.zephyr.config.discord.emoji.check} Gifted **${cards.length}** cards to **${giftee.tag}**.`
       );
-    await msg.channel.createMessage(
-      { embed },
-      {
-        file: image,
-        name: "card.png",
+      collector.en;
+      return;
+    });
+    collector.on("end", async (_collected: unknown, reason: string) => {
+      if (reason === "time") {
+        await conf.edit(
+          `${this.zephyr.config.discord.emoji.warn} Did not gift any cards.`
+        );
+        await conf.removeReaction(
+          `check:${this.zephyr.config.discord.emojiId.check}`,
+          this.zephyr.user.id
+        );
+        return;
       }
-    );*/
+    });
   }
 }
