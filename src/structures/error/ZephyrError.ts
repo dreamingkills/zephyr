@@ -20,6 +20,18 @@ export class InvalidMentionError extends ZephyrError {
     super(`Please mention a user.`);
   }
 }
+export class InvalidMentionGiftError extends ZephyrError {
+  constructor(plural: boolean) {
+    super(
+      `Please mention someone to gift your ${plural ? `cards` : `card`} to.`
+    );
+  }
+}
+export class CannotGiftAuthorError extends ZephyrError {
+  constructor() {
+    super(`You can't gift cards to yourself.`);
+  }
+}
 export class InvalidAmountError extends ZephyrError {
   constructor(type: string) {
     super(`Please enter a valid number of **${type}**.`);

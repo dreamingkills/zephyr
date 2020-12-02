@@ -10,7 +10,7 @@ export default class DevCard extends BaseCommand {
   developerOnly = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const cardId = parseInt(this.options[0]);
+    const cardId = parseInt(this.options[0], 10);
     if (isNaN(cardId)) return;
 
     const card = this.zephyr.getCard(cardId);

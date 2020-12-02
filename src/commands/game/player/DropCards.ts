@@ -14,13 +14,13 @@ export default class DropCards extends BaseCommand {
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const now = dayjs(Date.now());
-    const until = dayjs(profile.dropNext).add(30, "minute");
+    const until = dayjs(profile.dropNext);
     if (now < until)
       throw new ZephyrError.DropCooldownError(getTimeUntil(now, until));
 
     await ProfileService.setDropTimestamp(
       profile,
-      dayjs(new Date()).format(`YYYY/MM/DD HH:mm:ss`)
+      dayjs(new Date()).add(30, "minute").format(`YYYY/MM/DD HH:mm:ss`)
     );
     const cards = this.zephyr.getRandomCards(3);
 

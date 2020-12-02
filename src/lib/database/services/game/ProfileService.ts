@@ -96,6 +96,12 @@ export abstract class ProfileService {
     await ProfileSet.setDailyTimestamp(profile.discordId, timestamp);
     return await profile.fetch();
   }
+  public static async incrementDailyStreak(
+    profile: GameProfile
+  ): Promise<GameProfile> {
+    await ProfileSet.incrementDailyTimestamp(profile.discordId);
+    return await profile.fetch();
+  }
   public static async setDropTimestamp(
     profile: GameProfile,
     timestamp: string

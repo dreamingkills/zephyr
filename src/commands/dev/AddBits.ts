@@ -12,12 +12,14 @@ export default class AddBits extends BaseCommand {
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     if (!msg.mentions[0]) throw new ZephyrError.InvalidMentionError();
-    const amountRaw = msg.content.split(" ").filter((c) => !isNaN(parseInt(c)));
+    const amountRaw = msg.content
+      .split(" ")
+      .filter((c) => !isNaN(parseInt(c, 10)));
     if (!amountRaw[0]) throw new ZephyrError.InvalidAmountError(`bits`);
 
     let targetUser = msg.mentions[0];
     let target = await ProfileService.getProfile(targetUser.id);
-    const amount = parseInt(amountRaw[0]);
+    const amount = parseInt(amountRaw[0], 10);
 
     const _target = await ProfileService.addBitsToProfile(target, amount);
     const embed = new MessageEmbed()

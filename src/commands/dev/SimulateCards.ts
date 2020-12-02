@@ -9,7 +9,7 @@ export default class SimulateCards extends BaseCommand {
   developerOnly = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const loopTime = parseInt(this.options[0]);
+    const loopTime = parseInt(this.options[0], 10);
     if (isNaN(loopTime)) {
       msg.channel.createMessage("Enter a valid number.");
       return;

@@ -14,10 +14,14 @@ export class CommandLib {
       `${require("path").dirname(require.main?.filename)}/commands/**/*.js`
     );
     for (let f of files) {
-      const cmdExport = require(f);
-      if (!cmdExport.default) return;
-      const cmd = new cmdExport.default(zephyr) as BaseCommand;
-      this.commands.push(cmd);
+      try {
+        const cmdExport = require(f);
+        if (!cmdExport.default) return;
+        const cmd = new cmdExport.default(zephyr) as BaseCommand;
+        this.commands.push(cmd);
+      } catch {
+        continue;
+      }
     }
   }
 

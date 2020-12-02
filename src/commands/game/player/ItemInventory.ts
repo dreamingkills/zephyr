@@ -10,7 +10,7 @@ import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class ItemInventory extends BaseCommand {
   names = ["items"];
-  description = "Shows cards that belong to you.";
+  description = "Shows items that belong to you.";
 
   private renderInventory(inv: GameItem[], prefix: string): string {
     if (inv.length === 0) {

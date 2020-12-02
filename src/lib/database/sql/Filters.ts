@@ -26,7 +26,7 @@ export class FilterService {
           } else
             queryOptions.push(
               ` user_card.serial_number=${DB.connection.escape(
-                parseInt(value as string)
+                parseInt(value as string, 10)
               )}`
             );
           break;

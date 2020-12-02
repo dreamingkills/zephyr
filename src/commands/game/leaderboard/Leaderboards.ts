@@ -12,7 +12,7 @@ export default class Leaderboards extends BaseCommand {
   description = "Shows you top Zephyr players.";
   usage = ["$CMD$ <board name>"];
 
-  private leaderboardTypes = ["bits", "daily"];
+  private leaderboardTypes = ["bits", "daily", "cards"];
 
   private async getLeaderboard(
     type: string,

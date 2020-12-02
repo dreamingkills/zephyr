@@ -17,11 +17,11 @@ export default class ViewProfile extends BaseCommand {
       user = msg.mentions[0];
       target = msg.mentions[0].id;
     } else if (this.options[0]?.startsWith("id=")) {
-      const userId = this.options[0].slice(3);
-      if (isNaN(parseInt(userId)))
+      const userId = parseInt(this.options[0].slice(3), 10);
+      if (isNaN(userId) || userId === 0)
         throw new ZephyrError.InvalidSnowflakeError();
 
-      user = await this.zephyr.fetchUser(userId);
+      user = await this.zephyr.fetchUser(userId.toString());
       target = user.id;
     } else {
       user = msg.author;

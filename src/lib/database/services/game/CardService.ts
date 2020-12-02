@@ -134,6 +134,12 @@ export abstract class CardService {
     const newCard = await CardSet.setCardFrame(card, frameId);
     return await this.updateCardCache(newCard);
   }
+  public static async transferCardsToUser(
+    cards: GameUserCard[],
+    profile: GameProfile
+  ): Promise<void> {
+    return await CardSet.transferCardsToUser(cards, profile.discordId);
+  }
 
   /*
       Caching

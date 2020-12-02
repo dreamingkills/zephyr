@@ -41,14 +41,14 @@ export default class CardInventory extends BaseCommand {
 
     if (
       !options["page"] ||
-      isNaN(parseInt(<string>options["page"])) ||
+      isNaN(parseInt(<string>options["page"], 10)) ||
       options["page"] < 1
     )
       options["page"] = 1;
     const totalPages = Math.ceil(size / 10) || 1;
     if (options["page"] > totalPages) options["page"] = totalPages;
 
-    let page = parseInt(options["page"] as string);
+    let page = parseInt(options["page"] as string, 10);
     const inventory = await CardService.getUserInventory(profile, options);
 
     const embed = new MessageEmbed()

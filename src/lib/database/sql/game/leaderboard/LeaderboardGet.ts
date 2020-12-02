@@ -36,6 +36,8 @@ export abstract class LeaderboardGet extends DBClass {
       bits_bank: number;
       daily_last: string;
       daily_streak: number;
+      claim_next: string;
+      drop_next: string;
       patron: number;
       count: number;
     }[];

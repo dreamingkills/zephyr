@@ -12,7 +12,7 @@ export default class ForceFrame extends BaseCommand {
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     const reference = {
       identifier: this.options[0]?.split("#")[0]?.toUpperCase(),
-      serialNumber: parseInt(this.options[0]?.split("#")[1]),
+      serialNumber: parseInt(this.options[0]?.split("#")[1], 10),
     };
     if (isNaN(reference.serialNumber))
       throw new ZephyrError.InvalidCardReferenceError();

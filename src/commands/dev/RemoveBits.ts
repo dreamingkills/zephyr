@@ -12,12 +12,14 @@ export default class RemoveBits extends BaseCommand {
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     if (!msg.mentions[0]) throw new ZephyrError.InvalidMentionError();
-    const amountRaw = msg.content.split(" ").filter((c) => !isNaN(parseInt(c)));
+    const amountRaw = msg.content
+      .split(" ")
+      .filter((c) => !isNaN(parseInt(c, 10)));
     if (!amountRaw[0]) throw new ZephyrError.InvalidAmountError(`bits`);
 
     let targetUser = msg.mentions[0];
     let target = await ProfileService.getProfile(targetUser.id);
-    let amount = parseInt(amountRaw[0]);
+    let amount = parseInt(amountRaw[0], 10);
 
     if (profile.bits - amount < 0) amount = profile.bits;
 

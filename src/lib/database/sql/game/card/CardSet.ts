@@ -46,4 +46,14 @@ export abstract class CardSet extends DBClass {
     ]);
     return await CardService.getUserCardById(card.id);
   }
+  public static async transferCardsToUser(
+    cards: GameUserCard[],
+    discordId: string
+  ): Promise<void> {
+    await DB.query(`UPDATE user_card SET discord_id=? WHERE id IN (?);`, [
+      discordId,
+      cards.map((c) => c.id),
+    ]);
+    return;
+  }
 }

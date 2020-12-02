@@ -43,9 +43,9 @@ export abstract class ProfileSet extends DBClass {
     num: number
   ): Promise<void> {
     await DB.query(
-      `DELETE FROM wishlist WHERE id IN (SELECT id FROM (SELECT id FROM wishlist ORDER BY id ASC LIMIT 1 OFFSET ${
+      `DELETE FROM wishlist WHERE id IN (SELECT id FROM (SELECT id FROM wishlist WHERE discord_id="197186779843919877" ORDER BY id ASC LIMIT 1 OFFSET ${
         num - 1
-      }) x) AND discord_id=?;`,
+      }) x);`,
       [discordId]
     );
     return;
@@ -110,6 +110,15 @@ export abstract class ProfileSet extends DBClass {
       timestamp,
       discordId,
     ]);
+    return;
+  }
+  public static async incrementDailyTimestamp(
+    discordId: string
+  ): Promise<void> {
+    await DB.query(
+      `UPDATE profile SEt daily_streak=daily_streak+1 WHERE discord_id=?;`,
+      [discordId]
+    );
     return;
   }
   public static async setDropTimestamp(

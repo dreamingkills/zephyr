@@ -13,7 +13,7 @@ import { Chance } from "chance";
 import { CardSpawner } from "../../lib/CardSpawner";
 
 export class Zephyr extends Client {
-  version: string = "beta-0.2.1";
+  version: string = "beta-0.2.2";
   commandLib = new CommandLib();
   config: typeof config;
   chance = new Chance();
@@ -79,7 +79,10 @@ export class Zephyr extends Client {
         return;
 
       // go ahead if we're allowed to speak
-      await this.commandLib.process(message, this);
+      if (message.guildID === "752028821791703141") {
+        if (message.channel.name.includes("zephyr-channel"))
+          await this.commandLib.process(message, this);
+      } else await this.commandLib.process(message, this);
 
       // message counter
       await CardSpawner.processMessage(

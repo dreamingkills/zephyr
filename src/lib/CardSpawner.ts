@@ -14,7 +14,7 @@ import { GuildService } from "./database/services/guild/GuildService";
 export abstract class CardSpawner {
   private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
   private static readonly timeout = 2000;
-  private static readonly minSpawnThreshold = 10;
+  private static readonly minSpawnThreshold = 100;
   private static readonly spawnThreshold = CardSpawner.minSpawnThreshold * 2;
   private static guildLevels: { [key: string]: number } = {};
 
@@ -129,7 +129,7 @@ export abstract class CardSpawner {
           }
 
           await ProfileService.setClaimTimestamp(
-            profile,
+            fight.winner,
             now.add(10, "minute").format(`YYYY/MM/DD HH:mm:ss`)
           );
           if (finished[0] && finished[1] && finished[2]) collector.stop();

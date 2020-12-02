@@ -40,7 +40,7 @@ export default class Wishlist extends BaseCommand {
       await msg.channel.createMessage({ embed });
       return;
     } else if (subcommand === "delete") {
-      const num = parseInt(this.options[1]);
+      const num = parseInt(this.options[1], 10);
       if (isNaN(num))
         throw new ZephyrError.InvalidAmountError("wishlist entry");
 
@@ -84,6 +84,7 @@ export default class Wishlist extends BaseCommand {
     }
 
     const wishlist = await ProfileService.getWishlist(target);
+    let index = 1;
     const embed = new MessageEmbed()
       .setAuthor(
         `Wishlist | ${msg.author.tag}`,
@@ -95,7 +96,7 @@ export default class Wishlist extends BaseCommand {
           ? `This wishlist is empty!`
           : `${wishlist
               .map((i) => {
-                return `**${wishlist.indexOf(i) + 1}** — ${i}`;
+                return `**${index++}** — ${i}`;
               })
               .join("\n")}`
       )

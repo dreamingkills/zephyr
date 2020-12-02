@@ -30,7 +30,7 @@ export default class UseItem extends BaseCommand {
       const offset = this.options.slice(targetItem.name?.split(" ").length);
       const reference = {
         identifier: offset[0]?.split("#")[0],
-        serialNumber: parseInt(offset[0]?.split("#")[1]),
+        serialNumber: parseInt(offset[0]?.split("#")[1], 10),
       };
 
       if (!reference.identifier || isNaN(reference.serialNumber))
@@ -60,7 +60,7 @@ export default class UseItem extends BaseCommand {
     } else if (targetItem.type === "COUPON") {
       const match = targetItem.name.match(/\d+/g);
       if (!match) throw new ZephyrError.InvalidAmountError("bits");
-      let amount = parseInt(match.join(""));
+      let amount = parseInt(match.join(""), 10);
 
       if (isNaN(amount)) throw new ZephyrError.InvalidAmountError("bits");
 
