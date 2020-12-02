@@ -14,4 +14,14 @@ export abstract class GuildGet extends DBClass {
     }
     return prefixes;
   }
+  public static async getDropChannel(guildId: string): Promise<string | null> {
+    const query = (await DB.query(`SELECT * FROM guild WHERE guild_id=?;`, [
+      guildId,
+    ])) as {
+      guild_id: string;
+      prefix: string;
+      drop_channel_id: string | null;
+    }[];
+    return query[0].drop_channel_id;
+  }
 }

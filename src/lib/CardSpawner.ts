@@ -1,4 +1,4 @@
-import { Message, PartialEmoji, TextChannel } from "eris";
+import { Guild, Message, PartialEmoji, TextChannel, User } from "eris";
 import { GameDroppedCard } from "../structures/game/DroppedCard";
 import { CardService } from "./database/services/game/CardService";
 import { ReactionCollector } from "eris-collector";
@@ -9,12 +9,14 @@ import { Chance } from "chance";
 import { Zephyr } from "../structures/client/Zephyr";
 import { getTimeUntil } from "../lib/ZephyrUtils";
 import dayjs from "dayjs";
+import { GuildService } from "./database/services/guild/GuildService";
 
 export abstract class CardSpawner {
   private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
   private static readonly timeout = 2000;
-  // private static readonly minSpawnThreshold = 50;
-  // private static readonly spawnThreshold = CardSpawner.minSpawnThreshold * 2;
+  private static readonly minSpawnThreshold = 10;
+  private static readonly spawnThreshold = CardSpawner.minSpawnThreshold * 2;
+  private static guildLevels: { [key: string]: number } = {};
 
   static userCooldowns: Set<string> = new Set();
   static guildCooldowns: Set<string> = new Set();
@@ -170,5 +172,66 @@ export abstract class CardSpawner {
       cards,
       zephyr
     );
+  }
+
+  public static async activityDrop(
+    channel: TextChannel,
+    zephyr: Zephyr
+  ): Promise<void> {
+    const baseCards = zephyr.getRandomCards(3);
+    const droppedCards = baseCards.map(
+      (c) =>
+        new GameDroppedCard({
+          ...c,
+          serialNumber: c.serialTotal + 1,
+          frameUrl: `./src/assets/frames/frame-white.png`,
+        })
+    );
+    await this.dropCards(
+      "— **3 cards** are dropping due to server activity!",
+      channel,
+      droppedCards,
+      zephyr
+    );
+  }
+
+  public static async processMessage(guild: Guild, user: User, zephyr: Zephyr) {
+    // If they're on cooldown, ignore.
+    if (this.userCooldowns.has(user.id) || this.guildCooldowns.has(guild.id))
+      return;
+
+    if (!this.guildLevels[guild.id]) {
+      this.guildLevels[guild.id] = 1;
+      return;
+    } else {
+      this.guildLevels[guild.id]++;
+    }
+
+    this.guildCooldowns.add(guild.id);
+    this.userCooldowns.add(user.id);
+    setTimeout(() => {
+      this.userCooldowns.delete(user.id);
+    }, 3000);
+    setTimeout(() => {
+      this.guildCooldowns.delete(guild.id);
+    }, 1500);
+
+    if (this.guildLevels[guild.id] >= this.minSpawnThreshold) {
+      let rand = [false, true][Math.floor(Math.random() * 2)];
+      if (this.guildLevels[guild.id] === this.spawnThreshold) {
+        rand = true;
+      }
+      if (!rand) return;
+
+      const channelId = await GuildService.getDropChannel(guild.id);
+
+      if (!channelId) return;
+
+      const channel = guild.channels.find(
+        (c) => c.id === channelId
+      ) as TextChannel;
+      await this.activityDrop(channel, zephyr);
+      this.guildLevels[guild.id] = 0;
+    }
   }
 }

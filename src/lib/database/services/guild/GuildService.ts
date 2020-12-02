@@ -11,4 +11,14 @@ export abstract class GuildService {
   ): Promise<void> {
     return await GuildSet.setPrefix(guildId, prefix);
   }
+
+  public static async getDropChannel(guildId: string): Promise<string | null> {
+    return await GuildGet.getDropChannel(guildId);
+  }
+  public static async setDropChannel(
+    guildId: string,
+    dropChannel: string
+  ): Promise<void> {
+    return await GuildSet.setDropChannel(guildId, dropChannel);
+  }
 }

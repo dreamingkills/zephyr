@@ -10,9 +10,10 @@ import { FontLoader } from "../../lib/FontLoader";
 import { checkPermission } from "../../lib/ZephyrUtils";
 import { MessageEmbed } from "./RichEmbed";
 import { Chance } from "chance";
+import { CardSpawner } from "../../lib/CardSpawner";
 
 export class Zephyr extends Client {
-  version: string = "beta-0.2";
+  version: string = "beta-0.2.1";
   commandLib = new CommandLib();
   config: typeof config;
   chance = new Chance();
@@ -79,6 +80,13 @@ export class Zephyr extends Client {
 
       // go ahead if we're allowed to speak
       await this.commandLib.process(message, this);
+
+      // message counter
+      await CardSpawner.processMessage(
+        this.guilds.find((g) => g.id === message.guildID!)!,
+        message.author,
+        this
+      );
     });
 
     // Introduction when it joins a new guild
@@ -127,7 +135,7 @@ export class Zephyr extends Client {
         .setAuthor(`Welcome | ${guild.name}`)
         .setDescription(
           `**Thanks for inviting Zephyr!**` +
-            `\nYou can use \`${prefix}setchannel\` to set the Zephyr channel.` +
+            `\nUse \`${prefix}setchannel\` in any channel to set that channel as the Zephyr channel.` +
             `\n\n**Common configuration**` +
             `\n— \`${prefix}prefix <prefix>\` - changes the bot's prefix`
         );

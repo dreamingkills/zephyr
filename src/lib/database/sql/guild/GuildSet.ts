@@ -7,7 +7,17 @@ export abstract class GuildSet extends DBClass {
   ): Promise<void> {
     await DB.query(
       `INSERT INTO guild (guild_id, prefix) VALUES (?, ?) ON DUPLICATE KEY UPDATE prefix=?;`,
-      [guildId, prefix, prefix, guildId]
+      [guildId, prefix, prefix]
+    );
+    return;
+  }
+  public static async setDropChannel(
+    guildId: string,
+    dropChannel: string
+  ): Promise<void> {
+    await DB.query(
+      `INSERT INTO guild (guild_id, drop_channel_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE drop_channel_id=?;`,
+      [guildId, dropChannel, dropChannel]
     );
     return;
   }

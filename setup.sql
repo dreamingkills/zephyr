@@ -2,6 +2,7 @@ CREATE TABLE guild
 (
     guild_id        VARCHAR(32) NOT NULL,
     prefix          TINYTEXT DEFAULT "!",
+    drop_channel_id VARCHAR(32),
     PRIMARY KEY(guild_id)
 );
 CREATE TABLE profile
