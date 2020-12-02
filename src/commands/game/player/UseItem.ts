@@ -10,7 +10,9 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class UseItem extends BaseCommand {
   names = ["use"];
-  description = "Use an item.";
+  description =
+    "Use an item.\n**Note**: You must enter the item name **exactly** as it appears!";
+  usage = ["$CMD$ <item>", "$CMD$ <frame> <card>"];
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const target = this.options.join(" ")?.toLowerCase();

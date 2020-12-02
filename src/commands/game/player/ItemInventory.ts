@@ -24,8 +24,7 @@ export default class ItemInventory extends BaseCommand {
             )[0];
             return `— \`${itemEntry.name}\` **x${i.count}**`;
           })
-          .join("\n") +
-        `\n\nTo use an item, just type \`${prefix}use <item name>\`.`
+          .join("\n") + `\n\nCheck \`${prefix}help use\` for usage information.`
       );
   }
 
