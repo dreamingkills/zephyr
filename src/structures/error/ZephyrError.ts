@@ -94,6 +94,21 @@ export class NoItemInInventoryError extends ZephyrError {
 }
 
 /*
+    Timers
+            */
+export class DropCooldownError extends ZephyrError {
+  constructor(until: string) {
+    super(`You must wait **${until}** before dropping cards again.`);
+  }
+}
+export class ClaimCooldownError extends ZephyrError {
+  constructor(until: string, userId: string) {
+    super(
+      `<@${userId}>, you must wait **${until}** before claiming another card.`
+    );
+  }
+}
+/*
     Cards
            */
 export class InvalidCardReferenceError extends ZephyrError {

@@ -6,6 +6,7 @@ import items from "../../../assets/items.json";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ReactionCollector } from "eris-collector";
 import { GameItem } from "../../../structures/game/Item";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class ItemInventory extends BaseCommand {
   names = ["items"];
@@ -67,7 +68,7 @@ export default class ItemInventory extends BaseCommand {
           embed.setFooter(`Page ${page} of ${maxPage} • ${totalItems} entries`);
           await sent.edit({ embed });
 
-          if (this.zephyr.checkPermission("manageMessages", msg.textChannel))
+          if (checkPermission("manageMessages", msg.channel, this.zephyr))
             await sent.removeReaction(emoji.name, userId);
         }
       );

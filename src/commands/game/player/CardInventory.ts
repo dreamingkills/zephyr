@@ -6,6 +6,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { ReactionCollector } from "eris-collector";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class CardInventory extends BaseCommand {
   names = ["inventory", "inv", "i"];
@@ -83,7 +84,7 @@ export default class CardInventory extends BaseCommand {
         embed.setFooter(`Page ${page} of ${totalPages} • ${size} entries`);
         await sent.edit({ embed });
 
-        if (this.zephyr.checkPermission("manageMessages", msg.textChannel))
+        if (checkPermission("manageMessages", msg.textChannel, this.zephyr))
           await sent.removeReaction(emoji.name, userId);
       }
     );

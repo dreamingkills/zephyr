@@ -87,13 +87,27 @@ export abstract class ProfileService {
   }
 
   /*
-      Daily
+      Timers
   */
   public static async setDailyTimestamp(
     profile: GameProfile,
     timestamp: string
   ): Promise<GameProfile> {
     await ProfileSet.setDailyTimestamp(profile.discordId, timestamp);
+    return await profile.fetch();
+  }
+  public static async setDropTimestamp(
+    profile: GameProfile,
+    timestamp: string
+  ): Promise<GameProfile> {
+    await ProfileSet.setDropTimestamp(profile.discordId, timestamp);
+    return await profile.fetch();
+  }
+  public static async setClaimTimestamp(
+    profile: GameProfile,
+    timestamp: string
+  ): Promise<GameProfile> {
+    await ProfileSet.setClaimTimestamp(profile.discordId, timestamp);
     return await profile.fetch();
   }
 

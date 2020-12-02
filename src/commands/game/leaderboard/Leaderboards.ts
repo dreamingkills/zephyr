@@ -5,6 +5,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { ReactionCollector } from "eris-collector";
 import { StatisticsService } from "../../../lib/database/services/statistics/StatisticsService";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class Leaderboards extends BaseCommand {
   names = ["leaderboards", "leaderboard", "top"];
@@ -139,7 +140,7 @@ export default class Leaderboards extends BaseCommand {
         );
         await board.edit({ embed });
 
-        if (this.zephyr.checkPermission("manageMessages", msg.textChannel))
+        if (checkPermission("manageMessages", msg.textChannel, this.zephyr))
           await board.removeReaction(emoji.name, userId);
       }
     );

@@ -7,6 +7,7 @@ import { CardGet } from "../../sql/game/card/CardGet";
 import fs from "fs/promises";
 import { CardSet } from "../../sql/game/card/CardSet";
 import { Zephyr } from "../../../../structures/client/Zephyr";
+import { GameDroppedCard } from "../../../../structures/game/DroppedCard";
 
 export interface CardReference {
   identifier: string;
@@ -102,21 +103,25 @@ export abstract class CardService {
     const buf = canvas.toBuffer("image/png");
     return Buffer.alloc(buf.length, buf, "base64");
   }
-  public static async generateCardCollage(
-    cards: GameUserCard[]
+  public static async generateCardCollege(
+    cards: GameDroppedCard[]
   ): Promise<Buffer> {
     const canvas = createCanvas(cards.length * 250, 333);
     const ctx = canvas.getContext("2d");
 
+    const baseUrl = `./src/assets/cards/`;
     ctx.font = "14px AlteHaasGroteskBold";
     for (let card of cards) {
-      const buf = await this.generateCardImage(card);
-      const image = await loadImage(buf);
-      ctx.drawImage(image, cards.indexOf(card) * 250, 0, 250, 333);
+      const base = await loadImage(`${baseUrl}${card.id}/one.png`);
+      const overlay = await loadImage(`${baseUrl}${card.id}/overlay.png`);
+      const frame = await loadImage(card.frameUrl);
+      ctx.drawImage(base, cards.indexOf(card) * 250, 0, 250, 333);
+      ctx.drawImage(frame, cards.indexOf(card) * 250, 0, 250, 333);
+      ctx.drawImage(overlay, cards.indexOf(card) * 250, 0, 250, 333);
       ctx.fillText(
         `#${card.serialNumber}`,
-        cards.indexOf(card) * 250 + 26,
-        293
+        cards.indexOf(card) * 250 + 25,
+        292
       );
     }
     const buf = canvas.toBuffer("image/png");

@@ -100,7 +100,7 @@ export abstract class ProfileSet extends DBClass {
   }
 
   /*
-      Daily
+      Timers
   */
   public static async setDailyTimestamp(
     discordId: string,
@@ -111,6 +111,24 @@ export abstract class ProfileSet extends DBClass {
       discordId,
     ]);
     return;
+  }
+  public static async setDropTimestamp(
+    discordId: string,
+    timestamp: string
+  ): Promise<void> {
+    await DB.query(`UPDATE profile SET drop_next=? WHERE discord_id=?;`, [
+      timestamp,
+      discordId,
+    ]);
+  }
+  public static async setClaimTimestamp(
+    discordId: string,
+    timestamp: string
+  ): Promise<void> {
+    await DB.query(`UPDATE profile SET claim_next=? WHERE discord_id=?;`, [
+      timestamp,
+      discordId,
+    ]);
   }
 
   /*

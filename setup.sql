@@ -13,6 +13,8 @@ CREATE TABLE profile
     bits_bank       INT UNSIGNED DEFAULT 0,
     daily_last      DATE,
     daily_streak    SMALLINT UNSIGNED DEFAULT 0,
+    drop_next       DATETIME,
+    claim_next      DATETIME,
     patron          SMALLINT UNSIGNED DEFAULT 0,
     PRIMARY KEY(discord_id)
 );

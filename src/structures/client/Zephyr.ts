@@ -7,13 +7,27 @@ import { GuildService } from "../../lib/database/services/guild/GuildService";
 import { GameBaseCard } from "../game/BaseCard";
 import { CardService } from "../../lib/database/services/game/CardService";
 import { FontLoader } from "../../lib/FontLoader";
+import { checkPermission } from "../../lib/ZephyrUtils";
+import { MessageEmbed } from "./RichEmbed";
+import { Chance } from "chance";
 
 export class Zephyr extends Client {
   version: string = "beta-0.2";
   commandLib = new CommandLib();
-  prefixes: { [guildId: string]: string } = {};
-  cards: { [cardId: number]: GameBaseCard } = {};
   config: typeof config;
+  chance = new Chance();
+  private prefixes: { [guildId: string]: string } = {};
+  private cards: { [cardId: number]: GameBaseCard } = {};
+
+  private generalChannelNames = [
+    "welcome",
+    "general",
+    "lounge",
+    "chat",
+    "talk",
+    "main",
+  ];
+
   constructor() {
     super(config.discord.token, { restMode: true });
     this.config = config;
@@ -53,6 +67,7 @@ export class Zephyr extends Client {
           `\n\n${`=`.repeat(stripAnsi(header).length)}`
       );
     });
+
     this.on("messageCreate", async (message) => {
       await this.fetchUser(message.author.id);
       // type 0 corresponds to TextChannel
@@ -64,6 +79,60 @@ export class Zephyr extends Client {
 
       // go ahead if we're allowed to speak
       await this.commandLib.process(message, this);
+    });
+
+    // Introduction when it joins a new guild
+    this.on("guildCreate", async (guild) => {
+      // Get ONLY TextChannels in the guild (type === 0)
+      const channels = guild.channels.filter(
+        (c) => c.type === 0
+      ) as TextChannel[];
+
+      // The channel we're eventually going to send the message to
+      let welcomeChannel;
+
+      // Find any channels with names including anything from this.generalChannelNames
+      for (let channel of channels) {
+        for (let generalName of this.generalChannelNames) {
+          if (channel.name.toLowerCase().includes(generalName))
+            welcomeChannel = channel;
+        }
+      }
+
+      // If we couldn't find a channel, defer to the highest hoisted channel we can send messages to
+      if (!welcomeChannel) {
+        const channels = Array.from(guild.channels.values()).filter(
+          (c) => c.type === 0
+        ) as TextChannel[];
+        // Sorts the channels in order of "increasing" position (lower position value = higher on the guild list)
+        const top = channels.sort((a, b) => {
+          return a.position > b.position ? 1 : -1;
+        });
+
+        // Check if we can send messages...
+        for (let channel of top) {
+          if (checkPermission("sendMessages", <TextChannel>channel, this)) {
+            welcomeChannel = channel as TextChannel;
+            break;
+          }
+        }
+      }
+
+      // Didn't find anything? Oh well...
+      if (!welcomeChannel) return;
+
+      // Get the prefix just in case it's already different (bot previously in guild)
+      const prefix = this.getPrefix(guild.id);
+      const embed = new MessageEmbed()
+        .setAuthor(`Welcome | ${guild.name}`)
+        .setDescription(
+          `**Thanks for inviting Zephyr!**` +
+            `\nYou can use \`${prefix}setchannel\` to set the Zephyr channel.` +
+            `\n\n**Common configuration**` +
+            `\n— \`${prefix}prefix <prefix>\` - changes the bot's prefix`
+        );
+      await welcomeChannel.createMessage({ embed });
+      return;
     });
   }
 
@@ -97,6 +166,12 @@ export class Zephyr extends Client {
   public getCard(id: number): GameBaseCard {
     return this.cards[id];
   }
+  public getRandomCards(amount: number): GameBaseCard[] {
+    return this.chance.pickset(Object.values(this.cards), amount);
+  }
+  public getCards(): GameBaseCard[] {
+    return Object.values(this.cards);
+  }
 
   /*
       Functions-That-Probably-Should-Be-In-Eris-Anyway-But-Whatever
@@ -120,12 +195,5 @@ export class Zephyr extends Client {
       this.users.update(findUser);
       return findUser;
     }
-  }
-
-  /*
-      Permissions
-  */
-  public checkPermission(permission: string, channel: TextChannel) {
-    return channel.permissionsOf(this.user.id).json[permission];
   }
 }

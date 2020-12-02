@@ -8,6 +8,8 @@ export interface Profile {
   bits_bank: number;
   daily_last: string;
   daily_streak: number;
+  drop_next: string;
+  claim_next: string;
   patron: number;
 }
 export class GameProfile {
@@ -18,6 +20,8 @@ export class GameProfile {
   bitsBank: number;
   dailyLast: string;
   dailyStreak: number;
+  dropNext: string;
+  claimNext: string;
   patron: number;
   constructor(data: Profile) {
     this.discordId = data.discord_id;
@@ -28,6 +32,8 @@ export class GameProfile {
     this.dailyLast = data.daily_last;
     this.dailyStreak = data.daily_streak;
     this.patron = data.patron;
+    this.dropNext = data.drop_next;
+    this.claimNext = data.claim_next;
   }
 
   public async fetch(): Promise<GameProfile> {

@@ -1,162 +1,68 @@
-import { Message, PartialEmoji } from "eris";
-import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { Message, TextChannel } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
-import { Chance } from "chance";
-import { CardService } from "../../../lib/database/services/game/CardService";
-import { GameUserCard } from "../../../structures/game/UserCard";
-import { ReactionCollector } from "eris-collector";
+import { GameDroppedCard } from "../../../structures/game/DroppedCard";
+import { CardSpawner } from "../../../lib/CardSpawner";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
+import dayjs from "dayjs";
+import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { getTimeUntil } from "../../../lib/ZephyrUtils";
 
 export default class DropCards extends BaseCommand {
   names = ["drop"];
   description = "Drops three random cards in the channel.";
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const chance = new Chance();
-    const cards = chance.pickset(Object.values(this.zephyr.cards), 3);
+  async exec(msg: Message, profile: GameProfile): Promise<void> {
+    const now = dayjs(Date.now());
+    const until = dayjs(profile.dropNext).add(30, "minute");
+    if (now < until)
+      throw new ZephyrError.DropCooldownError(getTimeUntil(now, until));
 
-    const pics: GameUserCard[] = [];
-    for (let card of cards) {
-      const tier = chance.weighted(
-        [1, 2, 3, 4, 5, 6].slice(0, card.maxTier),
-        [1000, 80, 20, 7, 1.5, 0.1].slice(0, card.maxTier)
-      );
-      const userCard = new GameUserCard({
-        id: 0,
-        card_id: card.id,
-        serial_number: card.serialTotal + 1,
-        discord_id: "0",
-        original_owner: "0",
-        tier,
-        identifier: card.identifier,
-      });
-      pics.push(userCard);
-    }
+    await ProfileService.setDropTimestamp(
+      profile,
+      dayjs(new Date()).format(`YYYY/MM/DD HH:mm:ss`)
+    );
+    const cards = this.zephyr.getRandomCards(3);
 
+    const droppedCards = cards.map(
+      (c) =>
+        new GameDroppedCard({
+          id: c.id,
+          identifier: c.identifier,
+          serialNumber: c.serialTotal + 1,
+          frameUrl: `./src/assets/frames/frame-white.png`,
+        })
+    );
+
+    await CardSpawner.userDrop(
+      <TextChannel>msg.channel,
+      droppedCards,
+      profile,
+      this.zephyr
+    );
+    return;
+
+    /*
     const embed = new MessageEmbed()
       .setAuthor(`Drop | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
       .setDescription(
         `**${msg.author.username}** is dropping cards!` +
           `\n:one: **${cards[0].identifier}#${
             cards[0].serialTotal + 1
-          }** — ${this.zephyr.config.discord.emoji.star.repeat(pics[0].tier)}` +
+          }** — ${this.zephyr.config.discord.emoji.star.repeat(1)}` +
           `\n:two: **${cards[1].identifier}#${
             cards[1].serialTotal + 1
-          }** — ${this.zephyr.config.discord.emoji.star.repeat(pics[1].tier)}` +
+          }** — ${this.zephyr.config.discord.emoji.star.repeat(1)}` +
           `\n:three: **${cards[2].identifier}#${
             cards[2].serialTotal + 1
-          }** — ${this.zephyr.config.discord.emoji.star.repeat(pics[2].tier)}`
+          }** — ${this.zephyr.config.discord.emoji.star.repeat(1)}`
       )
       .setFooter(`⬇️ Use the buttons to claim!`);
 
-    const collage = await CardService.generateCardCollage(pics);
-
-    const drop = await msg.channel.createMessage(
-      {
-        embed,
-      },
+    const collage = await CardService.generateCardCollege(droppedCards);
+    await msg.channel.createMessage(
+      { embed },
       { file: collage, name: "collage.png" }
-    );
-
-    let [one, two, three] = [false, false, false];
-    const takers: string[] = [];
-
-    const filter = (_m: Message, emoji: PartialEmoji, userID: string) =>
-      ["1️⃣", "2️⃣", "3️⃣"].includes(emoji.name) &&
-      userID !== this.zephyr.user.id &&
-      !takers.includes(userID);
-    const collector = new ReactionCollector(this.zephyr, drop, filter, {
-      time: 30000,
-    });
-
-    collector.on(
-      "collect",
-      async (_m: Message, emoji: PartialEmoji, userID: string) => {
-        try {
-          const profile = await ProfileService.getProfile(userID, true);
-          if (emoji.name === "1️⃣" && !one && takers.indexOf(userID) < 0) {
-            one = true;
-            takers.push(userID);
-            const card = await CardService.createNewUserCard(
-              cards[0],
-              profile,
-              this.zephyr,
-              0,
-              pics[0].tier
-            );
-            await msg.channel.createMessage(
-              `<@${userID}> claimed ` +
-                `**${CardService.parseReference(
-                  card
-                )}** — ${this.zephyr.config.discord.emoji.star.repeat(
-                  card.tier
-                )}!`
-            );
-          } else if (
-            emoji.name === "2️⃣" &&
-            !two &&
-            takers.indexOf(userID) < 0
-          ) {
-            two = true;
-            takers.push(userID);
-            const card = await CardService.createNewUserCard(
-              cards[1],
-              profile,
-              this.zephyr,
-              0,
-              pics[1].tier
-            );
-            await msg.channel.createMessage(
-              `<@${userID}> claimed ` +
-                `**${CardService.parseReference(
-                  card
-                )}** — ${this.zephyr.config.discord.emoji.star.repeat(
-                  card.tier
-                )}!`
-            );
-          } else if (
-            emoji.name === "3️⃣" &&
-            !three &&
-            takers.indexOf(userID) < 0
-          ) {
-            three = true;
-            takers.push(userID);
-            const card = await CardService.createNewUserCard(
-              cards[2],
-              profile,
-              this.zephyr,
-              0,
-              pics[2].tier
-            );
-            await msg.channel.createMessage(
-              `<@${userID}> claimed ` +
-                `**${CardService.parseReference(
-                  card
-                )}** — ${this.zephyr.config.discord.emoji.star.repeat(
-                  card.tier
-                )}!`
-            );
-          }
-          if (one && two && three) collector.stop();
-        } catch {}
-      }
-    );
-    collector.on("end", async () => {
-      try {
-        await drop.delete();
-      } catch {
-      } finally {
-        return;
-      }
-    });
-
-    try {
-      await Promise.all([
-        drop.addReaction("1️⃣"),
-        drop.addReaction("2️⃣"),
-        drop.addReaction("3️⃣"),
-      ]);
-    } catch {}
+    );*/
   }
 }

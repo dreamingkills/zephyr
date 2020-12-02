@@ -28,7 +28,7 @@ export abstract class CardSet extends DBClass {
           `INSERT INTO user_card (card_id, serial_number, discord_id, original_owner, tier) VALUES (?, ?, ?, ?, ?)`,
           [card.id, issue, profile.discordId, profile.discordId, tier]
         )) as { insertId: number };
-        zephyr.cards[card.id].serialTotal = issue;
+        zephyr.getCard(card.id).serialTotal = issue;
         return await CardService.getUserCardById(query.insertId);
       } catch (e) {
         if (++tries === 3) throw e;

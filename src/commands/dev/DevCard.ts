@@ -13,7 +13,7 @@ export default class DevCard extends BaseCommand {
     const cardId = parseInt(this.options[0]);
     if (isNaN(cardId)) return;
 
-    const card = this.zephyr.cards[cardId];
+    const card = this.zephyr.getCard(cardId);
     if (!card) {
       const embed = new MessageEmbed()
         .setAuthor(

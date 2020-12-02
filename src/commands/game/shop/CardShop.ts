@@ -13,7 +13,7 @@ export default class CardShop extends BaseCommand {
     const subcommand = this.options[0]?.toLowerCase();
     if (subcommand === "buy") {
       const group = this.options.slice(1).join(" ").toLowerCase();
-      const cards = Object.values(this.zephyr.cards).filter((c) => {
+      const cards = this.zephyr.getCards().filter((c) => {
         return c.group?.toLowerCase() === group && c.rarity > 0;
       });
 

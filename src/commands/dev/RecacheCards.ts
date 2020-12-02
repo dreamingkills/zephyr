@@ -10,9 +10,7 @@ export default class RecacheCards extends BaseCommand {
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     await this.zephyr.cacheCards();
     await msg.channel.createMessage(
-      `:white_check_mark: Cached **${
-        Object.keys(this.zephyr.cards).length
-      }** cards.`
+      `:white_check_mark: Cached **${this.zephyr.getCards().length}** cards.`
     );
   }
 }
