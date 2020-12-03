@@ -56,7 +56,7 @@ export abstract class CardService {
     return await CardGet.getUserInventorySize(profile.discordId, options);
   }
   public static async generateCardImage(card: GameUserCard): Promise<Buffer> {
-    const canvas = createCanvas(700, 1000);
+    const canvas = createCanvas(350, 500);
     const ctx = canvas.getContext("2d");
 
     const dir = `./src/assets/cards/${card.baseCardId}`;
@@ -93,12 +93,12 @@ export abstract class CardService {
       frame = await loadImage(`./src/assets/frames/frame-white.png`);
     } else frame = await loadImage(card.frameUrl);
 
-    ctx.drawImage(img, 0, 0, 700, 1000);
-    ctx.drawImage(frame, 0, 0, 700, 1000);
-    ctx.drawImage(overlay, 0, 0, 700, 1000);
+    ctx.drawImage(img, 0, 0, 350, 500);
+    ctx.drawImage(frame, 0, 0, 350, 500);
+    ctx.drawImage(overlay, 0, 0, 350, 500);
 
-    ctx.font = "35px AlteHaasGroteskBold";
-    ctx.fillText(`#${card.serialNumber}`, 75, 878);
+    ctx.font = "20px AlteHaasGroteskBold";
+    ctx.fillText(`#${card.serialNumber}`, 48, 422);
 
     const buf = canvas.toBuffer("image/png");
     return Buffer.alloc(buf.length, buf, "base64");
@@ -120,8 +120,8 @@ export abstract class CardService {
       ctx.drawImage(overlay, cards.indexOf(card) * 250, 0, 250, 333);
       ctx.fillText(
         `#${card.serialNumber}`,
-        cards.indexOf(card) * 250 + 25,
-        292
+        cards.indexOf(card) * 250 + 35,
+        281
       );
     }
     const buf = canvas.toBuffer("image/png");

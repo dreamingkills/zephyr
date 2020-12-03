@@ -24,10 +24,14 @@ export abstract class CardSpawner {
   private static async fight(
     takers: Set<string>,
     card: GameDroppedCard,
-    zephyr: Zephyr
+    zephyr: Zephyr,
+    prefer?: GameProfile
   ): Promise<{ winner: GameProfile; card: GameUserCard }> {
-    const winnerId: string = new Chance().pickone(Array.from(takers));
-    const winner = await ProfileService.getProfile(winnerId);
+    let winner;
+    if (!prefer) {
+      const winnerId: string = new Chance().pickone(Array.from(takers));
+      winner = await ProfileService.getProfile(winnerId);
+    } else winner = prefer;
     const baseCard = zephyr.getCard(card.id);
     const newCard = await CardService.createNewUserCard(
       baseCard,
@@ -43,7 +47,8 @@ export abstract class CardSpawner {
     title: string,
     channel: TextChannel,
     cards: GameDroppedCard[],
-    zephyr: Zephyr
+    zephyr: Zephyr,
+    prefer?: GameProfile
   ): Promise<void> {
     const collage = await CardService.generateCardCollege(cards);
     const drop = await channel.createMessage(`${title}\n`, {
@@ -107,14 +112,19 @@ export abstract class CardSpawner {
         setTimeout(async () => {
           finished[num] = true;
 
-          const fight = await this.fight(takers[num], cards[num], zephyr);
+          const fight = await this.fight(
+            takers[num],
+            cards[num],
+            zephyr,
+            prefer
+          );
           winners.add(fight.winner.discordId);
 
           const countExl = takers[num].size - 1;
           takers[num].clear();
 
           const reference = CardService.parseReference(fight.card);
-          if (countExl === 0) {
+          if (countExl === 0 || prefer?.discordId === fight.winner.discordId) {
             await channel.createMessage(
               `— <@${fight.winner.discordId}> claimed **${reference}**!`
             );
@@ -170,7 +180,8 @@ export abstract class CardSpawner {
       `— <@${profile.discordId}> is dropping **${cards.length} cards**!`,
       channel,
       cards,
-      zephyr
+      zephyr,
+      profile
     );
   }
 

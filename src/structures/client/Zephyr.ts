@@ -42,7 +42,7 @@ export class Zephyr extends Client {
     this.connect();
 
     const startTime = Date.now();
-    this.on("ready", async () => {
+    this.once("ready", async () => {
       await this.commandLib.setup(this);
 
       const header = `===== ${chalk.hex(
