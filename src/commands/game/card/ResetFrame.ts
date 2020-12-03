@@ -40,7 +40,7 @@ export default class ResetFrame extends BaseCommand {
       max: 1,
     });
     collector.on("collect", async () => {
-      await CardService.changeCardFrame(card, 2);
+      await CardService.changeCardFrame(card, 1);
       await conf.edit(
         `${
           this.zephyr.config.discord.emoji.check

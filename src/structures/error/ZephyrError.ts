@@ -47,6 +47,7 @@ export class UserNotFoundError extends ZephyrError {
     super(`Sorry, but I couldn't find that user.`);
   }
 }
+
 /*
     Profile
              */
@@ -108,7 +109,18 @@ export class NoItemInInventoryError extends ZephyrError {
     super(`You don't have any **${item}**.`);
   }
 }
-
+export class InvalidFrameError extends ZephyrError {
+  constructor() {
+    super(
+      `I couldn't find that frame.\nPlease ensure your spelling is correct.`
+    );
+  }
+}
+export class NoFrameSpecifiedError extends ZephyrError {
+  constructor() {
+    super(`Please specify a frame to preview.`);
+  }
+}
 /*
     Timers
             */
