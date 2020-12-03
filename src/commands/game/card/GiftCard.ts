@@ -10,10 +10,11 @@ import { GameUserCard } from "../../../structures/game/UserCard";
 export default class GiftCard extends BaseCommand {
   names = ["gift", "give"];
   description = "Gives your card(s) to someone else.";
+  usage = ["$CMD$ <card> <mention>"];
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     const refs = this.options.filter((o) => o.includes("#"));
-    if (refs.length === 0) {
-    }
+    if (refs.length === 0) throw new ZephyrError.InvalidCardReferenceError();
+
     const references = refs.map((r) => {
       return {
         identifier: r.split("#")[0]?.toUpperCase(),

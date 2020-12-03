@@ -11,6 +11,10 @@ import { checkPermission } from "../../../lib/ZephyrUtils";
 export default class CardInventory extends BaseCommand {
   names = ["inventory", "inv", "i"];
   description = "Shows cards that belong to you.";
+  usage = [
+    "$CMD$ <filters>",
+    "Filters:\n— group=LOONA\n— name=JinSoul\n— serial=>5\n— serial=<5\n— serial=5",
+  ];
 
   private renderInventory(cards: GameUserCard[]): string {
     let desc: string[] = [];
@@ -67,7 +71,7 @@ export default class CardInventory extends BaseCommand {
     const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id;
     const collector = new ReactionCollector(this.zephyr, sent, filter, {
-      time: 5 * 60 * 1000,
+      time: 2 * 60 * 1000,
     });
     collector.on(
       "collect",

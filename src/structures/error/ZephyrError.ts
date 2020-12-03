@@ -143,3 +143,10 @@ export class NotOwnerOfCardError extends ZephyrError {
     super(`**${CardService.parseReference(card)}** does not belong to you.`);
   }
 }
+export class FrameAlreadyDefaultError extends ZephyrError {
+  constructor(card: GameUserCard) {
+    super(
+      `**${CardService.parseReference(card)}** already has the default frame.`
+    );
+  }
+}

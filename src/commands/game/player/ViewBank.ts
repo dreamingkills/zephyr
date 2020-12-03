@@ -8,8 +8,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 export default class ViewBank extends BaseCommand {
   names = ["bank", "b"];
   description = "Shows you the contents of your bit bank.";
-  usage = ["$CMD$", "$CMD$ deposit <amount>", "$CMD$ withdraw <amount>"];
-
+  subcommands = ["deposit <amount>", "withdraw <amount>"];
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const subcommand = this.options[0]?.toLowerCase();
     if (subcommand === "deposit") {

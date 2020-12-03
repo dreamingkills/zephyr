@@ -12,6 +12,7 @@ import { getTimeUntilNextDay } from "../../../lib/ZephyrUtils";
 export default class FrameShop extends BaseCommand {
   names = ["frameshop", "fs"];
   description = "Shows you what's on sale in the frame shop.";
+  subcommands = ["buy <frame name>"];
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const shop = await ShopService.getFrameShop();

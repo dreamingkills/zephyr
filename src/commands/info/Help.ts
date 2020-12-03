@@ -27,7 +27,8 @@ export default class Help extends BaseCommand {
             `\n\`\`\`` +
             `\n${findCommand.usage
               .map(
-                (u) => `${prefix}${u.replace(/\$CMD\$/g, findCommand.names[0])}`
+                (u) =>
+                  `${u.replace(/\$CMD\$/g, `${prefix}${findCommand.names[0]}`)}`
               )
               .join("\n")}` +
             `\n\`\`\``;

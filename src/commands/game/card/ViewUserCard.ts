@@ -8,6 +8,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 export default class ViewUserCard extends BaseCommand {
   names = ["card", "show", "view"];
   description = "Inspects one of your cards.";
+  usage = ["$CMD$ <card>"];
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     const reference = {
