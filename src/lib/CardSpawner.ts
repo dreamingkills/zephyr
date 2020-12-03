@@ -28,10 +28,12 @@ export abstract class CardSpawner {
     prefer?: GameProfile
   ): Promise<{ winner: GameProfile; card: GameUserCard }> {
     let winner;
-    if (!prefer) {
+    if (prefer && takers.has(prefer.discordId)) {
+      winner = prefer;
+    } else {
       const winnerId: string = new Chance().pickone(Array.from(takers));
       winner = await ProfileService.getProfile(winnerId);
-    } else winner = prefer;
+    }
     const baseCard = zephyr.getCard(card.id);
     const newCard = await CardService.createNewUserCard(
       baseCard,
