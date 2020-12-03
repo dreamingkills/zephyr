@@ -9,7 +9,7 @@ export default class Wishlist extends BaseCommand {
   names = ["wishlist", "wl"];
   description = "Shows your, or someone else's, wishlist.";
   usage = ["$CMD$", "$CMD$ <@user>", "$CMD$ id=<user id>"];
-  subcommands = ["add <text>", "delete <entry>", "clear"];
+  subcommands = ["add <text>", "delete/remove <entry>", "clear"];
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const subcommand = this.options[0]?.toLowerCase();
     let target: GameProfile;
@@ -39,7 +39,7 @@ export default class Wishlist extends BaseCommand {
         .setDescription(`Added "${text}" to your wishlist.`);
       await msg.channel.createMessage({ embed });
       return;
-    } else if (subcommand === "delete") {
+    } else if (subcommand === "delete" || subcommand === "remove") {
       const wishlist = await ProfileService.getWishlist(profile);
       let num = parseInt(this.options[1], 10);
 
