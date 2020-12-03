@@ -90,7 +90,11 @@ export class WishlistEmptyError extends ZephyrError {
     super(`Your wishlist is already empty!`);
   }
 }
-
+export class InvalidWishlistEntryError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid item from your wishlist.`);
+  }
+}
 /*
     Items
            */

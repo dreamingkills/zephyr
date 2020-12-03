@@ -40,13 +40,31 @@ export default class Wishlist extends BaseCommand {
       await msg.channel.createMessage({ embed });
       return;
     } else if (subcommand === "delete") {
-      const num = parseInt(this.options[1], 10);
-      if (isNaN(num))
-        throw new ZephyrError.InvalidAmountError("wishlist entry");
-
       const wishlist = await ProfileService.getWishlist(profile);
-      if (!wishlist[num - 1])
-        throw new ZephyrError.InvalidAmountError("wishlist entry");
+      let num = parseInt(this.options[1], 10);
+
+      if (isNaN(num)) {
+        if (this.options[1]) {
+          const query = this.options.slice(1)?.join(" ").toLowerCase();
+          const item = wishlist.filter((i) => i.toLowerCase() === query);
+          if (item[0]) {
+            const index = wishlist.indexOf(item[0]);
+            await ProfileService.removeFromWishlist(profile, index + 1);
+            const embed = new MessageEmbed()
+              .setAuthor(
+                `Wishlist | ${msg.author.tag}`,
+                msg.author.dynamicAvatarURL("png")
+              )
+              .setDescription(
+                `Removed "${wishlist[index]}" from your wishlist.`
+              );
+            await msg.channel.createMessage({ embed });
+            return;
+          }
+        } else throw new ZephyrError.InvalidWishlistEntryError();
+      }
+
+      if (!wishlist[num - 1]) throw new ZephyrError.InvalidWishlistEntryError();
 
       await ProfileService.removeFromWishlist(profile, num);
       const embed = new MessageEmbed()
