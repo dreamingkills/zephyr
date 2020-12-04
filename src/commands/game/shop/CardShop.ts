@@ -6,7 +6,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 
 export default class CardShop extends BaseCommand {
-  names = ["cardshop", "cs"];
+  names = ["cardshop"];
   description = "Shows you what's on sale in the card shop.";
   developerOnly = true;
   async exec(msg: Message, profile: GameProfile): Promise<void> {

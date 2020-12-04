@@ -35,7 +35,7 @@ export default class ViewUserCard extends BaseCommand {
         }** ${baseCard.subgroup ? ` (${baseCard.subgroup})` : ``} #${
           userCard.serialNumber
         }` +
-          `\n— Frame: **${userCard.frameName}**` +
+          `\n— Frame: **${userCard.frameName || "Default"}**` +
           `\n${baseCard.flavor ? `*${baseCard.flavor}*` : ``}`
       );
     await msg.channel.createMessage(

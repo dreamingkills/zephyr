@@ -66,7 +66,7 @@ export abstract class CardGet extends DBClass {
     query +=
       (queryOptions.length > 0 ? ` AND` : ``) +
       queryOptions.join(` AND`) +
-      ` ORDER BY user_card.tier DESC, user_card.serial_number ASC LIMIT 10 OFFSET ${DB.connection.escape(
+      ` ORDER BY user_card.serial_number ASC LIMIT 10 OFFSET ${DB.connection.escape(
         (isNaN(page) ? 1 : page) * 10 - 10
       )}`;
 

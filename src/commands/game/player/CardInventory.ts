@@ -25,8 +25,7 @@ export default class CardInventory extends BaseCommand {
       const entry =
         `\`${CardService.parseReference(card).padStart(pad, " ")}\` ` +
         (baseCard.group ? `**${baseCard.group}** ` : ``) +
-        `${baseCard.name} — ` +
-        `${this.zephyr.config.discord.emoji.star.repeat(card.tier)}`;
+        `${baseCard.name}`;
       desc.push(entry);
     }
     return desc.join("\n");
