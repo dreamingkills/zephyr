@@ -60,33 +60,7 @@ export abstract class CardService {
     const ctx = canvas.getContext("2d");
 
     const dir = `./src/assets/cards/${card.baseCardId}`;
-    let img: Image;
-    switch (card.tier) {
-      case 2: {
-        img = await loadImage(`${dir}/two.png`);
-        break;
-      }
-      case 3: {
-        img = await loadImage(`${dir}/three.png`);
-        break;
-      }
-      case 4: {
-        img = await loadImage(`${dir}/four.png`);
-        break;
-      }
-      case 5: {
-        img = await loadImage(`${dir}/five.png`);
-        break;
-      }
-      case 6: {
-        img = await loadImage(`${dir}/six.png`);
-        break;
-      }
-      default: {
-        img = await loadImage(`${dir}/one.png`);
-        break;
-      }
-    }
+    let img = await loadImage(`${dir}/one.png`);
     const overlay = await loadImage(`${dir}/overlay.png`);
     let frame: Image;
     if (!card.frameId || !card.frameUrl) {

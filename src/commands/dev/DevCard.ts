@@ -43,19 +43,7 @@ export default class DevCard extends BaseCommand {
           `\n**Individual Name**: ${card.name}` +
           `\n**Rarity**: ${card.rarity}` +
           `\n**Serial Total**: ${card.serialTotal.toLocaleString()}` +
-          `\n**Serial Limit**: ${card.serialLimit.toLocaleString()}` +
-          `\n**Max Tier**: ${card.maxTier}`,
-        inline: true,
-      })
-      .addField({
-        name: `Image Data`,
-        value:
-          `**T1**: ${card.tierOne || "*none*"}` +
-          `\n**T2**: ${card.tierTwo || "*none*"}` +
-          `\n**T3**: ${card.tierThree || "*none*"}` +
-          `\n**T4**: ${card.tierFour || "*none*"}` +
-          `\n**T5**: ${card.tierFive || "*none*"}` +
-          `\n**T6**: ${card.tierSix || "*none*"}`,
+          `\n**Serial Limit**: ${card.serialLimit.toLocaleString()}`,
         inline: true,
       });
 
