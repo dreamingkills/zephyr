@@ -1,7 +1,9 @@
 import { DB, DBClass } from "../../..";
 import {
   BaseCard,
+  Frame,
   GameBaseCard,
+  GameFrame,
 } from "../../../../../structures/game/BaseCard";
 import {
   GameUserCard,
@@ -31,6 +33,21 @@ export abstract class CardGet extends DBClass {
                                     card_image.tier_six
                                    FROM card_base LEFT JOIN card_image ON card_id=id;`)) as BaseCard[];
     return query.map((c) => new GameBaseCard(c));
+  }
+  public static async getRandomFrame(
+    includeUnshoppable: boolean
+  ): Promise<GameFrame> {
+    const query = (await DB.query(
+      `SELECT * FROM card_frame WHERE (shoppable=1 OR shoppable=1-?) AND NOT id=1 ORDER BY RAND() LIMIT 1;`,
+      [includeUnshoppable]
+    )) as Frame[];
+    return new GameFrame(query[0]);
+  }
+  public static async getFrameById(id: number): Promise<GameFrame> {
+    const query = (await DB.query(`SELECT * FROM card_frame WHERE id=?;`, [
+      id,
+    ])) as Frame[];
+    return new GameFrame(query[0]);
   }
 
   /*

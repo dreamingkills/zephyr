@@ -145,6 +145,10 @@ export class Zephyr extends Client {
       await welcomeChannel.createMessage({ embed });
       return;
     });
+
+    this.on("error", (error) => {
+      console.log(error.message);
+    });
   }
 
   /*

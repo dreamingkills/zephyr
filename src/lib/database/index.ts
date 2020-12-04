@@ -5,7 +5,7 @@ import { promisify } from "util";
 export class DB {
   public static query: (
     arg1: string | QueryOptions,
-    values?: (string | number | string[] | number[])[]
+    values?: (string | number | boolean | string[] | number[])[]
   ) => Promise<unknown>;
   public static connection: Pool;
   static async connect() {

@@ -1,13 +1,13 @@
 import { Message } from "eris";
-import { CardService } from "../../../lib/database/services/game/CardService";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
-export default class ViewUserCard extends BaseCommand {
-  names = ["card", "show", "view"];
-  description = "Inspects one of your cards.";
+export default class CardSearch extends BaseCommand {
+  names = ["cardsearch", "cs"];
+  description = "Shows you information about a card.";
   usage = ["$CMD$ <card>"];
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
@@ -20,30 +20,26 @@ export default class ViewUserCard extends BaseCommand {
 
     const userCard = await CardService.getUserCardByReference(reference);
     const baseCard = this.zephyr.getCard(userCard.baseCardId);
-    if (userCard.discordId !== msg.author.id)
-      throw new ZephyrError.NotOwnerOfCardError(userCard);
-    const image = await CardService.checkCacheForCard(userCard);
+
+    const owner = await this.zephyr.fetchUser(userCard.discordId);
+    const originalOwner = await this.zephyr.fetchUser(userCard.originalOwner);
 
     const embed = new MessageEmbed()
       .setAuthor(
-        `Card View | ${msg.author.tag}`,
+        `Card Search | ${msg.author.tag}`,
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(
-        `\n—${baseCard.group ? ` **${baseCard.group}**` : ""} **${
-          baseCard.name
-        }** ${baseCard.subgroup ? ` (${baseCard.subgroup})` : ``} #${
-          userCard.serialNumber
-        }` +
-          `\n— Frame: **${userCard.frameName}**` +
-          `\n${baseCard.flavor ? `*${baseCard.flavor}*` : ``}`
-      );
-    await msg.channel.createMessage(
-      { embed },
-      {
-        file: image,
-        name: "card.png",
-      }
-    );
+        `:bust_in_silhouette: Owned by **${owner.tag}**` +
+          `\n— **${baseCard.group ? `${baseCard.group} ` : ``}${
+            baseCard.name
+          }** ${baseCard.subgroup ? `(${baseCard.subgroup})` : ``}` +
+          `\n— Issue **#${userCard.serialNumber}**` +
+          `${
+            userCard.frameId !== 1 ? `\n— Frame: **${userCard.frameName}**` : ``
+          }`
+      )
+      .setFooter(`Card originally owned by ${originalOwner.tag}`);
+    await msg.channel.createMessage({ embed });
   }
 }

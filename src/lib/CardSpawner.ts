@@ -10,10 +10,11 @@ import { Zephyr } from "../structures/client/Zephyr";
 import { getTimeUntil } from "../lib/ZephyrUtils";
 import dayjs from "dayjs";
 import { GuildService } from "./database/services/guild/GuildService";
+import { GameBaseCard } from "../structures/game/BaseCard";
 
 export abstract class CardSpawner {
   private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
-  private static readonly timeout = 2000;
+  private static readonly timeout = 5000;
   private static readonly minSpawnThreshold = 100;
   private static readonly spawnThreshold = CardSpawner.minSpawnThreshold * 2;
   private static guildLevels: { [key: string]: number } = {};
@@ -25,6 +26,7 @@ export abstract class CardSpawner {
     takers: Set<string>,
     card: GameDroppedCard,
     zephyr: Zephyr,
+    frame: number,
     prefer?: GameProfile
   ): Promise<{ winner: GameProfile; card: GameUserCard }> {
     let winner;
@@ -40,7 +42,7 @@ export abstract class CardSpawner {
       winner,
       zephyr,
       0,
-      1
+      frame
     );
     return { winner, card: newCard };
   }
@@ -48,11 +50,30 @@ export abstract class CardSpawner {
   private static async dropCards(
     title: string,
     channel: TextChannel,
-    cards: GameDroppedCard[],
+    cards: GameBaseCard[],
     zephyr: Zephyr,
     prefer?: GameProfile
   ): Promise<void> {
-    const collage = await CardService.generateCardCollege(cards);
+    const chance = new Chance();
+    const droppedCards: GameDroppedCard[] = [];
+
+    for (let card of cards) {
+      const random = chance.bool({ likelihood: 2 });
+      let frame;
+      if (random) {
+        const randomFrame = await CardService.getRandomFrame();
+        frame = randomFrame.id;
+      } else frame = 1;
+      droppedCards.push(
+        new GameDroppedCard({
+          id: card.id,
+          identifier: card.identifier,
+          serialNumber: card.serialTotal + 1,
+          frameId: frame,
+        })
+      );
+    }
+    const collage = await CardService.generateCardCollege(droppedCards);
     const drop = await channel.createMessage(`${title}\n`, {
       file: collage,
       name: "collage.png",
@@ -116,8 +137,9 @@ export abstract class CardSpawner {
 
           const fight = await this.fight(
             takers[num],
-            cards[num],
+            droppedCards[num],
             zephyr,
+            droppedCards[num].frameId,
             prefer
           );
           winners.add(fight.winner.discordId);
@@ -161,7 +183,7 @@ export abstract class CardSpawner {
 
   public static async forceDrop(
     channel: TextChannel,
-    cards: GameDroppedCard[],
+    cards: GameBaseCard[],
     zephyr: Zephyr
   ): Promise<void> {
     return await this.dropCards(
@@ -174,7 +196,7 @@ export abstract class CardSpawner {
 
   public static async userDrop(
     channel: TextChannel,
-    cards: GameDroppedCard[],
+    cards: GameBaseCard[],
     profile: GameProfile,
     zephyr: Zephyr
   ): Promise<void> {
@@ -191,19 +213,11 @@ export abstract class CardSpawner {
     channel: TextChannel,
     zephyr: Zephyr
   ): Promise<void> {
-    const baseCards = zephyr.getRandomCards(3);
-    const droppedCards = baseCards.map(
-      (c) =>
-        new GameDroppedCard({
-          ...c,
-          serialNumber: c.serialTotal + 1,
-          frameUrl: `./src/assets/frames/frame-white.png`,
-        })
-    );
+    const cards = zephyr.getRandomCards(3);
     await this.dropCards(
       "— **3 cards** are dropping due to server activity!",
       channel,
-      droppedCards,
+      cards,
       zephyr
     );
   }

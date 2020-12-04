@@ -1,7 +1,6 @@
 import { Message, TextChannel } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
-import { GameDroppedCard } from "../../../structures/game/DroppedCard";
 import { CardSpawner } from "../../../lib/CardSpawner";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import dayjs from "dayjs";
@@ -23,20 +22,9 @@ export default class DropCards extends BaseCommand {
       dayjs(new Date()).add(30, "minute").format(`YYYY/MM/DD HH:mm:ss`)
     );
     const cards = this.zephyr.getRandomCards(3);
-
-    const droppedCards = cards.map(
-      (c) =>
-        new GameDroppedCard({
-          id: c.id,
-          identifier: c.identifier,
-          serialNumber: c.serialTotal + 1,
-          frameUrl: `./src/assets/frames/frame-white.png`,
-        })
-    );
-
     await CardSpawner.userDrop(
       <TextChannel>msg.channel,
-      droppedCards,
+      cards,
       profile,
       this.zephyr
     );

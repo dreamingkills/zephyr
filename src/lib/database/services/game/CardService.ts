@@ -1,5 +1,5 @@
 import { createCanvas, loadImage, Image } from "canvas";
-import { GameBaseCard } from "../../../../structures/game/BaseCard";
+import { GameBaseCard, GameFrame } from "../../../../structures/game/BaseCard";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameUserCard } from "../../../../structures/game/UserCard";
 import { Filter } from "../../sql/Filters";
@@ -31,9 +31,9 @@ export abstract class CardService {
     profile: GameProfile,
     zephyr: Zephyr,
     price: number = 0,
-    tier?: number
+    frame: number = 1
   ): Promise<GameUserCard> {
-    return await CardSet.createNewUserCard(card, profile, zephyr, price, tier);
+    return await CardSet.createNewUserCard(card, profile, zephyr, price, frame);
   }
   public static async getUserCardById(id: number): Promise<GameUserCard> {
     return await CardGet.getUserCardById(id);
@@ -114,7 +114,8 @@ export abstract class CardService {
     for (let card of cards) {
       const base = await loadImage(`${baseUrl}${card.id}/one.png`);
       const overlay = await loadImage(`${baseUrl}${card.id}/overlay.png`);
-      const frame = await loadImage(card.frameUrl);
+      const getFrame = await this.getFrameById(card.frameId);
+      const frame = await loadImage(getFrame.frameUrl);
       ctx.drawImage(base, cards.indexOf(card) * 250, 0, 250, 333);
       ctx.drawImage(frame, cards.indexOf(card) * 250, 0, 250, 333);
       ctx.drawImage(overlay, cards.indexOf(card) * 250, 0, 250, 333);
@@ -134,6 +135,15 @@ export abstract class CardService {
     const newCard = await CardSet.setCardFrame(card, frameId);
     return await this.updateCardCache(newCard);
   }
+  public static async getRandomFrame(
+    includeUnshoppable: boolean = false
+  ): Promise<GameFrame> {
+    return await CardGet.getRandomFrame(includeUnshoppable);
+  }
+  public static async getFrameById(id: number): Promise<GameFrame> {
+    return await CardGet.getFrameById(id);
+  }
+
   public static async transferCardsToUser(
     cards: GameUserCard[],
     profile: GameProfile

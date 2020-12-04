@@ -1,4 +1,3 @@
-import { Chance } from "chance";
 import { DB, DBClass } from "../../..";
 import { Zephyr } from "../../../../../structures/client/Zephyr";
 import { GameBaseCard } from "../../../../../structures/game/BaseCard";
@@ -12,21 +11,15 @@ export abstract class CardSet extends DBClass {
     profile: GameProfile,
     zephyr: Zephyr,
     price: number,
-    tier?: number
+    frame?: number
   ): Promise<GameUserCard> {
-    const chance = new Chance();
-    if (!tier)
-      tier = chance.weighted(
-        [1, 2, 3, 4, 5, 6].slice(0, card.maxTier),
-        [1000, 80, 20, 7, 1.5, 0.1].slice(0, card.maxTier)
-      );
     let issue = await IssueHandler.queueIssueGeneration(card, profile, price);
     let tries = 0;
     while (true) {
       try {
         const query = (await DB.query(
-          `INSERT INTO user_card (card_id, serial_number, discord_id, original_owner, tier) VALUES (?, ?, ?, ?, ?)`,
-          [card.id, issue, profile.discordId, profile.discordId, tier]
+          `INSERT INTO user_card (card_id, serial_number, discord_id, original_owner, frame) VALUES (?, ?, ?, ?, ?)`,
+          [card.id, issue, profile.discordId, profile.discordId, frame]
         )) as { insertId: number };
         zephyr.getCard(card.id).serialTotal = issue;
         return await CardService.getUserCardById(query.insertId);

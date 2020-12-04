@@ -4,7 +4,6 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ShopService } from "../../../lib/database/services/game/ShopService";
 import { createCanvas, loadImage } from "canvas";
-import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class PreviewFrame extends BaseCommand {
   names = ["previewframe", "pf"];
@@ -15,10 +14,6 @@ export default class PreviewFrame extends BaseCommand {
     const query = this.options.join(" ").toLowerCase();
     if (!query) throw new ZephyrError.NoFrameSpecifiedError();
     const frame = await ShopService.getFrameByName(query);
-
-    const frameName = frame.frameUrl.split("/")[
-      frame.frameUrl.split("/").length - 1
-    ];
 
     const canvas = createCanvas(385, 550);
     const ctx = canvas.getContext("2d");
