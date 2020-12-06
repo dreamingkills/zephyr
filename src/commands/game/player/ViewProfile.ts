@@ -40,12 +40,18 @@ export default class ViewProfile extends BaseCommand {
       .setDescription(
         `**Blurb**` +
           `\n${target.blurb || "*No blurb set*"}` +
-          `\n\n— You have ${
+          `\n\n— ${
+            target.discordId === msg.author.id ? `You have` : `${user.tag} has`
+          } ${
             this.zephyr.config.discord.emoji.bits
           }**${target.bits.toLocaleString()}**.`
       )
       .setFooter(
-        `Your profile is currently ${target.private ? `private` : `public`}.`
+        target.discordId === msg.author.id
+          ? `Your profile is currently ${
+              target.private ? `private` : `public`
+            }.`
+          : ``
       );
     await msg.channel.createMessage({ embed });
   }

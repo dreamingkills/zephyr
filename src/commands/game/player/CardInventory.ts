@@ -6,7 +6,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { ReactionCollector } from "eris-collector";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, idToIdentifier } from "../../../lib/ZephyrUtils";
 
 export default class CardInventory extends BaseCommand {
   names = ["inventory", "inv", "i"];
@@ -18,12 +18,21 @@ export default class CardInventory extends BaseCommand {
 
   private renderInventory(cards: GameUserCard[]): string {
     let desc: string[] = [];
-    let pad = 0;
-
+    if (cards.length === 0) return "";
+    const longestId = idToIdentifier(
+      [...cards].sort((a, b) =>
+        idToIdentifier(a.id) > idToIdentifier(b.id) ? 1 : -1
+      )[0].id
+    ).length;
     for (let card of cards) {
       const baseCard = this.zephyr.getCard(card.baseCardId);
       const entry =
-        `\`${CardService.parseReference(card).padStart(pad, " ")}\` ` +
+        `\`${idToIdentifier(card.id).padStart(
+          longestId,
+          " "
+        )}\` : \`${"★".repeat(card.wear).padEnd(5, "☆")}\` : \`#${
+          card.serialNumber
+        }\` ` +
         (baseCard.group ? `**${baseCard.group}** ` : ``) +
         `${baseCard.name}`;
       desc.push(entry);

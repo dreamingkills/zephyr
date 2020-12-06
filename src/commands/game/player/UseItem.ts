@@ -7,6 +7,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { ShopService } from "../../../lib/database/services/game/ShopService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { idToIdentifier, parseIdentifier } from "../../../lib/ZephyrUtils";
 
 export default class UseItem extends BaseCommand {
   names = ["use"];
@@ -30,14 +31,13 @@ export default class UseItem extends BaseCommand {
 
     if (targetItem.type === "FRAME") {
       const offset = this.options.slice(targetItem.name?.split(" ").length);
-      const reference = {
-        identifier: offset[0]?.split("#")[0],
-        serialNumber: parseInt(offset[0]?.split("#")[1], 10),
-      };
+      const identifier = offset[0];
+      if (!identifier) throw new ZephyrError.InvalidCardReferenceError();
 
-      if (!reference.identifier || isNaN(reference.serialNumber))
-        throw new ZephyrError.InvalidCardReferenceError();
-      const card = await CardService.getUserCardByReference(reference);
+      const id = parseIdentifier(identifier);
+      if (isNaN(id)) throw new ZephyrError.InvalidCardReferenceError();
+
+      const card = await CardService.getUserCardById(id);
       if (card.discordId !== msg.author.id)
         throw new ZephyrError.NotOwnerOfCardError(card);
 
@@ -52,7 +52,7 @@ export default class UseItem extends BaseCommand {
         .setDescription(
           `${this.zephyr.config.discord.emoji.check} You used \`${
             targetItem.name
-          }\` on **${CardService.parseReference(card)}**.` +
+          }\` on \`${idToIdentifier(card.id)}\`.` +
             `\n— You now have **${userItem.count - 1}x** \`${
               targetItem.name
             }\`.`

@@ -9,7 +9,6 @@ import {
   GameUserCard,
   UserCard,
 } from "../../../../../structures/game/UserCard";
-import { CardReference } from "../../../services/game/CardService";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { Filter, FilterService } from "../../Filters";
 
@@ -17,7 +16,6 @@ export abstract class CardGet extends DBClass {
   public static async getAllCards(): Promise<GameBaseCard[]> {
     const query = (await DB.query(`SELECT
                                     id,
-                                    identifier,
                                     flavor_text,
                                     group_name,
                                     subgroup_name,
@@ -57,7 +55,7 @@ export abstract class CardGet extends DBClass {
     discordId: string,
     options: Filter
   ): Promise<GameUserCard[]> {
-    let query = `SELECT user_card.*, card_base.identifier FROM user_card 
+    let query = `SELECT user_card.* FROM user_card 
                   LEFT JOIN card_base ON user_card.card_id=card_base.id WHERE discord_id=${DB.connection.escape(
                     discordId
                   )}`;
@@ -66,7 +64,7 @@ export abstract class CardGet extends DBClass {
     query +=
       (queryOptions.length > 0 ? ` AND` : ``) +
       queryOptions.join(` AND`) +
-      ` ORDER BY user_card.serial_number ASC LIMIT 10 OFFSET ${DB.connection.escape(
+      ` ORDER BY wear DESC, serial_number ASC LIMIT 10 OFFSET ${DB.connection.escape(
         (isNaN(page) ? 1 : page) * 10 - 10
       )}`;
 
@@ -89,20 +87,18 @@ export abstract class CardGet extends DBClass {
   }
   public static async getUserCardById(id: number): Promise<GameUserCard> {
     const query = (await DB.query(
-      `SELECT user_card.*, card_base.identifier, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id LEFT JOIN card_base ON card_base.id=user_card.card_id WHERE user_card.id=?;`,
+      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.id=?;`,
       [id]
     )) as UserCard[];
     if (!query[0]) throw new ZephyrError.UnknownUserCardIdError();
     return new GameUserCard(query[0]);
   }
-  public static async getUserCardByReference(
-    ref: CardReference
-  ): Promise<GameUserCard> {
+  public static async getLastCard(discordId: string): Promise<GameUserCard> {
     const query = (await DB.query(
-      `SELECT user_card.*, card_base.identifier, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url FROM user_card LEFT JOIN card_base ON card_base.id=user_card.card_id LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE serial_number=? AND card_base.identifier=?;`,
-      [ref.serialNumber, ref.identifier]
+      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE discord_id=? ORDER BY id DESC;`,
+      [discordId]
     )) as UserCard[];
-    if (!query[0]) throw new ZephyrError.UnknownUserCardError(ref);
+    if (!query[0]) throw new ZephyrError.InvalidCardReferenceError();
     return new GameUserCard(query[0]);
   }
 }

@@ -85,6 +85,13 @@ export abstract class ProfileService {
     await ProfileSet.withdrawBitsFromBank(profile.discordId, amount);
     return await profile.fetch();
   }
+  public static async addDustToProfile(
+    tier: 1 | 2 | 3 | 4 | 5,
+    profile: GameProfile
+  ): Promise<GameProfile> {
+    await ProfileSet.addDust(tier, profile.discordId);
+    return await profile.fetch();
+  }
 
   /*
       Timers

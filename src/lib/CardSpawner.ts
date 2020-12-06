@@ -7,7 +7,7 @@ import { ProfileService } from "./database/services/game/ProfileService";
 import { GameUserCard } from "../structures/game/UserCard";
 import { Chance } from "chance";
 import { Zephyr } from "../structures/client/Zephyr";
-import { getTimeUntil } from "../lib/ZephyrUtils";
+import { getTimeUntil, idToIdentifier } from "../lib/ZephyrUtils";
 import dayjs from "dayjs";
 import { GuildService } from "./database/services/guild/GuildService";
 import { GameBaseCard } from "../structures/game/BaseCard";
@@ -67,7 +67,6 @@ export abstract class CardSpawner {
       droppedCards.push(
         new GameDroppedCard({
           id: card.id,
-          identifier: card.identifier,
           serialNumber: card.serialTotal + 1,
           frameId: frame,
         })
@@ -147,25 +146,54 @@ export abstract class CardSpawner {
           const countExl = takers[num].size - 1;
           takers[num].clear();
 
-          const reference = CardService.parseReference(fight.card);
+          let message = "";
           if (countExl === 0 || prefer?.discordId === fight.winner.discordId) {
-            await channel.createMessage(
-              `— <@${fight.winner.discordId}> claimed **${reference}**!`
-            );
+            message += `<@${fight.winner.discordId}> claimed`;
           } else {
-            await channel.createMessage(
-              `— <@${
-                fight.winner.discordId
-              }> won the fight with **${countExl}** ${
-                countExl === 1 ? `person` : `people`
-              } and claimed **${reference}**`
-            );
+            message += `<@${
+              fight.winner.discordId
+            }> won the fight with **${countExl}** ${
+              countExl === 1 ? `person` : `people`
+            } and claimed`;
+          }
+
+          const baseCard = zephyr.getCard(fight.card.baseCardId);
+          message += ` \`${idToIdentifier(fight.card.id)}\` ${
+            baseCard.group ? `**${baseCard.group}** ` : ``
+          }${baseCard.name} #${fight.card.serialNumber}!`;
+
+          switch (fight.card.wear) {
+            case 0: {
+              message += ` Unfortunately, it seems to be **damaged**...`;
+              break;
+            }
+            case 1: {
+              message += ` Unfortunately, it seems to be in **poor** condition...`;
+              break;
+            }
+            case 2: {
+              message += ` It's in **average** condition.`;
+              break;
+            }
+            case 3: {
+              message += ` It's in **good** condition.`;
+              break;
+            }
+            case 4: {
+              message += ` This card is looking **great**!`;
+              break;
+            }
+            case 5: {
+              message += ` This card is in **mint** condition!!`;
+              break;
+            }
           }
 
           await ProfileService.setClaimTimestamp(
             fight.winner,
             now.add(10, "minute").format(`YYYY/MM/DD HH:mm:ss`)
           );
+          await channel.createMessage(message);
           if (finished[0] && finished[1] && finished[2]) collector.stop();
         }, this.timeout);
       }

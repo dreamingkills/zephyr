@@ -10,6 +10,12 @@ export interface Profile {
   daily_streak: number;
   drop_next: string;
   claim_next: string;
+  dust_1: number;
+  dust_2: number;
+  dust_3: number;
+  dust_4: number;
+  dust_5: number;
+  premium_currency: number;
   patron: number;
 }
 export class GameProfile {
@@ -22,6 +28,12 @@ export class GameProfile {
   dailyStreak: number;
   dropNext: string;
   claimNext: string;
+  dustPoor: number;
+  dustAverage: number;
+  dustGood: number;
+  dustGreat: number;
+  dustMint: number;
+  premiumCurrency: number;
   patron: number;
   constructor(data: Profile) {
     this.discordId = data.discord_id;
@@ -34,6 +46,12 @@ export class GameProfile {
     this.patron = data.patron;
     this.dropNext = data.drop_next;
     this.claimNext = data.claim_next;
+    this.dustPoor = data.dust_1;
+    this.dustAverage = data.dust_2;
+    this.dustGood = data.dust_3;
+    this.dustGreat = data.dust_4;
+    this.dustMint = data.dust_5;
+    this.premiumCurrency = data.premium_currency;
   }
 
   public async fetch(): Promise<GameProfile> {

@@ -4,6 +4,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { parseIdentifier } from "../../../lib/ZephyrUtils";
 
 export default class ViewUserCard extends BaseCommand {
   names = ["card", "show", "view"];
@@ -11,18 +12,20 @@ export default class ViewUserCard extends BaseCommand {
   usage = ["$CMD$ <card>"];
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const reference = {
-      identifier: this.options[0]?.split("#")[0]?.toUpperCase(),
-      serialNumber: parseInt(this.options[0]?.split("#")[1], 10),
-    };
-    if (isNaN(reference.serialNumber))
-      throw new ZephyrError.InvalidCardReferenceError();
+    const identifier = this.options[0];
+    let card;
+    if (!identifier) {
+      card = await CardService.getLastCard(msg.author.id);
+    } else {
+      const id = parseIdentifier(identifier);
+      if (isNaN(id)) throw new ZephyrError.InvalidCardReferenceError();
+      card = await CardService.getUserCardById(id);
+    }
 
-    const userCard = await CardService.getUserCardByReference(reference);
-    const baseCard = this.zephyr.getCard(userCard.baseCardId);
-    if (userCard.discordId !== msg.author.id)
-      throw new ZephyrError.NotOwnerOfCardError(userCard);
-    const image = await CardService.checkCacheForCard(userCard);
+    const baseCard = this.zephyr.getCard(card.baseCardId);
+    if (card.discordId !== msg.author.id)
+      throw new ZephyrError.NotOwnerOfCardError(card);
+    const image = await CardService.checkCacheForCard(card);
 
     const embed = new MessageEmbed()
       .setAuthor(
@@ -33,11 +36,15 @@ export default class ViewUserCard extends BaseCommand {
         `\n—${baseCard.group ? ` **${baseCard.group}**` : ""} **${
           baseCard.name
         }** ${baseCard.subgroup ? ` (${baseCard.subgroup})` : ``} #${
-          userCard.serialNumber
+          card.serialNumber
         }` +
-          `\n— Frame: **${userCard.frameName || "Default"}**` +
+          `\n— Frame: **${card.frameName || "Default"}**` +
+          `\n— Wear: **${
+            ["Damaged", "Poor", "Average", "Good", "Great", "Mint"][card.wear]
+          }**` +
           `\n${baseCard.flavor ? `*${baseCard.flavor}*` : ``}`
-      );
+      )
+      .setFooter(`Luck Coefficient: ${card.luckCoefficient}`);
     await msg.channel.createMessage(
       { embed },
       {

@@ -1,7 +1,4 @@
-import {
-  CardReference,
-  CardService,
-} from "../../lib/database/services/game/CardService";
+import { idToIdentifier } from "../../lib/ZephyrUtils";
 import { GameUserCard } from "../game/UserCard";
 
 abstract class ZephyrError extends Error {
@@ -69,6 +66,11 @@ export class NotEnoughBitsError extends ZephyrError {
 export class NotEnoughBitsInBankError extends ZephyrError {
   constructor(_has: number, _needs: number) {
     super(`You don't have enough bits in your bank to do that.`);
+  }
+}
+export class CannotPayYourselfError extends ZephyrError {
+  constructor() {
+    super(`You can't give bits to yourself.`);
   }
 }
 export class WishlistFullError extends ZephyrError {
@@ -150,19 +152,17 @@ export class UnknownUserCardIdError extends ZephyrError {
   }
 }
 export class UnknownUserCardError extends ZephyrError {
-  constructor(ref: CardReference) {
-    super(`**${`${ref.identifier}#${ref.serialNumber}`}** does not exist.`);
+  constructor(identifier: string) {
+    super(`\`${identifier}\` does not exist.`);
   }
 }
 export class NotOwnerOfCardError extends ZephyrError {
   constructor(card: GameUserCard) {
-    super(`**${CardService.parseReference(card)}** does not belong to you.`);
+    super(`\`${idToIdentifier(card.id)}\` does not belong to you.`);
   }
 }
 export class FrameAlreadyDefaultError extends ZephyrError {
   constructor(card: GameUserCard) {
-    super(
-      `**${CardService.parseReference(card)}** already has the default frame.`
-    );
+    super(`\`${idToIdentifier(card.id)}\` already has the default frame.`);
   }
 }

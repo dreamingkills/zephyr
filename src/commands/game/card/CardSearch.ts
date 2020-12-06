@@ -1,10 +1,11 @@
 import { Message } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
-import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
+import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { parseIdentifier } from "../../../lib/ZephyrUtils";
 
 export default class CardSearch extends BaseCommand {
   names = ["cardsearch", "cs"];
@@ -12,22 +13,22 @@ export default class CardSearch extends BaseCommand {
   usage = ["$CMD$ <card>"];
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const reference = {
-      identifier: this.options[0]?.split("#")[0]?.toUpperCase(),
-      serialNumber: parseInt(this.options[0]?.split("#")[1], 10),
-    };
-    if (isNaN(reference.serialNumber))
-      throw new ZephyrError.InvalidCardReferenceError();
+    const identifier = this.options[0];
+    let card;
+    if (!identifier) {
+      card = await CardService.getLastCard(msg.author.id);
+    } else {
+      const id = parseIdentifier(identifier);
+      if (isNaN(id)) throw new ZephyrError.InvalidCardReferenceError();
+      card = await CardService.getUserCardById(id);
+    }
 
-    const userCard = await CardService.getUserCardByReference(reference);
-    const baseCard = this.zephyr.getCard(userCard.baseCardId);
+    const baseCard = this.zephyr.getCard(card.baseCardId);
 
-    const owner = await this.zephyr.fetchUser(userCard.discordId);
-    const ownerProfile = await ProfileService.getProfile(userCard.discordId);
-    const originalOwner = await this.zephyr.fetchUser(userCard.originalOwner);
-    const originalProfile = await ProfileService.getProfile(
-      userCard.originalOwner
-    );
+    const owner = await this.zephyr.fetchUser(card.discordId);
+    const ownerProfile = await ProfileService.getProfile(card.discordId);
+    const originalOwner = await this.zephyr.fetchUser(card.originalOwner);
+    const originalProfile = await ProfileService.getProfile(card.originalOwner);
 
     const embed = new MessageEmbed()
       .setAuthor(
@@ -36,19 +37,28 @@ export default class CardSearch extends BaseCommand {
       )
       .setDescription(
         `:bust_in_silhouette: Owned by ${
-          ownerProfile.private ? `*Private User*` : `**${owner.tag}**`
+          ownerProfile.private && owner.id !== msg.author.id
+            ? `*Private User*`
+            : `**${owner.tag}**`
         }` +
           `\n— **${baseCard.group ? `${baseCard.group} ` : ``}${
             baseCard.name
           }** ${baseCard.subgroup ? `(${baseCard.subgroup})` : ``}` +
-          `\n— Issue **#${userCard.serialNumber}**` +
+          `\n— Issue **#${card.serialNumber}**` +
+          `\n— Wear: **${
+            ["Damaged", "Poor", "Average", "Good", "Great", "Mint"][card.wear]
+          }**` +
           `${
-            userCard.frameId !== 1 ? `\n— Frame: **${userCard.frameName}**` : ``
+            card.frameId !== null && card.frameId !== 1
+              ? `\n— Frame: **${card.frameName}**`
+              : ``
           }`
       )
       .setFooter(
         `Card originally owned by ${
-          originalProfile.private ? `Private User` : `${originalOwner.tag}`
+          originalProfile.private && originalOwner.id !== msg.author.id
+            ? `Private User`
+            : `${originalOwner.tag}`
         }`
       );
     await msg.channel.createMessage({ embed });

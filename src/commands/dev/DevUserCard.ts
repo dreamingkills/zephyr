@@ -4,6 +4,7 @@ import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 import * as ZephyrError from "../../structures/error/ZephyrError";
+import { parseIdentifier } from "../../lib/ZephyrUtils";
 
 export default class DevUserCard extends BaseCommand {
   names = ["devusercard", "duc"];
@@ -11,14 +12,12 @@ export default class DevUserCard extends BaseCommand {
   developerOnly = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const reference = {
-      identifier: this.options[0]?.split("#")[0]?.toUpperCase(),
-      serialNumber: parseInt(this.options[0]?.split("#")[1], 10),
-    };
-    if (isNaN(reference.serialNumber))
-      throw new ZephyrError.InvalidCardReferenceError();
+    const identifier = this.options[0];
+    if (!identifier) throw new ZephyrError.InvalidCardReferenceError();
 
-    const userCard = await CardService.getUserCardByReference(reference);
+    const userCard = await CardService.getUserCardById(
+      parseIdentifier(identifier)
+    );
     const baseCard = this.zephyr.getCard(userCard.baseCardId);
 
     const embed = new MessageEmbed()
@@ -31,7 +30,8 @@ export default class DevUserCard extends BaseCommand {
           `\n**User Card ID**: ${userCard.id}` +
           `\n**Owner ID**: ${userCard.discordId}` +
           `\n**Serial Number**: ${userCard.serialNumber}` +
-          `\n**Tier**: ${userCard.tier}`
+          `\n**Wear**: ${userCard.wear}` +
+          `\n**Luck Coefficient**: ${userCard.luckCoefficient}`
       );
     await msg.channel.createMessage({ embed });
     return;

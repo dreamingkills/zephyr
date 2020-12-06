@@ -98,6 +98,16 @@ export abstract class ProfileSet extends DBClass {
     );
     return;
   }
+  public static async addDust(
+    tier: 1 | 2 | 3 | 4 | 5,
+    discordId: string
+  ): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET dust_${tier}=dust_${tier}+1 WHERE discord_id=?;`,
+      [discordId]
+    );
+    return;
+  }
 
   /*
       Timers

@@ -4,6 +4,8 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ReactionCollector } from "eris-collector";
+import { idToIdentifier, parseIdentifier } from "../../../lib/ZephyrUtils";
+import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class ResetFrame extends BaseCommand {
   names = ["resetframe", "rf"];
@@ -11,24 +13,26 @@ export default class ResetFrame extends BaseCommand {
   usage = ["$CMD$ <card>"];
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const ref = {
-      identifier: this.options[0]?.split("#")[0],
-      serialNumber: parseInt(this.options[0]?.split("#")[1], 10),
-    };
-    if (!ref.identifier || isNaN(ref.serialNumber))
-      throw new ZephyrError.InvalidCardReferenceError();
+    const identifier = this.options[0];
+    let card: GameUserCard;
+    if (!identifier) {
+      card = await CardService.getLastCard(msg.author.id);
+    } else {
+      card = await CardService.getUserCardById(
+        parseIdentifier(this.options[0])
+      );
+    }
 
-    const card = await CardService.getUserCardByReference(ref);
     if (card.discordId !== msg.author.id)
       throw new ZephyrError.NotOwnerOfCardError(card);
 
-    if (card.frameName?.includes("Snow"))
+    if (card.frameName?.includes("Default"))
       throw new ZephyrError.FrameAlreadyDefaultError(card);
 
     const conf = await msg.channel.createMessage(
       `${
         this.zephyr.config.discord.emoji.warn
-      } Really reset the frame of **${CardService.parseReference(card)}**?`
+      } Really reset the frame of \`${idToIdentifier(card.id)}\`?`
     );
     await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
 
@@ -44,7 +48,7 @@ export default class ResetFrame extends BaseCommand {
       await conf.edit(
         `${
           this.zephyr.config.discord.emoji.check
-        } Reset the frame of **${CardService.parseReference(card)}**.`
+        } Reset the frame of \`${idToIdentifier(card.id)}\`.`
       );
       collector.en;
       return;

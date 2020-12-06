@@ -10,7 +10,7 @@ export default class RemoveBits extends BaseCommand {
   description = `Removes bits from a user's balance.`;
   developerOnly = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
+  async exec(msg: Message, _profile: GameProfile): Promise<void> {
     if (!msg.mentions[0]) throw new ZephyrError.InvalidMentionError();
     const amountRaw = msg.content
       .split(" ")
@@ -21,7 +21,7 @@ export default class RemoveBits extends BaseCommand {
     let target = await ProfileService.getProfile(targetUser.id);
     let amount = parseInt(amountRaw[0], 10);
 
-    if (profile.bits - amount < 0) amount = profile.bits;
+    if (target.bits - amount < 0) amount = target.bits;
 
     const _target = await ProfileService.removeBitsFromProfile(target, amount);
     const embed = new MessageEmbed()

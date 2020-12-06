@@ -3,6 +3,7 @@ import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 import { createCanvas, loadImage } from "canvas";
+import { idToIdentifier } from "../../lib/ZephyrUtils";
 
 export default class DevCard extends BaseCommand {
   names = ["dcard"];
@@ -36,7 +37,7 @@ export default class DevCard extends BaseCommand {
         name: `Card Data`,
         value:
           `**Card ID**: ${card.id}` +
-          `\n**Unique ID**: ${card.identifier}` +
+          `\n**Unique ID**: ${idToIdentifier(card.id)}` +
           `\n**Flavor Text**: ${card.flavor || "*none*"}` +
           `\n**Group Name**: ${card.group || "*none*"}` +
           `\n**Subgroup Name**: ${card.subgroup || "*none*"}` +

@@ -8,17 +8,10 @@ import fs from "fs/promises";
 import { CardSet } from "../../sql/game/card/CardSet";
 import { Zephyr } from "../../../../structures/client/Zephyr";
 import { GameDroppedCard } from "../../../../structures/game/DroppedCard";
-
-export interface CardReference {
-  identifier: string;
-  serialNumber: number;
-}
+import { parseIdentifier } from "../../../ZephyrUtils";
+import * as ZephyrError from "../../../../structures/error/ZephyrError";
 
 export abstract class CardService {
-  public static parseReference(card: GameUserCard): string {
-    return `${card.identifier}#${card.serialNumber}`;
-  }
-
   public static async getAllCards(): Promise<GameBaseCard[]> {
     return await CardGet.getAllCards();
   }
@@ -38,10 +31,15 @@ export abstract class CardService {
   public static async getUserCardById(id: number): Promise<GameUserCard> {
     return await CardGet.getUserCardById(id);
   }
-  public static async getUserCardByReference(
-    ref: CardReference
+  public static async getUserCardByIdentifier(
+    identifier: string
   ): Promise<GameUserCard> {
-    return await CardGet.getUserCardByReference(ref);
+    const id = parseIdentifier(identifier);
+    if (isNaN(id)) throw new ZephyrError.InvalidCardReferenceError();
+    return await this.getUserCardById(id);
+  }
+  public static async getLastCard(discordId: string): Promise<GameUserCard> {
+    return await CardGet.getLastCard(discordId);
   }
   public static async getUserInventory(
     profile: GameProfile,
@@ -123,6 +121,13 @@ export abstract class CardService {
     profile: GameProfile
   ): Promise<void> {
     return await CardSet.transferCardsToUser(cards, profile.discordId);
+  }
+
+  public static async dismantleCards(
+    cards: GameUserCard[],
+    zephyr: Zephyr
+  ): Promise<void> {
+    return await CardSet.dismantleCards(cards, zephyr.user.id);
   }
 
   /*

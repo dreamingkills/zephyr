@@ -38,6 +38,12 @@ export abstract class LeaderboardGet extends DBClass {
       daily_streak: number;
       claim_next: string;
       drop_next: string;
+      dust_1: number;
+      dust_2: number;
+      dust_3: number;
+      dust_4: number;
+      dust_5: number;
+      premium_currency: number;
       patron: number;
       count: number;
     }[];

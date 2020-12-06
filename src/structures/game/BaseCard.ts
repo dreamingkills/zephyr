@@ -1,6 +1,5 @@
 export interface BaseCard {
   id: number;
-  identifier: string;
   flavor_text?: string;
   group_name?: string;
   subgroup_name?: string;
@@ -16,7 +15,6 @@ export interface Frame {
 }
 export class GameBaseCard {
   id: number;
-  identifier: string;
   flavor?: string;
   group?: string;
   subgroup?: string;
@@ -26,7 +24,6 @@ export class GameBaseCard {
   serialLimit: number;
   constructor(card: BaseCard) {
     this.id = card.id;
-    this.identifier = card.identifier;
     this.flavor = card.flavor_text;
     this.group = card.group_name;
     this.subgroup = card.subgroup_name;

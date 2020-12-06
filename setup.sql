@@ -16,9 +16,16 @@ CREATE TABLE profile
     daily_streak    SMALLINT UNSIGNED DEFAULT 0,
     drop_next       DATETIME,
     claim_next      DATETIME,
+    dust_1          INT UNSIGNED DEFAULT 0,
+    dust_2          INT UNSIGNED DEFAULT 0,
+    dust_3          INT UNSIGNED DEFAULT 0,
+    dust_4          INT UNSIGNED DEFAULT 0,
+    dust_5          INT UNSIGNED DEFAULT 0,
+    premium_currency INT UNSIGNED DEFAULT 0,
     patron          SMALLINT UNSIGNED DEFAULT 0,
     PRIMARY KEY(discord_id)
 );
+
 CREATE TABLE wishlist
 (
     id              INT(11) AUTO_INCREMENT,
@@ -29,7 +36,6 @@ CREATE TABLE wishlist
 CREATE TABLE card_base
 (
     id              INT(11) AUTO_INCREMENT,
-    identifier      TEXT(8) NOT NULL,
     flavor_text     TEXT(500),
     group_name      TEXT(32),
     subgroup_name   TEXT(32),
@@ -53,14 +59,17 @@ CREATE TABLE card_image
 CREATE TABLE user_card
 (
     id              INT(11) AUTO_INCREMENT,
-    card_id         INT(11) NOT NULL,
+    identifier      TEXT(5) NOT NULL,
+    card_id         INT(11) NOT NULL,   
     serial_number   SMALLINT UNSIGNED NOT NULL,
     discord_id      VARCHAR(32) NOT NULL,
     original_owner  VARCHAR(32) NOT NULL,
-    tier            TINYINT UNSIGNED,
+    wear            TINYINT UNSIGNED DEFAULT 0,
+    luck_coeff      DECIMAL(11, 10) DEFAULT 0,
     frame           INT(11),
     PRIMARY KEY(id),
     CONSTRAINT UserCardUnique UNIQUE (serial_number, card_id),
+    CONSTRAINT UserCardUniqueIdentifier UNIQUE (identifier),
     FOREIGN KEY (frame) REFERENCES card_frame(id) ON DELETE SET NULL
 );
 
