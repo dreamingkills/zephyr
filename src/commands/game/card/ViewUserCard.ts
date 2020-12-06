@@ -4,7 +4,6 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
-import { parseIdentifier } from "../../../lib/ZephyrUtils";
 
 export default class ViewUserCard extends BaseCommand {
   names = ["card", "show", "view"];
@@ -12,20 +11,16 @@ export default class ViewUserCard extends BaseCommand {
   usage = ["$CMD$ <card>"];
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const identifier = this.options[0];
+    const rawIdentifier = this.options[0];
     let card;
-    if (!identifier) {
+    if (!rawIdentifier) {
       card = await CardService.getLastCard(msg.author.id);
-    } else {
-      const id = parseIdentifier(identifier);
-      if (isNaN(id)) throw new ZephyrError.InvalidCardReferenceError();
-      card = await CardService.getUserCardById(id);
-    }
+    } else card = await CardService.getUserCardByIdentifier(rawIdentifier);
 
     const baseCard = this.zephyr.getCard(card.baseCardId);
     if (card.discordId !== msg.author.id)
       throw new ZephyrError.NotOwnerOfCardError(card);
-    const image = await CardService.checkCacheForCard(card);
+    const image = await CardService.checkCacheForCard(card, this.zephyr);
 
     const embed = new MessageEmbed()
       .setAuthor(

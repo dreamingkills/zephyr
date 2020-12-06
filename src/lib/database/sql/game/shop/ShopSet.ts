@@ -11,7 +11,7 @@ export abstract class ShopSet extends DBClass {
     const values = [];
     const chance = new Chance();
     for (let frame of rand) {
-      const price = chance.integer({ min: 700, max: 1400 });
+      const price = chance.integer({ min: 500, max: 1200 });
       values.push(`(${frame.id}, ${price})`);
     }
     await DB.query(`${query}${values.join(", ")};`);

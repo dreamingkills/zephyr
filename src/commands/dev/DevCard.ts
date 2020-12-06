@@ -3,7 +3,6 @@ import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 import { createCanvas, loadImage } from "canvas";
-import { idToIdentifier } from "../../lib/ZephyrUtils";
 
 export default class DevCard extends BaseCommand {
   names = ["dcard"];
@@ -37,7 +36,7 @@ export default class DevCard extends BaseCommand {
         name: `Card Data`,
         value:
           `**Card ID**: ${card.id}` +
-          `\n**Unique ID**: ${idToIdentifier(card.id)}` +
+          `\n**Unique ID**: ${card.id.toString(36)}` +
           `\n**Flavor Text**: ${card.flavor || "*none*"}` +
           `\n**Group Name**: ${card.group || "*none*"}` +
           `\n**Subgroup Name**: ${card.subgroup || "*none*"}` +
@@ -51,9 +50,10 @@ export default class DevCard extends BaseCommand {
     const canvas = createCanvas(700, 1000);
     const ctx = canvas.getContext("2d");
 
-    const dir = `./src/assets/cards/${card.id}`;
-    const img = await loadImage(`${dir}/one.png`);
-    const overlay = await loadImage(`${dir}/overlay.png`);
+    const img = await loadImage(card.image);
+    const overlay = await loadImage(
+      `./src/assets/groups/${card.group?.toLowerCase() || "nogroup"}.png`
+    );
     const frame = await loadImage(`./src/assets/frames/frame-white.png`);
 
     ctx.drawImage(img, 0, 0, 700, 1000);

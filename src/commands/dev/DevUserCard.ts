@@ -4,7 +4,6 @@ import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 import * as ZephyrError from "../../structures/error/ZephyrError";
-import { parseIdentifier } from "../../lib/ZephyrUtils";
 
 export default class DevUserCard extends BaseCommand {
   names = ["devusercard", "duc"];
@@ -15,9 +14,7 @@ export default class DevUserCard extends BaseCommand {
     const identifier = this.options[0];
     if (!identifier) throw new ZephyrError.InvalidCardReferenceError();
 
-    const userCard = await CardService.getUserCardById(
-      parseIdentifier(identifier)
-    );
+    const userCard = await CardService.getUserCardByIdentifier(identifier);
     const baseCard = this.zephyr.getCard(userCard.baseCardId);
 
     const embed = new MessageEmbed()

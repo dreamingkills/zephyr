@@ -6,7 +6,6 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
-import { parseIdentifier } from "../../../lib/ZephyrUtils";
 
 export default class GiftCard extends BaseCommand {
   names = ["gift", "give"];
@@ -20,9 +19,7 @@ export default class GiftCard extends BaseCommand {
     const cards: GameUserCard[] = [];
     for (let ref of identifiers) {
       if (!ref) throw new ZephyrError.InvalidCardReferenceError();
-      const id = parseIdentifier(ref);
-      if (isNaN(id)) throw new ZephyrError.InvalidCardReferenceError();
-      const card = await CardService.getUserCardById(id);
+      const card = await CardService.getUserCardByIdentifier(ref);
       if (card.discordId !== msg.author.id)
         throw new ZephyrError.NotOwnerOfCardError(card);
       cards.push(card);

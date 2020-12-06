@@ -87,9 +87,10 @@ export abstract class ProfileService {
   }
   public static async addDustToProfile(
     tier: 1 | 2 | 3 | 4 | 5,
+    amount: number,
     profile: GameProfile
   ): Promise<GameProfile> {
-    await ProfileSet.addDust(tier, profile.discordId);
+    await ProfileSet.addDust(tier, amount, profile.discordId);
     return await profile.fetch();
   }
 

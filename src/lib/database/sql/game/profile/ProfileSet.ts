@@ -100,11 +100,12 @@ export abstract class ProfileSet extends DBClass {
   }
   public static async addDust(
     tier: 1 | 2 | 3 | 4 | 5,
+    amount: number,
     discordId: string
   ): Promise<void> {
     await DB.query(
-      `UPDATE profile SET dust_${tier}=dust_${tier}+1 WHERE discord_id=?;`,
-      [discordId]
+      `UPDATE profile SET dust_${tier}=dust_${tier}+? WHERE discord_id=?;`,
+      [amount, discordId]
     );
     return;
   }

@@ -21,6 +21,7 @@ export abstract class CardGet extends DBClass {
                                     subgroup_name,
                                     individual_name,
                                     rarity,
+                                    image_url,
                                     serial_total,
                                     serial_limit,
                                     card_image.tier_one,
@@ -62,13 +63,21 @@ export abstract class CardGet extends DBClass {
     const queryOptions = FilterService.parseOptions(options);
     const page = <number>options["page"];
     query +=
-      (queryOptions.length > 0 ? ` AND` : ``) +
-      queryOptions.join(` AND`) +
-      ` ORDER BY wear DESC, serial_number ASC LIMIT 10 OFFSET ${DB.connection.escape(
-        (isNaN(page) ? 1 : page) * 10 - 10
-      )}`;
+      (queryOptions.length > 0 ? ` AND` : ``) + queryOptions.join(` AND`);
 
-    const cards = (await DB.query(query + `;`)) as UserCard[];
+    if (["issue", "i", "serial"].indexOf(<string>options["order"]) > -1) {
+      query += ` ORDER BY serial_number ASC`;
+    } else if (["wear", "w"].indexOf(<string>options["order"]) > -1) {
+      query += ` ORDER BY wear DESC`;
+    } else if (["luck", "lc"].indexOf(<string>options["order"]) > -1) {
+      query += ` ORDER BY luck_coeff DESC`;
+    }
+
+    query += ` LIMIT 10 OFFSET ${DB.connection.escape(
+      (isNaN(page) ? 1 : page) * 10 - 10
+    )};`;
+
+    const cards = (await DB.query(query)) as UserCard[];
     return cards.map((c) => new GameUserCard(c));
   }
   public static async getUserInventorySize(

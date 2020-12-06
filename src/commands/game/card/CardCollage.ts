@@ -1,0 +1,33 @@
+import { Message } from "eris";
+import { BaseCommand } from "../../../structures/command/Command";
+import { GameProfile } from "../../../structures/game/Profile";
+import { CardService } from "../../../lib/database/services/game/CardService";
+import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { GameUserCard } from "../../../structures/game/UserCard";
+
+export default class CardCollage extends BaseCommand {
+  names = ["collage"];
+  description = "Shows you a collage of cards.";
+  usage = ["$CMD$ [card]"];
+  developerOnly = true;
+  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+    const identifiers = this.options.filter((o) => !o.includes("<@"));
+    if (identifiers.length === 0)
+      throw new ZephyrError.InvalidCardReferenceError();
+
+    const cards: GameUserCard[] = [];
+    for (let ref of identifiers) {
+      if (!ref) throw new ZephyrError.InvalidCardReferenceError();
+      const card = await CardService.getUserCardByIdentifier(ref);
+      if (card.discordId !== msg.author.id)
+        throw new ZephyrError.NotOwnerOfCardError(card);
+      cards.push(card);
+    }
+
+    const collage = await CardService.generateCardCollage(cards, this.zephyr);
+    await msg.channel.createMessage("Collage:", {
+      file: collage,
+      name: "collage.png",
+    });
+  }
+}

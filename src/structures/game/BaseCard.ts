@@ -4,6 +4,7 @@ export interface BaseCard {
   group_name?: string;
   subgroup_name?: string;
   individual_name: string;
+  image_url: string;
   rarity: number;
   serial_total: number;
   serial_limit: number;
@@ -19,6 +20,7 @@ export class GameBaseCard {
   group?: string;
   subgroup?: string;
   name: string;
+  image: string;
   rarity: number;
   serialTotal: number;
   serialLimit: number;
@@ -28,6 +30,7 @@ export class GameBaseCard {
     this.group = card.group_name;
     this.subgroup = card.subgroup_name;
     this.name = card.individual_name;
+    this.image = card.image_url;
     this.rarity = card.rarity;
     this.serialLimit = card.serial_limit;
     this.serialTotal = card.serial_total;

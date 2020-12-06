@@ -21,7 +21,7 @@ export default class Help extends BaseCommand {
         if (findCommand.developerOnly)
           description += `**Developer-only command!**\n`;
 
-        if (findCommand.usage.length > 1) {
+        if (findCommand.usage.length > 0) {
           description +=
             `\n**Usage**` +
             `\n\`\`\`` +

@@ -10,23 +10,23 @@ import { getTimeUntil } from "../../../lib/ZephyrUtils";
 export default class DropCards extends BaseCommand {
   names = ["drop"];
   description = "Drops three random cards in the channel.";
-
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const now = dayjs(Date.now());
     const until = dayjs(profile.dropNext);
     if (now < until)
       throw new ZephyrError.DropCooldownError(getTimeUntil(now, until));
 
-    await ProfileService.setDropTimestamp(
-      profile,
-      dayjs(new Date()).add(30, "minute").format(`YYYY/MM/DD HH:mm:ss`)
-    );
     const cards = this.zephyr.getRandomCards(3);
     await CardSpawner.userDrop(
       <TextChannel>msg.channel,
       cards,
       profile,
       this.zephyr
+    );
+
+    await ProfileService.setDropTimestamp(
+      profile,
+      dayjs(new Date()).add(30, "minute").format(`YYYY/MM/DD HH:mm:ss`)
     );
     return;
 

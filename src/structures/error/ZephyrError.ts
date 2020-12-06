@@ -1,4 +1,3 @@
-import { idToIdentifier } from "../../lib/ZephyrUtils";
 import { GameUserCard } from "../game/UserCard";
 
 abstract class ZephyrError extends Error {
@@ -158,11 +157,11 @@ export class UnknownUserCardError extends ZephyrError {
 }
 export class NotOwnerOfCardError extends ZephyrError {
   constructor(card: GameUserCard) {
-    super(`\`${idToIdentifier(card.id)}\` does not belong to you.`);
+    super(`\`${card.id.toString(36)}\` does not belong to you.`);
   }
 }
 export class FrameAlreadyDefaultError extends ZephyrError {
   constructor(card: GameUserCard) {
-    super(`\`${idToIdentifier(card.id)}\` already has the default frame.`);
+    super(`\`${card.id.toString(36)}\` already has the default frame.`);
   }
 }

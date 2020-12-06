@@ -6,6 +6,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import { ReactionCollector } from "eris-collector";
 import { StatisticsService } from "../../../lib/database/services/statistics/StatisticsService";
 import { checkPermission } from "../../../lib/ZephyrUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class Leaderboards extends BaseCommand {
   names = ["leaderboards", "leaderboard", "top"];
@@ -17,7 +18,8 @@ export default class Leaderboards extends BaseCommand {
   private async getLeaderboard(
     type: string,
     page: number,
-    authorId: string
+    authorId: string,
+    zephyr: Zephyr
   ): Promise<string> {
     let leaderboard = "";
     switch (type) {
@@ -48,7 +50,10 @@ export default class Leaderboards extends BaseCommand {
         break;
       }
       case "cards": {
-        const board = await LeaderboardService.getCardLeaderboard(page);
+        const board = await LeaderboardService.getCardLeaderboard(
+          page,
+          zephyr.user.id
+        );
         for (let entry of board) {
           const discordUser = await this.zephyr.fetchUser(
             entry.profile.discordId
@@ -105,7 +110,7 @@ export default class Leaderboards extends BaseCommand {
 
     embed.setTitle(title + ` (${1 + 10 * page - 10}-${10 * page})`);
     embed.setDescription(
-      await this.getLeaderboard(trueType, page, msg.author.id)
+      await this.getLeaderboard(trueType, page, msg.author.id, this.zephyr)
     );
     embed.setFooter(`Page ${page} of ${totalPages} • ${totalEntries} entries`);
     const board = await msg.channel.createMessage({ embed });
@@ -133,7 +138,7 @@ export default class Leaderboards extends BaseCommand {
 
         embed.setTitle(title + ` (${1 + 10 * page - 10}-${10 * page})`);
         embed.setDescription(
-          await this.getLeaderboard(trueType, page, msg.author.id)
+          await this.getLeaderboard(trueType, page, msg.author.id, this.zephyr)
         );
         embed.setFooter(
           `Page ${page} of ${totalPages} • ${totalEntries} entries`

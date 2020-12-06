@@ -6,9 +6,9 @@ export interface UserCard {
   original_owner: string;
   wear: 0 | 1 | 2 | 3 | 4 | 5;
   luck_coeff: number;
-  frame_id?: number;
-  frame_name?: string;
-  frame_url?: string;
+  frame_id: number;
+  frame_name: string;
+  frame_url: string;
 }
 export class GameUserCard {
   id: number;
@@ -18,9 +18,9 @@ export class GameUserCard {
   originalOwner: string;
   wear: 0 | 1 | 2 | 3 | 4 | 5;
   luckCoefficient: number;
-  frameId?: number;
-  frameName?: string;
-  frameUrl?: string;
+  frameId: number;
+  frameName: string;
+  frameUrl: string;
 
   constructor(data: UserCard) {
     this.id = data.id;

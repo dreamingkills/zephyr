@@ -62,19 +62,4 @@ function checkPermission(
   return (<TextChannel>channel).permissionsOf(zephyr.user.id).json[permission];
 }
 
-function parseIdentifier(identifier: string): number {
-  return parseInt(identifier, 16);
-}
-
-function idToIdentifier(id: number): string {
-  return id.toString(16);
-}
-
-export {
-  padIfNotLeading,
-  getTimeUntilNextDay,
-  checkPermission,
-  getTimeUntil,
-  parseIdentifier,
-  idToIdentifier,
-};
+export { padIfNotLeading, getTimeUntilNextDay, checkPermission, getTimeUntil };

@@ -7,7 +7,6 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { ShopService } from "../../../lib/database/services/game/ShopService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
-import { idToIdentifier, parseIdentifier } from "../../../lib/ZephyrUtils";
 
 export default class UseItem extends BaseCommand {
   names = ["use"];
@@ -34,7 +33,7 @@ export default class UseItem extends BaseCommand {
       const identifier = offset[0];
       if (!identifier) throw new ZephyrError.InvalidCardReferenceError();
 
-      const id = parseIdentifier(identifier);
+      const id = parseInt(identifier, 36);
       if (isNaN(id)) throw new ZephyrError.InvalidCardReferenceError();
 
       const card = await CardService.getUserCardById(id);
@@ -42,7 +41,7 @@ export default class UseItem extends BaseCommand {
         throw new ZephyrError.NotOwnerOfCardError(card);
 
       const frame = await ShopService.getFrameByName(targetItem.name);
-      await CardService.changeCardFrame(card, frame.id);
+      await CardService.changeCardFrame(card, frame.id, this.zephyr);
       await ProfileService.removeItem(profile, targetItem.id);
       const embed = new MessageEmbed()
         .setAuthor(
@@ -52,7 +51,7 @@ export default class UseItem extends BaseCommand {
         .setDescription(
           `${this.zephyr.config.discord.emoji.check} You used \`${
             targetItem.name
-          }\` on \`${idToIdentifier(card.id)}\`.` +
+          }\` on \`${card.id.toString(36)}\`.` +
             `\n— You now have **${userItem.count - 1}x** \`${
               targetItem.name
             }\`.`

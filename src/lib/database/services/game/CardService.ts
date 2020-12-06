@@ -8,10 +8,29 @@ import fs from "fs/promises";
 import { CardSet } from "../../sql/game/card/CardSet";
 import { Zephyr } from "../../../../structures/client/Zephyr";
 import { GameDroppedCard } from "../../../../structures/game/DroppedCard";
-import { parseIdentifier } from "../../../ZephyrUtils";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
 
 export abstract class CardService {
+  public static getCardDescription(
+    card: GameUserCard,
+    zephyr: Zephyr,
+    pad: { reference: number; issue: number }
+  ): string {
+    const baseCard = zephyr.getCard(card.baseCardId);
+    return (
+      `\`${card.id
+        .toString(36)
+        .padStart(pad.reference, " ")}\` : \`${"★"
+        .repeat(card.wear)
+        .padEnd(5, "☆")}\` : \`${(`#` + card.serialNumber.toString(10)).padEnd(
+        pad.issue,
+        " "
+      )}\` ` +
+      (baseCard.group ? `**${baseCard.group}** ` : ``) +
+      `${baseCard.name}`
+    );
+  }
+
   public static async getAllCards(): Promise<GameBaseCard[]> {
     return await CardGet.getAllCards();
   }
@@ -34,7 +53,7 @@ export abstract class CardService {
   public static async getUserCardByIdentifier(
     identifier: string
   ): Promise<GameUserCard> {
-    const id = parseIdentifier(identifier);
+    const id = parseInt(identifier, 36);
     if (isNaN(id)) throw new ZephyrError.InvalidCardReferenceError();
     return await this.getUserCardById(id);
   }
@@ -53,59 +72,82 @@ export abstract class CardService {
   ): Promise<number> {
     return await CardGet.getUserInventorySize(profile.discordId, options);
   }
-  public static async generateCardImage(card: GameUserCard): Promise<Buffer> {
+  public static async generateCardImage(
+    card: GameUserCard | GameDroppedCard,
+    zephyr: Zephyr
+  ): Promise<Buffer> {
+    const baseCard = zephyr.getCard(card.baseCardId);
+
     const canvas = createCanvas(350, 500);
     const ctx = canvas.getContext("2d");
 
-    const dir = `./src/assets/cards/${card.baseCardId}`;
-    let img = await loadImage(`${dir}/one.png`);
-    const overlay = await loadImage(`${dir}/overlay.png`);
+    let img = await loadImage(baseCard.image);
+    const overlay = await loadImage(
+      `./src/assets/groups/${baseCard.group?.toLowerCase() || "nogroup"}.png`
+    );
     let frame: Image;
     if (!card.frameId || !card.frameUrl) {
       frame = await loadImage(`./src/assets/frames/frame-white.png`);
     } else frame = await loadImage(card.frameUrl);
 
+    /*ctx.save();
+    ctx.shadowBlur = 15;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.shadowColor = "#18700C";
+    ctx.fill();
+
+    ctx.drawImage(frame, 0, 0, 350, 500);
+    ctx.restore();
+
+    ctx.drawImage(frame, 0, 0, 350, 500);
+    ctx.save();
+    ctx.globalCompositeOperation = "destination-atop";
+    ctx.fillStyle = "#18700C";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();*/
     ctx.drawImage(img, 0, 0, 350, 500);
     ctx.drawImage(frame, 0, 0, 350, 500);
     ctx.drawImage(overlay, 0, 0, 350, 500);
 
     ctx.font = "20px AlteHaasGroteskBold";
     ctx.fillText(`#${card.serialNumber}`, 48, 422);
+    ctx.font = "30px AlteHaasGroteskBold";
+    ctx.fillText(`${baseCard.name}`, 47, 446);
 
     const buf = canvas.toBuffer("image/png");
     return Buffer.alloc(buf.length, buf, "base64");
   }
-  public static async generateCardCollege(
-    cards: GameDroppedCard[]
+
+  public static async generateCardCollage(
+    cards: GameUserCard[] | GameDroppedCard[],
+    zephyr: Zephyr
   ): Promise<Buffer> {
     const canvas = createCanvas(cards.length * 250, 333);
     const ctx = canvas.getContext("2d");
 
-    const baseUrl = `./src/assets/cards/`;
+    ctx.beginPath();
+    ctx.rect(0, 0, cards.length * 250, 333);
+    ctx.fillStyle = "#36393E";
+    ctx.fill();
+
     ctx.font = "14px AlteHaasGroteskBold";
-    for (let card of cards) {
-      const base = await loadImage(`${baseUrl}${card.id}/one.png`);
-      const overlay = await loadImage(`${baseUrl}${card.id}/overlay.png`);
-      const getFrame = await this.getFrameById(card.frameId);
-      const frame = await loadImage(getFrame.frameUrl);
-      ctx.drawImage(base, cards.indexOf(card) * 250, 0, 250, 333);
-      ctx.drawImage(frame, cards.indexOf(card) * 250, 0, 250, 333);
-      ctx.drawImage(overlay, cards.indexOf(card) * 250, 0, 250, 333);
-      ctx.fillText(
-        `#${card.serialNumber}`,
-        cards.indexOf(card) * 250 + 35,
-        281
-      );
+    for (let [i, card] of cards.entries()) {
+      const cardBuffer = await this.generateCardImage(card, zephyr);
+      const img = await loadImage(cardBuffer);
+      ctx.drawImage(img, i * 250, 0, 250, 333);
     }
-    const buf = canvas.toBuffer("image/png");
+    const buf = canvas.toBuffer("image/jpeg");
     return Buffer.alloc(buf.length, buf, "base64");
   }
+
   public static async changeCardFrame(
     card: GameUserCard,
-    frameId: number
+    frameId: number,
+    zephyr: Zephyr
   ): Promise<Buffer> {
     const newCard = await CardSet.setCardFrame(card, frameId);
-    return await this.updateCardCache(newCard);
+    return await this.updateCardCache(newCard, zephyr);
   }
   public static async getRandomFrame(
     includeUnshoppable: boolean = false
@@ -133,8 +175,11 @@ export abstract class CardService {
   /*
       Caching
   */
-  public static async updateCardCache(card: GameUserCard): Promise<Buffer> {
-    const image = await this.generateCardImage(card);
+  public static async updateCardCache(
+    card: GameUserCard,
+    zephyr: Zephyr
+  ): Promise<Buffer> {
+    const image = await this.generateCardImage(card, zephyr);
     try {
       await fs.mkdir(`./cache/cards/${card.baseCardId}`);
     } catch (e) {}
@@ -145,11 +190,14 @@ export abstract class CardService {
     );
     return await fs.readFile(`./cache/cards/${card.baseCardId}/${card.id}`);
   }
-  public static async checkCacheForCard(card: GameUserCard): Promise<Buffer> {
+  public static async checkCacheForCard(
+    card: GameUserCard,
+    zephyr: Zephyr
+  ): Promise<Buffer> {
     try {
       return await fs.readFile(`./cache/cards/${card.baseCardId}/${card.id}`);
     } catch (e) {
-      return await this.updateCardCache(card);
+      return await this.updateCardCache(card, zephyr);
     }
   }
 }

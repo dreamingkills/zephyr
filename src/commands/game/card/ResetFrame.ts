@@ -4,7 +4,6 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ReactionCollector } from "eris-collector";
-import { idToIdentifier, parseIdentifier } from "../../../lib/ZephyrUtils";
 import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class ResetFrame extends BaseCommand {
@@ -13,15 +12,12 @@ export default class ResetFrame extends BaseCommand {
   usage = ["$CMD$ <card>"];
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const identifier = this.options[0];
+    const rawIdentifier = this.options[0];
     let card: GameUserCard;
-    if (!identifier) {
+    if (!rawIdentifier) {
       card = await CardService.getLastCard(msg.author.id);
-    } else {
-      card = await CardService.getUserCardById(
-        parseIdentifier(this.options[0])
-      );
-    }
+    } else card = await CardService.getUserCardByIdentifier(rawIdentifier);
+    const trueIdentifier = card.id.toString(36);
 
     if (card.discordId !== msg.author.id)
       throw new ZephyrError.NotOwnerOfCardError(card);
@@ -30,9 +26,7 @@ export default class ResetFrame extends BaseCommand {
       throw new ZephyrError.FrameAlreadyDefaultError(card);
 
     const conf = await msg.channel.createMessage(
-      `${
-        this.zephyr.config.discord.emoji.warn
-      } Really reset the frame of \`${idToIdentifier(card.id)}\`?`
+      `${this.zephyr.config.discord.emoji.warn} Really reset the frame of \`${trueIdentifier}\`?`
     );
     await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
 
@@ -44,11 +38,9 @@ export default class ResetFrame extends BaseCommand {
       max: 1,
     });
     collector.on("collect", async () => {
-      await CardService.changeCardFrame(card, 1);
+      await CardService.changeCardFrame(card, 1, this.zephyr);
       await conf.edit(
-        `${
-          this.zephyr.config.discord.emoji.check
-        } Reset the frame of \`${idToIdentifier(card.id)}\`.`
+        `${this.zephyr.config.discord.emoji.check} Reset the frame of \`${trueIdentifier}\`.`
       );
       collector.en;
       return;

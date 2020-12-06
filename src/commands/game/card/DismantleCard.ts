@@ -5,37 +5,76 @@ import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { idToIdentifier } from "../../../lib/ZephyrUtils";
 import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class DismantleCard extends BaseCommand {
   names = ["dismantle", "d"];
   description = "Dismantles a card, giving you dust and bits in exchange.";
-  usage = ["$CMD$ [card]"];
+  usage = ["$CMD$ [cards]"];
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const rawIdentifier = this.options[0];
-    let card: GameUserCard;
-    if (!rawIdentifier) {
-      card = await CardService.getLastCard(msg.author.id);
-    } else card = await CardService.getUserCardByIdentifier(rawIdentifier);
+    const identifiers = this.options.filter((o) => !o.includes("<@"));
+    const cards: GameUserCard[] = [];
+    if (identifiers.length === 0) {
+      const lastCard = await CardService.getLastCard(profile.discordId);
+      cards.push(lastCard);
+    }
 
-    if (card.discordId !== msg.author.id)
-      throw new ZephyrError.NotOwnerOfCardError(card);
+    for (let ref of identifiers) {
+      if (!ref) throw new ZephyrError.InvalidCardReferenceError();
+      const card = await CardService.getUserCardByIdentifier(ref);
+      if (card.discordId !== msg.author.id)
+        throw new ZephyrError.NotOwnerOfCardError(card);
+      cards.push(card);
+    }
 
-    const trueIdentifier = idToIdentifier(card.id);
+    const individualRewards = cards.map((c) => {
+      return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
+    });
+    const bitReward = individualRewards.reduce((acc, bits) => acc + bits);
+    const dustReward = {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0,
+    };
 
-    const bitReward =
-      Math.round(15 * card.luckCoefficient) * ((card.wear || 1) * 1.25);
+    const longestIdentifier = [...cards]
+      .sort((a, b) => (a.id.toString(36) > b.id.toString(36) ? 1 : -1))[0]
+      .id.toString(36).length;
+
+    // Note: we need to add 1 to accommodate for the # sign.
+    const longestIssue =
+      [...cards]
+        .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))[0]
+        .serialNumber.toString(10).length + 1;
+
+    let cardDescriptions = [];
+    for (let card of cards) {
+      if (card.wear !== 0) dustReward[card.wear]++;
+      cardDescriptions.push(
+        CardService.getCardDescription(card, this.zephyr, {
+          reference: longestIdentifier,
+          issue: longestIssue,
+        })
+      );
+    }
 
     let description =
-      `Really dismantle \`${trueIdentifier}\`? You will receive:` +
-      `\n\n:white_medium_small_square: ${this.zephyr.config.discord.emoji.bits} **${bitReward}**` +
-      (card.wear > 0
-        ? `\n:white_medium_small_square: **1** Dust \`${"★"
-            .repeat(card.wear)
-            .padEnd(5, "☆")}\``
-        : ``);
+      `Really dismantle **${cards.length}** card${
+        cards.length > 1 ? `s` : ``
+      }?` +
+      `\n${cardDescriptions.join("\n")}\n` +
+      `\nYou will receive:` +
+      `\n:white_medium_small_square: ${this.zephyr.config.discord.emoji.bits} **${bitReward}**`;
+
+    for (let [dust, count] of Object.entries(dustReward)) {
+      if (count === 0) continue;
+      description += `\n:white_medium_small_square: **${count}x** Dust [\`${"★"
+        .repeat(parseInt(dust))
+        .padEnd(5, "☆")}\`]`;
+    }
 
     const embed = new MessageEmbed()
       .setAuthor(
@@ -57,15 +96,24 @@ export default class DismantleCard extends BaseCommand {
 
     collector.on("collect", async () => {
       // We need to check that this user is still the owner, or they can dupe bits
-      const refetchCard = await CardService.getUserCardById(card.id);
-      if (refetchCard.discordId !== msg.author.id)
-        throw new ZephyrError.NotOwnerOfCardError(refetchCard);
+      for (let card of cards) {
+        const refetchCard = await CardService.getUserCardById(card.id);
+        if (refetchCard.discordId !== msg.author.id)
+          throw new ZephyrError.NotOwnerOfCardError(refetchCard);
+      }
 
       // Give the card to the bot
-      await CardService.dismantleCards([card], this.zephyr);
+      await CardService.dismantleCards(cards, this.zephyr);
 
-      if (card.wear !== 0)
-        await ProfileService.addDustToProfile(card.wear, profile);
+      for (let [dust, count] of Object.entries(dustReward)) {
+        if (count === 0) continue;
+        await ProfileService.addDustToProfile(
+          parseInt(dust, 10) as 1 | 2 | 3 | 4 | 5,
+          count,
+          profile
+        );
+      }
+
       const newProfile = await ProfileService.addBitsToProfile(
         profile,
         bitReward
@@ -73,7 +121,9 @@ export default class DismantleCard extends BaseCommand {
 
       await conf.edit({
         embed: embed.setFooter(
-          `🔥 This card has been destroyed.\nYou now have ${newProfile.bits.toLocaleString()} bits.`
+          `🔥 ${
+            cards.length === 1 ? `This card has` : `These cards have`
+          } been destroyed.\nYou now have ${newProfile.bits.toLocaleString()} bits.`
         ),
       });
       return;

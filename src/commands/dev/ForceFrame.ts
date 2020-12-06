@@ -3,7 +3,6 @@ import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 import { CardService } from "../../lib/database/services/game/CardService";
 import * as ZephyrError from "../../structures/error/ZephyrError";
-import { parseIdentifier } from "../../lib/ZephyrUtils";
 
 export default class ForceFrame extends BaseCommand {
   names = ["forceframe"];
@@ -14,13 +13,15 @@ export default class ForceFrame extends BaseCommand {
     const identifier = this.options[0];
     if (!identifier) throw new ZephyrError.InvalidCardReferenceError();
 
-    const userCard = await CardService.getUserCardById(
-      parseIdentifier(identifier)
-    );
+    const userCard = await CardService.getUserCardByIdentifier(identifier);
 
     const frameId = parseInt(this.options[1]);
 
-    const pic = await CardService.changeCardFrame(userCard, frameId);
+    const pic = await CardService.changeCardFrame(
+      userCard,
+      frameId,
+      this.zephyr
+    );
     await msg.channel.createMessage("OK", { file: pic, name: "card.png" });
   }
 }

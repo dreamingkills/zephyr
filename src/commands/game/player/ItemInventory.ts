@@ -19,19 +19,19 @@ export default class ItemInventory extends BaseCommand {
   ): string {
     let desc =
       (profile.dustPoor > 0
-        ? `:black_medium_small_square: **${profile.dustPoor.toLocaleString()}**x Dust \`★☆☆☆☆\`\n`
+        ? `:white_medium_small_square: \`★☆☆☆☆\` **Dust** x${profile.dustPoor.toLocaleString()}\n`
         : ``) +
       (profile.dustAverage > 0
-        ? `:black_medium_small_square: **${profile.dustAverage.toLocaleString()}**x Dust \`★★☆☆☆\`\n`
+        ? `:white_medium_small_square: \`★★☆☆☆\` **Dust** x${profile.dustAverage.toLocaleString()}\n`
         : ``) +
       (profile.dustGood > 0
-        ? `:black_medium_small_square: **${profile.dustGood.toLocaleString()}**x Dust \`★★★☆☆\`\n`
+        ? `:white_medium_small_square: \`★★★☆☆\` **Dust** x${profile.dustGood.toLocaleString()}\n`
         : ``) +
       (profile.dustGreat > 0
-        ? `:black_medium_small_square: **${profile.dustGreat.toLocaleString()}**x Dust \`★★★★☆\`\n`
+        ? `:white_medium_small_square: \`★★★★☆\` **Dust** x${profile.dustGreat.toLocaleString()}\n`
         : ``) +
       (profile.dustMint > 0
-        ? `:black_medium_small_square: **${profile.dustMint.toLocaleString()}**x Dust \`★★★★★\`\n`
+        ? `:white_medium_small_square: \`★★★★★\` **Dust** x${profile.dustMint.toLocaleString()}\n`
         : ``) +
       `\n`;
     if (inv.length === 0) {

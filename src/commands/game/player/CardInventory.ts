@@ -6,36 +6,37 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { ReactionCollector } from "eris-collector";
-import { checkPermission, idToIdentifier } from "../../../lib/ZephyrUtils";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class CardInventory extends BaseCommand {
   names = ["inventory", "inv", "i"];
   description = "Shows cards that belong to you.";
   usage = [
     "$CMD$ <filters>",
-    "Filters:\n— group=LOONA\n— name=JinSoul\n— serial=>5\n— serial=<5\n— serial=5",
+    "Filters:\n— group=LOONA\n— name=JinSoul\n— issue=>5\n— issue=<5\n— issue=5",
   ];
 
   private renderInventory(cards: GameUserCard[]): string {
     let desc: string[] = [];
     if (cards.length === 0) return "";
-    const longestId = idToIdentifier(
-      [...cards].sort((a, b) =>
-        idToIdentifier(a.id) > idToIdentifier(b.id) ? 1 : -1
-      )[0].id
-    ).length;
+
+    const longestId = [...cards]
+      .sort((a, b) => (a.id.toString(36) > b.id.toString(36) ? 1 : -1))[0]
+      .id.toString(36).length;
+
+    // Note: we need to add 1 to accommodate for the # sign.
+    const longestSerial =
+      [...cards]
+        .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))[0]
+        .serialNumber.toString(10).length + 1;
+
     for (let card of cards) {
-      const baseCard = this.zephyr.getCard(card.baseCardId);
-      const entry =
-        `\`${idToIdentifier(card.id).padStart(
-          longestId,
-          " "
-        )}\` : \`${"★".repeat(card.wear).padEnd(5, "☆")}\` : \`#${
-          card.serialNumber
-        }\` ` +
-        (baseCard.group ? `**${baseCard.group}** ` : ``) +
-        `${baseCard.name}`;
-      desc.push(entry);
+      desc.push(
+        CardService.getCardDescription(card, this.zephyr, {
+          reference: longestId,
+          issue: longestSerial,
+        })
+      );
     }
     return desc.join("\n");
   }

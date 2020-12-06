@@ -22,12 +22,13 @@ export abstract class LeaderboardGet extends DBClass {
     return query.map((p) => new GameProfile(p));
   }
   public static async getCardLeaderboard(
-    page: number
+    page: number,
+    zephyrId: string
   ): Promise<{ profile: GameProfile; count: number }[]> {
     const offset = page * this.entries - this.entries;
     const query = (await DB.query(
-      `SELECT profile.*, COUNT(*) as count FROM profile LEFT JOIN user_card ON user_card.discord_id=profile.discord_id WHERE NOT user_card.discord_id=0 GROUP BY profile.discord_id ORDER BY count DESC, user_card.discord_id LIMIT ? OFFSET ?;`,
-      [this.entries, offset]
+      `SELECT profile.*, COUNT(*) as count FROM profile LEFT JOIN user_card ON user_card.discord_id=profile.discord_id WHERE NOT user_card.discord_id=? GROUP BY profile.discord_id ORDER BY count DESC, user_card.discord_id LIMIT ? OFFSET ?;`,
+      [zephyrId, this.entries, offset]
     )) as {
       discord_id: string;
       private: boolean;

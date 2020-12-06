@@ -105,7 +105,8 @@ export default class FrameShop extends BaseCommand {
           this.zephyr.config.discord.emoji.star
         } Welcome to the **Frame Shop**. Offers change every 24 hours.\n\n${frames.join(
           "\n"
-        )}\n\n**See something you like?**\nUse \`${prefix}fs buy <frame>\` to make a purchase.`
+        )}\n\n**See something you like?**\nUse \`${prefix}fs buy <frame>\` to make a purchase.` +
+          `\nYou can also use \`${prefix}pf <frame>\` to preview a frame.`
       )
       .setFooter(`Shop resets in ${timeUntilNextDay}.`);
     await msg.channel.createMessage({ embed });

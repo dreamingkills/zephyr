@@ -4,8 +4,6 @@ import { GameProfile } from "../../../structures/game/Profile";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
-import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { parseIdentifier } from "../../../lib/ZephyrUtils";
 
 export default class CardSearch extends BaseCommand {
   names = ["cardsearch", "cs"];
@@ -13,15 +11,11 @@ export default class CardSearch extends BaseCommand {
   usage = ["$CMD$ <card>"];
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const identifier = this.options[0];
+    const rawIdentifier = this.options[0];
     let card;
-    if (!identifier) {
+    if (!rawIdentifier) {
       card = await CardService.getLastCard(msg.author.id);
-    } else {
-      const id = parseIdentifier(identifier);
-      if (isNaN(id)) throw new ZephyrError.InvalidCardReferenceError();
-      card = await CardService.getUserCardById(id);
-    }
+    } else card = await CardService.getUserCardByIdentifier(rawIdentifier);
 
     const baseCard = this.zephyr.getCard(card.baseCardId);
 

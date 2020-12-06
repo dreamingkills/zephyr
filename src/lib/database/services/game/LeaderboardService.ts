@@ -13,8 +13,9 @@ export abstract class LeaderboardService {
     return await LeaderboardGet.getDailyStreakLeaderboard(page);
   }
   public static async getCardLeaderboard(
-    page: number = 1
+    page: number = 1,
+    zephyrId: string
   ): Promise<{ profile: GameProfile; count: number }[]> {
-    return await LeaderboardGet.getCardLeaderboard(page);
+    return await LeaderboardGet.getCardLeaderboard(page, zephyrId);
   }
 }

@@ -7,10 +7,10 @@ import { ProfileService } from "./database/services/game/ProfileService";
 import { GameUserCard } from "../structures/game/UserCard";
 import { Chance } from "chance";
 import { Zephyr } from "../structures/client/Zephyr";
-import { getTimeUntil, idToIdentifier } from "../lib/ZephyrUtils";
+import { getTimeUntil } from "../lib/ZephyrUtils";
 import dayjs from "dayjs";
 import { GuildService } from "./database/services/guild/GuildService";
-import { GameBaseCard } from "../structures/game/BaseCard";
+import { GameBaseCard, GameFrame } from "../structures/game/BaseCard";
 
 export abstract class CardSpawner {
   private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
@@ -36,7 +36,7 @@ export abstract class CardSpawner {
       const winnerId: string = new Chance().pickone(Array.from(takers));
       winner = await ProfileService.getProfile(winnerId);
     }
-    const baseCard = zephyr.getCard(card.id);
+    const baseCard = zephyr.getCard(card.baseCardId);
     const newCard = await CardService.createNewUserCard(
       baseCard,
       winner,
@@ -59,20 +59,25 @@ export abstract class CardSpawner {
 
     for (let card of cards) {
       const random = chance.bool({ likelihood: 2 });
-      let frame;
+      let frame: GameFrame;
       if (random) {
         const randomFrame = await CardService.getRandomFrame();
-        frame = randomFrame.id;
-      } else frame = 1;
+        frame = randomFrame;
+      } else {
+        const defaultFrame = await CardService.getFrameById(1);
+        frame = defaultFrame;
+      }
       droppedCards.push(
         new GameDroppedCard({
-          id: card.id,
+          baseCardId: card.id,
           serialNumber: card.serialTotal + 1,
-          frameId: frame,
+          frameId: frame.id,
+          frameUrl: frame.frameUrl,
         })
       );
     }
-    const collage = await CardService.generateCardCollege(droppedCards);
+
+    const collage = await CardService.generateCardCollage(droppedCards, zephyr);
     const drop = await channel.createMessage(`${title}\n`, {
       file: collage,
       name: "collage.png",
@@ -158,7 +163,7 @@ export abstract class CardSpawner {
           }
 
           const baseCard = zephyr.getCard(fight.card.baseCardId);
-          message += ` \`${idToIdentifier(fight.card.id)}\` ${
+          message += ` \`${fight.card.id.toString(36)}\` ${
             baseCard.group ? `**${baseCard.group}** ` : ``
           }${baseCard.name} #${fight.card.serialNumber}!`;
 
@@ -251,8 +256,8 @@ export abstract class CardSpawner {
   }
 
   public static async processMessage(guild: Guild, user: User, zephyr: Zephyr) {
-    // If they're on cooldown, ignore.
     if (this.userCooldowns.has(user.id) || this.guildCooldowns.has(guild.id))
+      // If they're on cooldown, ignore.
       return;
 
     if (!this.guildLevels[guild.id]) {

@@ -1,12 +1,19 @@
 export class GameDroppedCard {
-  id: number;
+  baseCardId: number;
   serialNumber: number;
   frameId: number;
+  frameUrl: string;
 
-  constructor(data: { id: number; serialNumber: number; frameId: number }) {
-    this.id = data.id;
+  constructor(data: {
+    baseCardId: number;
+    serialNumber: number;
+    frameId: number;
+    frameUrl: string;
+  }) {
+    this.baseCardId = data.baseCardId;
     this.serialNumber = data.serialNumber;
 
     this.frameId = data.frameId;
+    this.frameUrl = data.frameUrl;
   }
 }
