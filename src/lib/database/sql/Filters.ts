@@ -56,7 +56,7 @@ export class FilterService {
         } else
           queryOptions.push(
             ` user_card.wear=${DB.connection.escape(
-              parseInt(value.toString().slice(1), 10)
+              parseInt(value.toString(), 10)
             )}`
           );
       }
