@@ -66,13 +66,13 @@ export abstract class CardService {
     profile: GameProfile,
     options: Filter
   ): Promise<GameUserCard[]> {
-    return await CardGet.getUserInventory(profile.discordId, options);
+    return await CardGet.getUserInventory(profile, options);
   }
   public static async getUserInventorySize(
     profile: GameProfile,
     options: Filter
   ): Promise<number> {
-    return await CardGet.getUserInventorySize(profile.discordId, options);
+    return await CardGet.getUserInventorySize(profile, options);
   }
   public static async generateCardImage(
     card: GameUserCard | GameDroppedCard,
