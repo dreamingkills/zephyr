@@ -99,3 +99,12 @@ CREATE TABLE user_item
     PRIMARY KEY(id),
     FOREIGN KEY(discord_id) REFERENCES profile(discord_id) ON DELETE CASCADE
 );
+
+CREATE TABLE card_tag
+(
+    id              INT(11) AUTO_INCREMENT,
+    discord_id      VARCHAR(32) NOT NULL,
+    tag_name        TEXT(6),
+    emoji           TEXT,
+    PRIMARY KEY(id)
+);

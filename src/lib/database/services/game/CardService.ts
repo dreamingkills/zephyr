@@ -9,16 +9,18 @@ import { CardSet } from "../../sql/game/card/CardSet";
 import { Zephyr } from "../../../../structures/client/Zephyr";
 import { GameDroppedCard } from "../../../../structures/game/DroppedCard";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
+import { GameTag } from "../../../../structures/game/Tag";
 
 export abstract class CardService {
   public static getCardDescription(
     card: GameUserCard,
     zephyr: Zephyr,
-    pad: { reference: number; issue: number }
+    pad: { reference: number; issue: number },
+    tag?: GameTag
   ): string {
     const baseCard = zephyr.getCard(card.baseCardId);
     return (
-      `\`${card.id
+      `${tag?.emoji || `:white_medium_small_square:`} \`${card.id
         .toString(36)
         .padStart(pad.reference, " ")}\` : \`${"★"
         .repeat(card.wear)
@@ -199,5 +201,15 @@ export abstract class CardService {
     } catch (e) {
       return await this.updateCardCache(card, zephyr);
     }
+  }
+
+  public static async setCardsTag(
+    cards: GameUserCard[],
+    tagId: number
+  ): Promise<void> {
+    return await CardSet.setCardsTag(cards, tagId);
+  }
+  public static async unsetCardsTag(cards: GameUserCard[]): Promise<void> {
+    return await CardSet.unsetCardsTag(cards);
   }
 }

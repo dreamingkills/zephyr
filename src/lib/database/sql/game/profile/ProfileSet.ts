@@ -174,4 +174,24 @@ export abstract class ProfileSet extends DBClass {
     );
     return;
   }
+
+  /*
+      Tags
+  */
+  public static async createTag(
+    discordId: string,
+    name: string,
+    emoji: string
+  ): Promise<void> {
+    await DB.query(
+      `INSERT INTO card_tag (discord_id, tag_name, emoji) VALUES (?, ?, ?);`,
+      [discordId, name, emoji]
+    );
+    return;
+  }
+  public static async deleteTag(tagId: number): Promise<void> {
+    await DB.query(`DELETE FROM card_tag WHERE id=?;`, [tagId]);
+    await DB.query(`UPDATE user_card SET tag_id=NULL WHERE tag_id=?;`, [tagId]);
+    return;
+  }
 }

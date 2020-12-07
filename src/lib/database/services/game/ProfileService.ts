@@ -1,5 +1,6 @@
 import { GameItem } from "../../../../structures/game/Item";
 import { GameProfile } from "../../../../structures/game/Profile";
+import { GameTag } from "../../../../structures/game/Tag";
 import { ProfileGet } from "../../sql/game/profile/ProfileGet";
 import { ProfileSet } from "../../sql/game/profile/ProfileSet";
 
@@ -155,5 +156,22 @@ export abstract class ProfileService {
     itemId: number
   ): Promise<void> {
     return await ProfileSet.removeItem(profile.discordId, itemId);
+  }
+
+  /*
+      Tags
+  */
+  public static async createTag(
+    profile: GameProfile,
+    name: string,
+    emoji: string
+  ): Promise<void> {
+    return await ProfileSet.createTag(profile.discordId, name, emoji);
+  }
+  public static async getTags(profile: GameProfile): Promise<GameTag[]> {
+    return await ProfileGet.getUserTags(profile.discordId);
+  }
+  public static async deleteTag(tag: GameTag): Promise<void> {
+    return await ProfileSet.deleteTag(tag.id);
   }
 }

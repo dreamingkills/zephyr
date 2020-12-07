@@ -13,7 +13,7 @@ import { Chance } from "chance";
 import { CardSpawner } from "../../lib/CardSpawner";
 
 export class Zephyr extends Client {
-  version: string = "beta-0.4.0";
+  version: string = "beta-0.5.0";
   commandLib = new CommandLib();
   config: typeof config;
   chance = new Chance();

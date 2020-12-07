@@ -9,6 +9,7 @@ export interface UserCard {
   frame_id: number;
   frame_name: string;
   frame_url: string;
+  tag_id: number;
 }
 export class GameUserCard {
   id: number;
@@ -21,6 +22,7 @@ export class GameUserCard {
   frameId: number;
   frameName: string;
   frameUrl: string;
+  tagId: number;
 
   constructor(data: UserCard) {
     this.id = data.id;
@@ -33,5 +35,6 @@ export class GameUserCard {
     this.frameId = data.frame_id;
     this.frameName = data.frame_name;
     this.frameUrl = data.frame_url;
+    this.tagId = data.tag_id;
   }
 }

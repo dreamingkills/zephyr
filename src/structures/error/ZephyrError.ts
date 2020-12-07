@@ -78,7 +78,7 @@ export class WishlistFullError extends ZephyrError {
       `Your wishlist is full!` +
         (patron >= 4
           ? ``
-          : `\nYou can get more slots by donating! Use \`${prefix}patreon\` to find out more!`)
+          : `\nYou can get more slots by becoming a patron! Use \`${prefix}patreon\` to find out more!`)
     );
   }
 }
@@ -163,5 +163,52 @@ export class NotOwnerOfCardError extends ZephyrError {
 export class FrameAlreadyDefaultError extends ZephyrError {
   constructor(card: GameUserCard) {
     super(`\`${card.id.toString(36)}\` already has the default frame.`);
+  }
+}
+
+/*
+    Tags
+          */
+export class UnspecifiedTagInCreationError extends ZephyrError {
+  constructor() {
+    super(
+      `Please enter a valid name for your tag.` +
+        `\nTags must be 6 characters or less.`
+    );
+  }
+}
+export class UnspecifiedTagError extends ZephyrError {
+  constructor() {
+    super(`Please enter a tag to add to your card.`);
+  }
+}
+export class InvalidTagError extends ZephyrError {
+  constructor() {
+    super(`You don't have a tag by that name.`);
+  }
+}
+export class InvalidEmojiTagError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid emoji for your tag.`);
+  }
+}
+export class NoTagsError extends ZephyrError {
+  constructor() {
+    super(`You have no tags.`);
+  }
+}
+export class TagsFullError extends ZephyrError {
+  constructor(patron: number, prefix: string) {
+    super(
+      `Your tags are full!` +
+        (patron >= 4
+          ? ``
+          : `\nYou can get more slots by becoming a patron! Use \`${prefix}patreon\` to find out more!`)
+    );
+  }
+}
+export class DuplicateTagError extends ZephyrError {
+  constructor() {
+    super(`You already have a tag by that name.`);
   }
 }

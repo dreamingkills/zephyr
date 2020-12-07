@@ -3,6 +3,7 @@ import { Profile, GameProfile } from "../../../../../structures/game/Profile";
 import { ProfileService } from "../../../services/game/ProfileService";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { GameItem, Item } from "../../../../../structures/game/Item";
+import { GameTag, Tag } from "../../../../../structures/game/Tag";
 
 export abstract class ProfileGet extends DBClass {
   public static async getProfileByDiscordId(
@@ -61,5 +62,16 @@ export abstract class ProfileGet extends DBClass {
       [discordId]
     )) as { count: number }[];
     return query[0].count;
+  }
+
+  /*
+      Tags
+  */
+  public static async getUserTags(discordId: string): Promise<GameTag[]> {
+    const query = (await DB.query(
+      `SELECT * FROM card_tag WHERE discord_id=?;`,
+      [discordId]
+    )) as Tag[];
+    return query.map((t) => new GameTag(t));
   }
 }

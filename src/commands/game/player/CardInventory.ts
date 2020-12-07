@@ -7,6 +7,8 @@ import { GameProfile } from "../../../structures/game/Profile";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { ReactionCollector } from "eris-collector";
 import { checkPermission } from "../../../lib/ZephyrUtils";
+import { ProfileService } from "../../../lib/database/services/game/ProfileService";
+import { GameTag } from "../../../structures/game/Tag";
 
 export default class CardInventory extends BaseCommand {
   names = ["inventory", "inv", "i"];
@@ -16,7 +18,7 @@ export default class CardInventory extends BaseCommand {
     "Filters:\n— group=LOONA\n— name=JinSoul\n— issue=>5\n— issue=<5\n— issue=5",
   ];
 
-  private renderInventory(cards: GameUserCard[]): string {
+  private renderInventory(cards: GameUserCard[], tags: GameTag[]): string {
     let desc: string[] = [];
     if (cards.length === 0) return "";
 
@@ -32,10 +34,15 @@ export default class CardInventory extends BaseCommand {
 
     for (let card of cards) {
       desc.push(
-        CardService.getCardDescription(card, this.zephyr, {
-          reference: longestId,
-          issue: longestSerial,
-        })
+        CardService.getCardDescription(
+          card,
+          this.zephyr,
+          {
+            reference: longestId,
+            issue: longestSerial,
+          },
+          tags.filter((t) => t.id === card.tagId)[0]
+        )
       );
     }
     return desc.join("\n");
@@ -64,13 +71,15 @@ export default class CardInventory extends BaseCommand {
     let page = parseInt(options["page"] as string, 10);
     const inventory = await CardService.getUserInventory(profile, options);
 
+    const userTags = await ProfileService.getTags(profile);
+
     const embed = new MessageEmbed()
       .setAuthor(
         `Inventory | ${msg.author.tag}`,
         msg.author.dynamicAvatarURL("png")
       )
       .setTitle(`${msg.author.tag}'s cards`)
-      .setDescription(this.renderInventory(inventory))
+      .setDescription(this.renderInventory(inventory, userTags))
       .setFooter(
         `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${size} cards`
       );
@@ -93,7 +102,7 @@ export default class CardInventory extends BaseCommand {
 
         options["page"] = page;
         const newCards = await CardService.getUserInventory(profile, options);
-        embed.setDescription(this.renderInventory(newCards));
+        embed.setDescription(this.renderInventory(newCards, userTags));
         embed.setFooter(`Page ${page} of ${totalPages} • ${size} entries`);
         await sent.edit({ embed });
 

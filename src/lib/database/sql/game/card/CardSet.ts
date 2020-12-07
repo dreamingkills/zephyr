@@ -71,4 +71,20 @@ export abstract class CardSet extends DBClass {
     ]);
     return;
   }
+
+  public static async setCardsTag(
+    cards: GameUserCard[],
+    tagId: number
+  ): Promise<void> {
+    await DB.query(`UPDATE user_card SET tag_id=? WHERE id IN (?);`, [
+      tagId,
+      cards.map((c) => c.id),
+    ]);
+    return;
+  }
+  public static async unsetCardsTag(cards: GameUserCard[]): Promise<void> {
+    await DB.query(`UPDATE user_card SET tag_id=NULL WHERE id IN (?);`, [
+      cards.map((c) => c.id),
+    ]);
+  }
 }
