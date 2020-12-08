@@ -74,4 +74,12 @@ export abstract class ProfileGet extends DBClass {
     )) as Tag[];
     return query.map((t) => new GameTag(t));
   }
+  public static async getTagById(tagId: number): Promise<GameTag> {
+    const query = (await DB.query(`SELECT * FROM card_tag WHERE id=?;`, [
+      tagId,
+    ])) as Tag[];
+    if (!query[0]) throw new ZephyrError.InvalidTagError();
+
+    return new GameTag(query[0]);
+  }
 }

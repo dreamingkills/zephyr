@@ -174,4 +174,14 @@ export abstract class ProfileService {
   public static async deleteTag(tag: GameTag): Promise<void> {
     return await ProfileSet.deleteTag(tag.id);
   }
+  public static async editTag(
+    tag: GameTag,
+    name?: string,
+    emoji?: string
+  ): Promise<void> {
+    return await ProfileSet.editTag(tag.id, name, emoji);
+  }
+  public static async getTagById(tagId: number): Promise<GameTag> {
+    return await ProfileGet.getTagById(tagId);
+  }
 }

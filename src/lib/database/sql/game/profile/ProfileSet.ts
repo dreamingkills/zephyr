@@ -1,6 +1,7 @@
 import { DB, DBClass } from "../../..";
 import { GameProfile } from "../../../../../structures/game/Profile";
 import { ProfileService } from "../../../services/game/ProfileService";
+import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 
 export abstract class ProfileSet extends DBClass {
   /*
@@ -192,6 +193,27 @@ export abstract class ProfileSet extends DBClass {
   public static async deleteTag(tagId: number): Promise<void> {
     await DB.query(`DELETE FROM card_tag WHERE id=?;`, [tagId]);
     await DB.query(`UPDATE user_card SET tag_id=NULL WHERE tag_id=?;`, [tagId]);
+    return;
+  }
+  public static async editTag(
+    tagId: number,
+    name?: string,
+    emoji?: string
+  ): Promise<void> {
+    if (!name && emoji) {
+      await DB.query(`UPDATE card_tag SET emoji=? WHERE id=?;`, [emoji, tagId]);
+    } else if (!emoji && name) {
+      await DB.query(`UPDATE card_tag SET tag_name=? WHERE id=?;`, [
+        name,
+        tagId,
+      ]);
+    } else if (emoji && name) {
+      await DB.query(`UPDATE card_tag SET tag_name=?, emoji=? WHERE id=?;`, [
+        name,
+        emoji,
+        tagId,
+      ]);
+    } else throw new ZephyrError.NoParametersInTagEditError();
     return;
   }
 }

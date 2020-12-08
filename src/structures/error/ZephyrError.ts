@@ -212,3 +212,8 @@ export class DuplicateTagError extends ZephyrError {
     super(`You already have a tag by that name.`);
   }
 }
+export class NoParametersInTagEditError extends ZephyrError {
+  constructor() {
+    super(`Please specify valid parameters to edit your tag.`);
+  }
+}

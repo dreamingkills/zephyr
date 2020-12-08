@@ -18,6 +18,7 @@ export abstract class CardSpawner {
   private static readonly minSpawnThreshold = 100;
   private static readonly spawnThreshold = CardSpawner.minSpawnThreshold * 2;
   private static guildLevels: { [key: string]: number } = {};
+  private static grabbing: Set<string> = new Set();
 
   static userCooldowns: Set<string> = new Set();
   static guildCooldowns: Set<string> = new Set();
@@ -104,6 +105,8 @@ export abstract class CardSpawner {
         const num = this.emojis.indexOf(emoji.name);
         if (finished[num]) return;
 
+        if (this.grabbing.has(userId)) return;
+
         const profile = await ProfileService.getProfile(userId, true);
 
         // Claim cooldown detection
@@ -132,6 +135,7 @@ export abstract class CardSpawner {
           return;
 
         takers[num].add(profile.discordId);
+        this.grabbing.add(profile.discordId);
 
         if (started[num]) return;
         started[num] = true;
@@ -149,6 +153,10 @@ export abstract class CardSpawner {
           winners.add(fight.winner.discordId);
 
           const countExl = takers[num].size - 1;
+          for (let t of takers[num]) {
+            this.grabbing.delete(t);
+          }
+
           takers[num].clear();
 
           let message = "";
