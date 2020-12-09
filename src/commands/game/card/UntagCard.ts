@@ -11,14 +11,20 @@ export default class ResetFrame extends BaseCommand {
   usage = ["$CMD$ [cards]"];
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     if (!this.options[0]) throw new ZephyrError.InvalidCardReferenceError();
-    let cards = [];
+    const cardsRaw = [];
     const identifiers = this.options;
     for (let i of identifiers) {
       const card = await CardService.getUserCardByIdentifier(i);
       if (card.discordId !== msg.author.id)
         throw new ZephyrError.NotOwnerOfCardError(card);
-      cards.push(card);
+
+      cardsRaw.push(card);
     }
+
+    const cards = cardsRaw.filter((c) => c.tagId);
+
+    if (cards.length === 0)
+      throw new ZephyrError.CardsNotTaggedError(cardsRaw.length > 1);
 
     await CardService.unsetCardsTag(cards);
     const embed = new MessageEmbed()

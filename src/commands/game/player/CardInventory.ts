@@ -19,33 +19,14 @@ export default class CardInventory extends BaseCommand {
   ];
 
   private renderInventory(cards: GameUserCard[], tags: GameTag[]): string {
-    let desc: string[] = [];
-    if (cards.length === 0) return "";
+    if (cards.length === 0) return "No cards here!";
 
-    const longestId = [...cards]
-      .sort((a, b) => (a.id.toString(36) > b.id.toString(36) ? 1 : -1))[0]
-      .id.toString(36).length;
-
-    // Note: we need to add 1 to accommodate for the # sign.
-    const longestSerial =
-      [...cards]
-        .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))[0]
-        .serialNumber.toString(10).length + 1;
-
-    for (let card of cards) {
-      desc.push(
-        CardService.getCardDescription(
-          card,
-          this.zephyr,
-          {
-            reference: longestId,
-            issue: longestSerial,
-          },
-          tags.filter((t) => t.id === card.tagId)[0]
-        )
-      );
-    }
-    return desc.join("\n");
+    const cardDescriptions = CardService.getCardDescriptions(
+      cards,
+      this.zephyr,
+      tags
+    );
+    return cardDescriptions.join("\n");
   }
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {

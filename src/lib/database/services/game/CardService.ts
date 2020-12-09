@@ -12,25 +12,36 @@ import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { GameTag } from "../../../../structures/game/Tag";
 
 export abstract class CardService {
-  public static getCardDescription(
-    card: GameUserCard,
+  public static getCardDescriptions(
+    cards: GameUserCard[],
     zephyr: Zephyr,
-    pad: { reference: number; issue: number },
-    tag?: GameTag
-  ): string {
-    const baseCard = zephyr.getCard(card.baseCardId);
-    return (
-      `${tag?.emoji || `:white_medium_small_square:`} \`${card.id
-        .toString(36)
-        .padStart(pad.reference, " ")}\` : \`${"★"
-        .repeat(card.wear)
-        .padEnd(5, "☆")}\` : \`${(`#` + card.serialNumber.toString(10)).padEnd(
-        pad.issue,
-        " "
-      )}\` ` +
-      (baseCard.group ? `**${baseCard.group}** ` : ``) +
-      `${baseCard.name}`
-    );
+    tags: GameTag[]
+  ): string[] {
+    const longestIdentifier = [...cards]
+      .sort((a, b) => (a.id.toString(36) > b.id.toString(36) ? 1 : -1))[0]
+      .id.toString(36).length;
+    const longestIssue = [...cards]
+      .sort((a, b) => (a.serialNumber > b.serialNumber ? 1 : -1))[0]
+      .serialNumber.toString().length;
+
+    let descs = [];
+    for (let card of cards) {
+      const baseCard = zephyr.getCard(card.baseCardId);
+      const hasTag = tags.filter((t) => t.id === card.tagId)[0];
+
+      descs.push(
+        `${hasTag?.emoji || `:white_medium_small_square:`} \`${card.id
+          .toString(36)
+          .padStart(longestIdentifier, " ")}\` : \`${"★"
+          .repeat(card.wear)
+          .padEnd(5, "☆")}\` : \`${(
+          `#` + card.serialNumber.toString(10)
+        ).padEnd(longestIssue, " ")}\`` +
+          ` ${baseCard.group ? `**${baseCard.group}** ` : ``}${baseCard.name}`
+      );
+    }
+
+    return descs;
   }
 
   public static async getAllCards(): Promise<GameBaseCard[]> {
@@ -85,7 +96,9 @@ export abstract class CardService {
 
     let img = await loadImage(baseCard.image);
     const overlay = await loadImage(
-      `./src/assets/groups/${baseCard.group?.toLowerCase() || "nogroup"}.png`
+      `./src/assets/groups/${
+        baseCard.group?.toLowerCase().replace("*", "") || "nogroup"
+      }.png`
     );
     let frame: Image;
     if (!card.frameId || !card.frameUrl) {
@@ -113,9 +126,9 @@ export abstract class CardService {
     ctx.drawImage(overlay, 0, 0, 350, 500);
 
     ctx.font = "20px AlteHaasGroteskBold";
-    ctx.fillText(`#${card.serialNumber}`, 48, 422);
+    ctx.fillText(`#${card.serialNumber}`, 50, 424);
     ctx.font = "30px AlteHaasGroteskBold";
-    ctx.fillText(`${baseCard.name}`, 47, 446);
+    ctx.fillText(`${baseCard.name}`, 50, 448);
 
     const buf = canvas.toBuffer("image/png");
     return Buffer.alloc(buf.length, buf, "base64");

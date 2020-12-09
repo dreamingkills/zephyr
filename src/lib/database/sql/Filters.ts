@@ -15,23 +15,26 @@ export class FilterService {
 
     for (let [prop, value] of Object.entries(options)) {
       if (["issue", "i", "serial"].indexOf(prop) > -1) {
+        let trueIssue = -1;
+        if (!isNaN(parseInt(value.toString(), 10))) {
+          trueIssue = parseInt(value.toString(), 10);
+        } else if (!isNaN(parseInt(value.toString().slice(1), 10))) {
+          trueIssue = parseInt(value.toString().slice(1), 10);
+        }
+
+        if (trueIssue < 0) continue;
+
         if (value.toString().startsWith(">")) {
           queryOptions.push(
-            ` user_card.serial_number>${DB.connection.escape(
-              value.toString().slice(1)
-            )}`
+            ` user_card.serial_number>${DB.connection.escape(trueIssue)}`
           );
         } else if (value.toString().startsWith("<")) {
           queryOptions.push(
-            ` user_card.serial_number<${DB.connection.escape(
-              value.toString().slice(1)
-            )}`
+            ` user_card.serial_number<${DB.connection.escape(trueIssue)}`
           );
         } else
           queryOptions.push(
-            ` user_card.serial_number=${DB.connection.escape(
-              parseInt(value as string, 10)
-            )}`
+            ` user_card.serial_number=${DB.connection.escape(trueIssue)}`
           );
       } else if (["name", "n", "member"].indexOf(prop) > -1) {
         queryOptions.push(
@@ -46,23 +49,42 @@ export class FilterService {
           )}),"%")`
         );
       } else if (["wear", "w"].indexOf(prop) > -1) {
+        let trueWear = -1;
+        if (!isNaN(parseInt(value.toString(), 10))) {
+          trueWear = parseInt(value.toString(), 10);
+        } else if (!isNaN(parseInt(value.toString().slice(1), 10))) {
+          trueWear = parseInt(value.toString().slice(1), 10);
+        } else {
+          let stringValue = value.toString();
+          if (["<", ">"].indexOf(stringValue[0]) > -1)
+            stringValue = stringValue.slice(1);
+
+          if (["mint", "m"].indexOf(stringValue) > -1) {
+            trueWear = 5;
+          } else if (["great", "gr"].indexOf(stringValue) > -1) {
+            trueWear = 4;
+          } else if (["good", "g"].indexOf(stringValue) > -1) {
+            trueWear = 3;
+          } else if (["average", "a"].indexOf(stringValue) > -1) {
+            trueWear = 2;
+          } else if (["poor", "p"].indexOf(stringValue) > -1) {
+            trueWear = 1;
+          } else if (["damaged", "d"].indexOf(stringValue) > -1) trueWear = 0;
+        }
+
+        if (trueWear < 0) continue;
+
         if (value.toString().startsWith(">")) {
           queryOptions.push(
-            ` user_card.wear>${DB.connection.escape(
-              parseInt(value.toString().slice(1), 10)
-            )}`
+            ` user_card.wear>${DB.connection.escape(trueWear)}`
           );
         } else if (value.toString().startsWith("<")) {
           queryOptions.push(
-            ` user_card.wear<${DB.connection.escape(
-              parseInt(value.toString().slice(1), 10)
-            )}`
+            ` user_card.wear<${DB.connection.escape(trueWear)}`
           );
         } else
           queryOptions.push(
-            ` user_card.wear=${DB.connection.escape(
-              parseInt(value.toString(), 10)
-            )}`
+            ` user_card.wear=${DB.connection.escape(trueWear)}`
           );
       } else if (["tag", "t"].indexOf(prop) > -1) {
         const tags = await ProfileService.getTags(profile);

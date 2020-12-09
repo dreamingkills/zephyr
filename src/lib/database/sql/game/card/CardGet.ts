@@ -72,7 +72,7 @@ export abstract class CardGet extends DBClass {
       query += ` ORDER BY wear DESC`;
     } else if (["luck", "lc"].indexOf(<string>options["order"]) > -1) {
       query += ` ORDER BY luck_coeff DESC`;
-    } else query += ` ORDER BY id DESC`;
+    } else query += ` ORDER BY user_card.id DESC`;
 
     query += ` LIMIT 10 OFFSET ${DB.connection.escape(
       (isNaN(page) ? 1 : page) * 10 - 10

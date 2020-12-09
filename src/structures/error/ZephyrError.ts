@@ -217,3 +217,10 @@ export class NoParametersInTagEditError extends ZephyrError {
     super(`Please specify valid parameters to edit your tag.`);
   }
 }
+export class CardsNotTaggedError extends ZephyrError {
+  constructor(plural: boolean) {
+    super(
+      plural ? `None of those cards are tagged.` : `That card is not tagged.`
+    );
+  }
+}

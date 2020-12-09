@@ -40,30 +40,16 @@ export default class DismantleCard extends BaseCommand {
       5: 0,
     };
 
-    const longestIdentifier = [...cards]
-      .sort((a, b) => (a.id.toString(36) > b.id.toString(36) ? 1 : -1))[0]
-      .id.toString(36).length;
-
-    // Note: we need to add 1 to accommodate for the # sign.
-    const longestIssue =
-      [...cards]
-        .sort((a, b) => (a.serialNumber > b.serialNumber ? -1 : 1))[0]
-        .serialNumber.toString(10).length + 1;
-
-    let cardDescriptions = [];
-    for (let card of cards) {
-      if (card.wear !== 0) dustReward[card.wear]++;
-      cardDescriptions.push(
-        CardService.getCardDescription(card, this.zephyr, {
-          reference: longestIdentifier,
-          issue: longestIssue,
-        })
-      );
-    }
+    const tags = await ProfileService.getTags(profile);
+    let cardDescriptions = CardService.getCardDescriptions(
+      cards,
+      this.zephyr,
+      tags
+    );
 
     let description =
       `Really dismantle **${cards.length}** card${
-        cards.length > 1 ? `s` : ``
+        cards.length === 1 ? `` : `s`
       }?` +
       `\n${cardDescriptions.join("\n")}\n` +
       `\nYou will receive:` +
@@ -121,8 +107,8 @@ export default class DismantleCard extends BaseCommand {
 
       await conf.edit({
         embed: embed.setFooter(
-          `🔥 ${
-            cards.length === 1 ? `This card has` : `These cards have`
+          `🔥 ${cards.length} card${
+            cards.length === 1 ? ` has` : `s have`
           } been destroyed.\nYou now have ${newProfile.bits.toLocaleString()} bits.`
         ),
       });
@@ -131,7 +117,7 @@ export default class DismantleCard extends BaseCommand {
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
         await conf.edit({
-          embed: embed.setFooter(`This card has not been destroyed.`),
+          embed: embed.setFooter(`🕒 This destruction has expired.`),
         });
       }
       try {
