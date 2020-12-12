@@ -4,7 +4,6 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { ReactionCollector } from "eris-collector";
-import { StatisticsService } from "../../../lib/database/services/statistics/StatisticsService";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 import { Zephyr } from "../../../structures/client/Zephyr";
 
