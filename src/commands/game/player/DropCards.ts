@@ -6,11 +6,20 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import dayjs from "dayjs";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { getTimeUntil } from "../../../lib/ZephyrUtils";
+import { GuildService } from "../../../lib/database/services/guild/GuildService";
 
 export default class DropCards extends BaseCommand {
   names = ["drop"];
   description = "Drops three random cards in the channel.";
   async exec(msg: Message, profile: GameProfile): Promise<void> {
+    const dropChannel = await GuildService.getDropChannel(msg.guildID!);
+
+    if (!dropChannel) {
+      const prefix = this.zephyr.getPrefix(msg.guildID);
+      throw new ZephyrError.UnsetZephyrChannelError(prefix);
+    }
+    if (msg.channel.id !== dropChannel)
+      throw new ZephyrError.CannotDropInChannelError(dropChannel);
     const now = dayjs(Date.now());
     const until = dayjs(profile.dropNext);
     if (now < until)

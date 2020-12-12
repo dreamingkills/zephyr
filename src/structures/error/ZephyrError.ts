@@ -245,3 +245,21 @@ export class InvalidGroupError extends ZephyrError {
     super(`There is no group by that name.`);
   }
 }
+
+export class UnsetZephyrChannelError extends ZephyrError {
+  constructor(prefix: string) {
+    super(
+      `This server doesn't have a Zephyr channel set.` +
+        `\nUse \`${prefix}setchannel\` in a channel of your choosing to set it up.`
+    );
+  }
+}
+export class CannotDropInChannelError extends ZephyrError {
+  constructor(channelId?: string) {
+    super(
+      channelId
+        ? `You can only drop cards in <#${channelId}>!`
+        : `You cannot drop cards in this channel.`
+    );
+  }
+}
