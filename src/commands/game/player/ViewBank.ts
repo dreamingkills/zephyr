@@ -13,7 +13,7 @@ export default class ViewBank extends BaseCommand {
     const subcommand = this.options[0]?.toLowerCase();
     if (subcommand === "deposit") {
       let amount = parseInt(this.options[1], 10);
-      if (this.options[1].toLowerCase() === "all") amount = profile.bits;
+      if (this.options[1]?.toLowerCase() === "all") amount = profile.bits;
 
       if (isNaN(amount) || amount < 1) {
         throw new ZephyrError.InvalidAmountError("bits");
@@ -44,7 +44,7 @@ export default class ViewBank extends BaseCommand {
       return;
     } else if (subcommand === "withdraw") {
       let amount = parseInt(this.options[1], 10);
-      if (this.options[1].toLowerCase() === "all") amount = profile.bitsBank;
+      if (this.options[1]?.toLowerCase() === "all") amount = profile.bitsBank;
 
       if (isNaN(amount) || amount < 1) {
         throw new ZephyrError.InvalidAmountError("bits");
