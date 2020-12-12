@@ -84,15 +84,17 @@ export default class Leaderboards extends BaseCommand {
 
     if (["bit", "bits", "b"].includes(boardType)) {
       trueType = "bits";
-      totalEntries = await StatisticsService.getNumberOfProfiles();
+      totalEntries = await LeaderboardService.getBitLeaderboardCount();
       title = `Top players by bits`;
     } else if (["daily", "d", "streak"].includes(boardType)) {
       trueType = "daily";
-      totalEntries = await StatisticsService.getNumberOfProfiles();
+      totalEntries = await LeaderboardService.getDailyStreakLeaderboardCount();
       title = `Top players by daily streak length`;
     } else if (["cards", "c", "card"].includes(boardType)) {
       trueType = "cards";
-      totalEntries = await StatisticsService.getNumberOfProfiles();
+      totalEntries = await LeaderboardService.getCardLeaderboardCount(
+        this.zephyr
+      );
       title = `Top players by card collection`;
     } else {
       embed.setDescription(
@@ -108,7 +110,12 @@ export default class Leaderboards extends BaseCommand {
 
     const totalPages = Math.ceil(totalEntries / 10);
 
-    embed.setTitle(title + ` (${1 + 10 * page - 10}-${10 * page})`);
+    embed.setTitle(
+      title +
+        ` (${1 + 10 * page - 10}-${
+          10 * page > totalEntries ? totalEntries : 10 * page
+        })`
+    );
     embed.setDescription(
       await this.getLeaderboard(trueType, page, msg.author.id, this.zephyr)
     );
@@ -136,7 +143,12 @@ export default class Leaderboards extends BaseCommand {
         if (emoji.name === "▶️" && page !== totalPages) page++;
         if (emoji.name === "⏭️" && page !== totalPages) page = totalPages;
 
-        embed.setTitle(title + ` (${1 + 10 * page - 10}-${10 * page})`);
+        embed.setTitle(
+          title +
+            ` (${1 + 10 * page - 10}-${
+              10 * page > totalEntries ? totalEntries : 10 * page
+            })`
+        );
         embed.setDescription(
           await this.getLeaderboard(trueType, page, msg.author.id, this.zephyr)
         );
