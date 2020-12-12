@@ -64,7 +64,11 @@ export default class TopGroup extends BaseCommand {
         `Top Collectors | ${msg.author.tag}`,
         msg.author.dynamicAvatarURL("png")
       )
-      .setTitle(`${title} (${1 + 10 * page - 10}-${10 * page})`)
+      .setTitle(
+        `${title} (${1 + 10 * page - 10}-${
+          10 * page > topCollectorCount ? topCollectorCount : 10 * page
+        })`
+      )
       .setDescription(await this.renderBody(topCollectors, page))
       .setFooter(
         `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${topCollectorCount.toLocaleString()} entries`
@@ -98,7 +102,11 @@ export default class TopGroup extends BaseCommand {
           this.zephyr,
           page
         );
-        embed.setTitle(`${title} (${1 + 10 * page - 10}-${10 * page})`);
+        embed.setTitle(
+          `${title} (${1 + 10 * page - 10}-${
+            10 * page > topCollectorCount ? topCollectorCount : 10 * page
+          })`
+        );
         embed.setDescription(await this.renderBody(newTopCollectors, page));
         embed.setFooter(
           `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${topCollectorCount.toLocaleString()} entries`

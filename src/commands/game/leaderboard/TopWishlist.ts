@@ -9,7 +9,7 @@ import { ReactionCollector } from "eris-collector";
 export default class TopWishlist extends BaseCommand {
   names = ["topwishlist", "twl"];
   description = "Shows you the top collectors of a certain group.";
-  usage = ["$CMD$ <group name>"];
+  usage = ["$CMD$"];
 
   private async renderBody(
     top: { group: string; name: string; count: number }[],
@@ -40,7 +40,11 @@ export default class TopWishlist extends BaseCommand {
         `Top Collectors | ${msg.author.tag}`,
         msg.author.dynamicAvatarURL("png")
       )
-      .setTitle(`${title} (${1 + 10 * page - 10}-${10 * page})`)
+      .setTitle(
+        `${title} (${1 + 10 * page - 10}-${
+          10 * page > topWishlistedCount ? topWishlistedCount : 10 * page
+        })`
+      )
       .setDescription(await this.renderBody(topWishlisted, page))
       .setFooter(
         `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${topWishlistedCount.toLocaleString()} entries`
@@ -70,7 +74,11 @@ export default class TopWishlist extends BaseCommand {
         if (emoji.name === "⏭️" && page !== totalPages) page = totalPages;
 
         const newTopWishlisted = await CardService.getTopWishlisted(page);
-        embed.setTitle(`${title} (${1 + 10 * page - 10}-${10 * page})`);
+        embed.setTitle(
+          `${title} (${1 + 10 * page - 10}-${
+            10 * page > topWishlistedCount ? topWishlistedCount : 10 * page
+          })`
+        );
         embed.setDescription(await this.renderBody(newTopWishlisted, page));
         embed.setFooter(
           `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${topWishlistedCount.toLocaleString()} entries`
