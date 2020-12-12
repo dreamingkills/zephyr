@@ -111,4 +111,31 @@ export abstract class CardGet extends DBClass {
     if (!query[0]) throw new ZephyrError.InvalidCardReferenceError();
     return new GameUserCard(query[0]);
   }
+
+  public static async getNumberOfTopCollectors(
+    ids: number[],
+    zephyrId: string
+  ): Promise<number> {
+    const query = (await DB.query(
+      `SELECT COUNT(*) as count FROM (SELECT COUNT(*) as count FROM user_card WHERE user_card.card_id IN (?) AND NOT user_card.discord_id=? GROUP BY user_card.discord_id HAVING COUNT(*)>0) AS total;`,
+      [ids, zephyrId]
+    )) as { count: number }[];
+    return query[0].count;
+  }
+  public static async getTopCollectorsByBaseIds(
+    ids: number[],
+    zephyrId: string,
+    page: number
+  ): Promise<{ discordId: string; amount: number }[]> {
+    const query = (await DB.query(
+      `SELECT user_card.discord_id, COUNT(*) as count FROM user_card WHERE user_card.card_id IN (?) AND NOT user_card.discord_id=? GROUP BY user_card.discord_id HAVING COUNT(*)>0 ORDER BY count DESC LIMIT 10 OFFSET ?;`,
+      [ids, zephyrId, page * 10 - 10]
+    )) as {
+      discord_id: string;
+      count: number;
+    }[];
+    return query.map((q) => {
+      return { discordId: q.discord_id, amount: q.count };
+    });
+  }
 }

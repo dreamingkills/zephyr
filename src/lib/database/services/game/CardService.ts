@@ -254,4 +254,18 @@ export abstract class CardService {
   public static async unsetCardsTag(cards: GameUserCard[]): Promise<void> {
     return await CardSet.unsetCardsTag(cards);
   }
+
+  public static async getNumberOfTopCollectors(
+    ids: number[],
+    zephyr: Zephyr
+  ): Promise<number> {
+    return await CardGet.getNumberOfTopCollectors(ids, zephyr.user.id);
+  }
+  public static async getTopCollectorsByBaseIds(
+    ids: number[],
+    zephyr: Zephyr,
+    page: number = 1
+  ): Promise<{ discordId: string; amount: number }[]> {
+    return await CardGet.getTopCollectorsByBaseIds(ids, zephyr.user.id, page);
+  }
 }

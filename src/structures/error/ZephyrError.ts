@@ -234,3 +234,14 @@ export class CardsNotTaggedError extends ZephyrError {
     );
   }
 }
+
+export class UnspecifiedGroupError extends ZephyrError {
+  constructor() {
+    super(`Please enter the name of a group.`);
+  }
+}
+export class InvalidGroupError extends ZephyrError {
+  constructor() {
+    super(`There is no group by that name.`);
+  }
+}
