@@ -24,7 +24,11 @@ export default class CardCollage extends BaseCommand {
       cards.push(card);
     }
 
-    const collage = await CardService.generateCardCollage(cards, this.zephyr);
+    const collage = await CardService.generateAlbum(
+      cards,
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/NGC_4414_%28NASA-med%29.jpg/1280px-NGC_4414_%28NASA-med%29.jpg",
+      this.zephyr
+    );
     await msg.channel.createMessage("Collage:", {
       file: collage,
       name: "collage.png",

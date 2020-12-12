@@ -156,6 +156,35 @@ export abstract class CardService {
     return Buffer.alloc(buf.length, buf, "base64");
   }
 
+  public static async generateAlbum(
+    cards: GameUserCard[],
+    background: string,
+    zephyr: Zephyr
+  ): Promise<Buffer> {
+    const canvas = createCanvas(1400, 1000);
+    const ctx = canvas.getContext("2d");
+
+    const image = await loadImage(background);
+    ctx.drawImage(image, 0, 0, 1400, 1000);
+
+    const top = cards.slice(0, 4);
+    const bottom = cards.slice(4, 8);
+
+    for (let t of top) {
+      const buffer = await this.generateCardImage(t, zephyr);
+      const image = await loadImage(buffer);
+      ctx.drawImage(image, 25 + top.indexOf(t) * 350, 50, 300, 400);
+    }
+    for (let b of bottom) {
+      const buffer = await this.generateCardImage(b, zephyr);
+      const image = await loadImage(buffer);
+      ctx.drawImage(image, 25 + bottom.indexOf(b) * 350, 550, 300, 400);
+    }
+
+    const buf = canvas.toBuffer("image/jpeg");
+    return Buffer.alloc(buf.length, buf, "base64");
+  }
+
   public static async changeCardFrame(
     card: GameUserCard,
     frameId: number,

@@ -12,7 +12,9 @@ export default class ViewBank extends BaseCommand {
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const subcommand = this.options[0]?.toLowerCase();
     if (subcommand === "deposit") {
-      const amount = parseInt(this.options[1], 10);
+      let amount = parseInt(this.options[1], 10);
+      if (this.options[1].toLowerCase() === "all") amount = profile.bits;
+
       if (isNaN(amount) || amount < 1) {
         throw new ZephyrError.InvalidAmountError("bits");
       }
@@ -41,7 +43,9 @@ export default class ViewBank extends BaseCommand {
       await msg.channel.createMessage({ embed });
       return;
     } else if (subcommand === "withdraw") {
-      const amount = parseInt(this.options[1], 10);
+      let amount = parseInt(this.options[1], 10);
+      if (this.options[1].toLowerCase() === "all") amount = profile.bitsBank;
+
       if (isNaN(amount) || amount < 1) {
         throw new ZephyrError.InvalidAmountError("bits");
       }

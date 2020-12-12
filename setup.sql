@@ -110,3 +110,11 @@ CREATE TABLE card_tag
     emoji           TEXT,
     PRIMARY KEY(id)
 );
+
+CREATE TABLE group
+(
+    id              INT(11) AUTO_INCREMENT,
+    group_name      TEXT(64) NOT NULL,
+    group_desc      TEXT(1000),
+    PRIMARY KEY(id)
+);
