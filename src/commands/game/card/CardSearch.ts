@@ -39,7 +39,7 @@ export default class CardSearch extends BaseCommand {
             baseCard.name
           }** ${baseCard.subgroup ? `(${baseCard.subgroup})` : ``}` +
           `\n— Issue **#${card.serialNumber}**` +
-          `\n— Wear: **${
+          `\n— Condition: **${
             ["Damaged", "Poor", "Average", "Good", "Great", "Mint"][card.wear]
           }**` +
           `${

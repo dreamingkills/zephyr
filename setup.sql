@@ -30,9 +30,11 @@ CREATE TABLE wishlist
 (
     id              INT(11) AUTO_INCREMENT,
     discord_id      VARCHAR(32) NOT NULL,
-    item            TEXT(12),
+    name            TEXT(50),
+    group_name      TEXT(50),
     PRIMARY KEY(id)
 );
+
 CREATE TABLE card_base
 (
     id              INT(11) AUTO_INCREMENT,

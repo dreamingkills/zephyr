@@ -31,12 +31,20 @@ export abstract class ProfileSet extends DBClass {
   }
   public static async addToWishlist(
     discordId: string,
-    text: string
+    name: string,
+    group?: string
   ): Promise<void> {
-    await DB.query(`INSERT INTO wishlist (discord_id, item) VALUES (?, ?);`, [
-      discordId,
-      text,
-    ]);
+    if (!group) {
+      await DB.query(`INSERT INTO wishlist (discord_id, name) VALUES (?, ?);`, [
+        discordId,
+        name,
+      ]);
+    } else {
+      await DB.query(
+        `INSERT INTO wishlist (discord_id, name, group_name) VALUES (?, ?, ?);`,
+        [discordId, name, group]
+      );
+    }
     return;
   }
   public static async removeFromWishlist(

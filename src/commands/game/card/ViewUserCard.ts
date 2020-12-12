@@ -34,7 +34,7 @@ export default class ViewUserCard extends BaseCommand {
           card.serialNumber
         }` +
           `\n— Frame: **${card.frameName || "Default"}**` +
-          `\n— Wear: **${
+          `\n— Condition: **${
             ["Damaged", "Poor", "Average", "Good", "Great", "Mint"][card.wear]
           }**` +
           `\n${baseCard.flavor ? `*${baseCard.flavor}*` : ``}`

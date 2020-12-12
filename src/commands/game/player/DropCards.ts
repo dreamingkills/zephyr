@@ -16,12 +16,14 @@ export default class DropCards extends BaseCommand {
     if (now < until)
       throw new ZephyrError.DropCooldownError(getTimeUntil(now, until));
 
-    const cards = this.zephyr.getRandomCards(3);
+    const wishlist = await ProfileService.getWishlist(profile);
+    const cards = this.zephyr.getRandomCards(3, wishlist);
 
     await ProfileService.setDropTimestamp(
       profile,
       dayjs(new Date()).add(30, "minute").format(`YYYY/MM/DD HH:mm:ss`)
     );
+
     await CardSpawner.userDrop(
       <TextChannel>msg.channel,
       cards,

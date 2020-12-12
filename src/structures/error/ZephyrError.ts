@@ -97,6 +97,16 @@ export class InvalidWishlistEntryError extends ZephyrError {
     super(`Please enter a valid item from your wishlist.`);
   }
 }
+export class InvalidWishlistNameError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid name to add to your wishlist.`);
+  }
+}
+export class DuplicateWishlistEntryError extends ZephyrError {
+  constructor() {
+    super(`That person is already on your wishlist.`);
+  }
+}
 /*
     Items
            */

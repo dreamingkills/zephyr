@@ -4,6 +4,10 @@ import { ProfileService } from "../../../services/game/ProfileService";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { GameItem, Item } from "../../../../../structures/game/Item";
 import { GameTag, Tag } from "../../../../../structures/game/Tag";
+import {
+  GameWishlist,
+  Wishlist,
+} from "../../../../../structures/game/Wishlist";
 
 export abstract class ProfileGet extends DBClass {
   public static async getProfileByDiscordId(
@@ -19,12 +23,12 @@ export abstract class ProfileGet extends DBClass {
       return await ProfileService.createProfile(discordId);
     } else throw new ZephyrError.NoProfileError(`<@${discordId}>`);
   }
-  public static async getWishlist(discordId: string): Promise<string[]> {
+  public static async getWishlist(discordId: string): Promise<GameWishlist[]> {
     const query = (await DB.query(
       `SELECT * FROM wishlist WHERE discord_id=?;`,
       [discordId]
-    )) as { id: number; discord_id: string; item: string }[];
-    return query.map((i) => i.item);
+    )) as Wishlist[];
+    return query.map((i) => new GameWishlist(i));
   }
   public static async getNumberOfClaims(discordId: string): Promise<number> {
     const query = (await DB.query(

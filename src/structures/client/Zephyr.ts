@@ -11,6 +11,7 @@ import { checkPermission } from "../../lib/ZephyrUtils";
 import { MessageEmbed } from "./RichEmbed";
 import { Chance } from "chance";
 import { CardSpawner } from "../../lib/CardSpawner";
+import { GameWishlist } from "../game/Wishlist";
 
 export class Zephyr extends Client {
   version: string = "beta-0.5.0";
@@ -79,10 +80,7 @@ export class Zephyr extends Client {
         return;
 
       // go ahead if we're allowed to speak
-      if (message.guildID === "752028821791703141") {
-        if (message.channel.name.includes("zephyr-channel"))
-          await this.commandLib.process(message, this);
-      } else await this.commandLib.process(message, this);
+      await this.commandLib.process(message, this);
 
       // message counter
       await CardSpawner.processMessage(
@@ -181,8 +179,33 @@ export class Zephyr extends Client {
   public getCard(id: number): GameBaseCard {
     return this.cards[id];
   }
-  public getRandomCards(amount: number): GameBaseCard[] {
-    return this.chance.pickset(Object.values(this.cards), amount);
+  public getRandomCards(
+    amount: number,
+    wishlist?: GameWishlist[]
+  ): GameBaseCard[] {
+    const cards: GameBaseCard[] = [];
+    if (wishlist) {
+      const bonus = this.chance.bool({ likelihood: 1.5 });
+      if (bonus) {
+        const random = this.chance.pickone(wishlist);
+        const bonus = this.chance.pickone(
+          Object.values(this.cards).filter(
+            (c) => c.name === random.name && c.group === random.groupName
+          )
+        );
+        cards.push(bonus);
+      }
+    }
+    const availableCards = Object.values(this.cards).filter(
+      (c) => c.rarity > 0
+    );
+    cards.push(...this.chance.pickset(Object.values(availableCards), amount));
+
+    for (let i = 0; i < amount; i++) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+    return cards.slice(0, amount);
   }
   public getCards(): GameBaseCard[] {
     return Object.values(this.cards);

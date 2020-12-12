@@ -1,6 +1,7 @@
 import { GameItem } from "../../../../structures/game/Item";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameTag } from "../../../../structures/game/Tag";
+import { GameWishlist } from "../../../../structures/game/Wishlist";
 import { ProfileGet } from "../../sql/game/profile/ProfileGet";
 import { ProfileSet } from "../../sql/game/profile/ProfileSet";
 
@@ -36,14 +37,17 @@ export abstract class ProfileService {
     await ProfileSet.setBlurb(profile.discordId, blurb);
     return await profile.fetch();
   }
-  public static async getWishlist(profile: GameProfile): Promise<string[]> {
+  public static async getWishlist(
+    profile: GameProfile
+  ): Promise<GameWishlist[]> {
     return await ProfileGet.getWishlist(profile.discordId);
   }
   public static async addToWishlist(
     profile: GameProfile,
-    text: string
+    name: string,
+    group?: string
   ): Promise<void> {
-    return await ProfileSet.addToWishlist(profile.discordId, text);
+    return await ProfileSet.addToWishlist(profile.discordId, name, group);
   }
   public static async removeFromWishlist(
     profile: GameProfile,
