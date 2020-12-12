@@ -268,4 +268,13 @@ export abstract class CardService {
   ): Promise<{ discordId: string; amount: number }[]> {
     return await CardGet.getTopCollectorsByBaseIds(ids, zephyr.user.id, page);
   }
+
+  public static async getNumberOfTopWishlisted(): Promise<number> {
+    return await CardGet.getNumberOfTopWishlisted();
+  }
+  public static async getTopWishlisted(
+    page: number = 1
+  ): Promise<{ group: string; name: string; count: number }[]> {
+    return await CardGet.getTopWishlisted(page);
+  }
 }

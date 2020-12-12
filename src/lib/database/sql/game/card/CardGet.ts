@@ -138,4 +138,22 @@ export abstract class CardGet extends DBClass {
       return { discordId: q.discord_id, amount: q.count };
     });
   }
+
+  public static async getNumberOfTopWishlisted(): Promise<number> {
+    const query = (await DB.query(
+      `SELECT COUNT(*) as count FROM (SELECT COUNT(*) as count FROM wishlist GROUP BY name, group_name HAVING COUNT(*) ORDER BY count DESC) g;`
+    )) as { count: number }[];
+    return query[0].count;
+  }
+  public static async getTopWishlisted(
+    page: number
+  ): Promise<{ group: string; name: string; count: number }[]> {
+    const query = (await DB.query(
+      `SELECT COUNT(*) as count, name, group_name FROM wishlist GROUP BY name, group_name ORDER BY count DESC LIMIT 10 OFFSET ?;`,
+      [page * 10 - 10]
+    )) as { count: number; name: string; group_name: string }[];
+    return query.map((q) => {
+      return { name: q.name, group: q.group_name, count: q.count };
+    });
+  }
 }
