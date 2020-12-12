@@ -6,6 +6,7 @@ import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 import { ReactionCollector } from "eris-collector";
+import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 
 export default class TopGroup extends BaseCommand {
   names = ["topgroup", "tg"];
@@ -20,10 +21,11 @@ export default class TopGroup extends BaseCommand {
     const pad = `#${page * 10}`.length;
     for (let col of collectors) {
       const user = await this.zephyr.fetchUser(col.discordId);
+      const profile = await ProfileService.getProfile(col.discordId);
       description += `\`${(
         `#` + (page * 10 - 10 + collectors.indexOf(col) + 1).toString()
       ).padStart(pad, " ")}\` ${
-        user.tag
+        profile.private ? `*Private User*` : user.tag
       } — **${col.amount.toLocaleString()}** cards\n`;
     }
     return description;
