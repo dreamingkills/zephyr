@@ -95,7 +95,6 @@ export class FilterService {
         const tag = tags.filter(
           (t) => t.name === value.toString()?.toLowerCase()
         )[0];
-        console.log(value);
         if (!value.toString()) {
           queryOptions.push(` user_card.tag_id IS NULL`);
           continue;
