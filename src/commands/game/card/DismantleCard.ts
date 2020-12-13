@@ -40,6 +40,11 @@ export default class DismantleCard extends BaseCommand {
       5: 0,
     };
 
+    for (let card of cards) {
+      if (card.wear === 0) continue;
+      dustReward[card.wear]++;
+    }
+
     const tags = await ProfileService.getTags(profile);
     let cardDescriptions = CardService.getCardDescriptions(
       cards,

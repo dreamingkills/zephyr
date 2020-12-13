@@ -67,6 +67,15 @@ export class NotEnoughBitsInBankError extends ZephyrError {
     super(`You don't have enough bits in your bank to do that.`);
   }
 }
+export class NotEnoughDustError extends ZephyrError {
+  constructor(has: number, needs: number, tier: number) {
+    super(
+      `You need **${needs.toLocaleString()}x** Card Dust \`${"★"
+        .repeat(tier)
+        .padEnd(5, "☆")}\` to do that.\nYou have **${has.toLocaleString()}**.`
+    );
+  }
+}
 export class CannotPayYourselfError extends ZephyrError {
   constructor() {
     super(`You can't give bits to yourself.`);
@@ -175,7 +184,11 @@ export class FrameAlreadyDefaultError extends ZephyrError {
     super(`\`${card.id.toString(36)}\` already has the default frame.`);
   }
 }
-
+export class CardBestConditionError extends ZephyrError {
+  constructor(card: GameUserCard) {
+    super(`\`${card.id.toString(36)}\` is already in Mint condition.`);
+  }
+}
 /*
     Tags
           */
@@ -261,5 +274,10 @@ export class CannotDropInChannelError extends ZephyrError {
         ? `You can only drop cards in <#${channelId}>!`
         : `You cannot drop cards in this channel.`
     );
+  }
+}
+export class InvalidDustTypeError extends ZephyrError {
+  constructor() {
+    super(`That is not a valid type of dust.`);
   }
 }

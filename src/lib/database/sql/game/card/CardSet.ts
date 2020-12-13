@@ -86,5 +86,11 @@ export abstract class CardSet extends DBClass {
     await DB.query(`UPDATE user_card SET tag_id=NULL WHERE id IN (?);`, [
       cards.map((c) => c.id),
     ]);
+    return;
+  }
+
+  public static async increaseCardWear(card: GameUserCard): Promise<void> {
+    await DB.query(`UPDATE user_card SET wear=wear+1 WHERE id=?;`, [card.id]);
+    return;
   }
 }

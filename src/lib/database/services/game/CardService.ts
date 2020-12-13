@@ -277,4 +277,8 @@ export abstract class CardService {
   ): Promise<{ group: string; name: string; count: number }[]> {
     return await CardGet.getTopWishlisted(page);
   }
+
+  public static async increaseCardWear(card: GameUserCard): Promise<void> {
+    return await CardSet.increaseCardWear(card);
+  }
 }
