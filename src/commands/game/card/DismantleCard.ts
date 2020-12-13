@@ -14,10 +14,10 @@ export default class DismantleCard extends BaseCommand {
   usage = ["$CMD$ [cards]"];
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const identifiers = this.options.filter((o) => !o.includes("<@"));
-    const cards: GameUserCard[] = [];
+    const cardsRaw: GameUserCard[] = [];
     if (identifiers.length === 0) {
       const lastCard = await CardService.getLastCard(profile.discordId);
-      cards.push(lastCard);
+      cardsRaw.push(lastCard);
     }
 
     for (let ref of identifiers) {
@@ -25,9 +25,10 @@ export default class DismantleCard extends BaseCommand {
       const card = await CardService.getUserCardByIdentifier(ref);
       if (card.discordId !== msg.author.id)
         throw new ZephyrError.NotOwnerOfCardError(card);
-      cards.push(card);
+      cardsRaw.push(card);
     }
 
+    const cards = cardsRaw.slice(0, 10);
     const individualRewards = cards.map((c) => {
       return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
     });
@@ -53,6 +54,9 @@ export default class DismantleCard extends BaseCommand {
     );
 
     let description =
+      (cardsRaw.length > 10
+        ? `:warning: You can only dismantle up to 10 cards at a time.\n\n`
+        : ``) +
       `Really dismantle **${cards.length}** card${
         cards.length === 1 ? `` : `s`
       }?` +

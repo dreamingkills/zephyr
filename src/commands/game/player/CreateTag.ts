@@ -14,11 +14,11 @@ export default class CreateTag extends BaseCommand {
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const userTags = await ProfileService.getTags(profile);
     if (
-      (userTags.length >= 3 && profile.patron === 0) ||
-      (userTags.length >= 5 && profile.patron === 1) ||
-      (userTags.length >= 7 && profile.patron === 2) ||
-      (userTags.length >= 10 && profile.patron === 3) ||
-      (userTags.length >= 15 && profile.patron === 4)
+      (userTags.length >= 10 && profile.patron === 0) ||
+      (userTags.length >= 15 && profile.patron === 1) ||
+      (userTags.length >= 25 && profile.patron === 2) ||
+      (userTags.length >= 40 && profile.patron === 3) ||
+      (userTags.length >= 75 && profile.patron === 4)
     ) {
       const prefix = this.zephyr.getPrefix(msg.guildID!);
       throw new ZephyrError.TagsFullError(profile.patron, prefix);
