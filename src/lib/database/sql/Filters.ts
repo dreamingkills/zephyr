@@ -32,6 +32,10 @@ export class FilterService {
           queryOptions.push(
             ` user_card.serial_number<${DB.connection.escape(trueIssue)}`
           );
+        } else if (value.toString().startsWith("/")) {
+          queryOptions.push(
+            ` (user_card.serial_number%${DB.connection.escape(trueIssue)}=0)`
+          );
         } else
           queryOptions.push(
             ` user_card.serial_number=${DB.connection.escape(trueIssue)}`
@@ -91,9 +95,19 @@ export class FilterService {
         const tag = tags.filter(
           (t) => t.name === value.toString()?.toLowerCase()
         )[0];
-        if (!tag) continue;
+        console.log(value);
+        if (!value.toString()) {
+          queryOptions.push(` user_card.tag_id IS NULL`);
+          continue;
+        }
+        if (tag && value) {
+          queryOptions.push(
+            ` user_card.tag_id=${DB.connection.escape(tag.id)}`
+          );
+          continue;
+        }
 
-        queryOptions.push(` user_card.tag_id=${DB.connection.escape(tag.id)}`);
+        queryOptions.push(` user_card.tag_id=-1`);
       } else if (["frame", "f"].indexOf(prop) > -1) {
         if (value === "true") {
           queryOptions.push(` user_card.frame!=1`);
