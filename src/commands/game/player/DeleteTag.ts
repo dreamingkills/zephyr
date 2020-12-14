@@ -25,7 +25,7 @@ export default class DeleteTag extends BaseCommand {
         `Delete Tag | ${msg.author.tag}`,
         msg.author.dynamicAvatarURL("png")
       )
-      .setDescription(`Deleted tag **${hasTag.name}**.`);
+      .setDescription(`Deleted tag ${hasTag.emoji} \`${hasTag.name}\`.`);
     await msg.channel.createMessage({ embed });
     return;
   }
