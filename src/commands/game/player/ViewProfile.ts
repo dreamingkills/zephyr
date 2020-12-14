@@ -4,6 +4,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { CardService } from "../../../lib/database/services/game/CardService";
 
 export default class ViewProfile extends BaseCommand {
   names = ["profile", "p"];
@@ -32,16 +33,20 @@ export default class ViewProfile extends BaseCommand {
     if (target.private && target.discordId !== msg.author.id)
       throw new ZephyrError.PrivateProfileError(user.tag);
 
+    const cardsAmount = await CardService.getUserInventorySize(target, [], {});
+
+    const targetIsSender = target.discordId === msg.author.id;
     const embed = new MessageEmbed()
       .setAuthor(`Profile | ${user.tag}`, msg.author.avatarURL)
       .setDescription(
         `**Blurb**` +
           `\n${target.blurb || "*No blurb set*"}` +
-          `\n\n— ${
-            target.discordId === msg.author.id ? `You have` : `${user.tag} has`
-          } ${
+          `\n\n— ${targetIsSender ? `You have` : `${user.tag} has`} ${
             this.zephyr.config.discord.emoji.bits
-          }**${target.bits.toLocaleString()}**.`
+          } **${target.bits.toLocaleString()}**.` +
+          `\n— ${
+            targetIsSender ? `You have` : `${user.tag} has`
+          } **${cardsAmount.toLocaleString()}** cards.`
       );
     if (profile.discordId === msg.author.id && profile.private)
       embed.setFooter(`Your profile is currently private.`);
