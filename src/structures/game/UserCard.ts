@@ -9,6 +9,10 @@ export interface UserCard {
   frame_id: number;
   frame_name: string;
   frame_url: string;
+  dye_mask_url: string;
+  dye_r: number;
+  dye_g: number;
+  dye_b: number;
   tag_id: number;
 }
 export class GameUserCard {
@@ -22,6 +26,10 @@ export class GameUserCard {
   frameId: number;
   frameName: string;
   frameUrl: string;
+  dyeMaskUrl: string;
+  dyeR: number;
+  dyeG: number;
+  dyeB: number;
   tagId: number;
 
   constructor(data: UserCard) {
@@ -35,6 +43,11 @@ export class GameUserCard {
     this.frameId = data.frame_id;
     this.frameName = data.frame_name;
     this.frameUrl = data.frame_url;
+    this.dyeMaskUrl = data.dye_mask_url;
     this.tagId = data.tag_id;
+
+    this.dyeR = data.dye_r;
+    this.dyeG = data.dye_g;
+    this.dyeB = data.dye_b;
   }
 }

@@ -38,7 +38,13 @@ export default class CardInventory extends BaseCommand {
       options[key] = value;
     }
 
-    const size = await CardService.getUserInventorySize(profile, options);
+    const userTags = await ProfileService.getTags(profile);
+
+    const size = await CardService.getUserInventorySize(
+      profile,
+      userTags,
+      options
+    );
 
     if (
       !options["page"] ||
@@ -50,9 +56,11 @@ export default class CardInventory extends BaseCommand {
     if (options["page"] > totalPages) options["page"] = totalPages;
 
     let page = parseInt(options["page"] as string, 10);
-    const inventory = await CardService.getUserInventory(profile, options);
-
-    const userTags = await ProfileService.getTags(profile);
+    const inventory = await CardService.getUserInventory(
+      profile,
+      userTags,
+      options
+    );
 
     const embed = new MessageEmbed()
       .setAuthor(
@@ -82,7 +90,11 @@ export default class CardInventory extends BaseCommand {
         if (emoji.name === "⏭️" && page !== totalPages) page = totalPages;
 
         options["page"] = page;
-        const newCards = await CardService.getUserInventory(profile, options);
+        const newCards = await CardService.getUserInventory(
+          profile,
+          userTags,
+          options
+        );
         embed.setDescription(this.renderInventory(newCards, userTags));
         embed.setFooter(`Page ${page} of ${totalPages} • ${size} entries`);
         await sent.edit({ embed });

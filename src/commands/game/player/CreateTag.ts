@@ -25,7 +25,7 @@ export default class CreateTag extends BaseCommand {
     }
 
     const tag = this.options[0]?.toLowerCase();
-    if (!tag || tag.length > 6)
+    if (!tag || tag.length > 12)
       throw new ZephyrError.UnspecifiedTagInCreationError();
 
     if (userTags.filter((t) => t.name === tag)[0])

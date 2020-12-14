@@ -55,20 +55,20 @@ export abstract class CardSet extends DBClass {
     cards: GameUserCard[],
     discordId: string
   ): Promise<void> {
-    await DB.query(`UPDATE user_card SET discord_id=? WHERE id IN (?);`, [
-      discordId,
-      cards.map((c) => c.id),
-    ]);
+    await DB.query(
+      `UPDATE user_card SET discord_id=?,tag_id=NULL WHERE id IN (?);`,
+      [discordId, cards.map((c) => c.id)]
+    );
     return;
   }
   public static async dismantleCards(
     cards: GameUserCard[],
     zephyrId: string
   ): Promise<void> {
-    await DB.query(`UPDATE user_card SET discord_id=? WHERE id IN (?);`, [
-      zephyrId,
-      cards.map((c) => c.id),
-    ]);
+    await DB.query(
+      `UPDATE user_card SET discord_id=?,tag_id=NULL WHERE id IN (?);`,
+      [zephyrId, cards.map((c) => c.id)]
+    );
     return;
   }
 

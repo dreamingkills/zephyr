@@ -26,7 +26,7 @@ export default class EditTag extends BaseCommand {
     const firstParam = this.options[1]?.toLowerCase();
     const secondParam = this.options[2]?.toLowerCase();
     if (secondParam) {
-      if (firstParam.length > 6)
+      if (firstParam.length > 12)
         throw new ZephyrError.UnspecifiedTagInCreationError();
       const isEmoji = emojiregex().exec(secondParam);
       if (!isEmoji) throw new ZephyrError.InvalidEmojiTagError();

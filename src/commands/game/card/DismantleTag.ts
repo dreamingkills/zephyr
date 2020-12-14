@@ -1,34 +1,28 @@
 import { Message, PartialEmoji } from "eris";
+import { CardService } from "../../../lib/database/services/game/CardService";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
-import { CardService } from "../../../lib/database/services/game/CardService";
-import { MessageEmbed } from "../../../structures/client/RichEmbed";
-import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { ReactionCollector } from "eris-collector";
-import { GameUserCard } from "../../../structures/game/UserCard";
+import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
-export default class DismantleCard extends BaseCommand {
-  names = ["dismantle", "d"];
-  description = "Dismantles a card, giving you dust and bits in exchange.";
-  usage = ["$CMD$ [cards]"];
+export default class DismantleTag extends BaseCommand {
+  names = ["dismantletag", "dit"];
+  description = "Dismantles all the cards in a tag.";
+  usage = ["$CMD$ <card> <mention>"];
+  developerOnly = true;
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const identifiers = this.options.filter((o) => !o.includes("<@"));
-    const cardsRaw: GameUserCard[] = [];
-    if (identifiers.length === 0) {
-      const lastCard = await CardService.getLastCard(profile.discordId);
-      cardsRaw.push(lastCard);
-    }
+    const tags = await ProfileService.getTags(profile);
+    const query = tags.filter(
+      (t) => t.name.toLowerCase() === this.options.join(" ").toLowerCase()
+    )[0];
 
-    for (let ref of identifiers) {
-      if (!ref) throw new ZephyrError.InvalidCardReferenceError();
-      const card = await CardService.getUserCardByIdentifier(ref);
-      if (card.discordId !== msg.author.id)
-        throw new ZephyrError.NotOwnerOfCardError(card);
-      cardsRaw.push(card);
-    }
+    if (!query) throw new ZephyrError.InvalidTagError();
 
-    const cards = cardsRaw.slice(0, 10);
+    const cards = await CardService.getCardsByTag(query);
+    if (cards.length < 1) throw new ZephyrError.NoCardsTaggedError(query);
+
     const individualRewards = cards.map((c) => {
       return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
     });
@@ -46,22 +40,20 @@ export default class DismantleCard extends BaseCommand {
       dustReward[card.wear]++;
     }
 
-    const tags = await ProfileService.getTags(profile);
-    let cardDescriptions = CardService.getCardDescriptions(
-      cards,
+    const descs = CardService.getCardDescriptions(
+      cards.slice(0, 5),
       this.zephyr,
       tags
     );
+    const excess = Math.max(cards.length - 5, 0);
 
     let description =
-      (cardsRaw.length > 10
-        ? `:warning: You can only dismantle up to 10 cards at a time.\n\n`
-        : ``) +
-      `Really dismantle **${cards.length}** card${
+      `Really dismantle **${cards.length.toLocaleString()} card${
         cards.length === 1 ? `` : `s`
-      }?` +
-      `\n${cardDescriptions.join("\n")}\n` +
-      `\nYou will receive:` +
+      }** tagged ${query.emoji} \`${query.name}\`?\n` +
+      descs.join("\n") +
+      (excess > 0 ? `\n*... and ${excess.toLocaleString()} more ...*` : ``) +
+      `\n\nYou will receive:` +
       `\n:white_medium_small_square: ${this.zephyr.config.discord.emoji.bits} **${bitReward}**`;
 
     for (let [dust, count] of Object.entries(dustReward)) {
@@ -73,22 +65,20 @@ export default class DismantleCard extends BaseCommand {
 
     const embed = new MessageEmbed()
       .setAuthor(
-        `Dismantle | ${msg.author.tag}`,
+        `Bulk Dismantle | ${msg.author.tag}`,
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(description);
-
-    const conf = await msg.channel.createMessage({ embed });
+    const conf = await msg.channel.createMessage({ embed: embed });
     await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
       emoji.id === this.zephyr.config.discord.emojiId.check;
     const collector = new ReactionCollector(this.zephyr, conf, filter, {
-      time: 15000,
+      time: 30000,
       max: 1,
     });
-
     collector.on("collect", async () => {
       // We need to check that this user is still the owner, or they can dupe bits
       for (let card of cards) {
@@ -134,10 +124,12 @@ export default class DismantleCard extends BaseCommand {
         await conf.edit({
           embed: embed.setFooter(`🕒 This destruction has expired.`),
         });
+        await conf.removeReaction(
+          `check:${this.zephyr.config.discord.emojiId.check}`,
+          this.zephyr.user.id
+        );
+        return;
       }
-      try {
-        await conf.removeReactions();
-      } catch {}
     });
   }
 }

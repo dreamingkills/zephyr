@@ -1,3 +1,4 @@
+import { GameTag } from "../game/Tag";
 import { GameUserCard } from "../game/UserCard";
 
 abstract class ZephyrError extends Error {
@@ -14,6 +15,11 @@ abstract class ZephyrError extends Error {
 export class InvalidMentionError extends ZephyrError {
   constructor() {
     super(`Please mention a user.`);
+  }
+}
+export class InvalidUserArgumentError extends ZephyrError {
+  constructor() {
+    super(`Please mention someone or provide their User ID.`);
   }
 }
 export class InvalidMentionGiftError extends ZephyrError {
@@ -196,7 +202,7 @@ export class UnspecifiedTagInCreationError extends ZephyrError {
   constructor() {
     super(
       `Please enter a valid name for your tag.` +
-        `\nTags must be 6 characters or less.`
+        `\nTags must be 12 characters or less.`
     );
   }
 }
@@ -245,6 +251,11 @@ export class CardsNotTaggedError extends ZephyrError {
     super(
       plural ? `None of those cards are tagged.` : `That card is not tagged.`
     );
+  }
+}
+export class NoCardsTaggedError extends ZephyrError {
+  constructor(tag: GameTag) {
+    super(`You have no cards tagged ${tag.emoji} \`${tag.name}\`.`);
   }
 }
 

@@ -56,7 +56,7 @@ export abstract class CardSpawner {
     prefer?: GameProfile
   ): Promise<void> {
     const chance = new Chance();
-    const droppedCards: GameDroppedCard[] = [];
+    const droppedCards: GameUserCard[] = [];
 
     for (let card of cards) {
       const random = chance.bool({ likelihood: 2 });
@@ -69,11 +69,22 @@ export abstract class CardSpawner {
         frame = defaultFrame;
       }
       droppedCards.push(
-        new GameDroppedCard({
-          baseCardId: card.id,
-          serialNumber: card.serialTotal + 1,
-          frameId: frame.id,
-          frameUrl: frame.frameUrl,
+        new GameUserCard({
+          id: 0,
+          serial_number: card.serialTotal + 1,
+          card_id: card.id,
+          discord_id: "0",
+          original_owner: "0",
+          wear: 0,
+          luck_coeff: 0,
+          frame_id: frame.id,
+          frame_name: frame.frameName,
+          frame_url: frame.frameUrl,
+          dye_mask_url: frame.dyeMaskUrl,
+          dye_r: 245,
+          dye_g: 245,
+          dye_b: 245,
+          tag_id: 0,
         })
       );
     }

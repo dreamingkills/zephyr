@@ -1,16 +1,12 @@
 import { DB } from "..";
-import { GameProfile } from "../../../structures/game/Profile";
-import { ProfileService } from "../services/game/ProfileService";
+import { GameTag } from "../../../structures/game/Tag";
 
 export interface Filter {
   [key: string]: string | number;
 }
 
 export class FilterService {
-  public static async parseOptions(
-    options: Filter,
-    profile: GameProfile
-  ): Promise<string[]> {
+  public static parseOptions(options: Filter, tags: GameTag[]): string[] {
     const queryOptions: string[] = [];
 
     for (let [prop, value] of Object.entries(options)) {
@@ -91,7 +87,6 @@ export class FilterService {
             ` user_card.wear=${DB.connection.escape(trueWear)}`
           );
       } else if (["tag", "t"].indexOf(prop) > -1) {
-        const tags = await ProfileService.getTags(profile);
         const tag = tags.filter(
           (t) => t.name === value.toString()?.toLowerCase()
         )[0];

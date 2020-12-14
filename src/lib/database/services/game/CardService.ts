@@ -7,22 +7,42 @@ import { CardGet } from "../../sql/game/card/CardGet";
 import fs from "fs/promises";
 import { CardSet } from "../../sql/game/card/CardSet";
 import { Zephyr } from "../../../../structures/client/Zephyr";
-import { GameDroppedCard } from "../../../../structures/game/DroppedCard";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { GameTag } from "../../../../structures/game/Tag";
+import gm from "gm";
 
 export abstract class CardService {
+  private static toBufferPromise(state: gm.State): Promise<Buffer> {
+    return new Promise((resolve) => {
+      try {
+        state.toBuffer((err, buf) => {
+          if (err) throw err;
+          resolve(buf);
+        });
+      } catch (err) {
+        throw err;
+      }
+    });
+  }
+
   public static getCardDescriptions(
     cards: GameUserCard[],
     zephyr: Zephyr,
     tags: GameTag[]
   ): string[] {
     const longestIdentifier = [...cards]
-      .sort((a, b) => (a.id.toString(36) > b.id.toString(36) ? 1 : -1))[0]
+      .sort((a, b) =>
+        a.id.toString(36).length < b.id.toString(36).length ? 1 : -1
+      )[0]
       .id.toString(36).length;
-    const longestIssue = [...cards]
-      .sort((a, b) => (a.serialNumber > b.serialNumber ? 1 : -1))[0]
-      .serialNumber.toString().length;
+    const longestIssue =
+      [...cards]
+        .sort((a, b) =>
+          a.serialNumber.toString().length < b.serialNumber.toString().length
+            ? 1
+            : -1
+        )[0]
+        .serialNumber.toString().length + 1;
 
     let descs = [];
     for (let card of cards) {
@@ -75,18 +95,20 @@ export abstract class CardService {
   }
   public static async getUserInventory(
     profile: GameProfile,
+    tags: GameTag[],
     options: Filter
   ): Promise<GameUserCard[]> {
-    return await CardGet.getUserInventory(profile, options);
+    return await CardGet.getUserInventory(profile, options, tags);
   }
   public static async getUserInventorySize(
     profile: GameProfile,
+    tags: GameTag[],
     options: Filter
   ): Promise<number> {
-    return await CardGet.getUserInventorySize(profile, options);
+    return await CardGet.getUserInventorySize(profile, options, tags);
   }
   public static async generateCardImage(
-    card: GameUserCard | GameDroppedCard,
+    card: GameUserCard,
     zephyr: Zephyr
   ): Promise<Buffer> {
     const baseCard = zephyr.getCard(card.baseCardId);
@@ -123,19 +145,32 @@ export abstract class CardService {
     ctx.restore();*/
     ctx.drawImage(img, 0, 0, 350, 500);
     ctx.drawImage(frame, 0, 0, 350, 500);
+
+    if (card.dyeMaskUrl) {
+      const dyeMask = gm(card.dyeMaskUrl).colorspace("RGB");
+      let [r, g, b] = [card.dyeR || 255, card.dyeG || 255, card.dyeB || 255];
+
+      const dyeBuffer = await this.toBufferPromise(dyeMask.colorize(r, g, b));
+
+      const dyeImage = await loadImage(dyeBuffer);
+      ctx.drawImage(dyeImage, 0, 0, 350, 500);
+    }
+
     ctx.drawImage(overlay, 0, 0, 350, 500);
 
     ctx.font = "20px AlteHaasGroteskBold";
-    ctx.fillText(`#${card.serialNumber}`, 50, 424);
+    ctx.fillText(`#${card.serialNumber}`, 50, 421);
     ctx.font = "30px AlteHaasGroteskBold";
-    ctx.fillText(`${baseCard.name}`, 50, 448);
+    ctx.fillText(`${baseCard.name}`, 50, 445);
 
     const buf = canvas.toBuffer("image/png");
-    return Buffer.alloc(buf.length, buf, "base64");
+    const final = Buffer.alloc(buf.length, buf, "base64");
+
+    return final;
   }
 
   public static async generateCardCollage(
-    cards: GameUserCard[] | GameDroppedCard[],
+    cards: GameUserCard[],
     zephyr: Zephyr
   ): Promise<Buffer> {
     const canvas = createCanvas(cards.length * 250, 333);
@@ -280,5 +315,9 @@ export abstract class CardService {
 
   public static async increaseCardWear(card: GameUserCard): Promise<void> {
     return await CardSet.increaseCardWear(card);
+  }
+
+  public static async getCardsByTag(tag: GameTag): Promise<GameUserCard[]> {
+    return await CardGet.getCardsByTagId(tag.id);
   }
 }

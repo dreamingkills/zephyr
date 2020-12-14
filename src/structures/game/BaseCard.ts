@@ -13,6 +13,7 @@ export interface Frame {
   id: number;
   frame_name: string;
   frame_url: string;
+  dye_mask_url: string;
 }
 export class GameBaseCard {
   id: number;
@@ -40,9 +41,11 @@ export class GameFrame {
   id: number;
   frameName: string;
   frameUrl: string;
+  dyeMaskUrl: string;
   constructor(data: Frame) {
     this.id = data.id;
     this.frameName = data.frame_name;
     this.frameUrl = data.frame_url;
+    this.dyeMaskUrl = data.dye_mask_url;
   }
 }

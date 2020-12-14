@@ -12,6 +12,7 @@ import {
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { Filter, FilterService } from "../../Filters";
 import { GameProfile } from "../../../../../structures/game/Profile";
+import { GameTag } from "../../../../../structures/game/Tag";
 
 export abstract class CardGet extends DBClass {
   public static async getAllCards(): Promise<GameBaseCard[]> {
@@ -55,13 +56,14 @@ export abstract class CardGet extends DBClass {
   */
   public static async getUserInventory(
     profile: GameProfile,
-    options: Filter
+    options: Filter,
+    tags: GameTag[]
   ): Promise<GameUserCard[]> {
     let query = `SELECT user_card.* FROM user_card 
                   LEFT JOIN card_base ON user_card.card_id=card_base.id WHERE discord_id=${DB.connection.escape(
                     profile.discordId
                   )}`;
-    const queryOptions = await FilterService.parseOptions(options, profile);
+    const queryOptions = FilterService.parseOptions(options, tags);
     const page = <number>options["page"];
     query +=
       (queryOptions.length > 0 ? ` AND` : ``) + queryOptions.join(` AND`);
@@ -83,12 +85,13 @@ export abstract class CardGet extends DBClass {
   }
   public static async getUserInventorySize(
     profile: GameProfile,
-    options: Filter
+    options: Filter,
+    tags: GameTag[]
   ): Promise<number> {
     let query = `SELECT COUNT(*) AS count FROM user_card LEFT JOIN card_base ON user_card.card_id=card_base.id WHERE discord_id=${DB.connection.escape(
       profile.discordId
     )}`;
-    const queryOptions = await FilterService.parseOptions(options, profile);
+    const queryOptions = FilterService.parseOptions(options, tags);
     query +=
       (queryOptions.length > 0 ? ` AND` : ``) + queryOptions.join(` AND`);
 
@@ -97,7 +100,7 @@ export abstract class CardGet extends DBClass {
   }
   public static async getUserCardById(id: number): Promise<GameUserCard> {
     const query = (await DB.query(
-      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.id=?;`,
+      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.id=?;`,
       [id]
     )) as UserCard[];
     if (!query[0]) throw new ZephyrError.UnknownUserCardIdError();
@@ -105,7 +108,7 @@ export abstract class CardGet extends DBClass {
   }
   public static async getLastCard(discordId: string): Promise<GameUserCard> {
     const query = (await DB.query(
-      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE discord_id=? ORDER BY id DESC;`,
+      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE discord_id=? ORDER BY id DESC;`,
       [discordId]
     )) as UserCard[];
     if (!query[0]) throw new ZephyrError.InvalidCardReferenceError();
@@ -155,5 +158,13 @@ export abstract class CardGet extends DBClass {
     return query.map((q) => {
       return { name: q.name, group: q.group_name, count: q.count };
     });
+  }
+
+  public static async getCardsByTagId(id: number): Promise<GameUserCard[]> {
+    const query = (await DB.query(
+      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.tag_id=?;`,
+      [id]
+    )) as UserCard[];
+    return query.map((c) => new GameUserCard(c));
   }
 }
