@@ -267,9 +267,9 @@ export abstract class ProfileSet extends DBClass {
   public static async setUserReminded(
     users: { id: string; type: 1 | 2 | 3 }[]
   ): Promise<void> {
-    const onlyClaims = users.filter((u) => u.type === 1).map((o) => o.id);
-    const onlyDrops = users.filter((u) => u.type === 2).map((o) => o.id);
-    const onlyBoth = users.filter((u) => u.type === 3).map((o) => o.id);
+    const onlyClaims = users.filter((u) => u.type === 2).map((o) => o.id);
+    const onlyDrops = users.filter((u) => u.type === 3).map((o) => o.id);
+    const onlyBoth = users.filter((u) => u.type === 1).map((o) => o.id);
 
     Promise.all([
       onlyClaims.length > 0

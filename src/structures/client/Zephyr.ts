@@ -71,7 +71,7 @@ export class Zephyr extends Client {
           `\n\n${`=`.repeat(stripAnsi(header).length)}`
       );
 
-      this.dmHandler.init(this);
+      setInterval(() => this.dmHandler.handle(this), 30000);
     });
 
     this.on("messageCreate", async (message) => {
