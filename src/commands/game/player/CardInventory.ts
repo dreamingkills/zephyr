@@ -31,7 +31,7 @@ export default class CardInventory extends BaseCommand {
   }
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    let target;
+    let target: GameProfile | undefined = undefined;
     let targetUser;
 
     const id = this.options.filter(
@@ -78,7 +78,7 @@ export default class CardInventory extends BaseCommand {
 
     let page = parseInt(options["page"] as string, 10);
     const inventory = await CardService.getUserInventory(
-      profile,
+      target,
       userTags,
       options
     );
@@ -112,7 +112,7 @@ export default class CardInventory extends BaseCommand {
 
         options["page"] = page;
         const newCards = await CardService.getUserInventory(
-          profile,
+          target!,
           userTags,
           options
         );
