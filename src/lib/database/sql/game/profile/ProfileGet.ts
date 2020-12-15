@@ -86,4 +86,14 @@ export abstract class ProfileGet extends DBClass {
 
     return new GameTag(query[0]);
   }
+
+  /*
+      DM Scheduler
+  */
+  public static async getAvailableReminderRecipients(): Promise<GameProfile[]> {
+    const query = (await DB.query(
+      `SELECT profile.* FROM profile WHERE (drop_reminder=1 OR claim_reminder=1) AND (drop_reminded=false OR claim_reminded=false);`
+    )) as Profile[];
+    return query.map((p) => new GameProfile(p));
+  }
 }

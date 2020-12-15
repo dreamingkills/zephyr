@@ -160,19 +160,19 @@ export abstract class ProfileSet extends DBClass {
     discordId: string,
     timestamp: string
   ): Promise<void> {
-    await DB.query(`UPDATE profile SET drop_next=? WHERE discord_id=?;`, [
-      timestamp,
-      discordId,
-    ]);
+    await DB.query(
+      `UPDATE profile SET drop_next=?,drop_reminded=0 WHERE discord_id=?;`,
+      [timestamp, discordId]
+    );
   }
   public static async setClaimTimestamp(
     discordId: string,
     timestamp: string
   ): Promise<void> {
-    await DB.query(`UPDATE profile SET claim_next=? WHERE discord_id=?;`, [
-      timestamp,
-      discordId,
-    ]);
+    await DB.query(
+      `UPDATE profile SET claim_next=?,claim_reminded=0 WHERE discord_id=?;`,
+      [timestamp, discordId]
+    );
   }
 
   /*
@@ -238,5 +238,58 @@ export abstract class ProfileSet extends DBClass {
       ]);
     } else throw new ZephyrError.NoParametersInTagEditError();
     return;
+  }
+
+  public static async toggleDropReminder(discordId: string[]): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET drop_reminder=1-drop_reminder WHERE discord_id IN (?);`,
+      [discordId]
+    );
+    return;
+  }
+
+  public static async toggleClaimReminder(discordId: string[]): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET claim_reminder=1-drop_reminder WHERE discord_id IN (?);`,
+      [discordId]
+    );
+    return;
+  }
+
+  public static async disableReminders(discordId: string[]): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET claim_reminder=0,drop_reminder=0 WHERE discord_id IN (?);`,
+      [discordId]
+    );
+    return;
+  }
+
+  public static async setUserReminded(
+    users: { id: string; type: 1 | 2 | 3 }[]
+  ): Promise<void> {
+    const onlyClaims = users.filter((u) => u.type === 1).map((o) => o.id);
+    const onlyDrops = users.filter((u) => u.type === 2).map((o) => o.id);
+    const onlyBoth = users.filter((u) => u.type === 3).map((o) => o.id);
+
+    Promise.all([
+      onlyClaims.length > 0
+        ? DB.query(
+            `UPDATE profile SET claim_reminded=1 WHERE discord_id IN (?);`,
+            [onlyClaims]
+          )
+        : false,
+      onlyDrops.length > 0
+        ? DB.query(
+            `UPDATE profile SET drop_reminded=1 WHERE discord_id IN (?);`,
+            [onlyDrops]
+          )
+        : false,
+      onlyBoth.length > 0
+        ? DB.query(
+            `UPDATE profile SET claim_reminded=1, drop_reminded=1 WHERE discord_id IN (?);`,
+            [onlyBoth]
+          )
+        : false,
+    ]);
   }
 }

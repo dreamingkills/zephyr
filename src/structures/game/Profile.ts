@@ -9,7 +9,11 @@ export interface Profile {
   daily_last: string;
   daily_streak: number;
   drop_next: string;
+  drop_reminder: boolean;
+  drop_reminded: boolean;
   claim_next: string;
+  claim_reminder: boolean;
+  claim_reminded: boolean;
   dust_1: number;
   dust_2: number;
   dust_3: number;
@@ -27,7 +31,11 @@ export class GameProfile {
   dailyLast: string;
   dailyStreak: number;
   dropNext: string;
+  dropReminder: boolean;
+  dropReminded: boolean;
   claimNext: string;
+  claimReminder: boolean;
+  claimReminded: boolean;
   dustPoor: number;
   dustAverage: number;
   dustGood: number;
@@ -52,6 +60,11 @@ export class GameProfile {
     this.dustGreat = data.dust_4;
     this.dustMint = data.dust_5;
     this.premiumCurrency = data.premium_currency;
+
+    this.dropReminder = data.drop_reminder;
+    this.dropReminded = data.drop_reminded;
+    this.claimReminder = data.claim_reminder;
+    this.claimReminded = data.claim_reminded;
   }
 
   public async fetch(): Promise<GameProfile> {

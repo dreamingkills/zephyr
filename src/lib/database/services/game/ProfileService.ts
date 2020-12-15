@@ -196,4 +196,35 @@ export abstract class ProfileService {
   public static async getTagById(tagId: number): Promise<GameTag> {
     return await ProfileGet.getTagById(tagId);
   }
+
+  /*
+      DM Scheduler
+  */
+
+  public static async getAvailableReminderRecipients(): Promise<GameProfile[]> {
+    return await ProfileGet.getAvailableReminderRecipients();
+  }
+  public static async setUserReminded(
+    users: { id: string; type: 1 | 2 | 3 }[]
+  ): Promise<void> {
+    return await ProfileSet.setUserReminded(users);
+  }
+
+  public static async toggleDropReminder(
+    profiles: GameProfile[]
+  ): Promise<void> {
+    return await ProfileSet.toggleDropReminder(
+      profiles.map((p) => p.discordId)
+    );
+  }
+  public static async toggleClaimReminder(
+    profiles: GameProfile[]
+  ): Promise<void> {
+    return await ProfileSet.toggleClaimReminder(
+      profiles.map((p) => p.discordId)
+    );
+  }
+  public static async disableReminders(profiles: GameProfile[]): Promise<void> {
+    return await ProfileSet.disableReminders(profiles.map((p) => p.discordId));
+  }
 }

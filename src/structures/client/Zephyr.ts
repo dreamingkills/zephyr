@@ -12,10 +12,12 @@ import { MessageEmbed } from "./RichEmbed";
 import { Chance } from "chance";
 import { CardSpawner } from "../../lib/CardSpawner";
 import { GameWishlist } from "../game/Wishlist";
+import { DMHandler } from "../../lib/DMHandler";
 
 export class Zephyr extends Client {
-  version: string = "Allium";
+  version: string = "Delphinium";
   commandLib = new CommandLib();
+  dmHandler = new DMHandler();
   config: typeof config;
   chance = new Chance();
   private prefixes: { [guildId: string]: string } = {};
@@ -68,6 +70,8 @@ export class Zephyr extends Client {
           `\n- ${chalk.hex(`1794E6`)`${fonts}`} fonts registered` +
           `\n\n${`=`.repeat(stripAnsi(header).length)}`
       );
+
+      this.dmHandler.init(this);
     });
 
     this.on("messageCreate", async (message) => {

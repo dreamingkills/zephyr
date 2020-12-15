@@ -122,6 +122,11 @@ export class DuplicateWishlistEntryError extends ZephyrError {
     super(`That person is already on your wishlist.`);
   }
 }
+export class InvalidReminderTypeError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid reminder type.`);
+  }
+}
 /*
     Items
            */
