@@ -27,6 +27,8 @@ export default class ViewTags extends BaseCommand {
     }
 
     if (!target) target = await ProfileService.getProfile(targetUser.id);
+    if (target.private && target.discordId !== msg.author.id)
+      throw new ZephyrError.PrivateProfileError(targetUser.tag);
 
     const userTags = await ProfileService.getTags(target);
 

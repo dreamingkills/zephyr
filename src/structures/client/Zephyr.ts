@@ -14,7 +14,7 @@ import { CardSpawner } from "../../lib/CardSpawner";
 import { GameWishlist } from "../game/Wishlist";
 
 export class Zephyr extends Client {
-  version: string = "beta-0.5.0";
+  version: string = "Allium";
   commandLib = new CommandLib();
   config: typeof config;
   chance = new Chance();
