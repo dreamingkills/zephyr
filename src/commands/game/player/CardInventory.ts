@@ -9,6 +9,7 @@ import { ReactionCollector } from "eris-collector";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { GameTag } from "../../../structures/game/Tag";
+import * as ZephyrError from "../../../structures/error/ZephyrError";
 
 export default class CardInventory extends BaseCommand {
   names = ["inventory", "inv", "i"];
@@ -30,6 +31,26 @@ export default class CardInventory extends BaseCommand {
   }
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
+    let target;
+    let targetUser;
+
+    const id = this.options.filter(
+      (o) => !isNaN(parseInt(o)) && o.length >= 17
+    )[0];
+    if (msg.mentions[0]) {
+      targetUser = msg.mentions[0];
+    } else if (id) {
+      targetUser = await this.zephyr.fetchUser(id);
+    } else {
+      targetUser = msg.author;
+      target = profile;
+    }
+
+    if (!target) target = await ProfileService.getProfile(targetUser.id);
+
+    if (target.private && target.discordId !== msg.author.id)
+      throw new ZephyrError.PrivateProfileError(targetUser.tag);
+
     const optionsRaw = this.options.filter((v) => v.includes("="));
     const options: Filter = {};
     for (let opt of optionsRaw) {
@@ -38,10 +59,10 @@ export default class CardInventory extends BaseCommand {
       options[key] = value;
     }
 
-    const userTags = await ProfileService.getTags(profile);
+    const userTags = await ProfileService.getTags(target);
 
     const size = await CardService.getUserInventorySize(
-      profile,
+      target,
       userTags,
       options
     );
@@ -67,7 +88,7 @@ export default class CardInventory extends BaseCommand {
         `Inventory | ${msg.author.tag}`,
         msg.author.dynamicAvatarURL("png")
       )
-      .setTitle(`${msg.author.tag}'s cards`)
+      .setTitle(`${targetUser.tag}'s cards`)
       .setDescription(this.renderInventory(inventory, userTags))
       .setFooter(
         `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${size} cards`
