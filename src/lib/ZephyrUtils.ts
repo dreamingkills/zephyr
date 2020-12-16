@@ -2,6 +2,14 @@ import { Dayjs } from "dayjs";
 import { Channel, TextChannel } from "eris";
 import { Zephyr } from "../structures/client/Zephyr";
 
+function strToInt(text: string): number {
+  let result = parseInt(text.replace(/[, ]+/g, ""), 10);
+  if (text.toLowerCase().endsWith("k")) result *= 1000;
+  if (text.toLowerCase().endsWith("m")) result *= 1000000;
+  if (text.toLowerCase().endsWith("b")) result *= 1000000000;
+  return result;
+}
+
 function padIfNotLeading(text: string | number, leading: boolean): string {
   return leading ? text.toString() : text.toString().padStart(2, "0");
 }
@@ -62,4 +70,10 @@ function checkPermission(
   return (<TextChannel>channel).permissionsOf(zephyr.user.id).json[permission];
 }
 
-export { padIfNotLeading, getTimeUntilNextDay, checkPermission, getTimeUntil };
+export {
+  padIfNotLeading,
+  getTimeUntilNextDay,
+  checkPermission,
+  getTimeUntil,
+  strToInt,
+};
