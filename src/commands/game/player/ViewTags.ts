@@ -8,7 +8,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 export default class ViewTags extends BaseCommand {
   names = ["viewtags", "tags", "vt"];
   description = "Shows you a list of your tags.";
-  usage = ["$CMD$"];
+  usage = ["$CMD$", "$CMD$ <@mention>", "$CMD$ <id>"];
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     let target: GameProfile | undefined;

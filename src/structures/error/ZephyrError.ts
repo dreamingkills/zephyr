@@ -127,6 +127,13 @@ export class InvalidReminderTypeError extends ZephyrError {
     super(`Please enter a valid reminder type.`);
   }
 }
+export class ReminderSpamError extends ZephyrError {
+  constructor() {
+    super(
+      `Please wait at least 10 seconds before switching your reminder status again.`
+    );
+  }
+}
 /*
     Items
            */

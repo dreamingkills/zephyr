@@ -10,8 +10,8 @@ import { MessageCollector } from "eris-collector";
 export default class Wishlist extends BaseCommand {
   names = ["wishlist", "wl"];
   description = "Shows your, or someone else's, wishlist.";
-  usage = ["$CMD$", "$CMD$ <@user>", "$CMD$ id=<user id>"];
-  subcommands = ["add <text>", "delete/remove <entry>", "clear"];
+  usage = ["$CMD$", "$CMD$ <@user>", "$CMD$ <id>"];
+  subcommands = ["add <name>", "delete/remove <number / text>", "clear"];
 
   private async add(
     query: { group?: string; name: string },

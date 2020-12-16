@@ -1,9 +1,11 @@
 import { Zephyr } from "../structures/client/Zephyr";
 import { ProfileService } from "./database/services/game/ProfileService";
+import dayjs from "dayjs";
 
 export class DMHandler {
+  public interval!: NodeJS.Timeout;
+
   public async handle(zephyr: Zephyr): Promise<void> {
-    console.log(zephyr.users.size);
     const eligible = await ProfileService.getAvailableReminderRecipients();
     const success: { id: string; type: 1 | 2 | 3 }[] = [];
     const failed = [];
@@ -11,10 +13,16 @@ export class DMHandler {
       try {
         const user = await zephyr.fetchUser(p.discordId);
         let [claim, drop] = [false, false];
-        if (p.claimReminder && !p.claimReminded) claim = true;
-        if (p.dropReminder && !p.dropReminded) drop = true;
 
-        if (!claim && !drop) return;
+        const now = dayjs(Date.now());
+        const nextClaim = dayjs(p.claimNext);
+        const nextDrop = dayjs(p.dropNext);
+
+        if (nextClaim < now && p.claimReminder && !p.claimReminded)
+          claim = true;
+        if (nextDrop < now && p.dropReminder && !p.dropReminded) drop = true;
+
+        if (!claim && !drop) continue;
 
         let type: 1 | 2 | 3 | undefined;
 

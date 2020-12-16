@@ -62,7 +62,11 @@ export abstract class LeaderboardGet extends DBClass {
       daily_last: string;
       daily_streak: number;
       claim_next: string;
+      claim_reminder: boolean;
+      claim_reminded: boolean;
       drop_next: string;
+      drop_reminder: boolean;
+      drop_reminded: boolean;
       dust_1: number;
       dust_2: number;
       dust_3: number;

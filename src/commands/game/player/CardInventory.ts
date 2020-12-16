@@ -15,7 +15,7 @@ export default class CardInventory extends BaseCommand {
   names = ["inventory", "inv", "i"];
   description = "Shows cards that belong to you.";
   usage = [
-    "$CMD$ <filters>",
+    "$CMD$ [@mention/id] <filters>",
     "Filters:\n— group=LOONA\n— name=JinSoul\n— issue=>5\n— issue=<5\n— issue=5",
   ];
 

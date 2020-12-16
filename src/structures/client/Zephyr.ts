@@ -15,7 +15,7 @@ import { GameWishlist } from "../game/Wishlist";
 import { DMHandler } from "../../lib/DMHandler";
 
 export class Zephyr extends Client {
-  version: string = "Delphinium";
+  version: string = "Lilac";
   commandLib = new CommandLib();
   dmHandler = new DMHandler();
   config: typeof config;
@@ -185,11 +185,11 @@ export class Zephyr extends Client {
   }
   public getRandomCards(
     amount: number,
-    wishlist?: GameWishlist[]
+    wishlist: GameWishlist[] = []
   ): GameBaseCard[] {
     const cards: GameBaseCard[] = [];
-    if (wishlist) {
-      const bonus = this.chance.bool({ likelihood: 1.5 });
+    if (wishlist.length > 0) {
+      const bonus = this.chance.bool({ likelihood: 1.25 });
       if (bonus) {
         const random = this.chance.pickone(wishlist);
         const bonus = this.chance.pickone(
