@@ -240,7 +240,7 @@ export abstract class ProfileSet extends DBClass {
     return;
   }
 
-  public static async toggleDropReminder(discordId: string[]): Promise<void> {
+  public static async toggleDropReminders(discordId: string[]): Promise<void> {
     await DB.query(
       `UPDATE profile SET drop_reminder=1-drop_reminder WHERE discord_id IN (?);`,
       [discordId]
@@ -248,9 +248,9 @@ export abstract class ProfileSet extends DBClass {
     return;
   }
 
-  public static async toggleClaimReminder(discordId: string[]): Promise<void> {
+  public static async toggleClaimReminders(discordId: string[]): Promise<void> {
     await DB.query(
-      `UPDATE profile SET claim_reminder=1-drop_reminder WHERE discord_id IN (?);`,
+      `UPDATE profile SET claim_reminder=1-claim_reminder WHERE discord_id IN (?);`,
       [discordId]
     );
     return;

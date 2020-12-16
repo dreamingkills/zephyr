@@ -210,17 +210,17 @@ export abstract class ProfileService {
     return await ProfileSet.setUserReminded(users);
   }
 
-  public static async toggleDropReminder(
+  public static async toggleDropReminders(
     profiles: GameProfile[]
   ): Promise<void> {
-    return await ProfileSet.toggleDropReminder(
+    return await ProfileSet.toggleDropReminders(
       profiles.map((p) => p.discordId)
     );
   }
-  public static async toggleClaimReminder(
+  public static async toggleClaimReminders(
     profiles: GameProfile[]
   ): Promise<void> {
-    return await ProfileSet.toggleClaimReminder(
+    return await ProfileSet.toggleClaimReminders(
       profiles.map((p) => p.discordId)
     );
   }

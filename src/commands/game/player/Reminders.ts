@@ -14,12 +14,12 @@ export default class Reminders extends BaseCommand {
     if (subcommand) {
       let message;
       if (["drop", "drops", "d"].indexOf(subcommand) > -1) {
-        await ProfileService.toggleDropReminder([profile]);
+        await ProfileService.toggleDropReminders([profile]);
         if (profile.dropReminder) {
           message = "You have disabled drop reminders.";
         } else message = "You have enabled drop reminders.";
       } else if (["claim", "claims", "c"].indexOf(subcommand) > -1) {
-        await ProfileService.toggleClaimReminder([profile]);
+        await ProfileService.toggleClaimReminders([profile]);
         if (profile.claimReminder) {
           message = "You have disabled claim reminders.";
         } else message = "You have enabled claim reminders.";
