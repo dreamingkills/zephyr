@@ -50,6 +50,12 @@ export class UserNotFoundError extends ZephyrError {
   }
 }
 
+export class InvalidHelpQueryError extends ZephyrError {
+  constructor() {
+    super(`Sorry, but I couldn't find a command by that name.`);
+  }
+}
+
 /*
     Profile
              */

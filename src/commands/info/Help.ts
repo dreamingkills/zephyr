@@ -2,6 +2,7 @@ import { Message } from "eris";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
+import * as ZephyrError from "../../structures/error/ZephyrError";
 
 export default class Help extends BaseCommand {
   names = ["help"];
@@ -58,9 +59,14 @@ export default class Help extends BaseCommand {
 
         await msg.channel.createMessage({ embed });
         return;
-      }
-
-      return;
+      } else throw new ZephyrError.InvalidHelpQueryError();
     }
+
+    const embed = new MessageEmbed()
+      .setAuthor(`Help | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
+      .setDescription(
+        this.zephyr.commandLib.commands.map((c) => c.names[0]).join("\n")
+      );
+    await msg.channel.createMessage({ embed });
   }
 }
