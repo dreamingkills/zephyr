@@ -10,6 +10,7 @@ export class FilterService {
     const queryOptions: string[] = [];
 
     for (let [prop, value] of Object.entries(options)) {
+      prop = prop.toLowerCase();
       if (["issue", "i", "serial"].indexOf(prop) > -1) {
         let trueIssue = -1;
         if (!isNaN(parseInt(value.toString(), 10))) {
