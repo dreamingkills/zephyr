@@ -147,13 +147,19 @@ export abstract class ProfileSet extends DBClass {
     ]);
     return;
   }
-  public static async incrementDailyTimestamp(
-    discordId: string
-  ): Promise<void> {
+
+  public static async incrementDailyStreak(discordId: string): Promise<void> {
     await DB.query(
-      `UPDATE profile SEt daily_streak=daily_streak+1 WHERE discord_id=?;`,
+      `UPDATE profile SET daily_streak=daily_streak+1 WHERE discord_id=?;`,
       [discordId]
     );
+    return;
+  }
+
+  public static async resetDailyStreak(discordId: string): Promise<void> {
+    await DB.query(`UPDATE profile SET daily_streak=0 WHERE discord_id=?;`, [
+      discordId,
+    ]);
     return;
   }
   public static async setDropTimestamp(

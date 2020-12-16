@@ -18,6 +18,8 @@ export default class DailyReward extends BaseCommand {
     const todayFormat = today.format(`YYYY-MM-DD`);
     const last = dayjs(profile.dailyLast);
 
+    const streakBroken = today.subtract(1, "day") !== last;
+
     let _profile = profile;
     let embed = new MessageEmbed().setAuthor(
       `Daily | ${msg.author.tag}`,
@@ -31,7 +33,11 @@ export default class DailyReward extends BaseCommand {
     } else {
       const reward = new Chance().integer(this.bitsReward);
       await ProfileService.addBitsToProfile(profile, reward);
-      await ProfileService.incrementDailyStreak(profile);
+
+      if (streakBroken) {
+        await ProfileService.resetDailyStreak(profile);
+      } else await ProfileService.incrementDailyStreak(profile);
+
       _profile = await ProfileService.setDailyTimestamp(profile, todayFormat);
       embed.setDescription(
         `${this.zephyr.config.discord.emoji.clock} You claimed your daily reward and got...` +
@@ -45,7 +51,7 @@ export default class DailyReward extends BaseCommand {
       `Your daily reward is available in ${getTimeUntil(
         today,
         dayjs(today).add(1, "day").startOf(`day`)
-      )}.`
+      )}.` + `\nYour current streak is ${_profile.dailyStreak.toLocaleString()}`
     );
     await msg.channel.createMessage({ embed });
     return;

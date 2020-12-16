@@ -117,12 +117,21 @@ export abstract class ProfileService {
     await ProfileSet.setDailyTimestamp(profile.discordId, timestamp);
     return await profile.fetch();
   }
+
   public static async incrementDailyStreak(
     profile: GameProfile
   ): Promise<GameProfile> {
-    await ProfileSet.incrementDailyTimestamp(profile.discordId);
+    await ProfileSet.incrementDailyStreak(profile.discordId);
     return await profile.fetch();
   }
+
+  public static async resetDailyStreak(
+    profile: GameProfile
+  ): Promise<GameProfile> {
+    await ProfileSet.resetDailyStreak(profile.discordId);
+    return await profile.fetch();
+  }
+
   public static async setDropTimestamp(
     profile: GameProfile,
     timestamp: string
@@ -130,6 +139,7 @@ export abstract class ProfileService {
     await ProfileSet.setDropTimestamp(profile.discordId, timestamp);
     return await profile.fetch();
   }
+
   public static async setClaimTimestamp(
     profile: GameProfile,
     timestamp: string
