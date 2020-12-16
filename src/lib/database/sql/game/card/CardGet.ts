@@ -68,13 +68,17 @@ export abstract class CardGet extends DBClass {
     query +=
       (queryOptions.length > 0 ? ` AND` : ``) + queryOptions.join(` AND`);
 
+    let order = <string>options["order"];
+    const reverse = order.startsWith("!");
+    if (reverse) order = order.slice(1);
+
     if (["issue", "i", "serial"].indexOf(<string>options["order"]) > -1) {
-      query += ` ORDER BY serial_number ASC`;
+      query += ` ORDER BY serial_number ${reverse ? `DESC` : `ASC`}`;
     } else if (["wear", "w"].indexOf(<string>options["order"]) > -1) {
-      query += ` ORDER BY wear DESC`;
+      query += ` ORDER BY wear ${reverse ? `ASC` : `DESC`}`;
     } else if (["luck", "lc"].indexOf(<string>options["order"]) > -1) {
-      query += ` ORDER BY luck_coeff DESC`;
-    } else query += ` ORDER BY user_card.id DESC`;
+      query += ` ORDER BY luck_coeff ${reverse ? `ASC` : `DESC`}`;
+    } else query += ` ORDER BY user_card.id ${reverse ? `ASC` : `DESC`}`;
 
     query += ` LIMIT 10 OFFSET ${DB.connection.escape(
       (isNaN(page) ? 1 : page) * 10 - 10
