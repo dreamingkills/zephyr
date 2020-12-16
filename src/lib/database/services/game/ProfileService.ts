@@ -18,6 +18,7 @@ export abstract class ProfileService {
       autoGenerate
     );
   }
+
   public static async createProfile(
     discordId: string | number
   ): Promise<GameProfile> {
@@ -30,6 +31,7 @@ export abstract class ProfileService {
     await ProfileSet.togglePrivateProfile(profile.discordId);
     return await profile.fetch();
   }
+
   public static async setProfileBlurb(
     profile: GameProfile,
     blurb: string
@@ -37,11 +39,13 @@ export abstract class ProfileService {
     await ProfileSet.setBlurb(profile.discordId, blurb);
     return await profile.fetch();
   }
+
   public static async getWishlist(
     profile: GameProfile
   ): Promise<GameWishlist[]> {
     return await ProfileGet.getWishlist(profile.discordId);
   }
+
   public static async addToWishlist(
     profile: GameProfile,
     name: string,
@@ -49,12 +53,14 @@ export abstract class ProfileService {
   ): Promise<void> {
     return await ProfileSet.addToWishlist(profile.discordId, name, group);
   }
+
   public static async removeFromWishlist(
     profile: GameProfile,
     num: number
   ): Promise<void> {
     return await ProfileSet.removeFromWishlist(profile.discordId, num);
   }
+
   public static async clearWishlist(profile: GameProfile): Promise<void> {
     return await ProfileSet.clearWishlist(profile.discordId);
   }
@@ -69,6 +75,7 @@ export abstract class ProfileService {
     await ProfileSet.addBits(profile.discordId, amount);
     return await profile.fetch();
   }
+
   public static async removeBitsFromProfile(
     profile: GameProfile,
     amount: number
@@ -76,6 +83,7 @@ export abstract class ProfileService {
     await ProfileSet.removeBits(profile.discordId, amount);
     return await profile.fetch();
   }
+
   public static async addBitsToBank(
     profile: GameProfile,
     amount: number
@@ -83,6 +91,7 @@ export abstract class ProfileService {
     await ProfileSet.addBitsToBank(profile.discordId, amount);
     return await profile.fetch();
   }
+
   public static async withdrawBitsFromBank(
     profile: GameProfile,
     amount: number
@@ -90,6 +99,7 @@ export abstract class ProfileService {
     await ProfileSet.withdrawBitsFromBank(profile.discordId, amount);
     return await profile.fetch();
   }
+
   public static async addDustToProfile(
     tier: 1 | 2 | 3 | 4 | 5,
     amount: number,
@@ -98,6 +108,7 @@ export abstract class ProfileService {
     await ProfileSet.addDust(tier, amount, profile.discordId);
     return await profile.fetch();
   }
+
   public static async removeDustFromProfile(
     tier: 1 | 2 | 3 | 4 | 5,
     amount: number,
@@ -157,6 +168,7 @@ export abstract class ProfileService {
   ): Promise<GameItem[]> {
     return await ProfileGet.getItems(profile.discordId, page);
   }
+
   public static async getItem(
     profile: GameProfile,
     itemId: number,
@@ -164,15 +176,18 @@ export abstract class ProfileService {
   ): Promise<GameItem> {
     return await ProfileGet.getItem(profile.discordId, itemId, name);
   }
+
   public static async getNumberOfItems(profile: GameProfile): Promise<number> {
     return await ProfileGet.getNumberOfItems(profile.discordId);
   }
+
   public static async addItem(
     profile: GameProfile,
     itemId: number
   ): Promise<void> {
     return await ProfileSet.addItem(profile.discordId, itemId);
   }
+
   public static async removeItem(
     profile: GameProfile,
     itemId: number
@@ -190,12 +205,15 @@ export abstract class ProfileService {
   ): Promise<void> {
     return await ProfileSet.createTag(profile.discordId, name, emoji);
   }
+
   public static async getTags(profile: GameProfile): Promise<GameTag[]> {
     return await ProfileGet.getUserTags(profile.discordId);
   }
+
   public static async deleteTag(tag: GameTag): Promise<void> {
     return await ProfileSet.deleteTag(tag.id);
   }
+
   public static async editTag(
     tag: GameTag,
     name?: string,
@@ -203,6 +221,7 @@ export abstract class ProfileService {
   ): Promise<void> {
     return await ProfileSet.editTag(tag.id, name, emoji);
   }
+
   public static async getTagById(tagId: number): Promise<GameTag> {
     return await ProfileGet.getTagById(tagId);
   }
@@ -214,6 +233,7 @@ export abstract class ProfileService {
   public static async getAvailableReminderRecipients(): Promise<GameProfile[]> {
     return await ProfileGet.getAvailableReminderRecipients();
   }
+
   public static async setUserReminded(
     users: { id: string; type: 1 | 2 | 3 }[]
   ): Promise<void> {
@@ -227,6 +247,7 @@ export abstract class ProfileService {
       profiles.map((p) => p.discordId)
     );
   }
+
   public static async toggleClaimReminders(
     profiles: GameProfile[]
   ): Promise<void> {
@@ -234,6 +255,7 @@ export abstract class ProfileService {
       profiles.map((p) => p.discordId)
     );
   }
+
   public static async disableReminders(profiles: GameProfile[]): Promise<void> {
     return await ProfileSet.disableReminders(profiles.map((p) => p.discordId));
   }
