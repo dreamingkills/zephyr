@@ -8,6 +8,7 @@ export interface BaseCard {
   rarity: number;
   serial_total: number;
   serial_limit: number;
+  num_generated: number;
 }
 export interface Frame {
   id: number;
@@ -25,6 +26,7 @@ export class GameBaseCard {
   rarity: number;
   serialTotal: number;
   serialLimit: number;
+  totalGenerated: number;
   constructor(card: BaseCard) {
     this.id = card.id;
     this.flavor = card.flavor_text;
@@ -35,6 +37,7 @@ export class GameBaseCard {
     this.rarity = card.rarity;
     this.serialLimit = card.serial_limit;
     this.serialTotal = card.serial_total;
+    this.totalGenerated = card.num_generated;
   }
 }
 export class GameFrame {

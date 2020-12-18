@@ -13,6 +13,7 @@ export interface UserCard {
   dye_r: number;
   dye_g: number;
   dye_b: number;
+  claim_time: number;
   tag_id: number;
 }
 export class GameUserCard {
@@ -30,6 +31,8 @@ export class GameUserCard {
   dyeR: number;
   dyeG: number;
   dyeB: number;
+  claimTime: number;
+
   tagId: number;
 
   constructor(data: UserCard) {
@@ -44,6 +47,8 @@ export class GameUserCard {
     this.frameName = data.frame_name;
     this.frameUrl = data.frame_url;
     this.dyeMaskUrl = data.dye_mask_url;
+    this.claimTime = data.claim_time;
+
     this.tagId = data.tag_id;
 
     this.dyeR = data.dye_r;

@@ -157,7 +157,7 @@ export abstract class ProfileSet extends DBClass {
   }
 
   public static async resetDailyStreak(discordId: string): Promise<void> {
-    await DB.query(`UPDATE profile SET daily_streak=0 WHERE discord_id=?;`, [
+    await DB.query(`UPDATE profile SET daily_streak=1 WHERE discord_id=?;`, [
       discordId,
     ]);
     return;

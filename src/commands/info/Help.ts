@@ -65,7 +65,10 @@ export default class Help extends BaseCommand {
     const embed = new MessageEmbed()
       .setAuthor(`Help | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
       .setDescription(
-        this.zephyr.commandLib.commands.map((c) => c.names[0]).join("\n")
+        this.zephyr.commandLib.commands
+          .filter((c) => !c.developerOnly)
+          .map((c) => c.names[0])
+          .join("\n")
       );
     await msg.channel.createMessage({ embed });
   }

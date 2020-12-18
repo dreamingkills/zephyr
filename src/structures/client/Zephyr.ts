@@ -15,7 +15,7 @@ import { GameWishlist } from "../game/Wishlist";
 import { DMHandler } from "../../lib/DMHandler";
 
 export class Zephyr extends Client {
-  version: string = "Lilac";
+  version: string = "Poppy";
   commandLib = new CommandLib();
   dmHandler = new DMHandler();
   config: typeof config;
@@ -180,9 +180,17 @@ export class Zephyr extends Client {
     }
     return;
   }
+
   public getCard(id: number): GameBaseCard {
     return this.cards[id];
   }
+
+  public async refreshCard(id: number): Promise<GameBaseCard> {
+    const recached = await CardService.getCardById(id);
+    this.cards[id] = recached;
+    return recached;
+  }
+
   public getRandomCards(
     amount: number,
     wishlist: GameWishlist[] = []

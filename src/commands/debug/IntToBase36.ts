@@ -5,6 +5,7 @@ import { GameProfile } from "../../structures/game/Profile";
 export default class IntToBase36 extends BaseCommand {
   names = ["itb36"];
   description = "Developer command";
+  developerOnly = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     const num = parseInt(this.options[0], 10);

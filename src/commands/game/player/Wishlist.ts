@@ -49,18 +49,7 @@ export default class Wishlist extends BaseCommand {
         throw new ZephyrError.WishlistFullError(profile.patron, prefix);
       }
 
-      /*const groupQuery = this.options
-        .slice(1)
-        .join(" ")
-        .split("-")[0]
-        ?.trim()
-        .toLowerCase(); */
-      const nameQuery = this.options
-        .slice(1)
-        .join(" ")
-        // .split("-")[0]
-        ?.trim()
-        .toLowerCase();
+      const nameQuery = this.options.slice(1).join(" ")?.trim().toLowerCase();
       const find = this.zephyr
         .getCards()
         .filter((c) => c.name.toLowerCase() === nameQuery);
@@ -79,9 +68,6 @@ export default class Wishlist extends BaseCommand {
       }
 
       if (!unique[0]) throw new ZephyrError.InvalidWishlistNameError();
-
-      /*const text = this.options.slice(1).join(" ");
-      if (text.length > 12) throw new ZephyrError.WishlistEntryTooLongError();*/
 
       if (unique.length > 1) {
         const embed = new MessageEmbed()

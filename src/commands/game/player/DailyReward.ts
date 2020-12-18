@@ -10,15 +10,18 @@ export default class DailyReward extends BaseCommand {
   names = ["daily"];
   description = "Shows you the status of your daily reward.";
 
+  private dayFormat = `YYYY-MM-DD`;
   private bitsReward = { min: 50, max: 100 };
   // private streakMultiplier = 2;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const today = dayjs(Date.now());
-    const todayFormat = today.format(`YYYY-MM-DD`);
+    const todayFormat = today.format(this.dayFormat);
     const last = dayjs(profile.dailyLast);
 
-    const streakBroken = today.subtract(1, "day") !== last;
+    const streakBroken =
+      today.subtract(1, "day").format(this.dayFormat) !==
+      last.format(this.dayFormat);
 
     let _profile = profile;
     let embed = new MessageEmbed().setAuthor(

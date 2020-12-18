@@ -26,15 +26,18 @@ export abstract class CardGet extends DBClass {
                                     image_url,
                                     serial_total,
                                     serial_limit,
-                                    card_image.tier_one,
-                                    card_image.tier_two,
-                                    card_image.tier_three,
-                                    card_image.tier_four,
-                                    card_image.tier_five,
-                                    card_image.tier_six
-                                   FROM card_base LEFT JOIN card_image ON card_id=id;`)) as BaseCard[];
+                                    num_generated
+                                   FROM card_base;`)) as BaseCard[];
     return query.map((c) => new GameBaseCard(c));
   }
+
+  public static async getCardById(id: number): Promise<GameBaseCard> {
+    const query = (await DB.query(`SELECT * FROM card_base WHERE id=?;`, [
+      id,
+    ])) as BaseCard[];
+    return new GameBaseCard(query[0]);
+  }
+
   public static async getRandomFrame(
     includeUnshoppable: boolean
   ): Promise<GameFrame> {
@@ -69,14 +72,14 @@ export abstract class CardGet extends DBClass {
       (queryOptions.length > 0 ? ` AND` : ``) + queryOptions.join(` AND`);
 
     let order = <string>options["order"];
-    const reverse = order.startsWith("!");
+    const reverse = order?.startsWith("!");
     if (reverse) order = order.slice(1);
 
-    if (["issue", "i", "serial"].indexOf(<string>options["order"]) > -1) {
+    if (["issue", "i", "serial"].indexOf(order) > -1) {
       query += ` ORDER BY serial_number ${reverse ? `DESC` : `ASC`}`;
-    } else if (["wear", "w"].indexOf(<string>options["order"]) > -1) {
+    } else if (["wear", "w"].indexOf(order) > -1) {
       query += ` ORDER BY wear ${reverse ? `ASC` : `DESC`}`;
-    } else if (["luck", "lc"].indexOf(<string>options["order"]) > -1) {
+    } else if (["luck", "lc"].indexOf(order) > -1) {
       query += ` ORDER BY luck_coeff ${reverse ? `ASC` : `DESC`}`;
     } else query += ` ORDER BY user_card.id ${reverse ? `ASC` : `DESC`}`;
 
@@ -170,5 +173,44 @@ export abstract class CardGet extends DBClass {
       [id]
     )) as UserCard[];
     return query.map((c) => new GameUserCard(c));
+  }
+
+  public static async getTimesCardDestroyed(
+    id: number,
+    zephyrId: string
+  ): Promise<number> {
+    const query = (await DB.query(
+      `SELECT COUNT(*) AS count FROM user_card WHERE card_id=? AND discord_id=?;`,
+      [id, zephyrId]
+    )) as { count: number }[];
+    return query[0].count;
+  }
+
+  public static async getTimesCardWishlisted(
+    baseCard: GameBaseCard
+  ): Promise<number> {
+    let count: number;
+    if (baseCard.group) {
+      const query = (await DB.query(
+        `SELECT COUNT(*) AS count FROM wishlist WHERE group_name=? AND name=?;`,
+        [baseCard.group, baseCard.name]
+      )) as { count: number }[];
+      count = query[0].count;
+    } else {
+      const query = (await DB.query(
+        `SELECT COUNT(*) AS count FROM wishlist WHERE name=?;`,
+        [baseCard.name]
+      )) as { count: number }[];
+      count = query[0].count;
+    }
+    return count;
+  }
+
+  public static async getAverageClaimTime(cardId: number): Promise<number> {
+    const query = (await DB.query(
+      `SELECT AVG(claim_time) AS average FROM user_card WHERE claim_time>0 AND card_id=?;`,
+      [cardId]
+    )) as { average: number }[];
+    return query[0].average;
   }
 }

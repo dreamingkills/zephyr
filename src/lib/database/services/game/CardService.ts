@@ -69,6 +69,10 @@ export abstract class CardService {
     return await CardGet.getAllCards();
   }
 
+  public static async getCardById(id: number): Promise<GameBaseCard> {
+    return await CardGet.getCardById(id);
+  }
+
   /*
       UserCards
   */
@@ -77,9 +81,17 @@ export abstract class CardService {
     profile: GameProfile,
     zephyr: Zephyr,
     price: number = 0,
+    claimTime: number,
     frame: number = 1
   ): Promise<GameUserCard> {
-    return await CardSet.createNewUserCard(card, profile, zephyr, price, frame);
+    return await CardSet.createNewUserCard(
+      card,
+      profile,
+      zephyr,
+      price,
+      claimTime,
+      frame
+    );
   }
 
   public static async getUserCardById(id: number): Promise<GameUserCard> {
@@ -348,5 +360,25 @@ export abstract class CardService {
 
   public static async getCardsByTag(tag: GameTag): Promise<GameUserCard[]> {
     return await CardGet.getCardsByTagId(tag.id);
+  }
+
+  public static async incrementGenerated(cards: GameBaseCard[]): Promise<void> {
+    return await CardSet.incrementGenerated(cards);
+  }
+
+  public static async getTimesCardDestroyed(
+    card: GameBaseCard,
+    zephyr: Zephyr
+  ): Promise<number> {
+    return await CardGet.getTimesCardDestroyed(card.id, zephyr.user.id);
+  }
+  public static async getTimesCardWishlisted(
+    card: GameBaseCard
+  ): Promise<number> {
+    return await CardGet.getTimesCardWishlisted(card);
+  }
+
+  public static async getAverageClaimTime(card: GameBaseCard): Promise<number> {
+    return await CardGet.getAverageClaimTime(card.id);
   }
 }

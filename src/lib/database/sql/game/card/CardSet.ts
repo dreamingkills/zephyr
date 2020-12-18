@@ -12,6 +12,7 @@ export abstract class CardSet extends DBClass {
     profile: GameProfile,
     zephyr: Zephyr,
     price: number,
+    claimTime: number,
     frame?: number
   ): Promise<GameUserCard> {
     const rng = new Chance();
@@ -22,7 +23,7 @@ export abstract class CardSet extends DBClass {
     while (true) {
       try {
         const query = (await DB.query(
-          `INSERT INTO user_card (card_id, serial_number, discord_id, original_owner, wear, luck_coeff, frame) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO user_card (card_id, serial_number, discord_id, original_owner, wear, luck_coeff, frame, claim_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             card.id,
             issue,
@@ -31,6 +32,7 @@ export abstract class CardSet extends DBClass {
             wear,
             luckCoefficient,
             frame,
+            claimTime,
           ]
         )) as { insertId: number };
         zephyr.getCard(card.id).serialTotal = issue;
@@ -82,6 +84,15 @@ export abstract class CardSet extends DBClass {
     ]);
     return;
   }
+
+  public static async incrementGenerated(cards: GameBaseCard[]): Promise<void> {
+    await DB.query(
+      `UPDATE card_base SET num_generated=num_generated+1 WHERE id IN (?);`,
+      [cards.map((c) => c.id)]
+    );
+    return;
+  }
+
   public static async unsetCardsTag(cards: GameUserCard[]): Promise<void> {
     await DB.query(`UPDATE user_card SET tag_id=NULL WHERE id IN (?);`, [
       cards.map((c) => c.id),

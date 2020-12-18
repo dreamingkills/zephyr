@@ -61,14 +61,24 @@ export class CommandLib {
       const profile = await ProfileService.getProfile(message.author.id, true);
       await command.run(message, profile, zephyr);
     } catch (e) {
-      const embed = new MessageEmbed()
-        .setAuthor(
-          `Error | ${message.author.tag}`,
-          message.author.dynamicAvatarURL("png")
-        )
-        .setDescription(e.message);
-      await message.channel.createMessage({ embed });
-      if (!e.isClientFacing) console.error(e);
+      if (e.isClientFacing) {
+        const embed = new MessageEmbed()
+          .setAuthor(
+            `Error | ${message.author.tag}`,
+            message.author.dynamicAvatarURL("png")
+          )
+          .setDescription(e.message);
+        await message.channel.createMessage({ embed });
+      } else {
+        const embed = new MessageEmbed()
+          .setAuthor(
+            `Error | ${message.author.tag}`,
+            message.author.dynamicAvatarURL("png")
+          )
+          .setDescription(`An unexpected error occurred. Please try again.`);
+        await message.channel.createMessage({ embed });
+        console.error(e);
+      }
     }
   }
 }

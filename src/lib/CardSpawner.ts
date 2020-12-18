@@ -28,6 +28,7 @@ export abstract class CardSpawner {
     card: GameDroppedCard,
     zephyr: Zephyr,
     frame: number,
+    start: number,
     prefer?: GameProfile
   ): Promise<{ winner: GameProfile; card: GameUserCard }> {
     let winner;
@@ -38,11 +39,14 @@ export abstract class CardSpawner {
       winner = await ProfileService.getProfile(winnerId);
     }
     const baseCard = zephyr.getCard(card.baseCardId);
+
+    const now = Date.now();
     const newCard = await CardService.createNewUserCard(
       baseCard,
       winner,
       zephyr,
       0,
+      now - start,
       frame
     );
     return { winner, card: newCard };
@@ -55,6 +59,7 @@ export abstract class CardSpawner {
     zephyr: Zephyr,
     prefer?: GameProfile
   ): Promise<void> {
+    const start = Date.now();
     const chance = new Chance();
     const droppedCards: GameUserCard[] = [];
 
@@ -85,6 +90,7 @@ export abstract class CardSpawner {
           dye_g: 245,
           dye_b: 245,
           tag_id: 0,
+          claim_time: 0,
         })
       );
     }
@@ -159,6 +165,7 @@ export abstract class CardSpawner {
             droppedCards[num],
             zephyr,
             droppedCards[num].frameId,
+            start,
             prefer
           );
           winners.add(fight.winner.discordId);
@@ -230,6 +237,8 @@ export abstract class CardSpawner {
     try {
       this.emojis.forEach((e) => drop.addReaction(e));
     } catch {}
+
+    await CardService.incrementGenerated(cards);
     return;
   }
 

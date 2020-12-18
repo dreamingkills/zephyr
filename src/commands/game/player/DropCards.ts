@@ -39,30 +39,6 @@ export default class DropCards extends BaseCommand {
       profile,
       this.zephyr
     );
-
     return;
-
-    /*
-    const embed = new MessageEmbed()
-      .setAuthor(`Drop | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
-      .setDescription(
-        `**${msg.author.username}** is dropping cards!` +
-          `\n:one: **${cards[0].identifier}#${
-            cards[0].serialTotal + 1
-          }** — ${this.zephyr.config.discord.emoji.star.repeat(1)}` +
-          `\n:two: **${cards[1].identifier}#${
-            cards[1].serialTotal + 1
-          }** — ${this.zephyr.config.discord.emoji.star.repeat(1)}` +
-          `\n:three: **${cards[2].identifier}#${
-            cards[2].serialTotal + 1
-          }** — ${this.zephyr.config.discord.emoji.star.repeat(1)}`
-      )
-      .setFooter(`⬇️ Use the buttons to claim!`);
-
-    const collage = await CardService.generateCardCollege(droppedCards);
-    await msg.channel.createMessage(
-      { embed },
-      { file: collage, name: "collage.png" }
-    );*/
   }
 }

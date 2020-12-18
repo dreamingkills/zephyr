@@ -1,6 +1,8 @@
 import { Dayjs } from "dayjs";
 import { Channel, TextChannel } from "eris";
 import { Zephyr } from "../structures/client/Zephyr";
+import colors from "../assets/colors.json";
+import nearestColor from "nearest-color";
 
 function strToInt(text: string): number {
   let result = parseInt(text.replace(/[, ]+/g, ""), 10);
@@ -70,10 +72,51 @@ function checkPermission(
   return (<TextChannel>channel).permissionsOf(zephyr.user.id).json[permission];
 }
 
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  if (hex.startsWith("#")) hex = hex.slice(1);
+  const big = parseInt(hex, 16);
+  return {
+    r: (big >> 16) & 255,
+    g: (big >> 8) & 255,
+    b: big & 255,
+  };
+}
+
+function rgbToHex(r: number, g: number, b: number): string {
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+function getNearestColor(
+  hex: string
+): {
+  name: string;
+  value: string;
+  rgb: { r: number; g: number; b: number };
+  distance: number;
+} {
+  const bruh = colors.colors.reduce(
+    (o, { name, hex }) => Object.assign(o, { [name]: hex }),
+    {}
+  );
+
+  const nearest = nearestColor.from(bruh);
+  const trueNearest = nearest(hex) as {
+    name: string;
+    value: string;
+    rgb: { r: number; g: number; b: number };
+    distance: number;
+  };
+
+  return trueNearest;
+}
+
 export {
   padIfNotLeading,
   getTimeUntilNextDay,
   checkPermission,
   getTimeUntil,
   strToInt,
+  hexToRgb,
+  rgbToHex,
+  getNearestColor,
 };

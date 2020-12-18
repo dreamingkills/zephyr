@@ -55,6 +55,11 @@ export class InvalidHelpQueryError extends ZephyrError {
     super(`Sorry, but I couldn't find a command by that name.`);
   }
 }
+export class InvalidLookupQueryError extends ZephyrError {
+  constructor() {
+    super(`Sorry, but I couldn't find anyone by that name.`);
+  }
+}
 
 /*
     Profile

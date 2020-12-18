@@ -37,6 +37,7 @@ export default class CardShop extends BaseCommand {
         baseCard,
         profile,
         this.zephyr,
+        0,
         300
       );
 
