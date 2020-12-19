@@ -14,6 +14,15 @@ import { Filter, FilterService } from "../../Filters";
 import { GameProfile } from "../../../../../structures/game/Profile";
 import { GameTag } from "../../../../../structures/game/Tag";
 
+export type WearSpread = {
+  0: number;
+  1: number;
+  2: number;
+  3: number;
+  4: number;
+  5: number;
+};
+
 export abstract class CardGet extends DBClass {
   public static async getAllCards(): Promise<GameBaseCard[]> {
     const query = (await DB.query(`SELECT
@@ -212,5 +221,24 @@ export abstract class CardGet extends DBClass {
       [cardId]
     )) as { average: number }[];
     return query[0].average;
+  }
+
+  public static async getCardWearSpread(
+    cardId: number,
+    zephyrId: string
+  ): Promise<WearSpread> {
+    const query = (await DB.query(
+      `SELECT wear, COUNT(*) AS count FROM user_card WHERE card_id=? AND discord_id!=? GROUP BY wear;`,
+      [cardId, zephyrId]
+    )) as { wear: number; count: number }[];
+
+    return {
+      0: query.filter((w) => w.wear === 0)[0]?.count || 0,
+      1: query.filter((w) => w.wear === 1)[0]?.count || 0,
+      2: query.filter((w) => w.wear === 2)[0]?.count || 0,
+      3: query.filter((w) => w.wear === 3)[0]?.count || 0,
+      4: query.filter((w) => w.wear === 4)[0]?.count || 0,
+      5: query.filter((w) => w.wear === 5)[0]?.count || 0,
+    };
   }
 }

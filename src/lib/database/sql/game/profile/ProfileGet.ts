@@ -8,6 +8,7 @@ import {
   GameWishlist,
   Wishlist,
 } from "../../../../../structures/game/Wishlist";
+import { Dye, GameDye } from "../../../../../structures/game/Dye";
 
 export abstract class ProfileGet extends DBClass {
   public static async getProfileByDiscordId(
@@ -95,5 +96,37 @@ export abstract class ProfileGet extends DBClass {
       `SELECT * FROM profile WHERE ((drop_reminder=1 OR claim_reminder=1) AND (drop_reminded=0 OR claim_reminded=0)) AND (drop_next < NOW() OR claim_next < NOW());`
     )) as Profile[];
     return query.map((p) => new GameProfile(p));
+  }
+
+  /*
+      Dyes
+  */
+  public static async getUserDyes(
+    discordId: string,
+    page: number
+  ): Promise<GameDye[]> {
+    const query = (await DB.query(
+      `SELECT * FROM dye WHERE discord_id=? LIMIT 10 OFFSET ?;`,
+      [discordId, page * 10 - 10]
+    )) as Dye[];
+    return query.map((d) => new GameDye(d));
+  }
+
+  public static async getUserDyeCount(discordId: string): Promise<number> {
+    const query = (await DB.query(
+      `SELECT COUNT(*) AS count FROM dye WHERE discord_id=?;`,
+      [discordId]
+    )) as { count: number }[];
+    return query[0].count;
+  }
+
+  public static async getDyeById(id: number): Promise<GameDye> {
+    const query = (await DB.query(`SELECT * FROM dye WHERE id=?;`, [
+      id,
+    ])) as Dye[];
+
+    if (!query[0]) throw new ZephyrError.InvalidDyeIdentifierError();
+
+    return new GameDye(query[0]);
   }
 }

@@ -1,3 +1,4 @@
+import { GameDye } from "../../../../structures/game/Dye";
 import { GameItem } from "../../../../structures/game/Item";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameTag } from "../../../../structures/game/Tag";
@@ -258,5 +259,49 @@ export abstract class ProfileService {
 
   public static async disableReminders(profiles: GameProfile[]): Promise<void> {
     return await ProfileSet.disableReminders(profiles.map((p) => p.discordId));
+  }
+
+  /*
+      Dyes
+  */
+  public static async addDye(
+    profile: GameProfile,
+    color: { r: number; g: number; b: number }
+  ): Promise<GameDye> {
+    return await ProfileSet.addDye(profile.discordId, color);
+  }
+
+  public static async getUserDyes(
+    profile: GameProfile,
+    page: number = 1
+  ): Promise<GameDye[]> {
+    return await ProfileGet.getUserDyes(profile.discordId, page);
+  }
+
+  public static async getUserDyeCount(profile: GameProfile): Promise<number> {
+    return await ProfileGet.getUserDyeCount(profile.discordId);
+  }
+
+  public static async addChargesToDye(
+    dye: GameDye,
+    amount: number = 1
+  ): Promise<void> {
+    return await ProfileSet.addChargesToDye(dye.id, amount);
+  }
+
+  public static async removeChargesFromDye(
+    dye: GameDye,
+    amount: number = 1
+  ): Promise<void> {
+    return await ProfileSet.removeChargesFromDye(dye.id, amount);
+  }
+
+  public static async getDyeById(id: number): Promise<GameDye> {
+    return await ProfileGet.getDyeById(id);
+  }
+
+  public static async getDyeByIdentifier(identifier: string): Promise<GameDye> {
+    if (identifier.startsWith("$")) identifier = identifier.slice(1);
+    return await ProfileGet.getDyeById(parseInt(identifier, 36));
   }
 }

@@ -64,7 +64,7 @@ export abstract class CardSpawner {
     const droppedCards: GameUserCard[] = [];
 
     for (let card of cards) {
-      const random = chance.bool({ likelihood: 0.2 });
+      const random = chance.bool({ likelihood: 0.02 });
       let frame: GameFrame;
       if (random) {
         const randomFrame = await CardService.getRandomFrame();

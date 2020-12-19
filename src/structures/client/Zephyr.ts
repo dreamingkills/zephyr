@@ -15,7 +15,7 @@ import { GameWishlist } from "../game/Wishlist";
 import { DMHandler } from "../../lib/DMHandler";
 
 export class Zephyr extends Client {
-  version: string = "Poppy";
+  version: string = "Snowdrop";
   commandLib = new CommandLib();
   dmHandler = new DMHandler();
   config: typeof config;

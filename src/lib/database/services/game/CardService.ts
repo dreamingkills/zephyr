@@ -3,13 +3,14 @@ import { GameBaseCard, GameFrame } from "../../../../structures/game/BaseCard";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameUserCard } from "../../../../structures/game/UserCard";
 import { Filter } from "../../sql/Filters";
-import { CardGet } from "../../sql/game/card/CardGet";
+import { CardGet, WearSpread } from "../../sql/game/card/CardGet";
 import fs from "fs/promises";
 import { CardSet } from "../../sql/game/card/CardSet";
 import { Zephyr } from "../../../../structures/client/Zephyr";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { GameTag } from "../../../../structures/game/Tag";
 import gm from "gm";
+import { GameDye } from "../../../../structures/game/Dye";
 
 export abstract class CardService {
   // Used for card image generation
@@ -58,7 +59,10 @@ export abstract class CardService {
           .padEnd(5, "☆")}\` : \`${(
           `#` + card.serialNumber.toString(10)
         ).padEnd(longestIssue, " ")}\`` +
-          ` ${baseCard.group ? `**${baseCard.group}** ` : ``}${baseCard.name}`
+          ` ${baseCard.group ? `**${baseCard.group}** ` : ``}${
+            baseCard.name
+          }` /*+
+          (baseCard.subgroup ? ` — ${baseCard.subgroup}` : ``)*/
       );
     }
 
@@ -153,7 +157,7 @@ export abstract class CardService {
     // Handle dye mask (this was so annoying to set up I hate Windows)
     if (card.dyeMaskUrl) {
       // Default to the classic "Undyed Mask Gray" if the card is undyed.
-      let [r, g, b] = [card.dyeR || 255, card.dyeG || 255, card.dyeB || 255];
+      let [r, g, b] = [card.dyeR || 185, card.dyeG || 185, card.dyeB || 185];
 
       // We need to convert the GM State to a buffer, so that
       // canvas knows what to do with it.
@@ -380,5 +384,20 @@ export abstract class CardService {
 
   public static async getAverageClaimTime(card: GameBaseCard): Promise<number> {
     return await CardGet.getAverageClaimTime(card.id);
+  }
+
+  public static async getCardWearSpread(
+    card: GameBaseCard,
+    zephyr: Zephyr
+  ): Promise<WearSpread> {
+    return await CardGet.getCardWearSpread(card.id, zephyr.user.id);
+  }
+
+  public static async setCardDye(
+    card: GameUserCard,
+    dye: GameDye
+  ): Promise<GameUserCard> {
+    await CardSet.setCardDye(card, dye);
+    return await this.getUserCardById(card.id);
   }
 }

@@ -26,6 +26,7 @@ export default class CardLookup extends BaseCommand {
     );
     const timesWishlisted = await CardService.getTimesCardWishlisted(card);
     const avgClaimTime = await CardService.getAverageClaimTime(card);
+    const wearSpread = await CardService.getCardWearSpread(card, this.zephyr);
 
     if (!embed)
       embed = new MessageEmbed().setAuthor(
@@ -45,10 +46,18 @@ export default class CardLookup extends BaseCommand {
           `\n\nTotal generated: **${card.totalGenerated.toLocaleString()}**` +
           `\nTotal claimed: **${card.serialTotal.toLocaleString()}**` +
           `\nTotal dismantled: **${timesDestroyed.toLocaleString()}**` +
-          `\n\nClaim rate: **${Math.round(
-            (card.totalGenerated / card.serialTotal) * 100
-          )}**%` +
-          `\nAverage claim time: **${(avgClaimTime / 1000).toFixed(2)}s**`
+          `\n\nClaim rate: **${(
+            (card.serialTotal / Math.max(card.totalGenerated, 1)) *
+            100
+          ).toFixed(2)}%**` +
+          `\nAverage claim time: **${(avgClaimTime / 1000).toFixed(2)}s**\n\n` +
+          `**Condition Spread**` +
+          `\n— \`☆☆☆☆☆\` **${wearSpread[0].toLocaleString()}**` +
+          `\n— \`★☆☆☆☆\` **${wearSpread[1].toLocaleString()}**` +
+          `\n— \`★★☆☆☆\` **${wearSpread[2].toLocaleString()}**` +
+          `\n— \`★★★☆☆\` **${wearSpread[3].toLocaleString()}**` +
+          `\n— \`★★★★☆\` **${wearSpread[4].toLocaleString()}**` +
+          `\n— \`★★★★★\` **${wearSpread[5].toLocaleString()}**`
       );
     if (!msg) {
       msg = await channel.createMessage({ embed });

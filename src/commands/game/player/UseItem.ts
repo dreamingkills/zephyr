@@ -7,6 +7,8 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { ShopService } from "../../../lib/database/services/game/ShopService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import chromajs from "chroma-js";
+import { getNearestColor } from "../../../lib/ZephyrUtils";
 
 export default class UseItem extends BaseCommand {
   names = ["use"];
@@ -82,6 +84,34 @@ export default class UseItem extends BaseCommand {
         );
       await msg.channel.createMessage({ embed });
       return;
+    } else if (targetItem.type === "ITEM") {
+      if (targetItem.id === 20) {
+        await ProfileService.removeItem(profile, targetItem.id);
+        const randomColor = chromajs.random();
+        const rgb = randomColor.rgb();
+        const hex = randomColor.hex();
+        const colorName = getNearestColor(hex);
+
+        const newDye = await ProfileService.addDye(profile, {
+          r: rgb[0],
+          g: rgb[1],
+          b: rgb[2],
+        });
+
+        const embed = new MessageEmbed()
+          .setAuthor(
+            `Dye Bottle | ${msg.author.tag}`,
+            msg.author.dynamicAvatarURL("png")
+          )
+          .setDescription(
+            `You got...` +
+              `\n\`$${newDye.id.toString(36)}\` **${colorName.name}** [**${
+                newDye.charges
+              }**]!`
+          );
+        await msg.channel.createMessage({ embed });
+        return;
+      }
     }
   }
 }

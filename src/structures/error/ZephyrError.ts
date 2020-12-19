@@ -317,3 +317,24 @@ export class InvalidDustTypeError extends ZephyrError {
     super(`That is not a valid type of dust.`);
   }
 }
+
+/*
+    Dyes
+          */
+export class InvalidDyeIdentifierError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid Dye ID.\nThey look like this: \`$b8ew9\``);
+  }
+}
+
+export class UnchargedDyeError extends ZephyrError {
+  constructor(id: number) {
+    super(`\`$${id.toString(36)}\` has no charges!`);
+  }
+}
+
+export class NotOwnerOfDyeError extends ZephyrError {
+  constructor(id: number) {
+    super(`\`$${id.toString(36)}\` does not belong to you.`);
+  }
+}

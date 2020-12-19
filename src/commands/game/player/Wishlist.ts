@@ -61,7 +61,7 @@ export default class Wishlist extends BaseCommand {
       for (let u of unique) {
         const match = wishlist.filter(
           (wl) =>
-            wl.groupName.toLowerCase() === u.group?.toLowerCase() &&
+            wl.groupName?.toLowerCase() === u.group?.toLowerCase() &&
             wl.name.toLowerCase() === u.name.toLowerCase()
         )[0];
         if (match) unique.splice(unique.indexOf(u), 1);
@@ -151,7 +151,9 @@ export default class Wishlist extends BaseCommand {
                 msg.author.dynamicAvatarURL("png")
               )
               .setDescription(
-                `Removed **${wishlist[index].groupName} ${wishlist[index].name}** from your wishlist.`
+                `Removed ${
+                  item[0].groupName ? `**${item[0].groupName}** ` : ``
+                }${item[0].name} from your wishlist.`
               );
             await msg.channel.createMessage({ embed });
             return;
@@ -159,7 +161,8 @@ export default class Wishlist extends BaseCommand {
         } else throw new ZephyrError.InvalidWishlistEntryError();
       }
 
-      if (!wishlist[num - 1]) throw new ZephyrError.InvalidWishlistEntryError();
+      const target = wishlist[num - 1];
+      if (!target) throw new ZephyrError.InvalidWishlistEntryError();
 
       await ProfileService.removeFromWishlist(profile, num);
       const embed = new MessageEmbed()
@@ -168,9 +171,9 @@ export default class Wishlist extends BaseCommand {
           msg.author.dynamicAvatarURL("png")
         )
         .setDescription(
-          `Removed **${wishlist[num - 1].groupName} ${
-            wishlist[num - 1].name
-          }** from your wishlist.`
+          `Removed ${target.groupName ? `**${target.groupName}** ` : ``}${
+            target.name
+          } from your wishlist.`
         );
       await msg.channel.createMessage({ embed });
       return;
@@ -219,9 +222,9 @@ export default class Wishlist extends BaseCommand {
               .map((i) => {
                 return `\`${(index++)
                   .toString()
-                  .padStart(wishlist.length.toString().length)}\` **${
-                  i.groupName
-                }** ${i.name}`;
+                  .padStart(wishlist.length.toString().length)}\` ${
+                  i.groupName ? `**${i.groupName}** ` : ``
+                }${i.name}`;
               })
               .join("\n")}`
       )

@@ -47,7 +47,7 @@ export default class Pay extends BaseCommand {
           this.zephyr.config.discord.emoji.bits
         }**${amount.toLocaleString()}** to <@${user.id}>.`
       );
-      collector.end();
+      collector.stop();
       return;
     });
     collector.on("end", async (_collected: unknown, reason: string) => {

@@ -1,8 +1,8 @@
 import { Dayjs } from "dayjs";
 import { Channel, TextChannel } from "eris";
 import { Zephyr } from "../structures/client/Zephyr";
-import colors from "../assets/colors.json";
 import nearestColor from "nearest-color";
+import colorNames from "color-name-list";
 
 function strToInt(text: string): number {
   let result = parseInt(text.replace(/[, ]+/g, ""), 10);
@@ -94,12 +94,12 @@ function getNearestColor(
   rgb: { r: number; g: number; b: number };
   distance: number;
 } {
-  const bruh = colors.colors.reduce(
+  const hexNames = colorNames.reduce(
     (o, { name, hex }) => Object.assign(o, { [name]: hex }),
     {}
   );
 
-  const nearest = nearestColor.from(bruh);
+  const nearest = nearestColor.from(hexNames);
   const trueNearest = nearest(hex) as {
     name: string;
     value: string;

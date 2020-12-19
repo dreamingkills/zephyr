@@ -2,6 +2,7 @@ import { DB, DBClass } from "../../..";
 import { GameProfile } from "../../../../../structures/game/Profile";
 import { ProfileService } from "../../../services/game/ProfileService";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
+import { GameDye } from "../../../../../structures/game/Dye";
 
 export abstract class ProfileSet extends DBClass {
   /*
@@ -297,5 +298,39 @@ export abstract class ProfileSet extends DBClass {
           )
         : false,
     ]);
+  }
+
+  public static async addDye(
+    discordId: string,
+    color: { r: number; g: number; b: number }
+  ): Promise<GameDye> {
+    const query = (await DB.query(
+      `INSERT INTO dye (discord_id, dye_r, dye_g, dye_b, charges) VALUES (?, ?, ?, ?, 1);`,
+      [discordId, color.r, color.g, color.b]
+    )) as { insertId: number };
+
+    return await ProfileService.getDyeById(query.insertId);
+  }
+
+  public static async addChargesToDye(
+    id: number,
+    amount: number
+  ): Promise<void> {
+    await DB.query(`UPDATE dye SET charges=charges+? WHERE id=?;`, [
+      amount,
+      id,
+    ]);
+    return;
+  }
+
+  public static async removeChargesFromDye(
+    id: number,
+    amount: number
+  ): Promise<void> {
+    await DB.query(`UPDATE dye SET charges=charges-? WHERE id=?;`, [
+      amount,
+      id,
+    ]);
+    return;
   }
 }

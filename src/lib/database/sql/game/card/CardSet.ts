@@ -6,6 +6,7 @@ import { GameUserCard } from "../../../../../structures/game/UserCard";
 import { IssueHandler } from "../../../../IssueHandler";
 import { CardService } from "../../../services/game/CardService";
 import { Chance } from "chance";
+import { GameDye } from "../../../../../structures/game/Dye";
 export abstract class CardSet extends DBClass {
   public static async createNewUserCard(
     card: GameBaseCard,
@@ -102,6 +103,17 @@ export abstract class CardSet extends DBClass {
 
   public static async increaseCardWear(card: GameUserCard): Promise<void> {
     await DB.query(`UPDATE user_card SET wear=wear+1 WHERE id=?;`, [card.id]);
+    return;
+  }
+
+  public static async setCardDye(
+    card: GameUserCard,
+    dye: GameDye
+  ): Promise<void> {
+    await DB.query(
+      `UPDATE user_card SET dye_r=?, dye_g=?, dye_b=? WHERE id=?;`,
+      [dye.dyeR, dye.dyeG, dye.dyeB, card.id]
+    );
     return;
   }
 }
