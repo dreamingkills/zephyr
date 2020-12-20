@@ -366,6 +366,12 @@ export abstract class CardService {
     return await CardGet.getCardsByTagId(tag.id);
   }
 
+  public static async getUntaggedCards(
+    profile: GameProfile
+  ): Promise<GameUserCard[]> {
+    return await CardGet.getUntaggedCards(profile.discordId);
+  }
+
   public static async incrementGenerated(cards: GameBaseCard[]): Promise<void> {
     return await CardSet.incrementGenerated(cards);
   }

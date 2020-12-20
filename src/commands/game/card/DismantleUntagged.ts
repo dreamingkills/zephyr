@@ -7,21 +7,15 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { ReactionCollector } from "eris-collector";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
-export default class DismantleTag extends BaseCommand {
-  names = ["dismantletag", "dit"];
-  description = "Dismantles all the cards in a tag.";
-  usage = ["$CMD$ <tag>"];
+export default class DismantleUntagged extends BaseCommand {
+  names = ["dismantleuntagged", "dut"];
+  description = "Dismantles all cards that are untagged.";
+  usage = ["$CMD$"];
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const tags = await ProfileService.getTags(profile);
-    const query = tags.filter(
-      (t) => t.name.toLowerCase() === this.options.join(" ").toLowerCase()
-    )[0];
+    const cards = await CardService.getUntaggedCards(profile);
 
-    if (!query) throw new ZephyrError.InvalidTagError();
-
-    const cards = await CardService.getCardsByTag(query);
-    if (cards.length < 1) throw new ZephyrError.NoCardsTaggedError(query);
+    if (cards.length < 1) throw new ZephyrError.NoUntaggedCardsError();
 
     const individualRewards = cards.map((c) => {
       return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
@@ -43,14 +37,14 @@ export default class DismantleTag extends BaseCommand {
     const descs = CardService.getCardDescriptions(
       cards.slice(0, 5),
       this.zephyr,
-      tags
+      []
     );
     const excess = Math.max(cards.length - 5, 0);
 
     let description =
       `Really dismantle **${cards.length.toLocaleString()} card${
         cards.length === 1 ? `` : `s`
-      }** tagged ${query.emoji} \`${query.name}\`?\n` +
+      }** with **no tag**?\n` +
       descs.join("\n") +
       (excess > 0 ? `\n*... and ${excess.toLocaleString()} more ...*` : ``) +
       `\n\nYou will receive:` +

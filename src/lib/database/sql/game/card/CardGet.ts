@@ -99,6 +99,7 @@ export abstract class CardGet extends DBClass {
     const cards = (await DB.query(query)) as UserCard[];
     return cards.map((c) => new GameUserCard(c));
   }
+
   public static async getUserInventorySize(
     profile: GameProfile,
     options: Filter,
@@ -114,6 +115,7 @@ export abstract class CardGet extends DBClass {
     const result = (await DB.query(query + `;`)) as { count: number }[];
     return result[0].count;
   }
+
   public static async getUserCardById(id: number): Promise<GameUserCard> {
     const query = (await DB.query(
       `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.id=?;`,
@@ -122,6 +124,7 @@ export abstract class CardGet extends DBClass {
     if (!query[0]) throw new ZephyrError.UnknownUserCardIdError();
     return new GameUserCard(query[0]);
   }
+
   public static async getLastCard(discordId: string): Promise<GameUserCard> {
     const query = (await DB.query(
       `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE discord_id=? ORDER BY id DESC;`,
@@ -141,6 +144,7 @@ export abstract class CardGet extends DBClass {
     )) as { count: number }[];
     return query[0].count;
   }
+
   public static async getTopCollectorsByBaseIds(
     ids: number[],
     zephyrId: string,
@@ -164,6 +168,7 @@ export abstract class CardGet extends DBClass {
     )) as { count: number }[];
     return query[0].count;
   }
+
   public static async getTopWishlisted(
     page: number
   ): Promise<{ group: string; name: string; count: number }[]> {
@@ -180,6 +185,16 @@ export abstract class CardGet extends DBClass {
     const query = (await DB.query(
       `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.tag_id=?;`,
       [id]
+    )) as UserCard[];
+    return query.map((c) => new GameUserCard(c));
+  }
+
+  public static async getUntaggedCards(
+    discordId: string
+  ): Promise<GameUserCard[]> {
+    const query = (await DB.query(
+      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.tag_id IS NULL AND discord_id=?;`,
+      [discordId]
     )) as UserCard[];
     return query.map((c) => new GameUserCard(c));
   }
