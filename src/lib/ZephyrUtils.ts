@@ -4,6 +4,11 @@ import { Zephyr } from "../structures/client/Zephyr";
 import nearestColor from "nearest-color";
 import colorNames from "color-name-list";
 
+const mappedColors = colorNames.reduce(
+  (o, { name, hex }) => Object.assign(o, { [name]: hex }),
+  {}
+);
+
 function strToInt(text: string): number {
   let result = parseInt(text.replace(/[, ]+/g, ""), 10);
   if (text.toLowerCase().endsWith("k")) result *= 1000;
@@ -94,12 +99,7 @@ function getNearestColor(
   rgb: { r: number; g: number; b: number };
   distance: number;
 } {
-  const hexNames = colorNames.reduce(
-    (o, { name, hex }) => Object.assign(o, { [name]: hex }),
-    {}
-  );
-
-  const nearest = nearestColor.from(hexNames);
+  const nearest = nearestColor.from(mappedColors);
   const trueNearest = nearest(hex) as {
     name: string;
     value: string;

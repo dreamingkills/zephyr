@@ -29,9 +29,12 @@ export default class UpgradeCard extends BaseCommand {
     if (card.wear === 5) throw new ZephyrError.CardBestConditionError(card);
 
     const dustTier = (card.wear + 1) as Dust;
-    const dustCost = [30, 25, 20, 15, 10][card.wear];
-    const successChance = 100 - (30 + card.wear * 10);
+    const dustCost = [5, 5, 5, 5, 5][card.wear];
+    const successChance = [80, 70, 60, 50, 40][card.wear];
     const bitCost = [150, 250, 400, 750, 1200][card.wear];
+
+    if (bitCost > profile.bits)
+      throw new ZephyrError.NotEnoughBitsError(profile.bits, bitCost);
 
     const dustBalance = [
       profile.dustPoor,
@@ -40,10 +43,9 @@ export default class UpgradeCard extends BaseCommand {
       profile.dustGreat,
       profile.dustMint,
     ][card.wear];
+
     if (dustCost > dustBalance)
       throw new ZephyrError.NotEnoughDustError(dustBalance, dustCost, dustTier);
-    if (bitCost > profile.bits)
-      throw new ZephyrError.NotEnoughBitsError(profile.bits, bitCost);
 
     const tags = await ProfileService.getTags(profile);
     const embed = new MessageEmbed()

@@ -3,6 +3,7 @@ import { GameProfile } from "../../../../../structures/game/Profile";
 import { ProfileService } from "../../../services/game/ProfileService";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { GameDye } from "../../../../../structures/game/Dye";
+import { getNearestColor, rgbToHex } from "../../../../ZephyrUtils";
 
 export abstract class ProfileSet extends DBClass {
   /*
@@ -304,9 +305,10 @@ export abstract class ProfileSet extends DBClass {
     discordId: string,
     color: { r: number; g: number; b: number }
   ): Promise<GameDye> {
+    const dyeName = getNearestColor(rgbToHex(color.r, color.g, color.b)).name;
     const query = (await DB.query(
-      `INSERT INTO dye (discord_id, dye_r, dye_g, dye_b, charges) VALUES (?, ?, ?, ?, 1);`,
-      [discordId, color.r, color.g, color.b]
+      `INSERT INTO dye (discord_id, name, dye_r, dye_g, dye_b, charges) VALUES (?, ?, ?, ?, ?, 1);`,
+      [discordId, dyeName, color.r, color.g, color.b]
     )) as { insertId: number };
 
     return await ProfileService.getDyeById(query.insertId);

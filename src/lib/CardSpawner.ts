@@ -86,9 +86,9 @@ export abstract class CardSpawner {
           frame_name: frame.frameName,
           frame_url: frame.frameUrl,
           dye_mask_url: frame.dyeMaskUrl,
-          dye_r: 245,
-          dye_g: 245,
-          dye_b: 245,
+          dye_r: 185,
+          dye_g: 185,
+          dye_b: 185,
           tag_id: 0,
           claim_time: 0,
         })

@@ -9,6 +9,7 @@ import { ShopService } from "../../../lib/database/services/game/ShopService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import chromajs from "chroma-js";
 import { getNearestColor } from "../../../lib/ZephyrUtils";
+import { createCanvas } from "canvas";
 
 export default class UseItem extends BaseCommand {
   names = ["use"];
@@ -98,6 +99,15 @@ export default class UseItem extends BaseCommand {
           b: rgb[2],
         });
 
+        const canvas = createCanvas(100, 100);
+        const ctx = canvas.getContext("2d");
+
+        ctx.fillStyle = hex;
+        ctx.fillRect(0, 0, 100, 100);
+
+        const buffer = canvas.toBuffer("image/jpeg");
+        const buf = Buffer.alloc(buffer.length, buffer, "base64");
+
         const embed = new MessageEmbed()
           .setAuthor(
             `Dye Bottle | ${msg.author.tag}`,
@@ -108,8 +118,15 @@ export default class UseItem extends BaseCommand {
               `\n\`$${newDye.id.toString(36)}\` **${colorName.name}** [**${
                 newDye.charges
               }**]!`
-          );
-        await msg.channel.createMessage({ embed });
+          )
+          .setThumbnail(`attachment://dye.png`)
+          .setColor(hex);
+
+        await msg.channel.createMessage(
+          { embed },
+          { file: buf, name: "dye.png" }
+        );
+
         return;
       }
     }

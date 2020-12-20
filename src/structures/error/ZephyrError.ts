@@ -338,3 +338,13 @@ export class NotOwnerOfDyeError extends ZephyrError {
     super(`\`$${id.toString(36)}\` does not belong to you.`);
   }
 }
+
+export class CardConditionTooLowError extends ZephyrError {
+  constructor(_wear: number, requirement: number) {
+    super(
+      `Your card must be in **${
+        ["Damaged", "Poor", "Average", "Good", "Great", "Mint"][requirement]
+      }** condition to do that!`
+    );
+  }
+}

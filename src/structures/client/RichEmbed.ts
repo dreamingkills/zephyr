@@ -18,19 +18,25 @@ export class MessageEmbed {
   image?: {
     url: string;
   };
+  thumbnail?: {
+    url: string;
+  };
 
   public setTitle(title: string): MessageEmbed {
     this.title = title;
     return this;
   }
+
   public setDescription(description: string): MessageEmbed {
     this.description = description;
     return this;
   }
+
   public setAuthor(name: string, iconUrl?: string, url?: string): MessageEmbed {
     this.author = { name, icon_url: iconUrl, url };
     return this;
   }
+
   public setColor(color: string | number): MessageEmbed {
     if (typeof color === "string") {
       if (color.startsWith("#")) {
@@ -39,10 +45,12 @@ export class MessageEmbed {
     } else this.color = color;
     return this;
   }
+
   public setFooter(footer: string, iconUrl?: string): MessageEmbed {
     this.footer = { text: footer, icon_url: iconUrl };
     return this;
   }
+
   public addField(field: {
     name: string;
     value: string;
@@ -51,8 +59,14 @@ export class MessageEmbed {
     this.fields.push(field);
     return this;
   }
+
   public setImage(url: string): MessageEmbed {
     this.image = { url };
+    return this;
+  }
+
+  public setThumbnail(url: string): MessageEmbed {
+    this.thumbnail = { url };
     return this;
   }
 }

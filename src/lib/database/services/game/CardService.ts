@@ -162,7 +162,7 @@ export abstract class CardService {
       // We need to convert the GM State to a buffer, so that
       // canvas knows what to do with it.
       const dyeBuffer = await this.toBufferPromise(
-        gm(card.dyeMaskUrl).colorize(r, g, b)
+        gm(card.dyeMaskUrl).colorspace("rgb").colorize(r, g, b)
       );
 
       // Load the buffer and draw the dye mask on top of the frame.

@@ -30,6 +30,8 @@ export default class DyeCard extends BaseCommand {
 
     if (targetCard.discordId !== msg.author.id)
       throw new ZephyrError.NotOwnerOfCardError(targetCard);
+    if (targetCard.wear !== 5)
+      throw new ZephyrError.CardConditionTooLowError(targetCard.wear, 5);
 
     [targetCard.dyeR, targetCard.dyeG, targetCard.dyeB] = [
       targetDye.dyeR,
@@ -74,12 +76,23 @@ export default class DyeCard extends BaseCommand {
     });
 
     collector.on("collect", async () => {
-      // We need to check that this user is still the owner, or they can do some nasty stuff
+      // We need to check that this user is still the owner of the card, or they can do some nasty stuff
       const refetchCard = await CardService.getUserCardById(targetCard.id);
       if (refetchCard.discordId !== msg.author.id) {
         await conf.edit({
           embed: embed.setFooter(
             `⚠️ ${refetchCard.id.toString(36)} does not belong to you.`
+          ),
+        });
+        return;
+      }
+
+      // Also check that their dye still has 1 charge
+      const refetchDye = await ProfileService.getDyeById(targetDye.id);
+      if (refetchDye.charges < 1) {
+        await conf.edit({
+          embed: embed.setFooter(
+            `⚠️ $${targetDye.id.toString(36)} has no charges.`
           ),
         });
         return;
