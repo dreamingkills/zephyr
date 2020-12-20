@@ -1,5 +1,5 @@
 import { GameDye } from "../../../../structures/game/Dye";
-import { GameItem } from "../../../../structures/game/Item";
+import { BaseItem, GameItem } from "../../../../structures/game/Item";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameTag } from "../../../../structures/game/Tag";
 import { GameWishlist } from "../../../../structures/game/Wishlist";
@@ -182,18 +182,26 @@ export abstract class ProfileService {
     return await ProfileGet.getNumberOfItems(profile.discordId);
   }
 
-  public static async addItem(
+  public static async addItems(
     profile: GameProfile,
-    itemId: number
+    items: BaseItem[]
   ): Promise<void> {
-    return await ProfileSet.addItem(profile.discordId, itemId);
+    return await ProfileSet.addItems(profile.discordId, items);
   }
 
-  public static async removeItem(
+  public static async removeItems(
     profile: GameProfile,
-    itemId: number
+    items: GameItem[]
   ): Promise<void> {
-    return await ProfileSet.removeItem(profile.discordId, itemId);
+    return await ProfileSet.removeItems(profile.discordId, items);
+  }
+
+  public static async transferItems(
+    to: GameProfile,
+    from: GameProfile,
+    items: GameItem[]
+  ): Promise<void> {
+    return await ProfileSet.transferItems(to.discordId, from.discordId, items);
   }
 
   /*

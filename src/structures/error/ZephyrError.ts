@@ -32,6 +32,18 @@ export class InvalidMentionGiftError extends ZephyrError {
   }
 }
 
+export class InvalidMentionItemError extends ZephyrError {
+  constructor(plural: boolean) {
+    super(`Please mention someone to gift your item${plural ? `s` : ``} to.`);
+  }
+}
+
+export class NoItemsSpecifiedError extends ZephyrError {
+  constructor() {
+    super(`Please specify some items.`);
+  }
+}
+
 export class CannotGiftAuthorError extends ZephyrError {
   constructor() {
     super(`You can't gift cards to yourself.`);

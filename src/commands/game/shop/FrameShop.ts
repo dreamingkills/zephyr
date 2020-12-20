@@ -55,10 +55,9 @@ export default class FrameShop extends BaseCommand {
       if (frame[0].price > profile.bits)
         throw new ZephyrError.NotEnoughBitsError(profile.bits, frame[0].price);
 
-      const itemId = itemFind.id;
       const realFrame = itemFind.name;
 
-      await ProfileService.addItem(profile, itemId);
+      await ProfileService.addItems(profile, [itemFind]);
       const newProfile = await ProfileService.removeBitsFromProfile(
         profile,
         frame[0].price

@@ -1,9 +1,16 @@
+export interface BaseItem {
+  id: number;
+  name: string;
+  type: string;
+}
+
 export interface Item {
   id: number;
   discord_id: string;
   item_id: number;
   count: number;
 }
+
 export class GameItem {
   id: number;
   discordId: string;

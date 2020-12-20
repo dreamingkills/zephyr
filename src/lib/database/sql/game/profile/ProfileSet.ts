@@ -4,6 +4,7 @@ import { ProfileService } from "../../../services/game/ProfileService";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { GameDye } from "../../../../../structures/game/Dye";
 import { getNearestColor, rgbToHex } from "../../../../ZephyrUtils";
+import { BaseItem, GameItem } from "../../../../../structures/game/Item";
 
 export abstract class ProfileSet extends DBClass {
   /*
@@ -15,12 +16,14 @@ export abstract class ProfileSet extends DBClass {
     await DB.query(`INSERT INTO profile (discord_id) VALUES (?);`, [discordId]);
     return await ProfileService.getProfile(discordId);
   }
+
   public static async togglePrivateProfile(discordId: string): Promise<void> {
     await DB.query(`UPDATE profile SET private=1-private WHERE discord_id=?;`, [
       discordId,
     ]);
     return;
   }
+
   public static async setBlurb(
     discordId: string,
     blurb: string
@@ -31,6 +34,7 @@ export abstract class ProfileSet extends DBClass {
     ]);
     return;
   }
+
   public static async addToWishlist(
     discordId: string,
     name: string,
@@ -186,23 +190,41 @@ export abstract class ProfileSet extends DBClass {
   /*
       Items
   */
-  public static async addItem(
+  public static async addItems(
     discordId: string,
-    itemId: number
+    items: BaseItem[]
   ): Promise<void> {
+    let values = items.map(
+      (i) =>
+        `(${DB.connection.escape(discordId)}, ${DB.connection.escape(i.id)})`
+    );
     await DB.query(
-      `INSERT INTO user_item (discord_id, item_id) VALUES (?, ?);`,
-      [discordId, itemId]
+      `INSERT INTO user_item (discord_id, item_id) VALUES ` +
+        values.join(", ") +
+        `;`
     );
     return;
   }
-  public static async removeItem(
+
+  public static async removeItems(
     discordId: string,
-    itemId: number
+    items: GameItem[]
+  ): Promise<void> {
+    await DB.query(`DELETE FROM user_item WHERE discord_id=? AND id IN (?);`, [
+      discordId,
+      items.map((i) => i.id),
+    ]);
+    return;
+  }
+
+  public static async transferItems(
+    to: string,
+    from: string,
+    items: GameItem[]
   ): Promise<void> {
     await DB.query(
-      `DELETE FROM user_item WHERE discord_id=? AND item_id=? LIMIT 1;`,
-      [discordId, itemId]
+      `UPDATE user_item SET discord_id=? WHERE discord_id=? AND id IN (?);`,
+      [to, from, items.map((i) => i.id)]
     );
     return;
   }
