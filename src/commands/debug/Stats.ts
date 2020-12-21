@@ -33,7 +33,10 @@ export default class Stats extends BaseCommand {
         value: `— ${usedPct.toFixed(2)}% ${ramStatusEmoji}`,
         inline: true,
       })
-      .setFooter(`Made with ❤️ by RTFL#8058`, rtfl.dynamicAvatarURL("png"));
+      .setFooter(
+        `Made with ❤️ by RTFL#8058`,
+        rtfl ? rtfl.dynamicAvatarURL("png") : ""
+      );
 
     await msg.channel.createMessage({ embed });
   }

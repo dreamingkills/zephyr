@@ -24,27 +24,31 @@ export default class Leaderboards extends BaseCommand {
     switch (type) {
       case "bits": {
         const board = await LeaderboardService.getBitLeaderboard(page);
-        for (let user of board) {
-          const discordUser = await this.zephyr.fetchUser(user.discordId);
-          leaderboard += `\`#${board.indexOf(user) + 1 + (page * 10 - 10)}\` `;
-          if (user.private && user.discordId !== authorId) {
+        for (let profile of board) {
+          const user = await this.zephyr.fetchUser(profile.discordId);
+          leaderboard += `\`#${
+            board.indexOf(profile) + 1 + (page * 10 - 10)
+          }\` `;
+          if (profile.private && profile.discordId !== authorId) {
             leaderboard += `*Private User*`;
-          } else leaderboard += discordUser.tag;
+          } else leaderboard += user ? user.tag : `*Unknown User*`;
           leaderboard += ` — ${this.zephyr.config.discord.emoji.bits}**${(
-            user.bits + user.bitsBank
+            profile.bits + profile.bitsBank
           ).toLocaleString()}**\n`;
         }
         break;
       }
       case "daily": {
         const board = await LeaderboardService.getDailyStreakLeaderboard(page);
-        for (let user of board) {
-          const discordUser = await this.zephyr.fetchUser(user.discordId);
-          leaderboard += `\`#${board.indexOf(user) + 1 + (page * 10 - 10)}\` `;
-          if (user.private && user.discordId !== authorId) {
+        for (let profile of board) {
+          const user = await this.zephyr.fetchUser(profile.discordId);
+          leaderboard += `\`#${
+            board.indexOf(profile) + 1 + (page * 10 - 10)
+          }\` `;
+          if (profile.private && profile.discordId !== authorId) {
             leaderboard += `*Private User*`;
-          } else leaderboard += discordUser.tag;
-          leaderboard += ` — **${user.dailyStreak.toLocaleString()} days**\n`;
+          } else leaderboard += user ? user.tag : `*Unknown User*`;
+          leaderboard += ` — **${profile.dailyStreak.toLocaleString()} days**\n`;
         }
         break;
       }
@@ -54,13 +58,11 @@ export default class Leaderboards extends BaseCommand {
           zephyr.user.id
         );
         for (let entry of board) {
-          const discordUser = await this.zephyr.fetchUser(
-            entry.profile.discordId
-          );
+          const user = await this.zephyr.fetchUser(entry.profile.discordId);
           leaderboard += `\`#${board.indexOf(entry) + 1 + (page * 10 - 10)}\` `;
           if (entry.profile.private && entry.profile.discordId !== authorId) {
             leaderboard += `*Private User*`;
-          } else leaderboard += discordUser.tag;
+          } else leaderboard += user ? user.tag : `*Unknown User*`;
           leaderboard += ` — **${entry.count} cards**\n`;
         }
         break;

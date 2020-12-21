@@ -31,9 +31,11 @@ export default class CardSearch extends BaseCommand {
       )
       .setDescription(
         `:bust_in_silhouette: Owned by ${
-          ownerProfile.private && owner.id !== msg.author.id
+          ownerProfile.private && owner?.id !== msg.author.id
             ? `*Private User*`
-            : `**${owner.tag}**`
+            : owner
+            ? `**${owner.tag}**`
+            : `*Unknown User*`
         }` +
           `\n— **${baseCard.group ? `${baseCard.group} ` : ``}${
             baseCard.name
@@ -50,9 +52,11 @@ export default class CardSearch extends BaseCommand {
       )
       .setFooter(
         `Card originally owned by ${
-          originalProfile.private && originalOwner.id !== msg.author.id
+          originalProfile.private && originalOwner?.id !== msg.author.id
             ? `Private User`
-            : `${originalOwner.tag}`
+            : originalOwner
+            ? `${originalOwner.tag}`
+            : `*Unknown User*`
         }`
       );
     await msg.channel.createMessage({ embed });

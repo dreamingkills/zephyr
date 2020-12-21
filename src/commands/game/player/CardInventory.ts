@@ -46,6 +46,8 @@ export default class CardInventory extends BaseCommand {
       target = profile;
     }
 
+    if (!targetUser) throw new ZephyrError.UserNotFoundError();
+
     if (!target) target = await ProfileService.getProfile(targetUser.id);
 
     if (target.private && target.discordId !== msg.author.id)

@@ -12,40 +12,42 @@ export default class ViewProfile extends BaseCommand {
   description = "Displays your profile.";
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    let target: GameProfile;
-    let user: User;
+    let target: GameProfile | undefined;
+    let targetUser: User | undefined;
     if (this.options[0]) {
       if (!isNaN(parseInt(this.options[0], 10))) {
         const userId = this.options[0];
         if (userId.length < 17) throw new ZephyrError.InvalidSnowflakeError();
 
-        user = await this.zephyr.fetchUser(userId);
-        target = await ProfileService.getProfile(user.id);
+        targetUser = await this.zephyr.fetchUser(userId);
       } else if (msg.mentions[0]) {
-        user = msg.mentions[0];
-        target = await ProfileService.getProfile(user.id);
+        targetUser = msg.mentions[0];
       } else throw new ZephyrError.InvalidUserArgumentError();
     } else {
-      user = msg.author;
+      targetUser = msg.author;
       target = profile;
     }
 
+    if (!targetUser) throw new ZephyrError.UserNotFoundError();
+
+    if (!target) target = await ProfileService.getProfile(targetUser.id);
+
     if (target.private && target.discordId !== msg.author.id)
-      throw new ZephyrError.PrivateProfileError(user.tag);
+      throw new ZephyrError.PrivateProfileError(targetUser.tag);
 
     const cardsAmount = await CardService.getUserInventorySize(target, [], {});
 
     const targetIsSender = target.discordId === msg.author.id;
     const embed = new MessageEmbed()
-      .setAuthor(`Profile | ${user.tag}`, msg.author.avatarURL)
+      .setAuthor(`Profile | ${targetUser.tag}`, msg.author.avatarURL)
       .setDescription(
         `**Blurb**` +
           `\n${target.blurb || "*No blurb set*"}` +
-          `\n\n— ${targetIsSender ? `You have` : `${user.tag} has`} ${
+          `\n\n— ${targetIsSender ? `You have` : `${targetUser.tag} has`} ${
             this.zephyr.config.discord.emoji.bits
           } **${target.bits.toLocaleString()}**.` +
           `\n— ${
-            targetIsSender ? `You have` : `${user.tag} has`
+            targetIsSender ? `You have` : `${targetUser.tag} has`
           } **${cardsAmount.toLocaleString()}** cards.`
       );
     if (profile.discordId === msg.author.id && profile.private)

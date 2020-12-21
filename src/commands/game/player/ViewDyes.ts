@@ -33,16 +33,19 @@ export default class ViewDyes extends BaseCommand {
     let targetUser;
     if (msg.mentions[0]) {
       targetUser = msg.mentions[0];
-      target = await ProfileService.getProfile(targetUser.id);
     } else if (!isNaN(parseInt(this.options[0]))) {
       if (this.options[0].length < 17)
         throw new ZephyrError.InvalidSnowflakeError();
+
       targetUser = await this.zephyr.fetchUser(this.options[0]);
-      target = await ProfileService.getProfile(targetUser.id);
     } else {
       targetUser = msg.author;
       target = profile;
     }
+
+    if (!targetUser) throw new ZephyrError.UserNotFoundError();
+
+    if (!target) target = await ProfileService.getProfile(targetUser.id);
 
     let page = 1;
 

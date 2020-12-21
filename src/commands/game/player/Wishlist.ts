@@ -35,7 +35,7 @@ export default class Wishlist extends BaseCommand {
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const subcommand = this.options[0]?.toLowerCase();
     let target: GameProfile | undefined;
-    let targetUser: User;
+    let targetUser: User | undefined;
     if (subcommand === "add") {
       const wishlist = await ProfileService.getWishlist(profile);
       if (
@@ -202,6 +202,8 @@ export default class Wishlist extends BaseCommand {
       target = profile;
       targetUser = msg.author;
     }
+
+    if (!targetUser) throw new ZephyrError.UserNotFoundError();
 
     if (!target) target = await ProfileService.getProfile(targetUser.id);
     if (target.private && target.discordId !== msg.author.id)

@@ -12,6 +12,10 @@ export class DMHandler {
     for (let p of eligible) {
       try {
         const user = await zephyr.fetchUser(p.discordId);
+        if (!user) {
+          failed.push(p);
+          continue;
+        }
         let [claim, drop] = [false, false];
 
         const now = dayjs(Date.now());

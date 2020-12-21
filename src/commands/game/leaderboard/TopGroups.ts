@@ -25,7 +25,7 @@ export default class TopGroup extends BaseCommand {
       description += `\`${(
         `#` + (page * 10 - 10 + collectors.indexOf(col) + 1).toString()
       ).padStart(pad, " ")}\` ${
-        profile.private ? `*Private User*` : user.tag
+        profile.private ? `*Private User*` : user ? user.tag : "*Unknown User*"
       } — **${col.amount.toLocaleString()}** cards\n`;
     }
     return description;

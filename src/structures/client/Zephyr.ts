@@ -20,7 +20,7 @@ export class Zephyr extends Client {
   dmHandler = new DMHandler();
   config: typeof config;
   chance = new Chance();
-  remindersEnabled = true;
+  remindersEnabled = false;
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
 
@@ -274,18 +274,26 @@ export class Zephyr extends Client {
   public async fetchUser(
     userId: string,
     ignoreCache: boolean = false
-  ): Promise<User> {
+  ): Promise<User | undefined> {
     if (ignoreCache) {
-      const user = await this.getRESTUser(userId);
-      this.users.add(user);
-      return user;
+      try {
+        const user = await this.getRESTUser(userId);
+        this.users.add(user);
+        return user;
+      } catch (e) {
+        return;
+      }
     }
     // check if user is already in cache
     const findUser = this.users.get(userId);
     if (!findUser) {
-      const user = await this.getRESTUser(userId);
-      this.users.add(user);
-      return user;
+      try {
+        const user = await this.getRESTUser(userId);
+        this.users.add(user);
+        return user;
+      } catch (e) {
+        return;
+      }
     } else {
       this.users.update(findUser);
       return findUser;

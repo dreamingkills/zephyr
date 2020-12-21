@@ -12,7 +12,7 @@ export default class ViewTags extends BaseCommand {
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     let target: GameProfile | undefined;
-    let targetUser: User;
+    let targetUser: User | undefined;
 
     if (msg.mentions[0]) {
       targetUser = msg.mentions[0];
@@ -25,6 +25,8 @@ export default class ViewTags extends BaseCommand {
       targetUser = msg.author;
       target = profile;
     }
+
+    if (!targetUser) throw new ZephyrError.UserNotFoundError();
 
     if (!target) target = await ProfileService.getProfile(targetUser.id);
     if (target.private && target.discordId !== msg.author.id)
