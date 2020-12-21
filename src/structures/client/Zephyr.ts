@@ -20,6 +20,7 @@ export class Zephyr extends Client {
   dmHandler = new DMHandler();
   config: typeof config;
   chance = new Chance();
+  remindersEnabled = true;
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
 
@@ -71,13 +72,22 @@ export class Zephyr extends Client {
           `\n\n${`=`.repeat(stripAnsi(header).length)}`
       );
 
-      setInterval(() => this.dmHandler.handle(this), 30000);
+      setInterval(() => {
+        if (this.remindersEnabled) this.dmHandler.handle(this);
+      }, 30000);
     });
 
     this.on("messageCreate", async (message) => {
       await this.fetchUser(message.author.id);
       // type 0 corresponds to TextChannel
       if (message.author.bot || message.channel.type !== 0) return;
+
+      if (message.mentions[0]?.id === this.user.id) {
+        await message.channel.createMessage(
+          `My prefix here is \`${this.getPrefix(message.guildID!)}\`!`
+        );
+        return;
+      }
 
       // check if we're allowed to send messages to this channel
       if (!message.channel.permissionsOf(this.user.id).json["sendMessages"])
@@ -176,7 +186,7 @@ export class Zephyr extends Client {
   public async cacheCards(): Promise<void> {
     const cards = await CardService.getAllCards();
     for (let card of cards) {
-      this.cards[card.id] = card;
+      if (card.rarity > 0) this.cards[card.id] = card;
     }
     return;
   }
@@ -200,23 +210,42 @@ export class Zephyr extends Client {
       const bonus = this.chance.bool({ likelihood: 1.25 });
       if (bonus) {
         const random = this.chance.pickone(wishlist);
-        const bonus = this.chance.pickone(
-          Object.values(this.cards).filter(
-            (c) => c.name === random.name && c.group === random.groupName
-          )
+        const potential = Object.values(this.cards).filter(
+          (c) =>
+            c.name === random.name &&
+            c.group === random.groupName &&
+            c.rarity > 100
         );
-        cards.push(bonus);
+        if (potential[0]) {
+          const bonusCard = this.chance.pickone(
+            Object.values(this.cards).filter(
+              (c) =>
+                c.name === random.name &&
+                c.group === random.groupName &&
+                c.rarity > 100
+            )
+          );
+          cards.push(bonusCard);
+        }
       }
     }
+
     const availableCards = Object.values(this.cards).filter(
       (c) => c.rarity > 0
     );
-    cards.push(...this.chance.pickset(Object.values(availableCards), amount));
+    const weightings = availableCards.map((c) => c.rarity);
 
-    for (let i = 0; i < amount; i++) {
+    while (cards.length < amount) {
+      const randomCard = this.chance.weighted(availableCards, weightings);
+      if (cards.includes(randomCard)) continue;
+      cards.push(randomCard);
+    }
+
+    /*for (let i = 0; i < amount; i++) {
       const j = Math.floor(Math.random() * (i + 1));
       [cards[i], cards[j]] = [cards[j], cards[i]];
-    }
+    }*/
+
     return cards.slice(0, amount);
   }
   public getCards(): GameBaseCard[] {
