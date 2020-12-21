@@ -5,6 +5,7 @@ export abstract class GuildService {
   public static async getPrefixes(): Promise<{ [guildId: string]: string }> {
     return await GuildGet.getPrefixes();
   }
+
   public static async setPrefix(
     guildId: string,
     prefix: string
@@ -15,6 +16,7 @@ export abstract class GuildService {
   public static async getDropChannel(guildId: string): Promise<string | null> {
     return await GuildGet.getDropChannel(guildId);
   }
+
   public static async setDropChannel(
     guildId: string,
     dropChannel: string

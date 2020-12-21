@@ -82,7 +82,23 @@ export class Zephyr extends Client {
       // type 0 corresponds to TextChannel
       if (message.author.bot || message.channel.type !== 0) return;
 
+      // Prefix resetter
       if (message.mentions[0]?.id === this.user.id) {
+        const subcommand = message.content.split(" ")[1]?.toLowerCase();
+
+        if (subcommand === "reset") {
+          this.setPrefix(message.guildID!, this.config.discord.defaultPrefix);
+          await GuildService.setPrefix(
+            message.guildID!,
+            this.config.discord.defaultPrefix
+          );
+
+          await message.channel.createMessage(
+            `Reset your prefix to \`${this.config.discord.defaultPrefix}\``
+          );
+          return;
+        }
+
         await message.channel.createMessage(
           `My prefix here is \`${this.getPrefix(message.guildID!)}\`!`
         );
