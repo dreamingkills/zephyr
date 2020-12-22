@@ -184,14 +184,14 @@ export abstract class ProfileService {
 
   public static async addItems(
     profile: GameProfile,
-    items: BaseItem[]
+    items: { item: BaseItem; count: number }[]
   ): Promise<void> {
     return await ProfileSet.addItems(profile.discordId, items);
   }
 
   public static async removeItems(
     profile: GameProfile,
-    items: GameItem[]
+    items: { item: BaseItem; count: number }[]
   ): Promise<void> {
     return await ProfileSet.removeItems(profile.discordId, items);
   }

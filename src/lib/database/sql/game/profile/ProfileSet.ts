@@ -192,12 +192,19 @@ export abstract class ProfileSet extends DBClass {
   */
   public static async addItems(
     discordId: string,
-    items: BaseItem[]
+    items: { item: BaseItem; count: number }[]
   ): Promise<void> {
-    let values = items.map(
-      (i) =>
-        `(${DB.connection.escape(discordId)}, ${DB.connection.escape(i.id)})`
-    );
+    let values = [];
+    for (let item of items) {
+      for (let i = 0; i < item.count; i++) {
+        values.push(
+          `(${DB.connection.escape(discordId)}, ${DB.connection.escape(
+            item.item.id
+          )})`
+        );
+      }
+    }
+
     await DB.query(
       `INSERT INTO user_item (discord_id, item_id) VALUES ` +
         values.join(", ") +
@@ -208,12 +215,14 @@ export abstract class ProfileSet extends DBClass {
 
   public static async removeItems(
     discordId: string,
-    items: GameItem[]
+    items: { item: BaseItem; count: number }[]
   ): Promise<void> {
-    await DB.query(`DELETE FROM user_item WHERE discord_id=? AND id IN (?);`, [
-      discordId,
-      items.map((i) => i.id),
-    ]);
+    for (let item of items) {
+      await DB.query(
+        `DELETE FROM user_item WHERE discord_id=? AND item_id=? LIMIT ?;`,
+        [discordId, item.item.id, item.count]
+      );
+    }
     return;
   }
 

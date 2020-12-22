@@ -3,6 +3,8 @@ import { Channel, TextChannel } from "eris";
 import { Zephyr } from "../structures/client/Zephyr";
 import nearestColor from "nearest-color";
 import colorNames from "color-name-list";
+import { Recipe } from "../structures/game/Recipe";
+import { items } from "../assets/items.json";
 
 const mappedColors = colorNames.reduce(
   (o, { name, hex }) => Object.assign(o, { [name]: hex }),
@@ -110,6 +112,20 @@ function getNearestColor(
   return trueNearest;
 }
 
+function renderRecipe(recipe: Recipe): string {
+  return `\`\`\`diff\n${recipe.ingredients
+    .map((i) => {
+      const baseItem = items.filter((b) => b.id === i.itemId)[0];
+      return `- ${i.count}x ${baseItem?.name || "Unknown Item"}`;
+    })
+    .join("\n")}\`\`\`\`\`\`diff\n${recipe.result
+    .map((i) => {
+      const baseItem = items.filter((b) => b.id === i.itemId)[0];
+      return `+ ${i.count}x ${baseItem?.name || "Unknown Item"}`;
+    })
+    .join("\n")}\n\`\`\``;
+}
+
 export {
   padIfNotLeading,
   getTimeUntilNextDay,
@@ -119,4 +135,5 @@ export {
   hexToRgb,
   rgbToHex,
   getNearestColor,
+  renderRecipe,
 };

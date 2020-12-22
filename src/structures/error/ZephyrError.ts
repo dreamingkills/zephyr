@@ -411,3 +411,20 @@ export class CardConditionTooLowError extends ZephyrError {
     );
   }
 }
+
+/*
+    Crafting
+              */
+export class RecipeNotFoundError extends ZephyrError {
+  constructor() {
+    super(
+      `Sorry, but there is no recipe by that name.\nPlease ensure your spelling is correct.`
+    );
+  }
+}
+
+export class NotEnoughOfItemError extends ZephyrError {
+  constructor(item: string) {
+    super(`Sorry, but you don't have enough **${item}** to craft that.`);
+  }
+}

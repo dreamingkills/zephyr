@@ -10,10 +10,11 @@ export default class ResetClaimTimer extends BaseCommand {
   description = `Resets someone's claim timer.`;
   developerOnly = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
+  async exec(msg: Message, _profile: GameProfile): Promise<void> {
     if (!msg.mentions[0]) throw new ZephyrError.InvalidMentionError();
 
-    await ProfileService.setClaimTimestamp(profile, "1970-01-01 00:00:00");
+    const target = await ProfileService.getProfile(msg.mentions[0].id);
+    await ProfileService.setClaimTimestamp(target, "1970-01-01 00:00:00");
 
     const embed = new MessageEmbed()
       .setAuthor(`Reset Claim Timer | ${msg.author.tag}`, msg.author.avatarURL)

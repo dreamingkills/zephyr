@@ -57,7 +57,7 @@ export default class FrameShop extends BaseCommand {
 
       const realFrame = itemFind.name;
 
-      await ProfileService.addItems(profile, [itemFind]);
+      await ProfileService.addItems(profile, [{ item: itemFind, count: 1 }]);
       const newProfile = await ProfileService.removeBitsFromProfile(
         profile,
         frame[0].price

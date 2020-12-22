@@ -45,7 +45,9 @@ export default class UseItem extends BaseCommand {
 
       const frame = await ShopService.getFrameByName(targetItem.name);
       await CardService.changeCardFrame(card, frame.id, this.zephyr);
-      await ProfileService.removeItems(profile, [userItem]);
+      await ProfileService.removeItems(profile, [
+        { item: targetItem, count: 1 },
+      ]);
       const embed = new MessageEmbed()
         .setAuthor(
           `Use Item | ${msg.author.tag}`,
@@ -68,7 +70,9 @@ export default class UseItem extends BaseCommand {
 
       if (isNaN(amount)) throw new ZephyrError.InvalidAmountError("bits");
 
-      await ProfileService.removeItems(profile, [userItem]);
+      await ProfileService.removeItems(profile, [
+        { item: targetItem, count: 1 },
+      ]);
       const newProfile = await ProfileService.addBitsToProfile(profile, amount);
       const embed = new MessageEmbed()
         .setAuthor(
@@ -85,9 +89,11 @@ export default class UseItem extends BaseCommand {
         );
       await msg.channel.createMessage({ embed });
       return;
-    } else if (targetItem.type === "ITEM") {
+    } else if (targetItem.type === "CONSUMABLE") {
       if (targetItem.id === 20) {
-        await ProfileService.removeItems(profile, [userItem]);
+        await ProfileService.removeItems(profile, [
+          { item: targetItem, count: 1 },
+        ]);
         const randomColor = chromajs.random();
         const rgb = randomColor.rgb();
         const hex = randomColor.hex();
