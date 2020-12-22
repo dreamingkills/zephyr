@@ -15,7 +15,7 @@ import { getDescriptions } from "../../../lib/ZephyrUtils";
 export default class BurnCard extends BaseCommand {
   names = ["burn", "b"];
   description = "Burns a card or dye, giving you resources in exchange.";
-  usage = ["$CMD$ [cards]"];
+  usage = ["$CMD$ [cards/dyes]"];
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const identifiers = this.options;
 
