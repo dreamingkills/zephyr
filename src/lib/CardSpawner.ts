@@ -51,8 +51,6 @@ export abstract class CardSpawner {
       frame
     );
 
-    await AnticheatService.logClaim(winner, prefer, newCard, Date.now(), start);
-
     return { winner, card: newCard };
   }
 
@@ -137,10 +135,9 @@ export abstract class CardSpawner {
           // Don't warn people more than once -- anti-spam
           if (!warned.has(profile.discordId)) {
             await channel.createMessage(
-              `<@${userId}>, you must wait **${getTimeUntil(
-                now,
-                until
-              )}** before claiming another card.`
+              `<@${userId}>, you must wait **${
+                getTimeUntil(now, until) || `<0s`
+              }** before claiming another card.`
             );
             warned.add(profile.discordId);
           }
@@ -174,6 +171,14 @@ export abstract class CardSpawner {
           );
           winners.add(fight.winner.discordId);
 
+          await AnticheatService.logClaim(
+            fight.winner,
+            prefer,
+            fight.card,
+            Date.now(),
+            start
+          );
+
           const countExl = takers[num].size - 1;
 
           for (let t of takers[num]) {
@@ -185,36 +190,33 @@ export abstract class CardSpawner {
           let message = "";
 
           if (countExl === 0 || prefer?.discordId === fight.winner.discordId) {
-            message += `<@${fight.winner.discordId}> claimed`;
+            message += `<@${fight.winner.discordId}> claimed `;
           } else {
             message += `<@${
               fight.winner.discordId
-            }> won the fight with **${countExl}** ${
+            }> fought off **${countExl}** ${
               countExl === 1 ? `person` : `people`
-            } and claimed`;
+            } and claimed `;
           }
 
           const baseCard = zephyr.getCard(fight.card.baseCardId);
 
-          message += ` \`${fight.card.id.toString(36)}\` ${
-            baseCard.group ? `**${baseCard.group}** ` : ``
-          }${baseCard.name} #${fight.card.serialNumber}!`;
+          message +=
+            `\`${fight.card.id.toString(36)}\` **${baseCard.name}**` +
+            (baseCard.subgroup ? ` (${baseCard.subgroup})` : ``) +
+            `!`;
 
           switch (fight.card.wear) {
             case 0: {
-              message += ` Unfortunately, it seems to be **damaged**...`;
+              message += ` This card is **damaged**...`;
               break;
             }
             case 1: {
-              message += ` Unfortunately, it seems to be in **poor** condition...`;
-              break;
-            }
-            case 2: {
-              message += ` It's in **average** condition.`;
+              message += ` It's in **poor** condition.`;
               break;
             }
             case 3: {
-              message += ` It's in **good** condition.`;
+              message += ` It looks **good**.`;
               break;
             }
             case 4: {
@@ -222,7 +224,7 @@ export abstract class CardSpawner {
               break;
             }
             case 5: {
-              message += ` This card is in **mint** condition!!`;
+              message += ` Wow, this card is in **mint** condition!`;
               break;
             }
           }

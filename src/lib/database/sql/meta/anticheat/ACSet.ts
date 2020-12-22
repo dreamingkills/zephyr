@@ -58,7 +58,7 @@ export abstract class ACSet extends DBClass {
       );
     } else {
       await DB.query(
-        `INSERT INTO claim (claimer, card_id, claim_time, drop_time) VALUES (?, ?, ?, ?, ?);`,
+        `INSERT INTO claim (claimer, card_id, claim_time, drop_time) VALUES (?, ?, ?, ?);`,
         [
           claimer.discordId,
           card.id,
