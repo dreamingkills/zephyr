@@ -11,6 +11,7 @@ import { getTimeUntil } from "../lib/ZephyrUtils";
 import dayjs from "dayjs";
 import { GuildService } from "./database/services/guild/GuildService";
 import { GameBaseCard, GameFrame } from "../structures/game/BaseCard";
+import { AnticheatService } from "./database/services/meta/AnticheatService";
 
 export abstract class CardSpawner {
   private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
@@ -49,6 +50,9 @@ export abstract class CardSpawner {
       now - start,
       frame
     );
+
+    await AnticheatService.logClaim(winner, prefer, newCard, Date.now(), start);
+
     return { winner, card: newCard };
   }
 
@@ -171,6 +175,7 @@ export abstract class CardSpawner {
           winners.add(fight.winner.discordId);
 
           const countExl = takers[num].size - 1;
+
           for (let t of takers[num]) {
             this.grabbing.delete(t);
           }
@@ -178,6 +183,7 @@ export abstract class CardSpawner {
           takers[num].clear();
 
           let message = "";
+
           if (countExl === 0 || prefer?.discordId === fight.winner.discordId) {
             message += `<@${fight.winner.discordId}> claimed`;
           } else {
@@ -189,6 +195,7 @@ export abstract class CardSpawner {
           }
 
           const baseCard = zephyr.getCard(fight.card.baseCardId);
+
           message += ` \`${fight.card.id.toString(36)}\` ${
             baseCard.group ? `**${baseCard.group}** ` : ``
           }${baseCard.name} #${fight.card.serialNumber}!`;
@@ -224,13 +231,18 @@ export abstract class CardSpawner {
             fight.winner,
             now.add(10, "minute").format(`YYYY/MM/DD HH:mm:ss`)
           );
+
           await channel.createMessage(message);
+
           if (finished[0] && finished[1] && finished[2]) collector.stop();
         }, this.timeout);
       }
     );
+
     collector.on("end", async () => {
-      await drop.delete();
+      try {
+        await drop.delete();
+      } catch {}
       return;
     });
 

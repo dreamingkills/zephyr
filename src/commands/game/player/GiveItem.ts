@@ -7,6 +7,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { BaseItem, GameItem } from "../../../structures/game/Item";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ReactionCollector } from "eris-collector";
+import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 
 export default class GiveItem extends BaseCommand {
   names = ["giveitem", "gi"];
@@ -19,6 +20,7 @@ export default class GiveItem extends BaseCommand {
 
     let targetUser;
     let target: GameProfile | undefined;
+
     if (msg.mentions[0]) {
       targetUser = msg.mentions[0];
       target = await ProfileService.getProfile(targetUser.id);
@@ -33,6 +35,7 @@ export default class GiveItem extends BaseCommand {
 
     const realItems: GameItem[] = [];
     const baseItems: BaseItem[] = [];
+
     for (let i of itemsRaw) {
       const target = items.items.filter(
         (t) => t.name.toLowerCase() === i.toLowerCase()
@@ -53,6 +56,7 @@ export default class GiveItem extends BaseCommand {
     }
 
     if (realItems.length < 1) throw new ZephyrError.InvalidItemError();
+
     if (!target || !targetUser)
       throw new ZephyrError.InvalidMentionItemError(realItems.length > 1);
 
@@ -69,8 +73,8 @@ export default class GiveItem extends BaseCommand {
             .map((_i, idx) => `— \`${baseItems[idx].name}\` **x1**`)
             .join("\n")
       );
+
     const conf = await msg.channel.createMessage({ embed });
-    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
@@ -102,6 +106,7 @@ export default class GiveItem extends BaseCommand {
       }
 
       await ProfileService.transferItems(target!, profile, realItems);
+      await AnticheatService.logItemTransaction(target!, profile, realItems);
 
       await conf.edit({
         embed: embed.setFooter(
@@ -110,7 +115,6 @@ export default class GiveItem extends BaseCommand {
           } been gifted.`
         ),
       });
-      collector.en;
       return;
     });
 
@@ -119,12 +123,13 @@ export default class GiveItem extends BaseCommand {
         await conf.edit({
           embed: embed.setFooter(`🕒 This item gift offer has expired.`),
         });
-        await conf.removeReaction(
-          `check:${this.zephyr.config.discord.emojiId.check}`,
-          this.zephyr.user.id
-        );
-        return;
       }
+
+      try {
+        await conf.removeReactions();
+      } catch {}
     });
+
+    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
   }
 }

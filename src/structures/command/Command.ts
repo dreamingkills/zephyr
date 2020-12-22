@@ -9,6 +9,7 @@ export interface Command {
   subcommands: string[];
   exec(msg: Message, profile: GameProfile): Promise<void>;
 }
+
 export abstract class BaseCommand implements Command {
   names: string[] = [];
   description: string = "This command has no description!";

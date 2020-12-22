@@ -20,7 +20,7 @@ export class Zephyr extends Client {
   dmHandler = new DMHandler();
   config: typeof config;
   chance = new Chance();
-  remindersEnabled = false;
+  remindersEnabled = true;
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
 

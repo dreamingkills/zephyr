@@ -7,6 +7,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 
 export default class GiftCard extends BaseCommand {
   names = ["gift", "give"];
@@ -22,21 +23,25 @@ export default class GiftCard extends BaseCommand {
 
     for (let ref of identifiers) {
       if (!ref) throw new ZephyrError.InvalidCardReferenceError();
+
       const card = await CardService.getUserCardByIdentifier(ref);
       if (card.discordId !== msg.author.id)
         throw new ZephyrError.NotOwnerOfCardError(card);
+
       cards.push(card);
     }
 
     const giftee = msg.mentions[0];
     if (!giftee)
       throw new ZephyrError.InvalidMentionGiftError(cards.length > 1);
+
     if (giftee.id === msg.author.id)
       throw new ZephyrError.CannotGiftAuthorError();
 
     const gifteeProfile = await ProfileService.getProfile(giftee.id);
 
     const tags = await ProfileService.getTags(profile);
+
     const cardDescriptions = CardService.getCardDescriptions(
       cards,
       this.zephyr,
@@ -51,8 +56,8 @@ export default class GiftCard extends BaseCommand {
         }?`
       )
       .setDescription(cardDescriptions.join("\n"));
+
     const conf = await msg.channel.createMessage({ embed });
-    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
@@ -61,9 +66,11 @@ export default class GiftCard extends BaseCommand {
       time: 30000,
       max: 1,
     });
+
     collector.on("collect", async () => {
       for (let card of cards) {
         const refetchCard = await CardService.getUserCardById(card.id);
+
         if (refetchCard.discordId !== msg.author.id) {
           await conf.edit({
             embed: embed.setFooter(
@@ -75,6 +82,8 @@ export default class GiftCard extends BaseCommand {
       }
 
       await CardService.transferCardsToUser(cards, gifteeProfile);
+      await AnticheatService.logGift(profile, gifteeProfile, cards);
+
       await conf.edit({
         embed: embed.setFooter(
           `🎁 ${cards.length} card${
@@ -82,20 +91,21 @@ export default class GiftCard extends BaseCommand {
           } been gifted.`
         ),
       });
-      collector.en;
       return;
     });
+
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
         await conf.edit({
           embed: embed.setFooter(`🕒 This gift offer has expired.`),
         });
-        await conf.removeReaction(
-          `check:${this.zephyr.config.discord.emojiId.check}`,
-          this.zephyr.user.id
-        );
-        return;
       }
+
+      try {
+        await conf.removeReactions();
+      } catch {}
     });
+
+    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
   }
 }
