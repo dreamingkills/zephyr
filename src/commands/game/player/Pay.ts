@@ -5,6 +5,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ReactionCollector } from "eris-collector";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
+import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class Pay extends BaseCommand {
   names = ["pay", "venmo", "paypal", "cashapp"];
@@ -29,11 +30,15 @@ export default class Pay extends BaseCommand {
     if (profile.bits < amount)
       throw new ZephyrError.NotEnoughBitsError(profile.bits, amount);
 
-    const conf = await msg.channel.createMessage(
-      `${this.zephyr.config.discord.emoji.warn} Really give ${
-        this.zephyr.config.discord.emoji.bits
-      }**${amount.toLocaleString()}** to <@${user.id}>?`
-    );
+    const embed = new MessageEmbed()
+      .setAuthor(`Pay | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
+      .setDescription(
+        `Really give ${
+          this.zephyr.config.discord.emoji.bits
+        } **${amount.toLocaleString()}** to **${user.tag}**?`
+      );
+
+    const conf = await msg.channel.createMessage({ embed });
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
@@ -50,11 +55,9 @@ export default class Pay extends BaseCommand {
 
       await AnticheatService.logBitTransaction(profile, target, amount);
 
-      await conf.edit(
-        `${this.zephyr.config.discord.emoji.check} Gave ${
-          this.zephyr.config.discord.emoji.bits
-        }**${amount.toLocaleString()}** to <@${user.id}>.`
-      );
+      await conf.edit({
+        embed: embed.setFooter(`💸 You've paid successfully.`),
+      });
 
       collector.stop();
       return;
@@ -62,9 +65,9 @@ export default class Pay extends BaseCommand {
 
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
-        await conf.edit(
-          `${this.zephyr.config.discord.emoji.warn} Did not send any money.`
-        );
+        await conf.edit({
+          embed: embed.setFooter(`🕒 This payment confirmation has expired.`),
+        });
       }
 
       try {
