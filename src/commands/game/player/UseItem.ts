@@ -57,7 +57,7 @@ export default class UseItem extends BaseCommand {
           `${this.zephyr.config.discord.emoji.check} You used \`${
             targetItem.name
           }\` on \`${card.id.toString(36)}\`.` +
-            `\n— You now have **${userItem.count - 1}x** \`${
+            `\n— You now have **${userItem.quantity - 1}x** \`${
               targetItem.name
             }\`.`
         );

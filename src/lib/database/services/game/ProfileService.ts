@@ -178,14 +178,6 @@ export abstract class ProfileService {
     return await ProfileSet.removeItems(profile.discordId, items);
   }
 
-  public static async transferItems(
-    to: GameProfile,
-    from: GameProfile,
-    items: GameItem[]
-  ): Promise<void> {
-    return await ProfileSet.transferItems(to.discordId, from.discordId, items);
-  }
-
   /*
       Tags
   */

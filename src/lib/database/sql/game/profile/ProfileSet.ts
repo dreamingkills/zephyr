@@ -4,7 +4,7 @@ import { ProfileService } from "../../../services/game/ProfileService";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { GameDye } from "../../../../../structures/game/Dye";
 import { getNearestColor, rgbToHex } from "../../../../ZephyrUtils";
-import { BaseItem, GameItem } from "../../../../../structures/game/Item";
+import { BaseItem } from "../../../../../structures/game/Item";
 
 export abstract class ProfileSet extends DBClass {
   /*
@@ -168,22 +168,12 @@ export abstract class ProfileSet extends DBClass {
     discordId: string,
     items: { item: BaseItem; count: number }[]
   ): Promise<void> {
-    let values = [];
     for (let item of items) {
-      for (let i = 0; i < item.count; i++) {
-        values.push(
-          `(${DB.connection.escape(discordId)}, ${DB.connection.escape(
-            item.item.id
-          )})`
-        );
-      }
+      await DB.query(
+        `INSERT INTO user_item (discord_id, item_id, quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE quantity=quantity+?;`,
+        [discordId, item.item.id, item.count, item.count]
+      );
     }
-
-    await DB.query(
-      `INSERT INTO user_item (discord_id, item_id) VALUES ` +
-        values.join(", ") +
-        `;`
-    );
     return;
   }
 
@@ -193,22 +183,10 @@ export abstract class ProfileSet extends DBClass {
   ): Promise<void> {
     for (let item of items) {
       await DB.query(
-        `DELETE FROM user_item WHERE discord_id=? AND item_id=? LIMIT ?;`,
-        [discordId, item.item.id, item.count]
+        `UPDATE user_item SET quantity=quantity-? WHERE item_id=? AND discord_id=?;`,
+        [item.count, item.item.id, discordId]
       );
     }
-    return;
-  }
-
-  public static async transferItems(
-    to: string,
-    from: string,
-    items: GameItem[]
-  ): Promise<void> {
-    await DB.query(
-      `UPDATE user_item SET discord_id=? WHERE discord_id=? AND id IN (?);`,
-      [to, from, items.map((i) => i.id)]
-    );
     return;
   }
 

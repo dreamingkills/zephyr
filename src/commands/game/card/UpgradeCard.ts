@@ -44,9 +44,9 @@ export default class UpgradeCard extends BaseCommand {
       dustItem.name
     );
 
-    if (dustCost > dustUserItem.count)
+    if (dustCost > dustUserItem.quantity)
       throw new ZephyrError.NotEnoughDustError(
-        dustUserItem.count,
+        dustUserItem.quantity,
         dustCost,
         dustTier
       );

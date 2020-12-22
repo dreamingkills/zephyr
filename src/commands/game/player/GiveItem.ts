@@ -47,7 +47,7 @@ export default class GiveItem extends BaseCommand {
           target[0].id,
           target[0].name
         );
-        if (inventoryItem.count === 0)
+        if (inventoryItem.quantity === 0)
           throw new ZephyrError.NoItemInInventoryError(target[0].name);
 
         baseItems.push(target[0]);
@@ -94,7 +94,7 @@ export default class GiveItem extends BaseCommand {
             baseItems[realItems.indexOf(i)].name
           );
 
-          if (refetchItem.count < 1) {
+          if (refetchItem.quantity < 1) {
             await conf.edit({
               embed: embed.setFooter(
                 `⚠️ You have no ${baseItems[realItems.indexOf(i)].name}.`
@@ -105,7 +105,18 @@ export default class GiveItem extends BaseCommand {
         } catch {}
       }
 
-      await ProfileService.transferItems(target!, profile, realItems);
+      await ProfileService.addItems(
+        target!,
+        baseItems.map((b) => {
+          return { item: b, count: 1 };
+        })
+      );
+      await ProfileService.removeItems(
+        profile,
+        baseItems.map((b) => {
+          return { item: b, count: 1 };
+        })
+      );
       await AnticheatService.logItemTransaction(target!, profile, realItems);
 
       await conf.edit({

@@ -39,7 +39,7 @@ export default class CraftItem extends BaseCommand {
       const ingredientCount =
         requiredItemCounts[requiredBaseItems.indexOf(base)];
 
-      if (userItem.count < ingredientCount)
+      if (userItem.quantity < ingredientCount)
         throw new ZephyrError.NotEnoughOfItemError(base.name);
 
       requiredUserItems.push(userItem);

@@ -44,7 +44,7 @@ export abstract class ProfileGet extends DBClass {
     page: number
   ): Promise<GameItem[]> {
     const query = (await DB.query(
-      `SELECT *, COUNT(*) AS count FROM user_item WHERE discord_id=? GROUP BY item_id ORDER BY item_id ASC LIMIT 10 OFFSET ?;`,
+      `SELECT * FROM user_item WHERE discord_id=? AND quantity>0 GROUP BY item_id ORDER BY item_id ASC LIMIT 10 OFFSET ?;`,
       [discordId, page * 10 - 10]
     )) as Item[];
     return query.map((i) => new GameItem(i));
@@ -55,12 +55,13 @@ export abstract class ProfileGet extends DBClass {
     name: string
   ): Promise<GameItem> {
     const query = (await DB.query(
-      `SELECT *, COUNT(*) AS count FROM user_item WHERE discord_id=? AND item_id=? GROUP BY item_id;`,
+      `SELECT * FROM user_item WHERE discord_id=? AND item_id=? AND quantity>0 GROUP BY item_id;`,
       [discordId, itemId]
     )) as Item[];
     if (!query[0]) throw new ZephyrError.NoItemInInventoryError(name);
     return new GameItem(query[0]);
   }
+
   public static async getNumberOfItems(discordId: string): Promise<number> {
     const query = (await DB.query(
       `SELECT COUNT(DISTINCT item_id) AS count FROM user_item WHERE discord_id=?;`,
