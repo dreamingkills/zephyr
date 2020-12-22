@@ -121,7 +121,7 @@ export abstract class CardGet extends DBClass {
       `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.id=?;`,
       [id]
     )) as UserCard[];
-    if (!query[0]) throw new ZephyrError.UnknownUserCardIdError();
+    if (!query[0]) throw new ZephyrError.UnknownUserCardError(id.toString(36));
     return new GameUserCard(query[0]);
   }
 

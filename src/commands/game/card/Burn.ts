@@ -134,7 +134,11 @@ export default class BurnCard extends BaseCommand {
     }
 
     embedDescription +=
-      `\n\nYou will receive:\n` +
+      `${
+        burnTargets.length > 5
+          ? `\n*... and ${burnTargets.length - 5} more ...*`
+          : ``
+      }\n\nYou will receive:\n` +
       (rewardsText.length === 0 ? `*... nothing ...*` : rewardsText.join("\n"));
 
     const embed = new MessageEmbed()
@@ -175,6 +179,7 @@ export default class BurnCard extends BaseCommand {
               `⚠️ ${dye.id.toString(36)} does not belong to you.`
             ),
           });
+          return;
         }
       }
 
@@ -202,7 +207,7 @@ export default class BurnCard extends BaseCommand {
         }`;
       }
 
-      if (cardTargets.length > 0 || dyeTargets.length > 0) {
+      if (cardTargets.length > 1 || dyeTargets.length > 1) {
         footer += ` have`;
       } else footer += ` has`;
 

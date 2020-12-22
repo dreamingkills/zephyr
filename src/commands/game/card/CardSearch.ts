@@ -30,13 +30,15 @@ export default class CardSearch extends BaseCommand {
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(
-        `:bust_in_silhouette: Owned by ${
-          ownerProfile.private && owner?.id !== msg.author.id
-            ? `*Private User*`
-            : owner
-            ? `**${owner.tag}**`
-            : `*Unknown User*`
-        }` +
+        (card.discordId !== this.zephyr.user.id
+          ? `:bust_in_silhouette: Owned by ${
+              ownerProfile.private && owner?.id !== msg.author.id
+                ? `*Private User*`
+                : owner
+                ? `**${owner.tag}**`
+                : `*Unknown User*`
+            }`
+          : `:fire: __**This card has been burned!**__ :fire:`) +
           `\n— **${baseCard.group ? `${baseCard.group} ` : ``}${
             baseCard.name
           }** ${baseCard.subgroup ? `(${baseCard.subgroup})` : ``}` +
@@ -51,13 +53,15 @@ export default class CardSearch extends BaseCommand {
           }`
       )
       .setFooter(
-        `Card originally owned by ${
-          originalProfile.private && originalOwner?.id !== msg.author.id
-            ? `Private User`
-            : originalOwner
-            ? `${originalOwner.tag}`
-            : `*Unknown User*`
-        }`
+        card.originalOwner !== card.discordId
+          ? `Card originally owned by ${
+              originalProfile.private && originalOwner?.id !== msg.author.id
+                ? `Private User`
+                : originalOwner
+                ? `${originalOwner.tag}`
+                : `*Unknown User*`
+            }`
+          : ``
       );
     await msg.channel.createMessage({ embed });
   }

@@ -235,12 +235,6 @@ export class InvalidCardReferenceError extends ZephyrError {
   }
 }
 
-export class UnknownUserCardIdError extends ZephyrError {
-  constructor() {
-    super(`I could not find that card.`);
-  }
-}
-
 export class UnknownUserCardError extends ZephyrError {
   constructor(identifier: string) {
     super(`\`${identifier}\` does not exist.`);

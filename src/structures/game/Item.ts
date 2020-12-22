@@ -1,6 +1,7 @@
 export interface BaseItem {
   id: number;
   name: string;
+  aliases?: string[];
   type: string;
 }
 
