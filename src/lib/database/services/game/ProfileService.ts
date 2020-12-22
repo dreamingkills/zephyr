@@ -101,24 +101,6 @@ export abstract class ProfileService {
     return await profile.fetch();
   }
 
-  public static async addDustToProfile(
-    tier: 1 | 2 | 3 | 4 | 5,
-    amount: number,
-    profile: GameProfile
-  ): Promise<GameProfile> {
-    await ProfileSet.addDust(tier, amount, profile.discordId);
-    return await profile.fetch();
-  }
-
-  public static async removeDustFromProfile(
-    tier: 1 | 2 | 3 | 4 | 5,
-    amount: number,
-    profile: GameProfile
-  ): Promise<GameProfile> {
-    await ProfileSet.removeDust(tier, amount, profile.discordId);
-    return await profile.fetch();
-  }
-
   /*
       Timers
   */

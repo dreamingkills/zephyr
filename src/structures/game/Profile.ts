@@ -14,11 +14,6 @@ export interface Profile {
   claim_next: string;
   claim_reminder: boolean;
   claim_reminded: boolean;
-  dust_1: number;
-  dust_2: number;
-  dust_3: number;
-  dust_4: number;
-  dust_5: number;
   premium_currency: number;
   patron: number;
 }
@@ -36,11 +31,6 @@ export class GameProfile {
   claimNext: string;
   claimReminder: boolean;
   claimReminded: boolean;
-  dustPoor: number;
-  dustAverage: number;
-  dustGood: number;
-  dustGreat: number;
-  dustMint: number;
   premiumCurrency: number;
   patron: number;
   constructor(data: Profile) {
@@ -54,11 +44,6 @@ export class GameProfile {
     this.patron = data.patron;
     this.dropNext = data.drop_next;
     this.claimNext = data.claim_next;
-    this.dustPoor = data.dust_1;
-    this.dustAverage = data.dust_2;
-    this.dustGood = data.dust_3;
-    this.dustGreat = data.dust_4;
-    this.dustMint = data.dust_5;
     this.premiumCurrency = data.premium_currency;
 
     this.dropReminder = data.drop_reminder;

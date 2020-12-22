@@ -9,6 +9,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { Dust } from "../../../structures/game/Dust";
+import { items } from "../../../assets/items.json";
 
 export default class UpgradeCard extends BaseCommand {
   names = ["upgrade", "u"];
@@ -36,16 +37,19 @@ export default class UpgradeCard extends BaseCommand {
     if (bitCost > profile.bits)
       throw new ZephyrError.NotEnoughBitsError(profile.bits, bitCost);
 
-    const dustBalance = [
-      profile.dustPoor,
-      profile.dustAverage,
-      profile.dustGood,
-      profile.dustGreat,
-      profile.dustMint,
-    ][card.wear];
+    const dustItem = items.filter((i) => i.type === "DUST")[card.wear];
+    const dustUserItem = await ProfileService.getItem(
+      profile,
+      dustItem.id,
+      dustItem.name
+    );
 
-    if (dustCost > dustBalance)
-      throw new ZephyrError.NotEnoughDustError(dustBalance, dustCost, dustTier);
+    if (dustCost > dustUserItem.count)
+      throw new ZephyrError.NotEnoughDustError(
+        dustUserItem.count,
+        dustCost,
+        dustTier
+      );
 
     const tags = await ProfileService.getTags(profile);
     const embed = new MessageEmbed()
@@ -57,9 +61,7 @@ export default class UpgradeCard extends BaseCommand {
         `Are you sure you want to upgrade this card?` +
           `\n${CardService.getCardDescriptions([card], this.zephyr, tags)}` +
           `\n\nThis will cost...` +
-          `\n— **${dustCost.toLocaleString()}x** Card Dust \`${"★"
-            .repeat(dustTier)
-            .padEnd(5, "☆")}\`` +
+          `\n— **${dustCost.toLocaleString()}x** \`${dustItem.name}\`` +
           `\n— **${
             this.zephyr.config.discord.emoji.bits
           } ${bitCost.toLocaleString()}**`
@@ -84,7 +86,9 @@ export default class UpgradeCard extends BaseCommand {
       if (refetchCard.discordId !== msg.author.id)
         throw new ZephyrError.NotOwnerOfCardError(refetchCard);
 
-      await ProfileService.removeDustFromProfile(dustTier, dustCost, profile);
+      await ProfileService.removeItems(profile, [
+        { item: dustItem, count: dustCost },
+      ]);
       await ProfileService.removeBitsFromProfile(profile, bitCost);
 
       const chance = new Chance();

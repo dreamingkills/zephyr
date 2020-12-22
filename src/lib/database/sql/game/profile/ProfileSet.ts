@@ -113,32 +113,6 @@ export abstract class ProfileSet extends DBClass {
     );
     return;
   }
-  public static async addDust(
-    tier: 1 | 2 | 3 | 4 | 5,
-    amount: number,
-    discordId: string
-  ): Promise<void> {
-    if ([1, 2, 3, 4, 5].indexOf(tier) < 0)
-      throw new ZephyrError.InvalidDustTypeError();
-    await DB.query(
-      `UPDATE profile SET dust_${tier}=dust_${tier}+? WHERE discord_id=?;`,
-      [amount, discordId]
-    );
-    return;
-  }
-  public static async removeDust(
-    tier: 1 | 2 | 3 | 4 | 5,
-    amount: number,
-    discordId: string
-  ): Promise<void> {
-    if ([1, 2, 3, 4, 5].indexOf(tier) < 0)
-      throw new ZephyrError.InvalidDustTypeError();
-    await DB.query(
-      `UPDATE profile SET dust_${tier}=dust_${tier}-? WHERE discord_id=?;`,
-      [amount, discordId]
-    );
-    return;
-  }
 
   /*
       Timers
