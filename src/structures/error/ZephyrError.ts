@@ -415,6 +415,12 @@ export class CardConditionTooLowError extends ZephyrError {
 /*
     Crafting
               */
+export class UnspecifiedRecipeError extends ZephyrError {
+  constructor() {
+    super(`Please specify a recipe to craft.`);
+  }
+}
+
 export class RecipeNotFoundError extends ZephyrError {
   constructor() {
     super(
@@ -426,5 +432,32 @@ export class RecipeNotFoundError extends ZephyrError {
 export class NotEnoughOfItemError extends ZephyrError {
   constructor(item: string) {
     super(`Sorry, but you don't have enough **${item}** to craft that.`);
+  }
+}
+
+/*
+    Burning
+             */
+export class UnspecifiedBurnTargetsError extends ZephyrError {
+  constructor() {
+    super(`Please specify one or more cards or dyes to burn.`);
+  }
+}
+
+export class InvalidDyeIdentifierBurnError extends ZephyrError {
+  constructor(invalid: string) {
+    super(`\`${invalid}\` is not a valid dye identifier.`);
+  }
+}
+
+export class InvalidCardIdentifierBurnError extends ZephyrError {
+  constructor(invalid: string) {
+    super(`\`${invalid}\` is not a valid card identifier.`);
+  }
+}
+
+export class UnspecifiedBurnTagsError extends ZephyrError {
+  constructor() {
+    super(`Please specify a tag to burn.`);
   }
 }

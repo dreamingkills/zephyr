@@ -10,6 +10,7 @@ import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { Dust } from "../../../structures/game/Dust";
 import { items } from "../../../assets/items.json";
+import { getDescriptions } from "../../../lib/ZephyrUtils";
 
 export default class UpgradeCard extends BaseCommand {
   names = ["upgrade", "u"];
@@ -59,7 +60,7 @@ export default class UpgradeCard extends BaseCommand {
       )
       .setDescription(
         `Are you sure you want to upgrade this card?` +
-          `\n${CardService.getCardDescriptions([card], this.zephyr, tags)}` +
+          `\n${getDescriptions([card], this.zephyr, tags)}` +
           `\n\nThis will cost...` +
           `\n— **${dustCost.toLocaleString()}x** \`${dustItem.name}\`` +
           `\n— **${

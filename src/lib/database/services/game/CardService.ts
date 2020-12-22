@@ -27,48 +27,6 @@ export abstract class CardService {
     });
   }
 
-  public static getCardDescriptions(
-    cards: GameUserCard[],
-    zephyr: Zephyr,
-    tags: GameTag[]
-  ): string[] {
-    const longestIdentifier = [...cards]
-      .sort((a, b) =>
-        a.id.toString(36).length < b.id.toString(36).length ? 1 : -1
-      )[0]
-      .id.toString(36).length;
-    const longestIssue =
-      [...cards]
-        .sort((a, b) =>
-          a.serialNumber.toString().length < b.serialNumber.toString().length
-            ? 1
-            : -1
-        )[0]
-        .serialNumber.toString().length + 1;
-
-    let descs = [];
-    for (let card of cards) {
-      const baseCard = zephyr.getCard(card.baseCardId);
-      const hasTag = tags.filter((t) => t.id === card.tagId)[0];
-
-      descs.push(
-        `${hasTag?.emoji || `:white_medium_small_square:`} \`${card.id
-          .toString(36)
-          .padStart(longestIdentifier, " ")}\` : \`${"★"
-          .repeat(card.wear)
-          .padEnd(5, "☆")}\` : \`${(
-          `#` + card.serialNumber.toString(10)
-        ).padEnd(longestIssue, " ")}\`` +
-          ` ${baseCard.group ? `**${baseCard.group}** ` : ``}${
-            baseCard.name
-          }` /*+
-          (baseCard.subgroup ? ` — ${baseCard.subgroup}` : ``)*/
-      );
-    }
-
-    return descs;
-  }
-
   public static async getAllCards(): Promise<GameBaseCard[]> {
     return await CardGet.getAllCards();
   }
@@ -276,11 +234,11 @@ export abstract class CardService {
     return await CardSet.transferCardsToUser(cards, profile.discordId);
   }
 
-  public static async dismantleCards(
+  public static async burnCards(
     cards: GameUserCard[],
     zephyr: Zephyr
   ): Promise<void> {
-    return await CardSet.dismantleCards(cards, zephyr.user.id);
+    return await CardSet.burnCards(cards, zephyr.user.id);
   }
 
   /*

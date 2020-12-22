@@ -48,7 +48,9 @@ export default class ViewProfile extends BaseCommand {
           } **${target.bits.toLocaleString()}**.` +
           `\n— ${
             targetIsSender ? `You have` : `${targetUser.tag} has`
-          } **${cardsAmount.toLocaleString()}** cards.`
+          } **${cardsAmount.toLocaleString()}** card${
+            cardsAmount === 1 ? `` : `s`
+          }.`
       );
     if (profile.discordId === msg.author.id && profile.private)
       embed.setFooter(`Your profile is currently private.`);

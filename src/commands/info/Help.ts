@@ -65,11 +65,54 @@ export default class Help extends BaseCommand {
     const embed = new MessageEmbed()
       .setAuthor(`Help | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
       .setDescription(
-        this.zephyr.commandLib.commands
-          .filter((c) => !c.developerOnly)
-          .map((c) => c.names[0])
-          .join("\n")
-      );
+        `Type \`${prefix}help command\` to see more information about a command.`
+      )
+      .addField({
+        name: "Basic",
+        value: `\`daily\`, \`drop\`, \`burn\`, \`profile\``,
+        inline: true,
+      })
+      .addField({
+        name: `Collection`,
+        value: `\`inventory\`, \`view\`, \`dyes\`, \`dye\`, \`items\`, \`craft\`, \`resetframe\`, \`upgrade\``,
+        inline: true,
+      })
+      .addField({
+        name: `Tags`,
+        value: `\`viewtags\`, \`createtag\`, \`deletetag\`, \`edittag\`, \`tag\`, \`untag\`, \`burntag\`, \`burnuntagged\``,
+        inline: true,
+      })
+      .addField({
+        name: `Information`,
+        value: `\`timers\`, \`reminders\`, \`lookup\`, \`cardsearch\`, \`recipes\`, \`previewframe\`, \`top\`, \`topgroup\`, \`topwishlist\``,
+        inline: true,
+      })
+      .addField({
+        name: `Profile`,
+        value: `\`blurb\`, \`private\`, \`bank\``,
+        inline: true,
+      })
+      .addField({
+        name: `Wishlist`,
+        value: `\`wishlist [add/remove/clear]\``,
+        inline: true,
+      })
+      .addField({
+        name: `Economy`,
+        value: `\`pay\`, \`frameshop\`, \`gift\`, \`giveitem\``,
+        inline: true,
+      })
+      .addField({
+        name: `Misc`,
+        value: `\`patreon\`, \`stats\``,
+        inline: true,
+      })
+      .addField({
+        name: `Setup`,
+        value: `\`setchannel\`, \`prefix\``,
+        inline: true,
+      });
+
     await msg.channel.createMessage({ embed });
   }
 }

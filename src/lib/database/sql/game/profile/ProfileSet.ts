@@ -318,4 +318,9 @@ export abstract class ProfileSet extends DBClass {
     ]);
     return;
   }
+
+  public static async burnDyes(dyes: GameDye[]): Promise<void> {
+    await DB.query(`DELETE FROM dye WHERE id IN (?);`, [dyes.map((d) => d.id)]);
+    return;
+  }
 }

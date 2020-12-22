@@ -6,7 +6,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { ReactionCollector } from "eris-collector";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, getDescriptions } from "../../../lib/ZephyrUtils";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { GameTag } from "../../../structures/game/Tag";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
@@ -22,11 +22,7 @@ export default class CardInventory extends BaseCommand {
   private renderInventory(cards: GameUserCard[], tags: GameTag[]): string {
     if (cards.length === 0) return "No cards here!";
 
-    const cardDescriptions = CardService.getCardDescriptions(
-      cards,
-      this.zephyr,
-      tags
-    );
+    const cardDescriptions = getDescriptions(cards, this.zephyr, tags);
     return cardDescriptions.join("\n");
   }
 

@@ -190,10 +190,7 @@ export default class UseItem extends BaseCommand {
               msg.author.dynamicAvatarURL("png")
             )
             .setDescription(
-              `You got...` +
-                `\n\`$${newDye.id.toString(36)}\` **${newDye.name}** [**${
-                  newDye.charges
-                }**]!`
+              `You got ` + `\`$${newDye.id.toString(36)}\` **${newDye.name}**!`
             )
             .setThumbnail(`attachment://dye.png`)
             .setColor(hex);

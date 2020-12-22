@@ -8,10 +8,11 @@ import { ReactionCollector } from "eris-collector";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseItem } from "../../../structures/game/Item";
 import { items } from "../../../assets/items.json";
+import { getDescriptions } from "../../../lib/ZephyrUtils";
 
-export default class DismantleUntagged extends BaseCommand {
-  names = ["dismantleuntagged", "dut"];
-  description = "Dismantles all cards that are untagged.";
+export default class BurnUntagged extends BaseCommand {
+  names = ["burnuntagged", "bu"];
+  description = "Burns all cards that are untagged.";
   usage = ["$CMD$"];
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
@@ -44,15 +45,12 @@ export default class DismantleUntagged extends BaseCommand {
       }
     }
 
-    const descs = CardService.getCardDescriptions(
-      cards.slice(0, 5),
-      this.zephyr,
-      []
-    );
+    const descs = getDescriptions(cards.slice(0, 5), this.zephyr, []);
+
     const excess = Math.max(cards.length - 5, 0);
 
     let description =
-      `Really dismantle **${cards.length.toLocaleString()} card${
+      `Really burn **${cards.length.toLocaleString()} card${
         cards.length === 1 ? `` : `s`
       }** with **no tag**?\n` +
       descs.join("\n") +
@@ -68,7 +66,7 @@ export default class DismantleUntagged extends BaseCommand {
 
     const embed = new MessageEmbed()
       .setAuthor(
-        `Bulk Dismantle | ${msg.author.tag}`,
+        `Bulk Burn | ${msg.author.tag}`,
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(description);
@@ -98,7 +96,7 @@ export default class DismantleUntagged extends BaseCommand {
       }
 
       // Give the card to the bot
-      await CardService.dismantleCards(cards, this.zephyr);
+      await CardService.burnCards(cards, this.zephyr);
 
       // Give the user their dust
       await ProfileService.addItems(profile, dustRewards);

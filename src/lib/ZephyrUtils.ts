@@ -5,6 +5,9 @@ import nearestColor from "nearest-color";
 import colorNames from "color-name-list";
 import { Recipe } from "../structures/game/Recipe";
 import { items } from "../assets/items.json";
+import { GameDye } from "../structures/game/Dye";
+import { GameUserCard } from "../structures/game/UserCard";
+import { GameTag } from "../structures/game/Tag";
 
 const mappedColors = colorNames.reduce(
   (o, { name, hex }) => Object.assign(o, { [name]: hex }),
@@ -126,6 +129,83 @@ function renderRecipe(recipe: Recipe): string {
     .join("\n")}\n\`\`\``;
 }
 
+function getDescriptions(
+  targets: (GameUserCard | GameDye)[],
+  zephyr: Zephyr,
+  tags: GameTag[] = []
+): string[] {
+  const descriptions = [];
+  const onlyCards = targets.filter(
+    (t) => t instanceof GameUserCard
+  ) as GameUserCard[];
+  const onlyDyes = targets.filter((t) => t instanceof GameDye) as GameDye[];
+
+  const longestCardIdentifier = [...onlyCards]
+    .sort((a, b) =>
+      a.id.toString(36).length < b.id.toString(36).length ? 1 : -1
+    )[0]
+    ?.id.toString(36).length;
+  const longestDyeIdentifier =
+    [...onlyDyes]
+      .sort((a, b) =>
+        `$${a.id.toString(36)}`.length < `$${b.id.toString(36)}`.length ? 1 : -1
+      )[0]
+      ?.id.toString(36).length + 1;
+
+  const longestIdentifier = Math.max(
+    longestCardIdentifier,
+    longestDyeIdentifier
+  );
+
+  const longestIssue =
+    [...onlyCards]
+      .sort((a, b) =>
+        a.serialNumber.toString().length < b.serialNumber.toString().length
+          ? 1
+          : -1
+      )[0]
+      ?.serialNumber.toString().length + 1;
+  const longestCharge = [...onlyDyes]
+    .sort((a, b) =>
+      a?.charges.toString().length < b?.charges.toString().length ? 1 : -1
+    )[0]
+    ?.charges.toString().length;
+
+  const padRight = Math.max(longestIssue, longestCharge);
+
+  for (let t of targets) {
+    if (t instanceof GameUserCard) {
+      const baseCard = zephyr.getCard(t.baseCardId);
+      const hasTag = tags.filter(
+        (tag) => tag.id === (<GameUserCard>t).tagId
+      )[0];
+
+      descriptions.push(
+        `${hasTag?.emoji || `:white_medium_small_square:`} \`${t.id
+          .toString(36)
+          .padStart(longestIdentifier, " ")}\` : \`${"★"
+          .repeat(t.wear)
+          .padEnd(5, "☆")}\` : \`${(`#` + t.serialNumber.toString(10)).padEnd(
+          padRight,
+          " "
+        )}\`` +
+          ` ${baseCard.group ? `**${baseCard.group}** ` : ``}${baseCard.name}`
+      );
+    } else if (t instanceof GameDye) {
+      descriptions.push(
+        `:white_medium_small_square: \`${`$${t.id.toString(36)}`.padStart(
+          longestIdentifier,
+          " "
+        )}\` : \`☆☆☆☆☆\` : \`${t.charges
+          .toString()
+          .padEnd(padRight, " ")}\` **${t.name}** Dye`
+      );
+    }
+  }
+
+  return descriptions;
+}
+
 export {
   padIfNotLeading,
   getTimeUntilNextDay,
@@ -136,4 +216,5 @@ export {
   rgbToHex,
   getNearestColor,
   renderRecipe,
+  getDescriptions,
 };

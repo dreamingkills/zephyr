@@ -45,7 +45,7 @@ export default class CardLookup extends BaseCommand {
           }** is on **${timesWishlisted.toLocaleString()}** wishlists.` +
           `\n\nTotal generated: **${card.totalGenerated.toLocaleString()}**` +
           `\nTotal claimed: **${card.serialTotal.toLocaleString()}**` +
-          `\nTotal dismantled: **${timesDestroyed.toLocaleString()}**` +
+          `\nTotal burned: **${timesDestroyed.toLocaleString()}**` +
           `\n\nClaim rate: **${(
             (card.serialTotal / Math.max(card.totalGenerated, 1)) *
             100

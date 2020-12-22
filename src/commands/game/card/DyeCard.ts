@@ -6,6 +6,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ReactionCollector } from "eris-collector";
+import { getDescriptions } from "../../../lib/ZephyrUtils";
 
 export default class DyeCard extends BaseCommand {
   names = ["dye"];
@@ -48,8 +49,7 @@ export default class DyeCard extends BaseCommand {
       .setDescription(
         `Really dye this card with \`$${targetDye.id.toString(36)}\` **${
           targetDye.name
-        }**?\n` +
-          CardService.getCardDescriptions([targetCard], this.zephyr, userTags)
+        }**?\n` + getDescriptions([targetCard], this.zephyr, userTags)
       )
       .setFooter(
         `$${targetDye.id.toString(36)} has ${targetDye.charges} charge${

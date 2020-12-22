@@ -6,7 +6,7 @@ import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class ResetFrame extends BaseCommand {
-  names = ["untagcard", "utc"];
+  names = ["untag", "ut"];
   description = "Removes the tag of a card.";
   usage = ["$CMD$ [cards]"];
   async exec(msg: Message, _profile: GameProfile): Promise<void> {

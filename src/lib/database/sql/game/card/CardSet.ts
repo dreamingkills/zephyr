@@ -64,7 +64,8 @@ export abstract class CardSet extends DBClass {
     );
     return;
   }
-  public static async dismantleCards(
+
+  public static async burnCards(
     cards: GameUserCard[],
     zephyrId: string
   ): Promise<void> {

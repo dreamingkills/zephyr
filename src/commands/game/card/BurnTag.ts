@@ -1,34 +1,32 @@
 import { Message, PartialEmoji } from "eris";
+import { CardService } from "../../../lib/database/services/game/CardService";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
-import { CardService } from "../../../lib/database/services/game/CardService";
-import { MessageEmbed } from "../../../structures/client/RichEmbed";
-import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { ReactionCollector } from "eris-collector";
-import { GameUserCard } from "../../../structures/game/UserCard";
-import { items } from "../../../assets/items.json";
+import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseItem } from "../../../structures/game/Item";
+import { items } from "../../../assets/items.json";
+import { getDescriptions } from "../../../lib/ZephyrUtils";
 
-export default class DismantleCard extends BaseCommand {
-  names = ["dismantle", "d"];
-  description = "Dismantles a card, giving you dust and bits in exchange.";
-  usage = ["$CMD$ [cards]"];
+export default class BurnTag extends BaseCommand {
+  names = ["burntag", "bt"];
+  description = "Burns all the cards in a tag.";
+  usage = ["$CMD$ <tag>"];
+
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const identifiers = this.options.filter((o) => !o.includes("<@"));
-    const cards: GameUserCard[] = [];
-    if (identifiers.length === 0) {
-      const lastCard = await CardService.getLastCard(profile.discordId);
-      cards.push(lastCard);
-    }
+    if (!this.options[0]) throw new ZephyrError.UnspecifiedBurnTagsError();
 
-    for (let ref of identifiers) {
-      if (!ref) throw new ZephyrError.InvalidCardReferenceError();
-      const card = await CardService.getUserCardByIdentifier(ref);
-      if (card.discordId !== msg.author.id)
-        throw new ZephyrError.NotOwnerOfCardError(card);
-      cards.push(card);
-    }
+    const tags = await ProfileService.getTags(profile);
+    const query = tags.filter(
+      (t) => t.name.toLowerCase() === this.options.join(" ").toLowerCase()
+    )[0];
+
+    if (!query) throw new ZephyrError.InvalidTagError();
+
+    const cards = await CardService.getCardsByTag(query);
+    if (cards.length < 1) throw new ZephyrError.NoCardsTaggedError(query);
 
     const individualRewards = cards.map((c) => {
       return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
@@ -55,21 +53,15 @@ export default class DismantleCard extends BaseCommand {
       }
     }
 
-    const tags = await ProfileService.getTags(profile);
-    let cardDescriptions = CardService.getCardDescriptions(
-      cards.slice(0, 5),
-      this.zephyr,
-      tags
-    );
+    const descs = getDescriptions(cards.slice(0, 5), this.zephyr, tags);
+    const excess = Math.max(cards.length - 5, 0);
 
     let description =
-      `Really dismantle **${cards.length}** card${
+      `Really burn **${cards.length.toLocaleString()} card${
         cards.length === 1 ? `` : `s`
-      }?` +
-      `\n${cardDescriptions.join("\n")}` +
-      (cards.length > 5
-        ? `\n*... and ${(cards.length - 5).toLocaleString()} more ...*`
-        : ``) +
+      }** tagged ${query.emoji} \`${query.name}\`?\n` +
+      descs.join("\n") +
+      (excess > 0 ? `\n*... and ${excess.toLocaleString()} more ...*` : ``) +
       `\n\nYou will receive:` +
       `\n:white_medium_small_square: ${this.zephyr.config.discord.emoji.bits} **${bitReward}**\n` +
       dustRewards
@@ -81,18 +73,18 @@ export default class DismantleCard extends BaseCommand {
 
     const embed = new MessageEmbed()
       .setAuthor(
-        `Dismantle | ${msg.author.tag}`,
+        `Bulk Burn | ${msg.author.tag}`,
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(description);
 
-    const conf = await msg.channel.createMessage({ embed });
+    const conf = await msg.channel.createMessage({ embed: embed });
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
       emoji.id === this.zephyr.config.discord.emojiId.check;
     const collector = new ReactionCollector(this.zephyr, conf, filter, {
-      time: 15000,
+      time: 30000,
       max: 1,
     });
 
@@ -111,7 +103,7 @@ export default class DismantleCard extends BaseCommand {
       }
 
       // Give the card to the bot
-      await CardService.dismantleCards(cards, this.zephyr);
+      await CardService.burnCards(cards, this.zephyr);
 
       // Give the user their dust
       await ProfileService.addItems(profile, dustRewards);
@@ -136,10 +128,12 @@ export default class DismantleCard extends BaseCommand {
         await conf.edit({
           embed: embed.setFooter(`🕒 This destruction has expired.`),
         });
+        await conf.removeReaction(
+          `check:${this.zephyr.config.discord.emojiId.check}`,
+          this.zephyr.user.id
+        );
+        return;
       }
-      try {
-        await conf.removeReactions();
-      } catch {}
     });
 
     await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);

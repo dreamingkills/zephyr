@@ -286,4 +286,8 @@ export abstract class ProfileService {
     if (identifier.startsWith("$")) identifier = identifier.slice(1);
     return await ProfileGet.getDyeById(parseInt(identifier, 36));
   }
+
+  public static async burnDyes(dyes: GameDye[]): Promise<void> {
+    return await ProfileSet.burnDyes(dyes);
+  }
 }

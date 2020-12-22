@@ -8,6 +8,7 @@ import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
+import { getDescriptions } from "../../../lib/ZephyrUtils";
 
 export default class GiftCard extends BaseCommand {
   names = ["gift", "give"];
@@ -42,11 +43,7 @@ export default class GiftCard extends BaseCommand {
 
     const tags = await ProfileService.getTags(profile);
 
-    const cardDescriptions = CardService.getCardDescriptions(
-      cards,
-      this.zephyr,
-      tags
-    );
+    const cardDescriptions = getDescriptions(cards, this.zephyr, tags);
 
     const embed = new MessageEmbed()
       .setAuthor(`Gift | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
