@@ -8,7 +8,6 @@ import { CardService } from "../../../lib/database/services/game/CardService";
 import { ShopService } from "../../../lib/database/services/game/ShopService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import chromajs from "chroma-js";
-import { getNearestColor } from "../../../lib/ZephyrUtils";
 import { createCanvas } from "canvas";
 import { ReactionCollector } from "eris-collector";
 
@@ -169,7 +168,6 @@ export default class UseItem extends BaseCommand {
           const randomColor = chromajs.random();
           const rgb = randomColor.rgb();
           const hex = randomColor.hex();
-          const colorName = getNearestColor(hex);
 
           const newDye = await ProfileService.addDye(profile, {
             r: rgb[0],
@@ -193,7 +191,7 @@ export default class UseItem extends BaseCommand {
             )
             .setDescription(
               `You got...` +
-                `\n\`$${newDye.id.toString(36)}\` **${colorName.name}** [**${
+                `\n\`$${newDye.id.toString(36)}\` **${newDye.name}** [**${
                   newDye.charges
                 }**]!`
             )

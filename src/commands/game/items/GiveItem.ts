@@ -11,7 +11,7 @@ import { AnticheatService } from "../../../lib/database/services/meta/AnticheatS
 
 export default class GiveItem extends BaseCommand {
   names = ["giveitem", "gi"];
-  description = "Gives someone an item";
+  description = "Gives someone an item.";
   usage = ["$CMD$ <@mention> <item[s]>"];
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {

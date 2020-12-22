@@ -13,7 +13,9 @@ import { ReactionCollector } from "eris-collector";
 
 export default class CraftItem extends BaseCommand {
   names = ["craft"];
-  description = "Shows the status of various timers.";
+  description =
+    "Crafts ingredients into a result according to a specified recipe.";
+  usage = ["$CMD$ <recipe name>"];
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const recipeQuery = recipes.filter(
