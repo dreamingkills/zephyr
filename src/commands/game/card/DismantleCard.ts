@@ -7,6 +7,8 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
+import { items } from "../../../assets/items.json";
+import { BaseItem } from "../../../structures/game/Item";
 
 export default class DismantleCard extends BaseCommand {
   names = ["dismantle", "d"];
@@ -32,17 +34,25 @@ export default class DismantleCard extends BaseCommand {
       return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
     });
     const bitReward = individualRewards.reduce((acc, bits) => acc + bits);
-    const dustReward = {
-      1: 0,
-      2: 0,
-      3: 0,
-      4: 0,
-      5: 0,
-    };
+    const dustRewards: { item: BaseItem; count: number }[] = [];
+
+    const dustItems = items.filter((i) => i.type === "DUST") as BaseItem[];
 
     for (let card of cards) {
       if (card.wear === 0) continue;
-      dustReward[card.wear]++;
+      const targetDustItem = dustItems[card.wear - 1];
+
+      const dustRewardsQuery = dustRewards.filter(
+        (r) => r.item.id === targetDustItem.id
+      )[0];
+      if (dustRewardsQuery) {
+        dustRewards[dustRewards.indexOf(dustRewardsQuery)] = {
+          item: targetDustItem,
+          count: dustRewardsQuery.count + 1,
+        };
+      } else {
+        dustRewards.push({ item: targetDustItem, count: 1 });
+      }
     }
 
     const tags = await ProfileService.getTags(profile);
@@ -58,17 +68,16 @@ export default class DismantleCard extends BaseCommand {
       }?` +
       `\n${cardDescriptions.join("\n")}` +
       (cards.length > 5
-        ? `\n*... and ${(cards.length - 5).toLocaleString()} more ...*\n`
-        : `\n`) +
-      `\nYou will receive:` +
-      `\n:white_medium_small_square: ${this.zephyr.config.discord.emoji.bits} **${bitReward}**`;
-
-    for (let [dust, count] of Object.entries(dustReward)) {
-      if (count === 0) continue;
-      description += `\n:white_medium_small_square: **${count}x** Dust [\`${"★"
-        .repeat(parseInt(dust))
-        .padEnd(5, "☆")}\`]`;
-    }
+        ? `\n*... and ${(cards.length - 5).toLocaleString()} more ...*`
+        : ``) +
+      `\n\nYou will receive:` +
+      `\n:white_medium_small_square: ${this.zephyr.config.discord.emoji.bits} **${bitReward}**\n` +
+      dustRewards
+        .map(
+          (r) =>
+            `:white_medium_small_square: **${r.count}x** \`${r.item.name}\``
+        )
+        .join("\n");
 
     const embed = new MessageEmbed()
       .setAuthor(
@@ -78,7 +87,6 @@ export default class DismantleCard extends BaseCommand {
       .setDescription(description);
 
     const conf = await msg.channel.createMessage({ embed });
-    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
@@ -105,14 +113,8 @@ export default class DismantleCard extends BaseCommand {
       // Give the card to the bot
       await CardService.dismantleCards(cards, this.zephyr);
 
-      for (let [dust, count] of Object.entries(dustReward)) {
-        if (count === 0) continue;
-        await ProfileService.addDustToProfile(
-          parseInt(dust, 10) as 1 | 2 | 3 | 4 | 5,
-          count,
-          profile
-        );
-      }
+      // Give the user their dust
+      await ProfileService.addItems(profile, dustRewards);
 
       const newProfile = await ProfileService.addBitsToProfile(
         profile,
@@ -128,6 +130,7 @@ export default class DismantleCard extends BaseCommand {
       });
       return;
     });
+
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
         await conf.edit({
@@ -138,5 +141,7 @@ export default class DismantleCard extends BaseCommand {
         await conf.removeReactions();
       } catch {}
     });
+
+    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
   }
 }

@@ -6,6 +6,8 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { ReactionCollector } from "eris-collector";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { BaseItem } from "../../../structures/game/Item";
+import { items } from "../../../assets/items.json";
 
 export default class DismantleUntagged extends BaseCommand {
   names = ["dismantleuntagged", "dut"];
@@ -21,17 +23,25 @@ export default class DismantleUntagged extends BaseCommand {
       return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
     });
     const bitReward = individualRewards.reduce((acc, bits) => acc + bits);
-    const dustReward = {
-      1: 0,
-      2: 0,
-      3: 0,
-      4: 0,
-      5: 0,
-    };
+    const dustRewards: { item: BaseItem; count: number }[] = [];
+
+    const dustItems = items.filter((i) => i.type === "DUST") as BaseItem[];
 
     for (let card of cards) {
       if (card.wear === 0) continue;
-      dustReward[card.wear]++;
+      const targetDustItem = dustItems[card.wear - 1];
+
+      const dustRewardsQuery = dustRewards.filter(
+        (r) => r.item.id === targetDustItem.id
+      )[0];
+      if (dustRewardsQuery) {
+        dustRewards[dustRewards.indexOf(dustRewardsQuery)] = {
+          item: targetDustItem,
+          count: dustRewardsQuery.count + 1,
+        };
+      } else {
+        dustRewards.push({ item: targetDustItem, count: 1 });
+      }
     }
 
     const descs = CardService.getCardDescriptions(
@@ -48,14 +58,13 @@ export default class DismantleUntagged extends BaseCommand {
       descs.join("\n") +
       (excess > 0 ? `\n*... and ${excess.toLocaleString()} more ...*` : ``) +
       `\n\nYou will receive:` +
-      `\n:white_medium_small_square: ${this.zephyr.config.discord.emoji.bits} **${bitReward}**`;
-
-    for (let [dust, count] of Object.entries(dustReward)) {
-      if (count === 0) continue;
-      description += `\n:white_medium_small_square: **${count}x** Dust [\`${"★"
-        .repeat(parseInt(dust))
-        .padEnd(5, "☆")}\`]`;
-    }
+      `\n:white_medium_small_square: ${this.zephyr.config.discord.emoji.bits} **${bitReward}**\n` +
+      dustRewards
+        .map(
+          (r) =>
+            `:white_medium_small_square: **${r.count}x** \`${r.item.name}\``
+        )
+        .join("\n");
 
     const embed = new MessageEmbed()
       .setAuthor(
@@ -63,8 +72,8 @@ export default class DismantleUntagged extends BaseCommand {
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(description);
+
     const conf = await msg.channel.createMessage({ embed: embed });
-    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
@@ -73,6 +82,7 @@ export default class DismantleUntagged extends BaseCommand {
       time: 30000,
       max: 1,
     });
+
     collector.on("collect", async () => {
       // We need to check that this user is still the owner, or they can dupe bits
       for (let card of cards) {
@@ -90,14 +100,8 @@ export default class DismantleUntagged extends BaseCommand {
       // Give the card to the bot
       await CardService.dismantleCards(cards, this.zephyr);
 
-      for (let [dust, count] of Object.entries(dustReward)) {
-        if (count === 0) continue;
-        await ProfileService.addDustToProfile(
-          parseInt(dust, 10) as 1 | 2 | 3 | 4 | 5,
-          count,
-          profile
-        );
-      }
+      // Give the user their dust
+      await ProfileService.addItems(profile, dustRewards);
 
       const newProfile = await ProfileService.addBitsToProfile(
         profile,
@@ -113,6 +117,7 @@ export default class DismantleUntagged extends BaseCommand {
       });
       return;
     });
+
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
         await conf.edit({
@@ -125,5 +130,7 @@ export default class DismantleUntagged extends BaseCommand {
         return;
       }
     });
+
+    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
   }
 }

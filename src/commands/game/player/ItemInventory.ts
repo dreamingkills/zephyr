@@ -12,42 +12,19 @@ export default class ItemInventory extends BaseCommand {
   names = ["items"];
   description = "Shows items that belong to you.";
 
-  private renderInventory(
-    inv: GameItem[],
-    prefix: string,
-    profile: GameProfile
-  ): string {
-    let desc =
-      (profile.dustPoor > 0
-        ? `:white_medium_small_square: \`★☆☆☆☆\` **Dust** x${profile.dustPoor.toLocaleString()}\n`
-        : ``) +
-      (profile.dustAverage > 0
-        ? `:white_medium_small_square: \`★★☆☆☆\` **Dust** x${profile.dustAverage.toLocaleString()}\n`
-        : ``) +
-      (profile.dustGood > 0
-        ? `:white_medium_small_square: \`★★★☆☆\` **Dust** x${profile.dustGood.toLocaleString()}\n`
-        : ``) +
-      (profile.dustGreat > 0
-        ? `:white_medium_small_square: \`★★★★☆\` **Dust** x${profile.dustGreat.toLocaleString()}\n`
-        : ``) +
-      (profile.dustMint > 0
-        ? `:white_medium_small_square: \`★★★★★\` **Dust** x${profile.dustMint.toLocaleString()}\n`
-        : ``) +
-      `\n`;
+  private renderInventory(inv: GameItem[], prefix: string): string {
     if (inv.length === 0) {
-      return desc + `You have no items.`;
+      return `You have no items.`;
     } else
       return (
-        desc +
-        (inv
+        inv
           .map((i) => {
             const itemEntry = items.items.filter(
               (item) => item.id === i.itemId
             )[0];
             return `— \`${itemEntry.name}\` **x${i.count}**`;
           })
-          .join("\n") +
-          `\n\nCheck \`${prefix}help use\` for usage information.`)
+          .join("\n") + `\n\nCheck \`${prefix}help use\` for usage information.`
       );
   }
 
@@ -64,7 +41,7 @@ export default class ItemInventory extends BaseCommand {
         msg.author.dynamicAvatarURL("png")
       )
       .setTitle(`${msg.author.tag}'s items`)
-      .setDescription(this.renderInventory(inventory, prefix, profile))
+      .setDescription(this.renderInventory(inventory, prefix))
       .setFooter(
         `Page 1 of ${maxPage} • ${totalItems.toLocaleString()} entries`
       );
@@ -86,7 +63,7 @@ export default class ItemInventory extends BaseCommand {
           if (emoji.name === "⏭️" && page !== maxPage) page = maxPage;
 
           const newItems = await ProfileService.getItems(profile, page);
-          embed.setDescription(this.renderInventory(newItems, prefix, profile));
+          embed.setDescription(this.renderInventory(newItems, prefix));
           embed.setFooter(`Page ${page} of ${maxPage} • ${totalItems} entries`);
           await sent.edit({ embed });
 
