@@ -76,6 +76,12 @@ export class Zephyr extends Client {
       setInterval(() => {
         if (this.remindersEnabled) this.dmHandler.handle(this);
       }, 30000);
+      setInterval(() => {
+        this.editStatus(`online`, {
+          name: `with cards | ${this.guilds.size} servers`,
+          type: 0,
+        });
+      }, 300000);
     });
 
     this.on("messageCreate", async (message) => {
