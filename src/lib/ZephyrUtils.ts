@@ -140,22 +140,20 @@ function getDescriptions(
   ) as GameUserCard[];
   const onlyDyes = targets.filter((t) => t instanceof GameDye) as GameDye[];
 
-  const longestCardIdentifier = [...onlyCards]
-    .sort((a, b) =>
-      a.id.toString(36).length < b.id.toString(36).length ? 1 : -1
-    )[0]
-    ?.id.toString(36).length;
+  const longestCardIdentifier =
+    [...onlyCards]
+      .sort((a, b) =>
+        a.id.toString(36).length < b.id.toString(36).length ? 1 : -1
+      )[0]
+      ?.id.toString(36).length || 1;
   const longestDyeIdentifier =
     [...onlyDyes]
       .sort((a, b) =>
         `$${a.id.toString(36)}`.length < `$${b.id.toString(36)}`.length ? 1 : -1
       )[0]
-      ?.id.toString(36).length + 1;
+      ?.id.toString(36).length + 1 || 1;
 
-  const longestIdentifier = Math.max(
-    longestCardIdentifier,
-    longestDyeIdentifier
-  );
+  const padLeft = Math.max(longestCardIdentifier, longestDyeIdentifier);
 
   const longestIssue =
     [...onlyCards]
@@ -164,14 +162,16 @@ function getDescriptions(
           ? 1
           : -1
       )[0]
-      ?.serialNumber.toString().length + 1;
-  const longestCharge = [...onlyDyes]
-    .sort((a, b) =>
-      a?.charges.toString().length < b?.charges.toString().length ? 1 : -1
-    )[0]
-    ?.charges.toString().length;
+      ?.serialNumber.toString().length + 1 || 1;
+  const longestCharge =
+    [...onlyDyes]
+      .sort((a, b) =>
+        a?.charges.toString().length < b?.charges.toString().length ? 1 : -1
+      )[0]
+      ?.charges.toString().length || 1;
 
   const padRight = Math.max(longestIssue, longestCharge);
+  console.log(padLeft, padRight);
 
   for (let t of targets) {
     if (t instanceof GameUserCard) {
@@ -183,7 +183,7 @@ function getDescriptions(
       descriptions.push(
         `${hasTag?.emoji || `:white_medium_small_square:`} \`${t.id
           .toString(36)
-          .padStart(longestIdentifier, " ")}\` : \`${"★"
+          .padStart(padLeft, " ")}\` : \`${"★"
           .repeat(t.wear)
           .padEnd(5, "☆")}\` : \`${(`#` + t.serialNumber.toString(10)).padEnd(
           padRight,
@@ -194,7 +194,7 @@ function getDescriptions(
     } else if (t instanceof GameDye) {
       descriptions.push(
         `:white_medium_small_square: \`${`$${t.id.toString(36)}`.padStart(
-          longestIdentifier,
+          padRight,
           " "
         )}\` : \`☆☆☆☆☆\` : \`${t.charges
           .toString()
