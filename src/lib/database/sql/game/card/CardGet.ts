@@ -90,6 +90,12 @@ export abstract class CardGet extends DBClass {
       query += ` ORDER BY wear ${reverse ? `ASC` : `DESC`}`;
     } else if (["luck", "lc"].indexOf(order) > -1) {
       query += ` ORDER BY luck_coeff ${reverse ? `ASC` : `DESC`}`;
+    } else if (["group", "g"].indexOf(order) > -1) {
+      query += ` ORDER BY card_base.group_name ${reverse ? `DESC` : `ASC`}`;
+    } else if (["name", "n"].indexOf(order) > -1) {
+      query += ` ORDER BY card_base.individual_name ${
+        reverse ? `DESC` : `ASC`
+      }`;
     } else query += ` ORDER BY user_card.id ${reverse ? `ASC` : `DESC`}`;
 
     query += ` LIMIT 10 OFFSET ${DB.connection.escape(
