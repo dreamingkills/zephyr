@@ -17,7 +17,10 @@ export abstract class CardSet extends DBClass {
     frame?: number
   ): Promise<GameUserCard> {
     const rng = new Chance();
-    const wear = rng.weighted([0, 1, 2, 3, 4, 5], [15, 45, 35, 15, 7, 2]);
+    const wear = rng.weighted(
+      [0, 1, 2, 3, 4, 5],
+      [15, 35, 50, 10.6, 1.25, 0.4]
+    );
     const luckCoefficient = rng.floating({ min: 0, max: 1, fixed: 10 });
     let issue = await IssueHandler.queueIssueGeneration(card, profile, price);
     let tries = 0;
