@@ -18,6 +18,7 @@ export default class DropCards extends BaseCommand {
       const prefix = this.zephyr.getPrefix(msg.guildID);
       throw new ZephyrError.UnsetZephyrChannelError(prefix);
     }
+
     if (msg.channel.id !== dropChannel)
       throw new ZephyrError.CannotDropInChannelError(dropChannel);
     const now = dayjs(Date.now());

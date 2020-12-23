@@ -22,6 +22,6 @@ export abstract class GuildGet extends DBClass {
       prefix: string;
       drop_channel_id: string | null;
     }[];
-    return query[0].drop_channel_id;
+    return query[0]?.drop_channel_id;
   }
 }
