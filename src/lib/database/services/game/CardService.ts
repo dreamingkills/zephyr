@@ -11,6 +11,7 @@ import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { GameTag } from "../../../../structures/game/Tag";
 import gm from "gm";
 import { GameDye } from "../../../../structures/game/Dye";
+import { rgbToCmy } from "../../../ZephyrUtils";
 
 export abstract class CardService {
   // Used for card image generation
@@ -116,11 +117,12 @@ export abstract class CardService {
     if (card.dyeMaskUrl) {
       // Default to the classic "Undyed Mask Gray" if the card is undyed.
       let [r, g, b] = [card.dyeR || 185, card.dyeG || 185, card.dyeB || 185];
+      const { c, m, y } = rgbToCmy(r, g, b);
 
       // We need to convert the GM State to a buffer, so that
       // canvas knows what to do with it.
       const dyeBuffer = await this.toBufferPromise(
-        gm(card.dyeMaskUrl).colorspace("rgb").colorize(r, g, b)
+        gm(card.dyeMaskUrl).colorize(c, m, y)
       );
 
       // Load the buffer and draw the dye mask on top of the frame.

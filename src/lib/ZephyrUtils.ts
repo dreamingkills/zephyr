@@ -206,6 +206,18 @@ function getDescriptions(
   return descriptions;
 }
 
+function rgbToCmy(
+  r: number,
+  g: number,
+  b: number
+): { c: number; m: number; y: number } {
+  return {
+    c: (1 - r / 255) * 100,
+    m: (1 - g / 255) * 100,
+    y: (1 - b / 255) * 100,
+  };
+}
+
 export {
   padIfNotLeading,
   getTimeUntilNextDay,
@@ -217,4 +229,5 @@ export {
   getNearestColor,
   renderRecipe,
   getDescriptions,
+  rgbToCmy,
 };
