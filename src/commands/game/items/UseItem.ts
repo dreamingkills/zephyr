@@ -1,15 +1,15 @@
-import { Message, PartialEmoji } from "eris";
+import { Message /*PartialEmoji*/ } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
-import { ProfileService } from "../../../lib/database/services/game/ProfileService";
+/*import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import items from "../../../assets/items.json";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
-import { ShopService } from "../../../lib/database/services/game/ShopService";
+import { ShopService } from "../../../lib/database/services/game/ShopService";*/
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
-import chromajs from "chroma-js";
+/*import chromajs from "chroma-js";
 import { createCanvas } from "canvas";
-import { ReactionCollector } from "eris-collector";
+import { ReactionCollector } from "eris-collector";*/
 
 export default class UseItem extends BaseCommand {
   names = ["use"];
@@ -17,8 +17,13 @@ export default class UseItem extends BaseCommand {
     "Use an item.\n**Note**: You must enter the item name **exactly** as it appears!";
   usage = ["$CMD$ <item>", "$CMD$ <frame> <card>"];
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const target = this.options.join(" ")?.toLowerCase();
+  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+    const embed = new MessageEmbed()
+      .setAuthor(`Use | ${msg.author}`, msg.author.dynamicAvatarURL("png"))
+      .setDescription(`This command is temporarily disabled.`);
+    await msg.channel.createMessage({ embed });
+    return;
+    /*const target = this.options.join(" ")?.toLowerCase();
     const targetItem = items.items.filter((i) =>
       target.includes(i.name.toLowerCase())
     )[0];
@@ -202,6 +207,6 @@ export default class UseItem extends BaseCommand {
           break;
         }
       }
-    }
+    }*/
   }
 }
