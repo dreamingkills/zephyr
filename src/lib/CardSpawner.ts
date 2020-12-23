@@ -320,6 +320,7 @@ export abstract class CardSpawner {
     }, 1500);
 
     if (this.guildLevels[guild.id] >= this.minSpawnThreshold) {
+      this.guildLevels[guild.id] = 0;
       let rand = [false, true][Math.floor(Math.random() * 2)];
       if (this.guildLevels[guild.id] === this.spawnThreshold) {
         rand = true;
@@ -334,7 +335,6 @@ export abstract class CardSpawner {
         (c) => c.id === channelId
       ) as TextChannel;
       await this.activityDrop(channel, zephyr);
-      this.guildLevels[guild.id] = 0;
     }
   }
 }

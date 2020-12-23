@@ -37,6 +37,7 @@ export class Zephyr extends Client {
     super(config.discord.token, { restMode: true });
     this.config = config;
     this.users.limit = 250;
+    this.setMaxListeners(250);
   }
 
   public async start() {
