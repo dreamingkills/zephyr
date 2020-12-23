@@ -171,7 +171,6 @@ function getDescriptions(
       ?.charges.toString().length || 1;
 
   const padRight = Math.max(longestIssue, longestCharge);
-  console.log(padLeft, padRight);
 
   for (let t of targets) {
     if (t instanceof GameUserCard) {
