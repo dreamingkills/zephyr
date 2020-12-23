@@ -19,7 +19,10 @@ export default class DropCards extends BaseCommand {
       throw new ZephyrError.UnsetZephyrChannelError(prefix);
     }
 
-    if (msg.channel.id !== dropChannel)
+    if (
+      msg.channel.id !== dropChannel &&
+      msg.channel.id !== this.zephyr.config.discord.secondaryChannel
+    )
       throw new ZephyrError.CannotDropInChannelError(dropChannel);
     const now = dayjs(Date.now());
     const until = dayjs(profile.dropNext);
