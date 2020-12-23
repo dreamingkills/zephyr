@@ -212,7 +212,7 @@ export class Zephyr extends Client {
   public async cacheCards(): Promise<void> {
     const cards = await CardService.getAllCards();
     for (let card of cards) {
-      if (card.rarity > 0) this.cards[card.id] = card;
+      this.cards[card.id] = card;
     }
     return;
   }
@@ -232,45 +232,25 @@ export class Zephyr extends Client {
     wishlist: GameWishlist[] = []
   ): GameBaseCard[] {
     const cards: GameBaseCard[] = [];
+    const eligibleCards = Object.values(this.cards).filter((c) => c.rarity > 0);
     if (wishlist.length > 0) {
       const bonus = this.chance.bool({ likelihood: 1.25 });
       if (bonus) {
         const random = this.chance.pickone(wishlist);
-        const potential = Object.values(this.cards).filter(
-          (c) =>
-            c.name === random.name &&
-            c.group === random.groupName &&
-            c.rarity > 100
+        const potential = eligibleCards.filter(
+          (c) => c.name === random.name && c.group === random.groupName
         );
-        if (potential[0]) {
-          const bonusCard = this.chance.pickone(
-            Object.values(this.cards).filter(
-              (c) =>
-                c.name === random.name &&
-                c.group === random.groupName &&
-                c.rarity > 100
-            )
-          );
-          cards.push(bonusCard);
-        }
+        if (potential[0]) cards.push(potential[0]);
       }
     }
 
-    const availableCards = Object.values(this.cards).filter(
-      (c) => c.rarity > 0
-    );
-    const weightings = availableCards.map((c) => c.rarity);
+    const weightings = eligibleCards.map((c) => c.rarity);
 
     while (cards.length < amount) {
-      const randomCard = this.chance.weighted(availableCards, weightings);
+      const randomCard = this.chance.weighted(eligibleCards, weightings);
       if (cards.includes(randomCard)) continue;
       cards.push(randomCard);
     }
-
-    /*for (let i = 0; i < amount; i++) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [cards[i], cards[j]] = [cards[j], cards[i]];
-    }*/
 
     return cards.slice(0, amount);
   }
