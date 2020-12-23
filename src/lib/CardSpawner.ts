@@ -176,7 +176,8 @@ export abstract class CardSpawner {
             prefer,
             fight.card,
             Date.now(),
-            start
+            start,
+            channel.guild.id
           );
 
           const countExl = takers[num].size - 1;

@@ -99,7 +99,7 @@ export default class Help extends BaseCommand {
       })
       .addField({
         name: `Economy`,
-        value: `\`pay\`, \`frameshop\`, \`gift\`, \`giveitem\``,
+        value: `\`pay\`, \`frameshop\`, \`gift\`, \`giveitem\`, \`trade\``,
         inline: true,
       })
       .addField({

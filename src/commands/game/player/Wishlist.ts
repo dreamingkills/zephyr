@@ -102,7 +102,7 @@ export default class Wishlist extends BaseCommand {
           const match = wishlist.filter(
             (wl) =>
               wl.name.toLowerCase() === index.name.toLowerCase() &&
-              wl.groupName.toLowerCase() === index.group?.toLowerCase()
+              wl.groupName?.toLowerCase() === index.group?.toLowerCase()
           )[0];
           if (match) throw new ZephyrError.DuplicateWishlistEntryError();
           await this.add(
@@ -123,7 +123,7 @@ export default class Wishlist extends BaseCommand {
         const match = wishlist.filter(
           (wl) =>
             wl.name.toLowerCase() === unique[0].name.toLowerCase() &&
-            wl.groupName.toLowerCase() === unique[0].group?.toLowerCase()
+            wl.groupName?.toLowerCase() === unique[0].group?.toLowerCase()
         )[0];
         if (match) throw new ZephyrError.DuplicateWishlistEntryError();
         await this.add(

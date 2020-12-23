@@ -117,7 +117,12 @@ export default class GiveItem extends BaseCommand {
           return { item: b, count: 1 };
         })
       );
-      await AnticheatService.logItemTransaction(target!, profile, realItems);
+      await AnticheatService.logItemTransaction(
+        target!,
+        profile,
+        realItems,
+        msg.guildID!
+      );
 
       await conf.edit({
         embed: embed.setFooter(

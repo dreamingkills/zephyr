@@ -455,3 +455,22 @@ export class UnspecifiedBurnTagsError extends ZephyrError {
     super(`Please specify a tag to burn.`);
   }
 }
+
+/*
+    Trading
+             */
+export class InvalidCardIdentifierTradeError extends ZephyrError {
+  constructor() {
+    super(`Please specify two valid cards in your trade.`);
+  }
+}
+export class TradeeNotOwnerOfCardError extends ZephyrError {
+  constructor(card: GameUserCard) {
+    super(`The person you mentioned does not own \`${card.id.toString(36)}\`.`);
+  }
+}
+export class UnacceptableTradeTargetError extends ZephyrError {
+  constructor() {
+    super(`You cannot trade with yourself or Zephyr.`);
+  }
+}

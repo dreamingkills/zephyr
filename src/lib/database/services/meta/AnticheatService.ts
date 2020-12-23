@@ -7,9 +7,10 @@ export abstract class AnticheatService {
   public static async logGift(
     giver: GameProfile,
     recipient: GameProfile,
-    cards: GameUserCard[]
+    cards: GameUserCard[],
+    guildId: string
   ): Promise<void> {
-    return await ACSet.logGift(giver, recipient, cards);
+    return await ACSet.logGift(giver, recipient, cards, guildId);
   }
 
   public static async logClaim(
@@ -17,24 +18,50 @@ export abstract class AnticheatService {
     dropper: GameProfile | undefined,
     card: GameUserCard,
     claimTime: number,
-    dropTime: number
+    dropTime: number,
+    guildId: string
   ): Promise<void> {
-    return await ACSet.logClaim(claimer, dropper, card, claimTime, dropTime);
+    return await ACSet.logClaim(
+      claimer,
+      dropper,
+      card,
+      claimTime,
+      dropTime,
+      guildId
+    );
   }
 
   public static async logBitTransaction(
     giver: GameProfile,
     recipient: GameProfile,
-    amount: number
+    amount: number,
+    guildId: string
   ): Promise<void> {
-    return await ACSet.logBitTransaction(giver, recipient, amount);
+    return await ACSet.logBitTransaction(giver, recipient, amount, guildId);
   }
 
   public static async logItemTransaction(
     giver: GameProfile,
     recipient: GameProfile,
-    items: GameItem[]
+    items: GameItem[],
+    guildId: string
   ): Promise<void> {
-    return await ACSet.logItemTransaction(giver, recipient, items);
+    return await ACSet.logItemTransaction(giver, recipient, items, guildId);
+  }
+
+  public static async logTrade(
+    sender: GameProfile,
+    receiver: GameProfile,
+    senderCard: GameUserCard,
+    receiverCard: GameUserCard,
+    guildId: string
+  ): Promise<void> {
+    return await ACSet.logTrade(
+      sender,
+      receiver,
+      senderCard,
+      receiverCard,
+      guildId
+    );
   }
 }

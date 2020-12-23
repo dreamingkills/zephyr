@@ -79,7 +79,12 @@ export default class GiftCard extends BaseCommand {
       }
 
       await CardService.transferCardsToUser(cards, gifteeProfile);
-      await AnticheatService.logGift(profile, gifteeProfile, cards);
+      await AnticheatService.logGift(
+        profile,
+        gifteeProfile,
+        cards,
+        msg.guildID!
+      );
 
       await conf.edit({
         embed: embed.setFooter(

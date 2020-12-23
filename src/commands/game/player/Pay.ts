@@ -53,7 +53,12 @@ export default class Pay extends BaseCommand {
       await ProfileService.removeBitsFromProfile(profile, amount);
       await ProfileService.addBitsToProfile(target, amount);
 
-      await AnticheatService.logBitTransaction(profile, target, amount);
+      await AnticheatService.logBitTransaction(
+        profile,
+        target,
+        amount,
+        msg.guildID!
+      );
 
       await conf.edit({
         embed: embed.setFooter(`💸 You've paid successfully.`),
