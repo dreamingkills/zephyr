@@ -38,8 +38,8 @@ export default class ViewUserCard extends BaseCommand {
             ["Damaged", "Poor", "Average", "Good", "Great", "Mint"][card.wear]
           }**` +
           `\n${baseCard.flavor ? `*${baseCard.flavor}*` : ``}`
-      )
-      .setFooter(`Luck Coefficient: ${card.luckCoefficient}`);
+      );
+    // .setFooter(`Luck Coefficient: ${card.luckCoefficient}`);
     await msg.channel.createMessage(
       { embed },
       {
