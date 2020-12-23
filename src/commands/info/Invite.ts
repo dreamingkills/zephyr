@@ -4,7 +4,7 @@ import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 
 export default class Invite extends BaseCommand {
-  names = ["invite", "inv", "support"];
+  names = ["invite", "support"];
   description =
     "Sends a link to the Zephyr Community server, and a link to add the bot.";
   usage = ["$CMD$"];
