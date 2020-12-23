@@ -290,4 +290,11 @@ export abstract class ProfileService {
   public static async burnDyes(dyes: GameDye[]): Promise<void> {
     return await ProfileSet.burnDyes(dyes);
   }
+
+  public static async setPatronTier(
+    profile: GameProfile,
+    tier: number
+  ): Promise<void> {
+    return await ProfileSet.setPatronTier(profile, tier);
+  }
 }

@@ -323,4 +323,15 @@ export abstract class ProfileSet extends DBClass {
     await DB.query(`DELETE FROM dye WHERE id IN (?);`, [dyes.map((d) => d.id)]);
     return;
   }
+
+  public static async setPatronTier(
+    profile: GameProfile,
+    tier: number
+  ): Promise<void> {
+    await DB.query(`UPDATE profile SET patron=? WHERE discord_id=?;`, [
+      tier,
+      profile.discordId,
+    ]);
+    return;
+  }
 }

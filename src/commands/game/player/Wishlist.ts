@@ -39,11 +39,11 @@ export default class Wishlist extends BaseCommand {
     if (subcommand === "add") {
       const wishlist = await ProfileService.getWishlist(profile);
       if (
-        (wishlist.length >= 3 && profile.patron === 0) ||
-        (wishlist.length >= 5 && profile.patron === 1) ||
-        (wishlist.length >= 7 && profile.patron === 2) ||
-        (wishlist.length >= 10 && profile.patron === 3) ||
-        (wishlist.length >= 15 && profile.patron === 4)
+        (wishlist.length >= 5 && profile.patron === 0) ||
+        (wishlist.length >= 10 && profile.patron === 1) ||
+        (wishlist.length >= 15 && profile.patron === 2) ||
+        (wishlist.length >= 20 && profile.patron === 3) ||
+        (wishlist.length >= 25 && profile.patron === 4)
       ) {
         const prefix = this.zephyr.getPrefix(msg.guildID!);
         throw new ZephyrError.WishlistFullError(profile.patron, prefix);

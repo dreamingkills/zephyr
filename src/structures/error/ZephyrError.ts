@@ -474,3 +474,12 @@ export class UnacceptableTradeTargetError extends ZephyrError {
     super(`You cannot trade with yourself or Zephyr.`);
   }
 }
+
+/*
+    Patreon
+             */
+export class NotAPatronError extends ZephyrError {
+  constructor() {
+    super(`Sorry, you must be a $3+ Patron or higher to claim that reward.`);
+  }
+}
