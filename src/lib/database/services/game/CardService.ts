@@ -156,14 +156,14 @@ export abstract class CardService {
     zephyr: Zephyr
   ): Promise<Buffer> {
     // Create the collage canvas
-    const canvas = createCanvas(cards.length * 250, 333);
+    const canvas = createCanvas(cards.length * 350, 500);
     const ctx = canvas.getContext("2d");
 
     // Draw the background - this will be a jpeg, so we need a
     // Discord-colored background to look transparent.
     // Sorry lightmode users!
     ctx.beginPath();
-    ctx.rect(0, 0, cards.length * 250, 333);
+    ctx.rect(0, 0, cards.length * 350, 500);
     ctx.fillStyle = "#36393E";
     ctx.fill();
 
@@ -172,7 +172,7 @@ export abstract class CardService {
     for (let [i, card] of cards.entries()) {
       const cardBuffer = await this.generateCardImage(card, zephyr);
       const img = await loadImage(cardBuffer);
-      ctx.drawImage(img, i * 250, 0, 250, 333);
+      ctx.drawImage(img, i * 350, 0, 350, 500);
     }
 
     // Send it off!
