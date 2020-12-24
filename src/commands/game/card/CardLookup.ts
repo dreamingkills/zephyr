@@ -1,4 +1,4 @@
-import { Message, TextChannel, User } from "eris";
+import { Message, User } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { CardService } from "../../../lib/database/services/game/CardService";
@@ -14,11 +14,8 @@ export default class CardLookup extends BaseCommand {
 
   private async getCardStats(
     card: GameBaseCard,
-    author: User,
-    channel: TextChannel,
-    msg?: Message,
-    embed?: MessageEmbed
-  ): Promise<any> {
+    author: User
+  ): Promise<MessageEmbed> {
     card = await this.zephyr.refreshCard(card.id);
     const timesDestroyed = await CardService.getTimesCardDestroyed(
       card,
@@ -28,11 +25,10 @@ export default class CardLookup extends BaseCommand {
     const avgClaimTime = await CardService.getAverageClaimTime(card);
     const wearSpread = await CardService.getCardWearSpread(card, this.zephyr);
 
-    if (!embed)
-      embed = new MessageEmbed().setAuthor(
-        `Lookup | ${author.tag}`,
-        author.dynamicAvatarURL("png")
-      );
+    const embed = new MessageEmbed().setAuthor(
+      `Lookup | ${author.tag}`,
+      author.dynamicAvatarURL("png")
+    );
 
     embed
       //.setTitle(`Lookup - ${card.group ? `${card.group} ` : ``}${card.name}`)
@@ -61,12 +57,8 @@ export default class CardLookup extends BaseCommand {
           `\n— \`★★★★☆\` **${wearSpread[4].toLocaleString()}**` +
           `\n— \`★★★★★\` **${wearSpread[5].toLocaleString()}**`
       );
-    if (!msg) {
-      msg = await channel.createMessage({ embed });
-      return;
-    }
-    await msg.edit({ embed });
-    return;
+
+    return embed;
   }
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
@@ -80,7 +72,8 @@ export default class CardLookup extends BaseCommand {
     } else nameQuery = this.options.join(" ")?.trim();
 
     if (baseCard) {
-      await this.getCardStats(baseCard, msg.author, msg.textChannel);
+      const embed = await this.getCardStats(baseCard, msg.author);
+      await msg.channel.createMessage({ embed });
       return;
     }
 
@@ -91,7 +84,8 @@ export default class CardLookup extends BaseCommand {
     if (!find[0]) throw new ZephyrError.InvalidLookupQueryError();
 
     if (find.length === 1) {
-      await this.getCardStats(find[0], msg.author, msg.textChannel);
+      const embed = await this.getCardStats(find[0], msg.author);
+      await msg.channel.createMessage({ embed });
       return;
     }
 
@@ -121,13 +115,11 @@ export default class CardLookup extends BaseCommand {
       max: 1,
     });
     collector.on("collect", async (m: Message) => {
-      await this.getCardStats(
+      const embed = await this.getCardStats(
         find[parseInt(m.content) - 1],
-        msg.author,
-        msg.textChannel,
-        conf,
-        embed
+        msg.author
       );
+      await msg.channel.createMessage({ embed });
       return;
     });
     collector.on("end", async (_c: any, reason: string) => {
