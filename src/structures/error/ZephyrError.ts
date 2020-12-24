@@ -44,6 +44,12 @@ export class NoItemsSpecifiedError extends ZephyrError {
   }
 }
 
+export class UnspecifiedItemError extends ZephyrError {
+  constructor() {
+    super(`Please specify an item to use.`);
+  }
+}
+
 export class CannotGiftAuthorError extends ZephyrError {
   constructor() {
     super(`You can't gift cards to yourself.`);
@@ -434,7 +440,6 @@ export class NotEnoughOfItemError extends ZephyrError {
     super(`Sorry, but you don't have enough **${item}** to craft that.`);
   }
 }
-
 /*
     Burning
              */
