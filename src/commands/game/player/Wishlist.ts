@@ -89,6 +89,7 @@ export default class Wishlist extends BaseCommand {
           filter,
           { time: 15000, max: 1 }
         );
+
         collector.on("collect", async (m: Message) => {
           const index = unique[parseInt(m.content) - 1];
           const match = wishlist.filter(
@@ -120,6 +121,7 @@ export default class Wishlist extends BaseCommand {
             msg.channel as TextChannel
           );
         });
+
         collector.on("end", async (_c: any, reason: string) => {
           if (reason === "time") {
             await conf.edit({
@@ -133,8 +135,13 @@ export default class Wishlist extends BaseCommand {
             wl.name.toLowerCase() === unique[0].name.toLowerCase() &&
             wl.groupName?.toLowerCase() === unique[0].group?.toLowerCase()
         )[0];
+
         if (match)
-          throw new ZephyrError.DuplicateWishlistEntryError(match.name);
+          throw new ZephyrError.DuplicateWishlistEntryError(
+            match.name,
+            match.groupName
+          );
+
         await this.add(
           { group: unique[0].group, name: unique[0].name },
           msg.author,

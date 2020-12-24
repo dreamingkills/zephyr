@@ -165,8 +165,12 @@ export class InvalidWishlistNameError extends ZephyrError {
 }
 
 export class DuplicateWishlistEntryError extends ZephyrError {
-  constructor(name: string) {
-    super(`${name} is already on your wishlist.`);
+  constructor(name: string, groupName?: string) {
+    super(
+      `${
+        groupName ? `**${groupName}** ` : ``
+      }${name} is already on your wishlist.`
+    );
   }
 }
 
