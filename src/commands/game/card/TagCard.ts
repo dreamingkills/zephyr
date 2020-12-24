@@ -27,10 +27,14 @@ export default class ResetFrame extends BaseCommand {
     } else {
       const trueQuery = this.options[0]?.toLowerCase();
 
-      const isTag = tags.map((t) => t.name).includes(trueQuery);
-      if (!isTag) throw new ZephyrError.InvalidTagError();
+      const findTag = tags.filter(
+        (t) =>
+          t.name.toLowerCase() === trueQuery ||
+          t.emoji.toLowerCase() === trueQuery
+      )[0];
+      if (!findTag) throw new ZephyrError.InvalidTagError();
 
-      tag = tags.filter((t) => t.name === trueQuery)[0];
+      tag = findTag;
 
       const identifiers = this.options.slice(1);
       for (let i of identifiers) {

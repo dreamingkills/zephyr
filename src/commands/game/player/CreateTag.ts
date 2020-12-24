@@ -29,11 +29,14 @@ export default class CreateTag extends BaseCommand {
       throw new ZephyrError.UnspecifiedTagInCreationError();
 
     if (userTags.filter((t) => t.name === tag)[0])
-      throw new ZephyrError.DuplicateTagError();
+      throw new ZephyrError.DuplicateTagError(tag);
 
     const emojiRaw = this.options[1];
     const trueEmoji = emojiregex().exec(emojiRaw);
     if (!trueEmoji) throw new ZephyrError.InvalidEmojiTagError();
+
+    if (userTags.filter((t) => t.emoji === trueEmoji[0])[0])
+      throw new ZephyrError.DuplicateTagEmojiError(trueEmoji[0]);
 
     await ProfileService.createTag(profile, tag, trueEmoji[0]);
     const embed = new MessageEmbed()

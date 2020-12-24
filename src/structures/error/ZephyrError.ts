@@ -279,7 +279,7 @@ export class UnspecifiedTagError extends ZephyrError {
 
 export class InvalidTagError extends ZephyrError {
   constructor() {
-    super(`You don't have a tag by that name.`);
+    super(`You don't have a tag with that name.`);
   }
 }
 
@@ -307,8 +307,14 @@ export class TagsFullError extends ZephyrError {
 }
 
 export class DuplicateTagError extends ZephyrError {
-  constructor() {
-    super(`You already have a tag by that name.`);
+  constructor(name: string) {
+    super(`You already have a tag named \`${name}\`.`);
+  }
+}
+
+export class DuplicateTagEmojiError extends ZephyrError {
+  constructor(emoji: string) {
+    super(`You already have a tag using ${emoji}.`);
   }
 }
 
