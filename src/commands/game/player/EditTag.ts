@@ -32,17 +32,19 @@ export default class EditTag extends BaseCommand {
       if (!isEmoji) throw new ZephyrError.InvalidEmojiTagError();
 
       if (userTags.filter((t) => t.name === firstParam)[0])
-        throw new ZephyrError.DuplicateTagError();
+        throw new ZephyrError.DuplicateTagError(firstParam);
+
       await ProfileService.editTag(hasTag, firstParam, secondParam);
     } else {
-      if (!firstParam || firstParam.length > 6)
+      if (!firstParam || firstParam.length > 12)
         throw new ZephyrError.UnspecifiedTagInCreationError();
       const isEmoji = emojiregex().exec(firstParam);
       if (isEmoji) {
         await ProfileService.editTag(hasTag, undefined, isEmoji[0]);
       } else {
         if (userTags.filter((t) => t.name === firstParam)[0])
-          throw new ZephyrError.DuplicateTagError();
+          throw new ZephyrError.DuplicateTagEmojiError(secondParam);
+
         await ProfileService.editTag(hasTag, firstParam);
       }
     }
