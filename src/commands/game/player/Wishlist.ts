@@ -54,18 +54,10 @@ export default class Wishlist extends BaseCommand {
         .getCards()
         .filter((c) => c.name.toLowerCase() === nameQuery);
 
-      let unique: GameBaseCard[] = [];
+      const unique: GameBaseCard[] = [];
       find.forEach((c) => {
         if (!unique.filter((u) => u.group === c.group)[0]) unique.push(c);
       });
-      for (let u of unique) {
-        const match = wishlist.filter(
-          (wl) =>
-            wl.groupName?.toLowerCase() === u.group?.toLowerCase() &&
-            wl.name.toLowerCase() === u.name.toLowerCase()
-        )[0];
-        if (match) unique.splice(unique.indexOf(u), 1);
-      }
 
       if (!unique[0]) throw new ZephyrError.InvalidWishlistNameError();
 
@@ -104,7 +96,23 @@ export default class Wishlist extends BaseCommand {
               wl.name.toLowerCase() === index.name.toLowerCase() &&
               wl.groupName?.toLowerCase() === index.group?.toLowerCase()
           )[0];
-          if (match) throw new ZephyrError.DuplicateWishlistEntryError();
+
+          if (match) {
+            // we should find a way to stop the library from catching the error
+            const embed = new MessageEmbed()
+              .setAuthor(
+                `Error | ${msg.author.tag}`,
+                msg.author.dynamicAvatarURL("png")
+              )
+              .setDescription(
+                `${match.groupName ? `**${match.groupName}** ` : ``}${
+                  match.name
+                } is already on your wishlist.`
+              );
+            await msg.channel.createMessage({ embed });
+            return;
+          }
+
           await this.add(
             { group: index.group, name: index.name },
             msg.author,
@@ -125,7 +133,8 @@ export default class Wishlist extends BaseCommand {
             wl.name.toLowerCase() === unique[0].name.toLowerCase() &&
             wl.groupName?.toLowerCase() === unique[0].group?.toLowerCase()
         )[0];
-        if (match) throw new ZephyrError.DuplicateWishlistEntryError();
+        if (match)
+          throw new ZephyrError.DuplicateWishlistEntryError(match.name);
         await this.add(
           { group: unique[0].group, name: unique[0].name },
           msg.author,

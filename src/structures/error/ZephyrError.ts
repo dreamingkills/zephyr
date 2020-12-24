@@ -165,8 +165,8 @@ export class InvalidWishlistNameError extends ZephyrError {
 }
 
 export class DuplicateWishlistEntryError extends ZephyrError {
-  constructor() {
-    super(`That person is already on your wishlist.`);
+  constructor(name: string) {
+    super(`${name} is already on your wishlist.`);
   }
 }
 
