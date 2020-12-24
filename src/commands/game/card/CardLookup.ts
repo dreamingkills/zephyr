@@ -50,7 +50,9 @@ export default class CardLookup extends BaseCommand {
             (card.serialTotal / Math.max(card.totalGenerated, 1)) *
             100
           ).toFixed(2)}%**` +
-          `\nAverage claim time: **${(avgClaimTime / 1000).toFixed(2)}s**\n\n` +
+          `\nAverage claim time: **${(avgClaimTime / 1000 - 5).toFixed(
+            2
+          )}s**\n\n` +
           `**Condition Spread**` +
           `\n— \`☆☆☆☆☆\` **${wearSpread[0].toLocaleString()}**` +
           `\n— \`★☆☆☆☆\` **${wearSpread[1].toLocaleString()}**` +
