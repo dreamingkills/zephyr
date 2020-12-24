@@ -222,7 +222,7 @@ export class NoFrameSpecifiedError extends ZephyrError {
             */
 export class DropCooldownError extends ZephyrError {
   constructor(until: string) {
-    super(`You must wait **${until || `<0s`}** before dropping cards again.`);
+    super(`You must wait **${until || `<1s`}** before dropping cards again.`);
   }
 }
 
@@ -230,7 +230,7 @@ export class ClaimCooldownError extends ZephyrError {
   constructor(until: string, userId: string) {
     super(
       `<@${userId}>, you must wait **${
-        until || `<0s`
+        until || `<1s`
       }** before claiming another card.`
     );
   }

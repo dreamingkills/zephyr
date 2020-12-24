@@ -27,7 +27,7 @@ export default class Cooldowns extends BaseCommand {
         ? getTimeUntil(
             now,
             dayjs(Date.now()).add(1, "day").startOf("day") || "Now"
-          )
+          ) || `<1s`
         : `Now`
     }__\n\` ${prefix}drop\` **Drop**: __${
       getTimeUntil(now, dayjs(profile.dropNext)) || "Now"
