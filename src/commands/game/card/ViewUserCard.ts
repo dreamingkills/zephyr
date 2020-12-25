@@ -24,11 +24,11 @@ export default class ViewUserCard extends BaseCommand {
 
     const embed = new MessageEmbed()
       .setAuthor(
-        `Card View | ${msg.author.tag}`,
+        `Card View - ${card.id.toString(36)} | ${msg.author.tag}`,
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(
-        `\n—${baseCard.group ? ` **${baseCard.group}**` : ""} **${
+        `—${baseCard.group ? ` **${baseCard.group}**` : ""} **${
           baseCard.name
         }** ${baseCard.subgroup ? ` (${baseCard.subgroup})` : ``} #${
           card.serialNumber
