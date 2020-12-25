@@ -6,7 +6,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class ViewUserCard extends BaseCommand {
-  names = ["card", "show", "view"];
+  names = ["card", "show", "view", "v"];
   description = "Inspects one of your cards.";
   usage = ["$CMD$ <card>"];
 
