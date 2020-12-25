@@ -21,6 +21,7 @@ export class Zephyr extends Client {
   config: typeof config;
   chance = new Chance();
   remindersEnabled = true;
+  dropsEnabled = true;
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
 

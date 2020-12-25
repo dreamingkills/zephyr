@@ -12,6 +12,14 @@ abstract class ZephyrError extends Error {
   }
 }
 
+export class DropsDisabledError extends ZephyrError {
+  constructor() {
+    super(
+      `Drops are currently disabled, likely because the bot will restart soon. Please try again in a couple minutes.`
+    );
+  }
+}
+
 export class AccountBlacklistedError extends ZephyrError {
   constructor() {
     super(
@@ -19,6 +27,7 @@ export class AccountBlacklistedError extends ZephyrError {
     );
   }
 }
+
 export class InvalidMentionError extends ZephyrError {
   constructor() {
     super(`Please mention a user.`);

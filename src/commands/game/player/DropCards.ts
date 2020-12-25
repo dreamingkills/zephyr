@@ -12,6 +12,8 @@ export default class DropCards extends BaseCommand {
   names = ["drop"];
   description = "Drops three random cards in the channel.";
   async exec(msg: Message, profile: GameProfile): Promise<void> {
+    if (!this.zephyr.dropsEnabled) throw new ZephyrError.DropsDisabledError();
+
     const dropChannel = await GuildService.getDropChannel(msg.guildID!);
 
     if (!dropChannel) {
