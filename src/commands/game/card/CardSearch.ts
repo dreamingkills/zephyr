@@ -20,7 +20,11 @@ export default class CardSearch extends BaseCommand {
     const baseCard = this.zephyr.getCard(card.baseCardId);
 
     const owner = await this.zephyr.fetchUser(card.discordId);
-    const ownerProfile = await ProfileService.getProfile(card.discordId);
+    let ownerProfile: GameProfile | undefined;
+    try {
+      ownerProfile = await ProfileService.getProfile(card.discordId);
+    } catch {} // undefined if burned
+
     const originalOwner = await this.zephyr.fetchUser(card.originalOwner);
     const originalProfile = await ProfileService.getProfile(card.originalOwner);
 
@@ -30,7 +34,7 @@ export default class CardSearch extends BaseCommand {
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(
-        (card.discordId !== this.zephyr.user.id
+        (ownerProfile && card.discordId !== this.zephyr.user.id
           ? `:bust_in_silhouette: Owned by ${
               ownerProfile.private && owner?.id !== msg.author.id
                 ? `*Private User*`
