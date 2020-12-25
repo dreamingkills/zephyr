@@ -297,4 +297,11 @@ export abstract class ProfileService {
   ): Promise<void> {
     return await ProfileSet.setPatronTier(profile, tier);
   }
+
+  public static async toggleBlacklisted(
+    profile: GameProfile
+  ): Promise<GameProfile> {
+    await ProfileSet.toggleBlacklisted(profile);
+    return await profile.fetch();
+  }
 }

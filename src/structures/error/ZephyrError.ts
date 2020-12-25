@@ -12,6 +12,13 @@ abstract class ZephyrError extends Error {
   }
 }
 
+export class AccountBlacklistedError extends ZephyrError {
+  constructor() {
+    super(
+      `You have been blacklisted. If you think this is in error, please join the support server by clicking [here](https://discord.gg/7PFyqUvKYs).`
+    );
+  }
+}
 export class InvalidMentionError extends ZephyrError {
   constructor() {
     super(`Please mention a user.`);

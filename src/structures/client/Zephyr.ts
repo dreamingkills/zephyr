@@ -36,7 +36,7 @@ export class Zephyr extends Client {
   constructor() {
     super(config.discord.token, { restMode: true });
     this.config = config;
-    this.users.limit = 250;
+    this.users.limit = 500;
     this.setMaxListeners(250);
   }
 
@@ -44,7 +44,6 @@ export class Zephyr extends Client {
     await this.cachePrefixes();
     await this.cacheCards();
     const fonts = await FontLoader.init();
-    this.connect();
 
     const startTime = Date.now();
     this.once("ready", async () => {
@@ -187,6 +186,8 @@ export class Zephyr extends Client {
     this.on("error", (error) => {
       console.log(error.message);
     });
+
+    this.connect();
   }
 
   /*

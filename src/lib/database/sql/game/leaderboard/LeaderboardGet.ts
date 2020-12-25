@@ -6,14 +6,14 @@ export abstract class LeaderboardGet extends DBClass {
 
   public static async getBitLeaderboardCount(): Promise<number> {
     const query = (await DB.query(
-      `SELECT COUNT(*) as count FROM profile WHERE bits+bits_bank>0;`
+      `SELECT COUNT(*) as count FROM profile WHERE bits+bits_bank>0 AND blacklisted=0;`
     )) as { count: number }[];
     return query[0].count;
   }
   public static async getBitLeaderboard(page: number): Promise<GameProfile[]> {
     const offset = page * this.entries - this.entries;
     const query = (await DB.query(
-      `SELECT * FROM profile WHERE bits+bits_bank>0 ORDER BY bits+bits_bank DESC LIMIT ? OFFSET ?`,
+      `SELECT * FROM profile WHERE bits+bits_bank>0 AND blacklisted=0 ORDER BY bits+bits_bank DESC LIMIT ? OFFSET ?`,
       [this.entries, offset]
     )) as Profile[];
     return query.map((p) => new GameProfile(p));
@@ -21,7 +21,7 @@ export abstract class LeaderboardGet extends DBClass {
 
   public static async getDailyStreakLeaderboardCount(): Promise<number> {
     const query = (await DB.query(
-      `SELECT COUNT(*) as count FROM profile WHERE daily_streak>0;`
+      `SELECT COUNT(*) as count FROM profile WHERE daily_streak>0 AND blacklisted=0;`
     )) as { count: number }[];
     return query[0].count;
   }
@@ -30,7 +30,7 @@ export abstract class LeaderboardGet extends DBClass {
   ): Promise<GameProfile[]> {
     const offset = page * this.entries - this.entries;
     const query = (await DB.query(
-      `SELECT * FROM profile WHERE daily_streak>0 ORDER BY daily_streak DESC LIMIT ? OFFSET ?`,
+      `SELECT * FROM profile WHERE daily_streak>0 AND blacklisted=0 ORDER BY daily_streak DESC LIMIT ? OFFSET ?`,
       [this.entries, offset]
     )) as Profile[];
     return query.map((p) => new GameProfile(p));
@@ -40,7 +40,7 @@ export abstract class LeaderboardGet extends DBClass {
     zephyrId: string
   ): Promise<number> {
     const query = (await DB.query(
-      `SELECT COUNT(*) AS count FROM (SELECT profile.*, COUNT(*) AS count FROM profile LEFT JOIN user_card ON user_card.discord_id=profile.discord_id WHERE NOT user_card.discord_id=? GROUP BY profile.discord_id) q;`,
+      `SELECT COUNT(*) AS count FROM (SELECT profile.*, COUNT(*) AS count FROM profile LEFT JOIN user_card ON user_card.discord_id=profile.discord_id WHERE blacklisted=0 AND user_card.discord_id!=? GROUP BY profile.discord_id) q;`,
       [zephyrId]
     )) as { count: number }[];
     return query[0].count;
@@ -51,7 +51,7 @@ export abstract class LeaderboardGet extends DBClass {
   ): Promise<{ profile: GameProfile; count: number }[]> {
     const offset = page * this.entries - this.entries;
     const query = (await DB.query(
-      `SELECT profile.*, COUNT(*) as count FROM profile LEFT JOIN user_card ON user_card.discord_id=profile.discord_id WHERE NOT user_card.discord_id=? GROUP BY profile.discord_id ORDER BY count DESC, user_card.discord_id LIMIT ? OFFSET ?;`,
+      `SELECT profile.*, COUNT(*) as count FROM profile LEFT JOIN user_card ON user_card.discord_id=profile.discord_id WHERE blacklisted=0 AND user_card.discord_id!=? GROUP BY profile.discord_id ORDER BY count DESC, user_card.discord_id LIMIT ? OFFSET ?;`,
       [zephyrId, this.entries, offset]
     )) as {
       discord_id: string;
@@ -75,6 +75,7 @@ export abstract class LeaderboardGet extends DBClass {
       premium_currency: number;
       patron: number;
       count: number;
+      blacklisted: boolean;
     }[];
     return query.map((p) => {
       return { profile: new GameProfile(p), count: p.count };

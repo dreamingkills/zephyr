@@ -5,6 +5,7 @@ import { Message } from "eris";
 import { ProfileService } from "../database/services/game/ProfileService";
 import { Zephyr } from "../../structures/client/Zephyr";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
+import * as ZephyrError from "../../structures/error/ZephyrError";
 
 export class CommandLib {
   commands: BaseCommand[] = [];
@@ -59,6 +60,9 @@ export class CommandLib {
 
     try {
       const profile = await ProfileService.getProfile(message.author.id, true);
+
+      if (profile.blacklisted) throw new ZephyrError.AccountBlacklistedError();
+
       await command.run(message, profile, zephyr);
     } catch (e) {
       if (e.isClientFacing) {

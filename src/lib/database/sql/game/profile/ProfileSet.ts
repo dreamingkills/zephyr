@@ -334,4 +334,12 @@ export abstract class ProfileSet extends DBClass {
     ]);
     return;
   }
+
+  public static async toggleBlacklisted(profile: GameProfile): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET blacklisted=1-blacklisted WHERE discord_id=?;`,
+      [profile.discordId]
+    );
+    return;
+  }
 }
