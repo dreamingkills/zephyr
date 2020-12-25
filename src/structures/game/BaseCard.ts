@@ -1,32 +1,36 @@
 export interface BaseCard {
   id: number;
-  flavor_text?: string;
-  group_name?: string;
-  subgroup_name?: string;
+  flavor_text: string | null;
+  group_name: string | null;
+  subgroup_name: string | null;
   individual_name: string;
   image_url: string;
   rarity: number;
   serial_total: number;
   serial_limit: number;
   num_generated: number;
+  emoji: string | null;
 }
+
 export interface Frame {
   id: number;
   frame_name: string;
   frame_url: string;
   dye_mask_url: string;
 }
+
 export class GameBaseCard {
   id: number;
-  flavor?: string;
-  group?: string;
-  subgroup?: string;
+  flavor: string | null;
+  group: string | null;
+  subgroup: string | null;
   name: string;
   image: string;
   rarity: number;
   serialTotal: number;
   serialLimit: number;
   totalGenerated: number;
+  emoji: string | null;
   constructor(card: BaseCard) {
     this.id = card.id;
     this.flavor = card.flavor_text;
@@ -38,8 +42,10 @@ export class GameBaseCard {
     this.serialLimit = card.serial_limit;
     this.serialTotal = card.serial_total;
     this.totalGenerated = card.num_generated;
+    this.emoji = card.emoji;
   }
 }
+
 export class GameFrame {
   id: number;
   frameName: string;

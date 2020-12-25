@@ -188,7 +188,8 @@ function getDescriptions(
           padRight,
           " "
         )}\`` +
-          ` ${baseCard.group ? `**${baseCard.group}** ` : ``}${baseCard.name}`
+          ` ${baseCard.group ? `**${baseCard.group}** ` : ``}${baseCard.name}` +
+          (baseCard.emoji ? ` ${baseCard.emoji}` : ``)
       );
     } else if (t instanceof GameDye) {
       descriptions.push(
