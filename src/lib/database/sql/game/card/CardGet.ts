@@ -35,7 +35,8 @@ export abstract class CardGet extends DBClass {
                                     image_url,
                                     serial_total,
                                     serial_limit,
-                                    num_generated
+                                    num_generated,
+                                    emoji
                                    FROM card_base;`)) as BaseCard[];
     return query.map((c) => new GameBaseCard(c));
   }
