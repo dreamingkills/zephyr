@@ -46,9 +46,10 @@ export default class CardLookup extends BaseCommand {
             (card.serialTotal / Math.max(card.totalGenerated, 1)) *
             100
           ).toFixed(2)}%**` +
-          `\nAverage claim time: **${(avgClaimTime / 1000 - 5).toFixed(
-            2
-          )}s**\n\n` +
+          `\nAverage claim time: **${Math.max(
+            avgClaimTime / 1000 - 5,
+            0
+          ).toFixed(2)}s**\n\n` +
           `**Condition Spread**` +
           `\n— \`☆☆☆☆☆\` **${wearSpread[0].toLocaleString()}**` +
           `\n— \`★☆☆☆☆\` **${wearSpread[1].toLocaleString()}**` +
@@ -125,7 +126,7 @@ export default class CardLookup extends BaseCommand {
     collector.on("end", async (_c: any, reason: string) => {
       if (reason === "time") {
         await conf.edit({
-          embed: embed.setFooter(`This lookup has timed out.`),
+          embed: embed.setFooter(`🕒 This lookup has timed out.`),
         });
       }
     });
