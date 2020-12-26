@@ -1,9 +1,9 @@
-import express from "express";
-import bodyparser from "body-parser";
+//import express from "express";
+//import bodyparser from "body-parser";
 
 export class WebhookListener {
   public async init() {
-    const app = express();
+    /*const app = express();
     const port = 3000;
 
     app.use(bodyparser.urlencoded());
@@ -13,6 +13,6 @@ export class WebhookListener {
       console.log(req.connection.remoteAddress);
       console.log(req.body);
       res.status(200).end();
-    });
+    });*/
   }
 }
