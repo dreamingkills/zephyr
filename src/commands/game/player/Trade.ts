@@ -86,7 +86,6 @@ export default class Trade extends BaseCommand {
             });
             return;
           }
-          await CardService.transferCardsToUser([traderCard], target);
 
           const recheckTradeeCard = await CardService.getUserCardById(
             tradeeCard.id
@@ -99,6 +98,8 @@ export default class Trade extends BaseCommand {
             });
             return;
           }
+
+          await CardService.transferCardsToUser([traderCard], target);
           await CardService.transferCardsToUser([tradeeCard], profile);
 
           await AnticheatService.logTrade(

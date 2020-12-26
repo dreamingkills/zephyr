@@ -55,9 +55,11 @@ export default class ResetFrame extends BaseCommand {
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(
-        `Tagged **${cards.length}** card${cards.length > 1 ? `s` : ``} as ${
-          tag.emoji
-        } **${tag.name}**.`
+        `Tagged ${
+          cards.length === 1
+            ? `\`${cards[0].id.toString(36)}\``
+            : `**${cards.length}** card${cards.length > 1 ? `s` : ``}`
+        } as ${tag.emoji} **${tag.name}**.`
       );
     await msg.channel.createMessage({ embed });
   }
