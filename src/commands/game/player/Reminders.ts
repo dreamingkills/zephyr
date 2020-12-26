@@ -9,6 +9,8 @@ export default class Reminders extends BaseCommand {
   names = ["reminders", "rm"];
   description = "Shows your active reminders.";
   usage = ["$CMD$ [type]"];
+  allowDm = true;
+
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const subcommand = this.options[0]?.toLowerCase();
     if (subcommand) {

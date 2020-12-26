@@ -12,6 +12,7 @@ export default class TopGroup extends BaseCommand {
   names = ["topgroup", "tg"];
   description = "Shows you the top collectors of a certain group.";
   usage = ["$CMD$ <group name>"];
+  allowDm = true;
 
   private async renderBody(
     collectors: { discordId: string; amount: number }[],

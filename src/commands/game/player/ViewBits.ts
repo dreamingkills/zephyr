@@ -6,6 +6,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 export default class ViewBits extends BaseCommand {
   names = ["bits", "$", "bal"];
   description = "Shows you your bit balance.";
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const embed = new MessageEmbed()

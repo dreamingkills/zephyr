@@ -10,6 +10,7 @@ export default class ViewUserCard extends BaseCommand {
   names = ["card", "show", "view", "v"];
   description = "Inspects one of your cards.";
   usage = ["$CMD$ <card>"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const rawIdentifier = this.options[0];

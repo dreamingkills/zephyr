@@ -7,6 +7,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 export default class Cooldowns extends BaseCommand {
   names = ["cooldowns", "cd", "timer", "timers", "t"];
   description = "Shows the status of various timers.";
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const prefix = this.zephyr.getPrefix(msg.guildID);

@@ -9,6 +9,7 @@ export default class ViewTags extends BaseCommand {
   names = ["viewtags", "tags", "vt"];
   description = "Shows you a list of your tags.";
   usage = ["$CMD$", "$CMD$ <@mention>", "$CMD$ <id>"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     let target: GameProfile | undefined;

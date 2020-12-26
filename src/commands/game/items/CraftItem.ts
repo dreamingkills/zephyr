@@ -16,6 +16,7 @@ export default class CraftItem extends BaseCommand {
   description =
     "Crafts ingredients into a result according to a specified recipe.";
   usage = ["$CMD$ <recipe name>"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     if (!this.options[0]) throw new ZephyrError.UnspecifiedRecipeError();

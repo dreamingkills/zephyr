@@ -8,6 +8,8 @@ export default class Invite extends BaseCommand {
   description =
     "Sends a link to the Zephyr Community server, and a link to add the bot.";
   usage = ["$CMD$"];
+  allowDm = true;
+
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     const embed = new MessageEmbed()
       .setAuthor(

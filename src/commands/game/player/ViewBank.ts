@@ -9,6 +9,8 @@ export default class ViewBank extends BaseCommand {
   names = ["bank"];
   description = "Shows you the contents of your bit bank.";
   subcommands = ["deposit <amount>", "withdraw <amount>"];
+  allowDm = true;
+
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const subcommand = this.options[0]?.toLowerCase();
     if (subcommand === "deposit") {

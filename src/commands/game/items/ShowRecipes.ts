@@ -8,6 +8,7 @@ import { renderRecipe } from "../../../lib/ZephyrUtils";
 export default class ShowRecipes extends BaseCommand {
   names = ["recipes"];
   description = "Shows recipes available to craft.";
+  allowDm = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     const embed = new MessageEmbed().setAuthor(

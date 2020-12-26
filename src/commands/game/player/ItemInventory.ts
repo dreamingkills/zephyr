@@ -11,6 +11,7 @@ import { checkPermission } from "../../../lib/ZephyrUtils";
 export default class ItemInventory extends BaseCommand {
   names = ["items"];
   description = "Shows items that belong to you.";
+  allowDm = true;
 
   private renderInventory(inv: GameItem[], prefix: string): string {
     if (inv.length === 0) {

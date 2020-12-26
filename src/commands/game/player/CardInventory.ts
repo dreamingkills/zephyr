@@ -18,6 +18,7 @@ export default class CardInventory extends BaseCommand {
     "$CMD$ [@mention/id] <filters>",
     "Filters:\n— group=LOONA\n— name=JinSoul\n— issue=>5\n— issue=<5\n— issue=5",
   ];
+  allowDm = true;
 
   private renderInventory(cards: GameUserCard[], tags: GameTag[]): string {
     if (cards.length === 0) return "No cards here!";

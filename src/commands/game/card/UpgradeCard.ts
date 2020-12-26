@@ -16,6 +16,7 @@ export default class UpgradeCard extends BaseCommand {
   names = ["upgrade", "u"];
   description = "Use dust to have a chance to increase your card's condition.";
   usage = ["$CMD$ <card>"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const reference = this.options[0];

@@ -11,6 +11,7 @@ export default class Leaderboards extends BaseCommand {
   names = ["leaderboards", "leaderboard", "top"];
   description = "Shows you top Zephyr players.";
   usage = ["$CMD$ <board name>"];
+  allowDm = true;
 
   private leaderboardTypes = ["bits", "daily", "cards"];
 

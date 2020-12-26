@@ -14,6 +14,7 @@ export default class BurnUntagged extends BaseCommand {
   names = ["burnuntagged", "bu"];
   description = "Burns all cards that are untagged.";
   usage = ["$CMD$"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const cards = await CardService.getUntaggedCards(profile);

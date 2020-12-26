@@ -11,6 +11,7 @@ export default class ResetFrame extends BaseCommand {
   names = ["resetframe", "rf"];
   description = "Resets the frame of a card to default.";
   usage = ["$CMD$ <card>"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const rawIdentifier = this.options[0];

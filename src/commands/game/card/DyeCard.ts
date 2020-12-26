@@ -12,6 +12,7 @@ export default class DyeCard extends BaseCommand {
   names = ["dye"];
   description = "Dyes a card.";
   usage = ["$CMD$ <$dye> <card>"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     if (!this.options[0]?.startsWith("$"))

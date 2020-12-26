@@ -14,6 +14,7 @@ export default class BurnTag extends BaseCommand {
   names = ["burntag", "bt"];
   description = "Burns all the cards in a tag.";
   usage = ["$CMD$ <tag>"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     if (!this.options[0]) throw new ZephyrError.UnspecifiedBurnTagsError();

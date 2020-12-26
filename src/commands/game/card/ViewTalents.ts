@@ -12,6 +12,7 @@ export default class ViewTalent extends BaseCommand {
   names = ["talent", "ta"];
   description = "Inspects the talent of your cards.";
   usage = ["$CMD$ <card>"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     let card: GameUserCard;

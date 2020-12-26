@@ -10,6 +10,7 @@ export default class CreateTag extends BaseCommand {
   names = ["createtag", "ct"];
   description = "Creates a tag for use.";
   usage = ["$CMD$ <tag name> <emoji>"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     if (this.options.length > 2) throw new ZephyrError.TagContainsSpacesError();

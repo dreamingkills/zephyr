@@ -9,6 +9,7 @@ export default class PreviewFrame extends BaseCommand {
   names = ["previewframe", "pf"];
   description = "Shows you what a frame looks like before you buy it.";
   usage = ["$CMD$ <frame>"];
+  allowDm = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     const query = this.options.join(" ").toLowerCase();

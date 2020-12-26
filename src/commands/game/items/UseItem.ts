@@ -17,6 +17,7 @@ export default class UseItem extends BaseCommand {
   description =
     "Use an item.\n**Note**: You must enter the item name **exactly** as it appears!";
   usage = ["$CMD$ <item>", "$CMD$ <frame> <card>"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     if (!this.options[0]) throw new ZephyrError.UnspecifiedItemError();

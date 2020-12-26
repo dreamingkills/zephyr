@@ -8,9 +8,14 @@ export default class Help extends BaseCommand {
   names = ["help"];
   description = "Shows you the help center.";
   usage = ["$CMD$", "$CMD$ [command/topic]"];
+  allowDm = true;
+
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const guild = this.zephyr.guilds.get(msg.guildID!);
-    const prefix = this.zephyr.getPrefix(guild!.id);
+    let prefix: string;
+    if (!this.isDm) {
+      const guild = this.zephyr.guilds.get(msg.guildID!);
+      prefix = this.zephyr.getPrefix(guild!.id);
+    } else prefix = ".";
 
     const commands = this.zephyr.commandLib.commands;
     const query = this.options[0]?.toLowerCase();

@@ -9,6 +9,7 @@ import { getTimeUntil } from "../../../lib/ZephyrUtils";
 export default class DailyReward extends BaseCommand {
   names = ["daily"];
   description = "Shows you the status of your daily reward.";
+  allowDm = true;
 
   private dayFormat = `YYYY-MM-DD`;
   private bitsReward = { min: 50, max: 100 };

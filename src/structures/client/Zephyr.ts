@@ -91,8 +91,11 @@ export class Zephyr extends Client {
 
     this.on("messageCreate", async (message) => {
       await this.fetchUser(message.author.id);
-      // type 0 corresponds to TextChannel
-      if (message.author.bot || message.channel.type !== 0) return;
+
+      if (message.channel.type === 1) {
+        await this.commandLib.process(message, this);
+        return;
+      }
 
       // Prefix resetter
       if (message.mentions[0]?.id === this.user.id) {
@@ -121,7 +124,11 @@ export class Zephyr extends Client {
       }
 
       // check if we're allowed to send messages to this channel
-      if (!message.channel.permissionsOf(this.user.id).json["sendMessages"])
+      if (
+        !(<TextChannel>message.channel).permissionsOf(this.user.id).json[
+          "sendMessages"
+        ]
+      )
         return;
 
       // go ahead if we're allowed to speak

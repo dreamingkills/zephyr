@@ -14,6 +14,7 @@ export default class EditTag extends BaseCommand {
     "$CMD$ <tag name> <new emoji>",
     "$CMD$ <tag name> <new name> <new emoji>",
   ];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const userTags = await ProfileService.getTags(profile);

@@ -12,6 +12,7 @@ export default class CardLookup extends BaseCommand {
   names = ["lookup", "lu"];
   description = "Shows you information about a card.";
   usage = ["$CMD$ <name>"];
+  allowDm = true;
 
   private async getCardStats(
     card: GameBaseCard,

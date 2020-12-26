@@ -8,6 +8,7 @@ export default class SetBlurb extends BaseCommand {
   names = ["blurb", "setblurb", "desc", "setdesc"];
   description = "Changes the blurb on your profile.";
   usage = ["$CMD$ <up to 500 characters>"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const blurbRaw = this.options.join(" ");

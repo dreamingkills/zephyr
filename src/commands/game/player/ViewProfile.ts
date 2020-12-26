@@ -10,6 +10,7 @@ export default class ViewProfile extends BaseCommand {
   names = ["profile", "p"];
   usage = ["$CMD$", "$CMD$ <@mention>", "$CMD$ <id>"];
   description = "Displays your profile.";
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     let target: GameProfile | undefined;

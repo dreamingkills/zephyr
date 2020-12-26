@@ -5,7 +5,8 @@ import { GameProfile } from "../../structures/game/Profile";
 
 export default class Stats extends BaseCommand {
   names = ["stats"];
-  description = "Hello.";
+  description = "Shows the bot's memory usage.";
+  allowDm = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     const usedMb = process.memoryUsage().heapUsed / 1000 / 1000;

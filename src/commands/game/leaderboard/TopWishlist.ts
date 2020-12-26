@@ -10,6 +10,7 @@ export default class TopWishlist extends BaseCommand {
   names = ["topwishlist", "twl"];
   description = "Shows you the top collectors of a certain group.";
   usage = ["$CMD$"];
+  allowDm = true;
 
   private async renderBody(
     top: { group: string; name: string; count: number }[],

@@ -12,6 +12,12 @@ abstract class ZephyrError extends Error {
   }
 }
 
+export class NotAllowedInDMError extends ZephyrError {
+  constructor() {
+    super(`You cannot do that here.`);
+  }
+}
+
 export class DropsDisabledError extends ZephyrError {
   constructor() {
     super(

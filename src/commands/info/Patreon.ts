@@ -7,6 +7,8 @@ export default class Patreon extends BaseCommand {
   names = ["patreon", "donate", "kofi", "ko-fi"];
   description = "Sends a link to Zephyr's Patreon page.";
   usage = ["$CMD$"];
+  allowDm = true;
+
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     const embed = new MessageEmbed()
       .setAuthor(

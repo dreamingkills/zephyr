@@ -12,6 +12,7 @@ export default class Wishlist extends BaseCommand {
   description = "Shows your, or someone else's, wishlist.";
   usage = ["$CMD$", "$CMD$ <@user>", "$CMD$ <id>"];
   subcommands = ["add <name>", "delete/remove <number / text>", "clear"];
+  allowDm = true;
 
   private async add(
     query: { group: string | null; name: string },

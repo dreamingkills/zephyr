@@ -9,6 +9,7 @@ export default class CardSearch extends BaseCommand {
   names = ["cardsearch", "cs"];
   description = "Shows you information about a card.";
   usage = ["$CMD$ <card>"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const rawIdentifier = this.options[0];

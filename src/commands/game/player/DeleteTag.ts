@@ -9,6 +9,7 @@ export default class DeleteTag extends BaseCommand {
   names = ["deletetag", "dt"];
   description = "Deletes a tag.";
   usage = ["$CMD$ <tag name>"];
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     if (!this.options[0]) throw new ZephyrError.UnspecifiedTagError();

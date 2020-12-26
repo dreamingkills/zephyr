@@ -13,6 +13,7 @@ import { PatreonService } from "../../../lib/database/services/meta/PatreonServi
 export default class ClaimMonthlyPatronReward extends BaseCommand {
   names = ["monthly"];
   description = "Claims your monthly Patreon reward.";
+  allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     if (profile.patron < 1) throw new ZephyrError.NotAPatronError();

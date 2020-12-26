@@ -27,8 +27,14 @@ export class CommandLib {
   }
 
   async process(message: Message, zephyr: Zephyr): Promise<void> {
-    const guild = zephyr.guilds.get(message.guildID!);
-    const prefix = zephyr.getPrefix(guild!.id);
+    let prefix;
+    if (message.channel.type === 1) {
+      prefix = ".";
+    } else {
+      const guild = zephyr.guilds.get(message.guildID!);
+      prefix = zephyr.getPrefix(guild!.id);
+    }
+
     const commandNameRegExp = new RegExp(
       `^(${prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})(\\S+)`,
       `g`
@@ -62,6 +68,8 @@ export class CommandLib {
       const profile = await ProfileService.getProfile(message.author.id, true);
 
       if (profile.blacklisted) throw new ZephyrError.AccountBlacklistedError();
+      if (message.channel.type === 1 && !command.allowDm)
+        throw new ZephyrError.NotAllowedInDMError();
 
       await command.run(message, profile, zephyr);
     } catch (e) {

@@ -9,6 +9,8 @@ export default class ResetFrame extends BaseCommand {
   names = ["untag", "ut"];
   description = "Removes the tag of a card.";
   usage = ["$CMD$ [cards]"];
+  allowDm = true;
+
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
     if (!this.options[0]) throw new ZephyrError.InvalidCardReferenceError();
     const cardsRaw = [];
