@@ -50,7 +50,7 @@ export abstract class ProfileService {
   public static async addToWishlist(
     profile: GameProfile,
     name: string,
-    group?: string
+    group: string | null
   ): Promise<void> {
     return await ProfileSet.addToWishlist(profile.discordId, name, group);
   }

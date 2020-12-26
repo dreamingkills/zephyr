@@ -14,7 +14,7 @@ export default class Wishlist extends BaseCommand {
   subcommands = ["add <name>", "delete/remove <number / text>", "clear"];
 
   private async add(
-    query: { group?: string; name: string },
+    query: { group: string | null; name: string },
     author: User,
     profile: GameProfile,
     channel: TextChannel
@@ -115,7 +115,7 @@ export default class Wishlist extends BaseCommand {
           }
 
           await this.add(
-            { group: index.group!, name: index.name },
+            { group: index.group, name: index.name },
             msg.author,
             profile,
             msg.channel as TextChannel
@@ -143,7 +143,7 @@ export default class Wishlist extends BaseCommand {
           );
 
         await this.add(
-          { group: unique[0].group!, name: unique[0].name },
+          { group: unique[0].group, name: unique[0].name },
           msg.author,
           profile,
           msg.channel as TextChannel

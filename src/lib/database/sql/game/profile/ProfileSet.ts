@@ -38,7 +38,7 @@ export abstract class ProfileSet extends DBClass {
   public static async addToWishlist(
     discordId: string,
     name: string,
-    group?: string
+    group: string | null
   ): Promise<void> {
     if (!group) {
       await DB.query(`INSERT INTO wishlist (discord_id, name) VALUES (?, ?);`, [
