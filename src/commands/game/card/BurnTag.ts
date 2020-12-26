@@ -23,7 +23,7 @@ export default class BurnTag extends BaseCommand {
       (t) => t.name.toLowerCase() === this.options.join(" ").toLowerCase()
     )[0];
 
-    if (!query) throw new ZephyrError.InvalidTagError();
+    if (!query) throw new ZephyrError.InvalidTagError(this.options[0]);
 
     const cards = await CardService.getCardsByTag(query);
     if (cards.length < 1) throw new ZephyrError.NoCardsTaggedError(query);

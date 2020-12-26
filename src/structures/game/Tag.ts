@@ -1,3 +1,5 @@
+import { ProfileService } from "../../lib/database/services/game/ProfileService";
+
 export interface Tag {
   id: number;
   discord_id: string;
@@ -15,5 +17,9 @@ export class GameTag {
     this.discordId = data.discord_id;
     this.name = data.tag_name;
     this.emoji = data.emoji;
+  }
+
+  public async fetch(): Promise<GameTag> {
+    return await ProfileService.getTagById(this.id);
   }
 }

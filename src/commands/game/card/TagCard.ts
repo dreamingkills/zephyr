@@ -11,6 +11,8 @@ export default class ResetFrame extends BaseCommand {
   description = "Sets the tag of a card.";
   usage = ["$CMD$ <tag> [cards]"];
   async exec(msg: Message, profile: GameProfile): Promise<void> {
+    if (!this.options[0]) throw new ZephyrError.UnspecifiedTagError();
+
     const tags = await ProfileService.getTags(profile);
     if (tags.length === 0) throw new ZephyrError.NoTagsError();
 
@@ -32,7 +34,7 @@ export default class ResetFrame extends BaseCommand {
           t.name.toLowerCase() === trueQuery ||
           t.emoji.toLowerCase() === trueQuery
       )[0];
-      if (!findTag) throw new ZephyrError.InvalidTagError();
+      if (!findTag) throw new ZephyrError.InvalidTagError(trueQuery);
 
       tag = findTag;
 
@@ -45,7 +47,6 @@ export default class ResetFrame extends BaseCommand {
       }
     }
 
-    if (!tag) throw new ZephyrError.InvalidTagError();
     if (cards.length === 0) throw new ZephyrError.InvalidCardReferenceError();
 
     await CardService.setCardsTag(cards, tag.id);

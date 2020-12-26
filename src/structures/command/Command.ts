@@ -18,7 +18,7 @@ export abstract class BaseCommand implements Command {
   developerOnly: boolean = false;
 
   zephyr!: Zephyr;
-  options!: string[];
+  options: string[] = [];
 
   abstract exec(msg: Message, profile: GameProfile): Promise<void>;
 

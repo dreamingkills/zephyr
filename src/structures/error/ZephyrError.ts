@@ -305,19 +305,25 @@ export class UnspecifiedTagInCreationError extends ZephyrError {
 
 export class UnspecifiedTagError extends ZephyrError {
   constructor() {
-    super(`Please enter a tag to add to your card.`);
+    super(`Please enter a tag.`);
   }
 }
 
 export class InvalidTagError extends ZephyrError {
-  constructor() {
-    super(`You don't have a tag with that name.`);
+  constructor(name: string) {
+    super(`You don't have a tag named \`${name}\`.`);
   }
 }
 
 export class InvalidEmojiTagError extends ZephyrError {
   constructor() {
     super(`Please enter a valid emoji for your tag.`);
+  }
+}
+
+export class TagContainsSpacesError extends ZephyrError {
+  constructor() {
+    super(`Your tag cannot include spaces.`);
   }
 }
 

@@ -12,6 +12,8 @@ export default class CreateTag extends BaseCommand {
   usage = ["$CMD$ <tag name> <emoji>"];
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
+    if (this.options.length > 2) throw new ZephyrError.TagContainsSpacesError();
+
     const userTags = await ProfileService.getTags(profile);
     if (
       (userTags.length >= 10 && profile.patron === 0) ||

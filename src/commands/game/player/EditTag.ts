@@ -21,7 +21,7 @@ export default class EditTag extends BaseCommand {
     const tagQuery = this.options[0]?.toLowerCase();
     const hasTag = userTags.filter((t) => t.name === tagQuery)[0];
 
-    if (!hasTag) throw new ZephyrError.InvalidTagError();
+    if (!hasTag) throw new ZephyrError.InvalidTagError(this.options[0]);
 
     const firstParam = this.options[1]?.toLowerCase();
     const secondParam = this.options[2]?.toLowerCase();
