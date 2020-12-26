@@ -1,3 +1,5 @@
+import { ProfileService } from "../../lib/database/services/game/ProfileService";
+
 export interface Dye {
   id: number;
   discord_id: string;
@@ -24,5 +26,9 @@ export class GameDye {
     this.dyeG = data.dye_g;
     this.dyeB = data.dye_b;
     this.charges = data.charges;
+  }
+
+  public async fetch(): Promise<GameDye> {
+    return await ProfileService.getDyeById(this.id);
   }
 }

@@ -88,7 +88,7 @@ export default class DyeCard extends BaseCommand {
       }
 
       // Also check that their dye still has 1 charge
-      const refetchDye = await ProfileService.getDyeById(targetDye.id);
+      const refetchDye = await targetDye.fetch();
       if (refetchDye.charges < 1) {
         await conf.edit({
           embed: embed.setFooter(

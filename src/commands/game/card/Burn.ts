@@ -170,7 +170,7 @@ export default class BurnCard extends BaseCommand {
       }
       for (let dye of dyeTargets) {
         try {
-          const refetchDye = await ProfileService.getDyeById(dye.id);
+          const refetchDye = await dye.fetch();
           if (refetchDye.discordId !== msg.author.id)
             throw new ZephyrError.NotOwnerOfDyeError(dye.id);
         } catch {
