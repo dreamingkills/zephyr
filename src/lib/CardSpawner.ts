@@ -10,7 +10,7 @@ import { Zephyr } from "../structures/client/Zephyr";
 import { getTimeUntil } from "../lib/ZephyrUtils";
 import dayjs from "dayjs";
 import { GuildService } from "./database/services/guild/GuildService";
-import { GameBaseCard, GameFrame } from "../structures/game/BaseCard";
+import { GameBaseCard } from "../structures/game/BaseCard";
 import { AnticheatService } from "./database/services/meta/AnticheatService";
 
 export abstract class CardSpawner {
@@ -62,19 +62,10 @@ export abstract class CardSpawner {
     prefer?: GameProfile
   ): Promise<void> {
     const start = Date.now();
-    const chance = new Chance();
     const droppedCards: GameUserCard[] = [];
 
     for (let card of cards) {
-      const random = chance.bool({ likelihood: 0.02 });
-      let frame: GameFrame;
-      if (random) {
-        const randomFrame = await CardService.getRandomFrame();
-        frame = randomFrame;
-      } else {
-        const defaultFrame = await CardService.getFrameById(1);
-        frame = defaultFrame;
-      }
+      const frame = await CardService.getFrameById(1);
       droppedCards.push(
         new GameUserCard({
           id: 0,
@@ -127,6 +118,9 @@ export abstract class CardSpawner {
         if (this.grabbing.has(userId)) return;
 
         const profile = await ProfileService.getProfile(userId, true);
+
+        // Do not allow blacklisted users to claim cards.
+        if (profile.blacklisted) return;
 
         // Claim cooldown detection
         const now = dayjs(Date.now());

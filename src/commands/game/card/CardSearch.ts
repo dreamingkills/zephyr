@@ -28,24 +28,30 @@ export default class CardSearch extends BaseCommand {
     const originalOwner = await this.zephyr.fetchUser(card.originalOwner);
     const originalProfile = await ProfileService.getProfile(card.originalOwner);
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Card Search | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed().setAuthor(
+      `Card Search | ${msg.author.tag}`,
+      msg.author.dynamicAvatarURL("png")
+    );
+
+    if (!ownerProfile) {
+      embed.setDescription(`:fire: __**This card has been burned!**__ :fire:`);
+    } else if (ownerProfile.blacklisted) {
+      embed.setDescription(
+        `:hammer: __**This card is owned by a blacklisted user.**__`
+      );
+    } else if (ownerProfile.private) {
+      embed.setDescription(`:bust_in_silhouette: Owned by *Private User*`);
+    } else if (owner) {
+      embed.setDescription(`:bust_in_silhouette: Owned by **${owner.tag}**`);
+    } else {
+      embed.setDescription(`:bust_in_silhouette: Owned by *Unknown User*`);
+    }
+
+    embed
       .setDescription(
-        (ownerProfile && card.discordId !== this.zephyr.user.id
-          ? `:bust_in_silhouette: Owned by ${
-              ownerProfile.private && owner?.id !== msg.author.id
-                ? `*Private User*`
-                : owner
-                ? `**${owner.tag}**`
-                : `*Unknown User*`
-            }`
-          : `:fire: __**This card has been burned!**__ :fire:`) +
-          `\n— **${baseCard.group ? `${baseCard.group} ` : ``}${
-            baseCard.name
-          }** ${baseCard.subgroup ? `(${baseCard.subgroup})` : ``}` +
+        `\n— **${baseCard.group ? `${baseCard.group} ` : ``}${
+          baseCard.name
+        }** ${baseCard.subgroup ? `(${baseCard.subgroup})` : ``}` +
           `\n— Issue **#${card.serialNumber}**` +
           `\n— Condition: **${
             ["Damaged", "Poor", "Average", "Good", "Great", "Mint"][card.wear]

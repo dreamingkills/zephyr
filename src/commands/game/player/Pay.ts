@@ -20,6 +20,9 @@ export default class Pay extends BaseCommand {
 
     const target = await ProfileService.getProfile(user.id);
 
+    if (target.blacklisted)
+      throw new ZephyrError.AccountBlacklistedOtherError();
+
     const amount = parseInt(
       this.options.filter((p) => !isNaN(parseInt(p, 10)))[0]
     );

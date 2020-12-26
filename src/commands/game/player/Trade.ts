@@ -25,6 +25,9 @@ export default class Trade extends BaseCommand {
     )
       throw new ZephyrError.UnacceptableTradeTargetError();
 
+    if (target.blacklisted)
+      throw new ZephyrError.AccountBlacklistedOtherError();
+
     const refs = this.options.filter((v) => !v.includes("@"));
     if (!refs[0] || !refs[1])
       throw new ZephyrError.InvalidCardIdentifierTradeError();

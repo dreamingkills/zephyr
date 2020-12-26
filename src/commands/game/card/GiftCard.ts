@@ -41,6 +41,9 @@ export default class GiftCard extends BaseCommand {
 
     const gifteeProfile = await ProfileService.getProfile(giftee.id);
 
+    if (gifteeProfile.blacklisted)
+      throw new ZephyrError.AccountBlacklistedOtherError();
+
     const tags = await ProfileService.getTags(profile);
 
     const cardDescriptions = getDescriptions(cards, this.zephyr, tags);

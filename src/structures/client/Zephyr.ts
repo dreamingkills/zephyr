@@ -13,6 +13,7 @@ import { Chance } from "chance";
 import { CardSpawner } from "../../lib/CardSpawner";
 import { GameWishlist } from "../game/Wishlist";
 import { DMHandler } from "../../lib/DMHandler";
+import { WebhookListener } from "../../webhook";
 
 export class Zephyr extends Client {
   version: string = "Oleander";
@@ -24,6 +25,8 @@ export class Zephyr extends Client {
   dropsEnabled = true;
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
+
+  webhookListener = new WebhookListener();
 
   private generalChannelNames = [
     "welcome",
@@ -45,6 +48,8 @@ export class Zephyr extends Client {
     await this.cachePrefixes();
     await this.cacheCards();
     const fonts = await FontLoader.init();
+
+    await this.webhookListener.init();
 
     const startTime = Date.now();
     this.once("ready", async () => {

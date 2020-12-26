@@ -28,6 +28,12 @@ export class AccountBlacklistedError extends ZephyrError {
   }
 }
 
+export class AccountBlacklistedOtherError extends ZephyrError {
+  constructor() {
+    super(`That user is blacklisted and cannot be interacted with.`);
+  }
+}
+
 export class InvalidMentionError extends ZephyrError {
   constructor() {
     super(`Please mention a user.`);

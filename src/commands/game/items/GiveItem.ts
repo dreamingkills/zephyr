@@ -60,6 +60,9 @@ export default class GiveItem extends BaseCommand {
     if (!target || !targetUser)
       throw new ZephyrError.InvalidMentionItemError(realItems.length > 1);
 
+    if (target.blacklisted)
+      throw new ZephyrError.AccountBlacklistedOtherError();
+
     const embed = new MessageEmbed()
       .setAuthor(
         `Give Item | ${msg.author.tag}`,
