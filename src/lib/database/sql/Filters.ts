@@ -50,6 +50,12 @@ export class FilterService {
             value
           )}),"%")`
         );
+      } else if (["subgroup", "sg"].indexOf(prop) > -1) {
+        queryOptions.push(
+          ` alphanum(card_base.subgroup_name) LIKE CONCAT("%",alphanum(${DB.connection.escape(
+            value
+          )}), "%")`
+        );
       } else if (["wear", "w", "condition", "c"].indexOf(prop) > -1) {
         let trueWear = -1;
         if (!isNaN(parseInt(value.toString(), 10))) {
