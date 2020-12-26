@@ -16,7 +16,7 @@ import { DMHandler } from "../../lib/DMHandler";
 import { WebhookListener } from "../../webhook";
 
 export class Zephyr extends Client {
-  version: string = "Oleander";
+  version: string = "Peony";
   commandLib = new CommandLib();
   dmHandler = new DMHandler();
   config: typeof config;
