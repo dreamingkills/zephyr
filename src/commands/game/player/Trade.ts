@@ -75,9 +75,7 @@ export default class Trade extends BaseCommand {
         if (confirmed.indexOf(userId) < 0) confirmed.push(userId);
 
         if (confirmed.length === 2) {
-          const recheckTraderCard = await CardService.getUserCardById(
-            traderCard.id
-          );
+          const recheckTraderCard = await traderCard.fetch();
           if (recheckTraderCard.discordId !== msg.author.id) {
             await confirmation.edit({
               embed: embed.setFooter(
@@ -87,9 +85,7 @@ export default class Trade extends BaseCommand {
             return;
           }
 
-          const recheckTradeeCard = await CardService.getUserCardById(
-            tradeeCard.id
-          );
+          const recheckTradeeCard = await tradeeCard.fetch();
           if (recheckTradeeCard.discordId !== target.discordId) {
             await confirmation.edit({
               embed: embed.setFooter(

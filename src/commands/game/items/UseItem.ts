@@ -89,7 +89,7 @@ export default class UseItem extends BaseCommand {
         );
 
         collector.on("collect", async () => {
-          const refetchCard = await CardService.getUserCardById(card.id);
+          const refetchCard = await card.fetch();
           if (refetchCard.discordId !== msg.author.id) {
             await confirmation.edit({
               embed: embed.setFooter(

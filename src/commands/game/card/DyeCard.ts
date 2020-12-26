@@ -77,7 +77,7 @@ export default class DyeCard extends BaseCommand {
 
     collector.on("collect", async () => {
       // We need to check that this user is still the owner of the card, or they can do some nasty stuff
-      const refetchCard = await CardService.getUserCardById(targetCard.id);
+      const refetchCard = await targetCard.fetch();
       if (refetchCard.discordId !== msg.author.id) {
         await conf.edit({
           embed: embed.setFooter(

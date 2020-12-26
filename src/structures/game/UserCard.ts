@@ -1,3 +1,5 @@
+import { CardService } from "../../lib/database/services/game/CardService";
+
 export interface UserCard {
   id: number;
   card_id: number;
@@ -64,5 +66,9 @@ export class GameUserCard {
     this.dyeR = data.dye_r;
     this.dyeG = data.dye_g;
     this.dyeB = data.dye_b;
+  }
+
+  public async fetch(): Promise<GameUserCard> {
+    return await CardService.getUserCardById(this.id);
   }
 }

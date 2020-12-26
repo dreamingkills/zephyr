@@ -369,6 +369,6 @@ export abstract class CardService {
     dye: GameDye
   ): Promise<GameUserCard> {
     await CardSet.setCardDye(card, dye);
-    return await this.getUserCardById(card.id);
+    return await card.fetch();
   }
 }

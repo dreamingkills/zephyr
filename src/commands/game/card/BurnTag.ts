@@ -91,7 +91,7 @@ export default class BurnTag extends BaseCommand {
     collector.on("collect", async () => {
       // We need to check that this user is still the owner, or they can dupe bits
       for (let card of cards) {
-        const refetchCard = await CardService.getUserCardById(card.id);
+        const refetchCard = await card.fetch();
         if (refetchCard.discordId !== msg.author.id) {
           await conf.edit({
             embed: embed.setFooter(

@@ -83,7 +83,7 @@ export default class UpgradeCard extends BaseCommand {
 
     collector.on("collect", async () => {
       // We need to check that this user is still the owner, or they can do some nasty stuff
-      const refetchCard = await CardService.getUserCardById(card.id);
+      const refetchCard = await card.fetch();
       if (refetchCard.discordId !== msg.author.id)
         throw new ZephyrError.NotOwnerOfCardError(refetchCard);
 

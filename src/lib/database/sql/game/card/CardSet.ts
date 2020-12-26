@@ -51,6 +51,7 @@ export abstract class CardSet extends DBClass {
       }
     }
   }
+
   public static async setCardFrame(
     card: GameUserCard,
     frameId: number
@@ -59,8 +60,9 @@ export abstract class CardSet extends DBClass {
       frameId,
       card.id,
     ]);
-    return await CardService.getUserCardById(card.id);
+    return await card.fetch();
   }
+
   public static async transferCardsToUser(
     cards: GameUserCard[],
     discordId: string
