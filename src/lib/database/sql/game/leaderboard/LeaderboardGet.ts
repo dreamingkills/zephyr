@@ -76,6 +76,7 @@ export abstract class LeaderboardGet extends DBClass {
       patron: number;
       count: number;
       blacklisted: boolean;
+      last_card: number | null;
     }[];
     return query.map((p) => {
       return { profile: new GameProfile(p), count: p.count };

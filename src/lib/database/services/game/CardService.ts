@@ -12,6 +12,7 @@ import { GameTag } from "../../../../structures/game/Tag";
 import gm from "gm";
 import { GameDye } from "../../../../structures/game/Dye";
 import { rgbToCmy } from "../../../ZephyrUtils";
+import { ProfileService } from "./ProfileService";
 
 export abstract class CardService {
   // Used for card image generation
@@ -45,16 +46,20 @@ export abstract class CardService {
     zephyr: Zephyr,
     price: number = 0,
     claimTime: number,
+    dropper: GameProfile | null,
     frame: number = 1
   ): Promise<GameUserCard> {
-    return await CardSet.createNewUserCard(
+    const newCard = await CardSet.createNewUserCard(
       card,
       profile,
       zephyr,
       price,
       claimTime,
+      dropper,
       frame
     );
+    await ProfileService.setLastCard(profile, newCard);
+    return newCard;
   }
 
   public static async getUserCardById(id: number): Promise<GameUserCard> {
@@ -67,10 +72,6 @@ export abstract class CardService {
     const id = parseInt(identifier, 36);
     if (isNaN(id)) throw new ZephyrError.InvalidCardReferenceError();
     return await this.getUserCardById(id);
-  }
-
-  public static async getLastCard(discordId: string): Promise<GameUserCard> {
-    return await CardGet.getLastCard(discordId);
   }
 
   public static async getUserInventory(
@@ -106,7 +107,7 @@ export abstract class CardService {
     // Load the card's frame, default if the id column is null
     let frame: Image;
     if (!card.frameId || !card.frameUrl) {
-      frame = await loadImage(`./src/assets/frames/frame-white.png`);
+      frame = await loadImage(`./src/assets/frames/default/frame-default.png`);
     } else frame = await loadImage(card.frameUrl);
 
     // Draw the base image, then the frame on top of that
@@ -233,7 +234,9 @@ export abstract class CardService {
     cards: GameUserCard[],
     profile: GameProfile
   ): Promise<void> {
-    return await CardSet.transferCardsToUser(cards, profile.discordId);
+    await CardSet.transferCardsToUser(cards, profile.discordId);
+    await ProfileService.setLastCard(profile, cards[cards.length - 1]);
+    return;
   }
 
   public static async burnCards(

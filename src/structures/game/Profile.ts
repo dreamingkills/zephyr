@@ -17,7 +17,9 @@ export interface Profile {
   premium_currency: number;
   patron: number;
   blacklisted: boolean;
+  last_card: number | null;
 }
+
 export class GameProfile {
   discordId: string;
   private: boolean;
@@ -35,6 +37,7 @@ export class GameProfile {
   premiumCurrency: number;
   patron: number;
   blacklisted: boolean;
+  lastCard: number | null;
   constructor(data: Profile) {
     this.discordId = data.discord_id;
     this.private = data.private;
@@ -53,6 +56,7 @@ export class GameProfile {
     this.claimReminder = data.claim_reminder;
     this.claimReminded = data.claim_reminded;
     this.blacklisted = data.blacklisted;
+    this.lastCard = data.last_card;
   }
 
   public async fetch(): Promise<GameProfile> {

@@ -5,17 +5,18 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
+import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 
 export default class ResetFrame extends BaseCommand {
   names = ["resetframe", "rf"];
   description = "Resets the frame of a card to default.";
   usage = ["$CMD$ <card>"];
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(msg: Message, profile: GameProfile): Promise<void> {
     const rawIdentifier = this.options[0];
     let card: GameUserCard;
     if (!rawIdentifier) {
-      card = await CardService.getLastCard(msg.author.id);
+      card = await ProfileService.getLastCard(profile);
     } else card = await CardService.getUserCardByIdentifier(rawIdentifier);
     const trueIdentifier = card.id.toString(36);
 

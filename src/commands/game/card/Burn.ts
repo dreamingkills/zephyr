@@ -22,7 +22,7 @@ export default class BurnCard extends BaseCommand {
     const burnTargets: (GameUserCard | GameDye)[] = [];
 
     if (identifiers.length === 0) {
-      const lastCard = await CardService.getLastCard(profile.discordId);
+      const lastCard = await ProfileService.getLastCard(profile);
       burnTargets.push(lastCard);
     }
 

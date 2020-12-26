@@ -18,7 +18,7 @@ export default class GiftCard extends BaseCommand {
     const identifiers = this.options.filter((o) => !o.includes("<@"));
     const cards: GameUserCard[] = [];
     if (identifiers.length === 0) {
-      const lastCard = await CardService.getLastCard(profile.discordId);
+      const lastCard = await ProfileService.getLastCard(profile);
       cards.push(lastCard);
     }
 
@@ -81,6 +81,7 @@ export default class GiftCard extends BaseCommand {
         }
       }
 
+      await ProfileService.setLastCard(profile, null);
       await CardService.transferCardsToUser(cards, gifteeProfile);
       await AnticheatService.logGift(
         profile,
