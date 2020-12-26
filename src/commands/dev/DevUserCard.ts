@@ -27,8 +27,7 @@ export default class DevUserCard extends BaseCommand {
           `\n**User Card ID**: ${userCard.id}` +
           `\n**Owner ID**: ${userCard.discordId}` +
           `\n**Serial Number**: ${userCard.serialNumber}` +
-          `\n**Condition**: ${userCard.wear}` +
-          `\n**Luck Coefficient**: ${userCard.luckCoefficient}`
+          `\n**Condition**: ${userCard.wear}`
       );
     await msg.channel.createMessage({ embed });
     return;

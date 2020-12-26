@@ -48,6 +48,7 @@ export abstract class CardSpawner {
       zephyr,
       0,
       now - start,
+      prefer ? prefer : null,
       frame
     );
 
@@ -74,7 +75,6 @@ export abstract class CardSpawner {
           discord_id: "0",
           original_owner: "0",
           wear: 0,
-          luck_coeff: 0,
           frame_id: frame.id,
           frame_name: frame.frameName,
           frame_url: frame.frameUrl,
@@ -84,6 +84,10 @@ export abstract class CardSpawner {
           dye_b: 185,
           tag_id: 0,
           claim_time: 0,
+          original_wear: 0,
+          fight_count: 0,
+          dropper: "0",
+          luck_coeff: 0,
         })
       );
     }

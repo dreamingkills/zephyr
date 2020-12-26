@@ -2,9 +2,12 @@ import { GameDye } from "../../../../structures/game/Dye";
 import { BaseItem, GameItem } from "../../../../structures/game/Item";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameTag } from "../../../../structures/game/Tag";
+import { GameUserCard } from "../../../../structures/game/UserCard";
 import { GameWishlist } from "../../../../structures/game/Wishlist";
 import { ProfileGet } from "../../sql/game/profile/ProfileGet";
 import { ProfileSet } from "../../sql/game/profile/ProfileSet";
+import { CardService } from "./CardService";
+import * as ZephyrError from "../../../../structures/error/ZephyrError";
 
 export abstract class ProfileService {
   /*
@@ -64,6 +67,11 @@ export abstract class ProfileService {
 
   public static async clearWishlist(profile: GameProfile): Promise<void> {
     return await ProfileSet.clearWishlist(profile.discordId);
+  }
+
+  public static async getLastCard(profile: GameProfile): Promise<GameUserCard> {
+    if (!profile.lastCard) throw new ZephyrError.InvalidCardReferenceError();
+    return await CardService.getUserCardById(profile.lastCard);
   }
 
   /*
@@ -302,6 +310,14 @@ export abstract class ProfileService {
     profile: GameProfile
   ): Promise<GameProfile> {
     await ProfileSet.toggleBlacklisted(profile);
+    return await profile.fetch();
+  }
+
+  public static async setLastCard(
+    profile: GameProfile,
+    card: GameUserCard | null
+  ): Promise<GameProfile> {
+    await ProfileSet.setLastCard(profile, card);
     return await profile.fetch();
   }
 }

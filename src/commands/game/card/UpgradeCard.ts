@@ -21,7 +21,7 @@ export default class UpgradeCard extends BaseCommand {
     const reference = this.options[0];
     let card: GameUserCard;
     if (!reference) {
-      const lastCard = await CardService.getLastCard(msg.author.id);
+      const lastCard = await ProfileService.getLastCard(profile);
       card = lastCard;
     } else {
       const getCard = await CardService.getUserCardByIdentifier(reference);

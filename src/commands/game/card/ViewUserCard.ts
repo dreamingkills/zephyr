@@ -4,17 +4,18 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 
 export default class ViewUserCard extends BaseCommand {
   names = ["card", "show", "view", "v"];
   description = "Inspects one of your cards.";
   usage = ["$CMD$ <card>"];
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(msg: Message, profile: GameProfile): Promise<void> {
     const rawIdentifier = this.options[0];
     let card;
     if (!rawIdentifier) {
-      card = await CardService.getLastCard(msg.author.id);
+      card = await ProfileService.getLastCard(profile);
     } else card = await CardService.getUserCardByIdentifier(rawIdentifier);
 
     const baseCard = this.zephyr.getCard(card.baseCardId);

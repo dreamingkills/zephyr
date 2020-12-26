@@ -5,7 +5,6 @@ export interface UserCard {
   discord_id: string;
   original_owner: string;
   wear: 0 | 1 | 2 | 3 | 4 | 5;
-  luck_coeff: number;
   frame_id: number;
   frame_name: string;
   frame_url: string;
@@ -15,7 +14,12 @@ export interface UserCard {
   dye_b: number;
   claim_time: number;
   tag_id: number;
+  original_wear: number;
+  fight_count: number;
+  luck_coeff: number;
+  dropper: string;
 }
+
 export class GameUserCard {
   id: number;
   baseCardId: number;
@@ -23,7 +27,6 @@ export class GameUserCard {
   discordId: string;
   originalOwner: string;
   wear: 0 | 1 | 2 | 3 | 4 | 5;
-  luckCoefficient: number;
   frameId: number;
   frameName: string;
   frameUrl: string;
@@ -32,6 +35,10 @@ export class GameUserCard {
   dyeG: number;
   dyeB: number;
   claimTime: number;
+  originalWear: number;
+  fightCount: number;
+  luckCoefficient: number;
+  dropper: string;
 
   tagId: number;
 
@@ -42,12 +49,15 @@ export class GameUserCard {
     this.discordId = data.discord_id;
     this.originalOwner = data.original_owner;
     this.wear = data.wear;
-    this.luckCoefficient = data.luck_coeff;
     this.frameId = data.frame_id;
     this.frameName = data.frame_name;
     this.frameUrl = data.frame_url;
     this.dyeMaskUrl = data.dye_mask_url;
     this.claimTime = data.claim_time;
+    this.originalWear = data.original_wear;
+    this.fightCount = data.fight_count;
+    this.luckCoefficient = data.luck_coeff;
+    this.dropper = data.dropper;
 
     this.tagId = data.tag_id;
 
