@@ -102,8 +102,11 @@ export class Zephyr extends Client {
         const subcommand = message.content.split(" ")[1]?.toLowerCase();
 
         if (subcommand === "reset") {
-          const guild = await this.getRESTGuild(message.guildID!);
-          if (guild.ownerID !== message.author.id) return;
+          if (
+            !(<TextChannel>message.channel).permissionsOf(message.author.id)
+              .json["manageChannels"]
+          )
+            return;
 
           this.setPrefix(message.guildID!, this.config.discord.defaultPrefix);
           await GuildService.setPrefix(
