@@ -10,6 +10,10 @@ export class DMHandler {
     const success: { id: string; type: 1 | 2 | 3 }[] = [];
     const failed = [];
     for (let p of eligible) {
+      if (p.blacklisted) {
+        failed.push(p);
+        continue;
+      }
       try {
         const user = await zephyr.fetchUser(p.discordId);
         if (!user) {
