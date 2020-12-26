@@ -47,7 +47,8 @@ export abstract class CardService {
     price: number = 0,
     claimTime: number,
     dropper: GameProfile | null,
-    frame: number = 1
+    frame: number = 1,
+    fightCount: number
   ): Promise<GameUserCard> {
     const newCard = await CardSet.createNewUserCard(
       card,
@@ -56,7 +57,8 @@ export abstract class CardService {
       price,
       claimTime,
       dropper,
-      frame
+      frame,
+      fightCount
     );
     await ProfileService.setLastCard(profile, newCard);
     return newCard;

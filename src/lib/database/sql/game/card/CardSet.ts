@@ -15,6 +15,7 @@ export abstract class CardSet extends DBClass {
     price: number,
     claimTime: number,
     dropper: GameProfile | null,
+    fightCount: number,
     frame?: number
   ): Promise<GameUserCard> {
     const rng = new Chance();
@@ -28,7 +29,7 @@ export abstract class CardSet extends DBClass {
     while (true) {
       try {
         const query = (await DB.query(
-          `INSERT INTO user_card (card_id, serial_number, discord_id, original_owner, wear, luck_coeff, frame, claim_time, dropper) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO user_card (card_id, serial_number, discord_id, original_owner, wear, luck_coeff, frame, claim_time, dropper, fight_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             card.id,
             issue,
@@ -39,6 +40,7 @@ export abstract class CardSet extends DBClass {
             frame,
             claimTime,
             dropper ? dropper.discordId : null,
+            fightCount,
           ]
         )) as { insertId: number };
         zephyr.getCard(card.id).serialTotal = issue;

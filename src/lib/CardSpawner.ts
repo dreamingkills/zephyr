@@ -49,7 +49,8 @@ export abstract class CardSpawner {
       0,
       now - start,
       prefer ? prefer : null,
-      frame
+      frame,
+      takers.size
     );
 
     return { winner, card: newCard };
