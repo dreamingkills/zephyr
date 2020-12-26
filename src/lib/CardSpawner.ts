@@ -67,7 +67,6 @@ export abstract class CardSpawner {
     const droppedCards: GameUserCard[] = [];
 
     for (let card of cards) {
-      const frame = await CardService.getFrameById(1);
       droppedCards.push(
         new GameUserCard({
           id: 0,
@@ -76,10 +75,10 @@ export abstract class CardSpawner {
           discord_id: "0",
           original_owner: "0",
           wear: 0,
-          frame_id: frame.id,
-          frame_name: frame.frameName,
-          frame_url: frame.frameUrl,
-          dye_mask_url: frame.dyeMaskUrl,
+          frame_id: 1,
+          frame_name: "",
+          frame_url: "",
+          dye_mask_url: "",
           dye_r: 185,
           dye_g: 185,
           dye_b: 185,

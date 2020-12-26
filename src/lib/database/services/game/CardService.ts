@@ -57,8 +57,8 @@ export abstract class CardService {
       price,
       claimTime,
       dropper,
-      frame,
-      fightCount
+      fightCount,
+      frame
     );
     await ProfileService.setLastCard(profile, newCard);
     return newCard;
