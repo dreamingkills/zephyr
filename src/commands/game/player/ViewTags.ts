@@ -33,6 +33,7 @@ export default class ViewTags extends BaseCommand {
       throw new ZephyrError.PrivateProfileError(targetUser.tag);
 
     const userTags = await ProfileService.getTags(target);
+    userTags.sort((a, b) => (a.name[0] > b.name[0] ? 1 : -1));
 
     const embed = new MessageEmbed()
       .setAuthor(
