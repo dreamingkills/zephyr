@@ -22,7 +22,7 @@ export default class ResetFrame extends BaseCommand {
     let cards = [];
     if (queryIsTag && !this.options[1]) {
       tag = tags.filter((t) => t.name === query)[0];
-      const card = await CardService.getLastCard(profile.discordId);
+      const card = await ProfileService.getLastCard(profile);
       cards.push(card);
     } else {
       const trueQuery = this.options[0]?.toLowerCase();

@@ -10,11 +10,11 @@ export default class CardSearch extends BaseCommand {
   description = "Shows you information about a card.";
   usage = ["$CMD$ <card>"];
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(msg: Message, profile: GameProfile): Promise<void> {
     const rawIdentifier = this.options[0];
     let card;
     if (!rawIdentifier) {
-      card = await CardService.getLastCard(msg.author.id);
+      card = await ProfileService.getLastCard(profile);
     } else card = await CardService.getUserCardByIdentifier(rawIdentifier);
 
     const baseCard = this.zephyr.getCard(card.baseCardId);

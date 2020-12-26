@@ -5,6 +5,7 @@ import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { GameDye } from "../../../../../structures/game/Dye";
 import { getNearestColor, rgbToHex } from "../../../../ZephyrUtils";
 import { BaseItem } from "../../../../../structures/game/Item";
+import { GameUserCard } from "../../../../../structures/game/UserCard";
 
 export abstract class ProfileSet extends DBClass {
   /*
@@ -340,6 +341,23 @@ export abstract class ProfileSet extends DBClass {
       `UPDATE profile SET blacklisted=1-blacklisted WHERE discord_id=?;`,
       [profile.discordId]
     );
+    return;
+  }
+
+  public static async setLastCard(
+    profile: GameProfile,
+    card: GameUserCard | null
+  ): Promise<void> {
+    if (card) {
+      await DB.query(`UPDATE profile SET last_card=? WHERE discord_id=?;`, [
+        card.id,
+        profile.discordId,
+      ]);
+    } else {
+      await DB.query(`UPDATE profile SET last_card=NULL WHERE discord_id=?;`, [
+        profile.discordId,
+      ]);
+    }
     return;
   }
 }

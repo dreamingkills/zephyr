@@ -48,6 +48,7 @@ export abstract class CardSpawner {
       zephyr,
       0,
       now - start,
+      prefer ? prefer : null,
       frame
     );
 

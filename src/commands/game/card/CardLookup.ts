@@ -6,6 +6,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { MessageCollector } from "eris-collector";
 import { GameBaseCard } from "../../../structures/game/BaseCard";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 
 export default class CardLookup extends BaseCommand {
   names = ["lookup", "lu"];
@@ -66,7 +67,7 @@ export default class CardLookup extends BaseCommand {
     let nameQuery: string;
     let baseCard: GameBaseCard | undefined;
     if (!this.options[0]) {
-      const lastCard = await CardService.getLastCard(profile.discordId);
+      const lastCard = await ProfileService.getLastCard(profile);
       const lastBase = this.zephyr.getCard(lastCard.baseCardId);
 
       baseCard = lastBase;
