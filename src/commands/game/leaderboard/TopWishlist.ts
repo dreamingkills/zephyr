@@ -8,7 +8,7 @@ import { ReactionCollector } from "eris-collector";
 
 export default class TopWishlist extends BaseCommand {
   names = ["topwishlist", "twl"];
-  description = "Shows you the top collectors of a certain group.";
+  description = "Shows you the top cards, ordered by number of wishlists.";
   usage = ["$CMD$"];
   allowDm = true;
 
