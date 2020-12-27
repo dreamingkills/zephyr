@@ -80,15 +80,21 @@ export class CommandLib {
             message.author.dynamicAvatarURL("png")
           )
           .setDescription(e.message);
-        await message.channel.createMessage({ embed });
+        try {
+          await message.channel.createMessage({ embed });
+        } catch {}
       } else {
+        if (e.name === "Missing Access") return;
+        console.log(e.name);
         const embed = new MessageEmbed()
           .setAuthor(
             `Error | ${message.author.tag}`,
             message.author.dynamicAvatarURL("png")
           )
           .setDescription(`An unexpected error occurred. Please try again.`);
-        await message.channel.createMessage({ embed });
+        try {
+          await message.channel.createMessage({ embed });
+        } catch {}
         console.error(e);
       }
     }
