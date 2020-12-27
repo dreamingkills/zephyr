@@ -9,7 +9,7 @@ import { createCanvas } from "canvas";
 
 export default class ViewDye extends BaseCommand {
   names = ["viewdye", "vd"];
-  description = "Shows you a dyes you own.";
+  description = "Shows you a dye you own.";
   allowDm = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
