@@ -6,7 +6,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
-export default class ResetFrame extends BaseCommand {
+export default class TagCard extends BaseCommand {
   names = ["tag", "tc"];
   description = "Sets the tag of a card.";
   usage = ["$CMD$ <tag> [cards]"];
