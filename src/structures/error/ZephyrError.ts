@@ -124,8 +124,8 @@ export class NoProfileError extends ZephyrError {
 }
 
 export class PrivateProfileError extends ZephyrError {
-  constructor(user: string) {
-    super(`**${user}**'s profile is private.`);
+  constructor(user?: string) {
+    super(`${user ? `**${user}**'s` : `That user's`} profile is private.`);
   }
 }
 
@@ -481,6 +481,12 @@ export class NotEnoughOfItemError extends ZephyrError {
 /*
     Burning
              */
+export class CardBurnedError extends ZephyrError {
+  constructor(card: GameUserCard) {
+    super(`:fire: \`${card.id.toString(36)}\` has been burned!`);
+  }
+}
+
 export class UnspecifiedBurnTargetsError extends ZephyrError {
   constructor() {
     super(`Please specify one or more cards or dyes to burn.`);
