@@ -5,7 +5,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
-export default class ResetFrame extends BaseCommand {
+export default class UntagCard extends BaseCommand {
   names = ["untag", "ut"];
   description = "Removes the tag of a card.";
   usage = ["$CMD$ [cards]"];
