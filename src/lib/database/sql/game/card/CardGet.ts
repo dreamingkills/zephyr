@@ -81,7 +81,7 @@ export abstract class CardGet extends DBClass {
     query +=
       (queryOptions.length > 0 ? ` AND` : ``) + queryOptions.join(` AND`);
 
-    let order = <string>options["order"];
+    let order = <string>options["order"] || <string>options["sort"];
     const reverse = order?.startsWith("!");
     if (reverse) order = order.slice(1);
 
@@ -97,6 +97,8 @@ export abstract class CardGet extends DBClass {
       query += ` ORDER BY card_base.individual_name ${
         reverse ? `DESC` : `ASC`
       }`;
+    } else if (["subgroup", "sg"].indexOf(order) > -1) {
+      query += ` ORDER BY card_base.subgroup_name ${reverse ? `DESC` : `ASC`}`;
     } else query += ` ORDER BY user_card.id ${reverse ? `ASC` : `DESC`}`;
 
     query += ` LIMIT 10 OFFSET ${DB.connection.escape(
