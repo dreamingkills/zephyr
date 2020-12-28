@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import stripAnsi from "strip-ansi";
-import { Client, TextChannel, User } from "eris";
+import { Client, Guild, TextChannel, User } from "eris";
 import config from "../../../config.json";
 import { CommandLib } from "../../lib/command/CommandLib";
 import { GuildService } from "../../lib/database/services/guild/GuildService";
@@ -42,7 +42,7 @@ export class Zephyr extends Client {
   constructor() {
     super(config.discord.token, { restMode: true });
     this.config = config;
-    this.users.limit = 500;
+    this.users.limit = 1000;
     this.setMaxListeners(250);
   }
 
@@ -306,6 +306,35 @@ export class Zephyr extends Client {
     } else {
       this.users.update(findUser);
       return findUser;
+    }
+  }
+  public async fetchGuild(
+    guildId: string,
+    ignoreCache: boolean = false
+  ): Promise<Guild | undefined> {
+    if (ignoreCache) {
+      try {
+        const guild = await this.getRESTGuild(guildId);
+        this.guilds.add(guild);
+        return guild;
+      } catch (e) {
+        return;
+      }
+    }
+
+    // check if guild is already in cache
+    const findGuild = this.guilds.find((g) => g.id === guildId);
+    if (!findGuild) {
+      try {
+        const guild = await this.getRESTGuild(guildId);
+        this.guilds.add(guild);
+        return guild;
+      } catch (e) {
+        return;
+      }
+    } else {
+      this.guilds.update(findGuild);
+      return findGuild;
     }
   }
 

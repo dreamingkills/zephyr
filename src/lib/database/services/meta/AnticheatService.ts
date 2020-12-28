@@ -1,6 +1,7 @@
 import { GameItem } from "../../../../structures/game/Item";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameUserCard } from "../../../../structures/game/UserCard";
+import { ACGet } from "../../sql/meta/anticheat/ACGet";
 import { ACSet } from "../../sql/meta/anticheat/ACSet";
 
 export abstract class AnticheatService {
@@ -70,5 +71,44 @@ export abstract class AnticheatService {
     isWeekend: boolean
   ): Promise<void> {
     return await ACSet.logVote(voter, isWeekend);
+  }
+
+  /*
+      Stat Getters
+  */
+  public static async getNumberOfClaimedCards(
+    profile: GameProfile
+  ): Promise<number> {
+    return await ACGet.getNumberOfClaimedCards(profile);
+  }
+
+  public static async getNumberOfVotes(profile: GameProfile): Promise<number> {
+    return await ACGet.getNumberOfVotes(profile);
+  }
+
+  public static async getNumberOfCardsGifted(
+    profile: GameProfile
+  ): Promise<number> {
+    return await ACGet.getNumberOfCardsGifted(profile);
+  }
+
+  public static async getNumberOfCardsReceivedByGift(
+    profile: GameProfile
+  ): Promise<number> {
+    return await ACGet.getNumberOfCardsReceivedByGift(profile);
+  }
+
+  public static async getClaimInformation(
+    card: GameUserCard
+  ): Promise<{
+    id: number;
+    claimer: string;
+    dropper: string;
+    card_id: number;
+    guild_id: string;
+    claim_time: string;
+    drop_time: string;
+  }> {
+    return await ACGet.getClaimInformation(card);
   }
 }
