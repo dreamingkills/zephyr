@@ -79,7 +79,7 @@ export default class Help extends BaseCommand {
       })
       .addField({
         name: `Collection`,
-        value: `\`inventory\`, \`view\`, \`dyes\`, \`dye\`, \`items\`, \`craft\`, \`resetframe\`, \`upgrade\``,
+        value: `\`inventory\`, \`view\`, \`dyes\`, \`dye\`, \`items\`, \`craft\`, \`resetframe\`, \`upgrade\`, \`cardinfo\``,
         inline: true,
       })
       .addField({
@@ -94,7 +94,7 @@ export default class Help extends BaseCommand {
       })
       .addField({
         name: `Profile`,
-        value: `\`blurb\`, \`private\`, \`bank\``,
+        value: `\`blurb\`, \`private\`, \`bank\`, \`userinfo\``,
         inline: true,
       })
       .addField({
