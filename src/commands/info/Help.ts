@@ -109,7 +109,7 @@ export default class Help extends BaseCommand {
       })
       .addField({
         name: `Misc`,
-        value: `\`patreon\`, \`stats\``,
+        value: `\`patreon\`, \`stats\`, \`vote\``,
         inline: true,
       })
       .addField({
