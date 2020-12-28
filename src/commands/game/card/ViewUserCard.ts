@@ -5,7 +5,6 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
-import { calculateTalent } from "../../../lib/talent";
 import { getDescriptions } from "../../../lib/ZephyrUtils";
 
 export default class ViewUserCard extends BaseCommand {
@@ -37,7 +36,6 @@ export default class ViewUserCard extends BaseCommand {
     const baseCard = this.zephyr.getCard(card.baseCardId);
     const image = await CardService.checkCacheForCard(card, this.zephyr);
 
-    const cardTalent = calculateTalent(targetProfile, card, baseCard);
     const userTags = await ProfileService.getTags(targetProfile);
     const cardDescription = getDescriptions([card], this.zephyr, userTags)[0];
 
@@ -47,11 +45,10 @@ export default class ViewUserCard extends BaseCommand {
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(
-        `${cardDescription}\n` +
-          `\nOwner: ${
-            targetUser ? `**${targetUser.tag}**` : `*Unknown User*`
-          }` +
-          `\nTalent: **${cardTalent.total}**`
+        `${cardDescription} ${
+          baseCard.subgroup ? `**(${baseCard.subgroup})**` : ``
+        }\n` +
+          `\nOwner: ${targetUser ? `**${targetUser.tag}**` : `*Unknown User*`}`
       )
       .setImage(`attachment://card.png`);
     // .setFooter(`Luck Coefficient: ${card.luckCoefficient}`);
