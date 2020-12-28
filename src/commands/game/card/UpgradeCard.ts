@@ -29,6 +29,9 @@ export default class UpgradeCard extends BaseCommand {
       card = getCard;
     }
 
+    if (card.discordId !== msg.author.id)
+      throw new ZephyrError.NotOwnerOfCardError(card);
+
     if (card.wear === 5) throw new ZephyrError.CardBestConditionError(card);
 
     const dustTier = (card.wear + 1) as Dust;
