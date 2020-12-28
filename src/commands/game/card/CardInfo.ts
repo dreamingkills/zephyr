@@ -46,7 +46,11 @@ export default class CardInfo extends BaseCommand {
               : `Unknown Guild (${claimInfo.guild_id})`
           }**` +
           `\n— Dropped by **${
-            dropperUser ? dropperUser.tag : `Unknown User`
+            claimInfo.dropper
+              ? dropperUser
+                ? dropperUser.tag
+                : `Unknown User`
+              : `server activity`
           }**` +
           `\n— Claimed by **${
             claimerUser ? claimerUser.tag : `Unknown User`
