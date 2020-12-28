@@ -26,9 +26,35 @@ export default class CardInfo extends BaseCommand {
     const claimInfo = await AnticheatService.getClaimInformation(card);
 
     const claimTime = dayjs(claimInfo.claim_time).format(`YYYY/MM/DD HH:mm:ss`);
+    let claimer;
+    let dropper;
+
+    if (claimInfo.claimer) {
+      const claimerUser = await this.zephyr.fetchUser(claimInfo.claimer);
+      const claimerProfile = await ProfileService.getProfile(claimInfo.claimer);
+      if (
+        claimerProfile.private &&
+        claimerProfile.discordId !== msg.author.id
+      ) {
+        claimer = "Private User";
+      } else claimer = claimerUser?.tag || "Unknown User";
+    }
+    if (claimInfo.dropper) {
+      const dropperUser = await this.zephyr.fetchUser(claimInfo.dropper);
+      if (!dropperUser) {
+        dropper = "Unknown User";
+      } else {
+        const dropperProfile = await ProfileService.getProfile(dropperUser.id);
+        if (
+          dropperProfile.private &&
+          dropperProfile.discordId !== msg.author.id
+        ) {
+          dropper = "Private User";
+        } else dropper = dropperUser.tag;
+      }
+    } else dropper = "Server Activity";
+
     const claimGuild = await this.zephyr.fetchGuild(claimInfo.guild_id);
-    const dropperUser = await this.zephyr.fetchUser(claimInfo.dropper);
-    const claimerUser = await this.zephyr.fetchUser(claimInfo.claimer);
 
     const cardImage = await CardService.checkCacheForCard(card, this.zephyr);
 
@@ -45,16 +71,8 @@ export default class CardInfo extends BaseCommand {
               ? claimGuild.name
               : `Unknown Guild (${claimInfo.guild_id})`
           }**` +
-          `\n— Dropped by **${
-            claimInfo.dropper
-              ? dropperUser
-                ? dropperUser.tag
-                : `Unknown User`
-              : `server activity`
-          }**` +
-          `\n— Claimed by **${
-            claimerUser ? claimerUser.tag : `Unknown User`
-          }**` +
+          `\n— Dropped by **${dropper}**` +
+          `\n— Claimed by **${claimer}**` +
           `\n\n— Claimed in **${
             ["damaged", "poor", "average", "good", "great", "mint"][
               card.originalWear
