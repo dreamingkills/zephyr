@@ -18,7 +18,7 @@ import { ProfileService } from "../../lib/database/services/game/ProfileService"
 import { AnticheatService } from "../../lib/database/services/meta/AnticheatService";
 
 export class Zephyr extends Client {
-  version: string = "Peony";
+  version: string = "Primrose";
   commandLib = new CommandLib();
   dmHandler = new DMHandler();
   config: typeof config;
