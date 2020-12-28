@@ -320,4 +320,12 @@ export abstract class ProfileService {
     await ProfileSet.setLastCard(profile, card);
     return await profile.fetch();
   }
+
+  public static async addVote(
+    voter: GameProfile,
+    isWeekend: boolean
+  ): Promise<GameProfile> {
+    await ProfileSet.addVote(voter, isWeekend);
+    return await voter.fetch();
+  }
 }

@@ -14,6 +14,8 @@ import { CardSpawner } from "../../lib/CardSpawner";
 import { GameWishlist } from "../game/Wishlist";
 import { DMHandler } from "../../lib/DMHandler";
 import { WebhookListener } from "../../webhook";
+import { ProfileService } from "../../lib/database/services/game/ProfileService";
+import { AnticheatService } from "../../lib/database/services/meta/AnticheatService";
 
 export class Zephyr extends Client {
   version: string = "Peony";
@@ -49,7 +51,7 @@ export class Zephyr extends Client {
     await this.cacheCards();
     const fonts = await FontLoader.init();
 
-    await this.webhookListener.init();
+    await this.webhookListener.init(this);
 
     const startTime = Date.now();
     this.once("ready", async () => {
@@ -305,5 +307,30 @@ export class Zephyr extends Client {
       this.users.update(findUser);
       return findUser;
     }
+  }
+
+  /*
+      Vote Handler
+  */
+  public async handleVote(voterId: string, isWeekend: boolean): Promise<void> {
+    const profile = await ProfileService.getProfile(voterId, true);
+    const voter = await this.fetchUser(voterId);
+
+    await ProfileService.addVote(profile, isWeekend);
+    await AnticheatService.logVote(profile, isWeekend);
+
+    if (!voter) return;
+    try {
+      const dmChannel = await voter.getDMChannel();
+
+      const embed = new MessageEmbed()
+        .setAuthor(`Vote | ${voter.tag}`, voter.dynamicAvatarURL("png"))
+        .setDescription(
+          `:sparkles: Thanks for voting, **${
+            voter.username
+          }**! You've been given **${isWeekend ? 4 : 2}** cubits!`
+        );
+      await dmChannel.createMessage({ embed });
+    } catch {}
   }
 }

@@ -126,7 +126,7 @@ export abstract class ProfileGet extends DBClass {
       id,
     ])) as Dye[];
 
-    if (!query[0]) throw new ZephyrError.InvalidDyeIdentifierError();
+    if (!query[0]) throw new ZephyrError.DyeDoesNotExistError(id);
 
     return new GameDye(query[0]);
   }

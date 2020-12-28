@@ -51,6 +51,11 @@ export default class ViewProfile extends BaseCommand {
             targetIsSender ? `You have` : `${targetUser.tag} has`
           } **${cardsAmount.toLocaleString()}** card${
             cardsAmount === 1 ? `` : `s`
+          }.` +
+          `\n— ${
+            targetIsSender ? `You have` : `${targetUser.tag} has`
+          } **${target.cubits.toLocaleString()}** cubit${
+            target.cubits === 1 ? `` : `s`
           }.`
       );
     if (profile.discordId === msg.author.id && profile.private)

@@ -6,6 +6,7 @@ import { GameDye } from "../../../../../structures/game/Dye";
 import { getNearestColor, rgbToHex } from "../../../../ZephyrUtils";
 import { BaseItem } from "../../../../../structures/game/Item";
 import { GameUserCard } from "../../../../../structures/game/UserCard";
+import dayjs from "dayjs";
 
 export abstract class ProfileSet extends DBClass {
   /*
@@ -358,6 +359,19 @@ export abstract class ProfileSet extends DBClass {
         profile.discordId,
       ]);
     }
+    return;
+  }
+
+  public static async addVote(
+    profile: GameProfile,
+    isWeekend: boolean
+  ): Promise<void> {
+    const formattedTimestamp = dayjs().format(`YYYY/MM/DD HH:mm:ss`);
+
+    await DB.query(
+      `UPDATE profile SET cubits=cubits+?, vote_last=? WHERE discord_id=?;`,
+      [isWeekend ? 4 : 2, formattedTimestamp, profile.discordId]
+    );
     return;
   }
 }

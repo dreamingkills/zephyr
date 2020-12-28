@@ -446,6 +446,12 @@ export class NotOwnerOfDyeError extends ZephyrError {
   }
 }
 
+export class DyeDoesNotExistError extends ZephyrError {
+  constructor(id: number) {
+    super(`\`$${id.toString(36)}\` does not exist.`);
+  }
+}
+
 export class CardConditionTooLowError extends ZephyrError {
   constructor(_wear: number, requirement: number) {
     super(

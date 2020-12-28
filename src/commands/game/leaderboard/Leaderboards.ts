@@ -13,7 +13,7 @@ export default class Leaderboards extends BaseCommand {
   usage = ["$CMD$ <board name>"];
   allowDm = true;
 
-  private leaderboardTypes = ["bits", "daily", "cards"];
+  private leaderboardTypes = ["bits", "daily", "cards", "cubits"];
 
   private async getLeaderboard(
     type: string,
@@ -68,6 +68,20 @@ export default class Leaderboards extends BaseCommand {
         }
         break;
       }
+      case "cubits": {
+        const board = await LeaderboardService.getCubitLeaderboard(page);
+        for (let profile of board) {
+          const user = await this.zephyr.fetchUser(profile.discordId);
+          leaderboard += `\`#${
+            board.indexOf(profile) + 1 + (page * 10 - 10)
+          }\` `;
+          if (profile.private && profile.discordId !== authorId) {
+            leaderboard += `*Private User*`;
+          } else leaderboard += user ? user.tag : `*Unknown User*`;
+          leaderboard += ` — **${profile.cubits.toLocaleString()}** cubits\n`;
+        }
+        break;
+      }
     }
     return leaderboard;
   }
@@ -98,6 +112,10 @@ export default class Leaderboards extends BaseCommand {
         this.zephyr
       );
       title = `Top players by card collection`;
+    } else if (["cubits", "cubit"].includes(boardType)) {
+      trueType = "cubits";
+      totalEntries = await LeaderboardService.getCubitLeaderboardCount();
+      title = `Top players by cubits`;
     } else {
       embed.setDescription(
         `Please specify a valid leaderboard.\n` +

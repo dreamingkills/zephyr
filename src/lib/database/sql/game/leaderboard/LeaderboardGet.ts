@@ -10,6 +10,7 @@ export abstract class LeaderboardGet extends DBClass {
     )) as { count: number }[];
     return query[0].count;
   }
+
   public static async getBitLeaderboard(page: number): Promise<GameProfile[]> {
     const offset = page * this.entries - this.entries;
     const query = (await DB.query(
@@ -25,6 +26,7 @@ export abstract class LeaderboardGet extends DBClass {
     )) as { count: number }[];
     return query[0].count;
   }
+
   public static async getDailyStreakLeaderboard(
     page: number
   ): Promise<GameProfile[]> {
@@ -45,6 +47,7 @@ export abstract class LeaderboardGet extends DBClass {
     )) as { count: number }[];
     return query[0].count;
   }
+
   public static async getCardLeaderboard(
     page: number,
     zephyrId: string
@@ -77,9 +80,29 @@ export abstract class LeaderboardGet extends DBClass {
       count: number;
       blacklisted: boolean;
       last_card: number | null;
+      cubits: number;
+      vote_last: string | null;
     }[];
     return query.map((p) => {
       return { profile: new GameProfile(p), count: p.count };
     });
+  }
+
+  public static async getCubitLeaderboardCount(): Promise<number> {
+    const query = (await DB.query(
+      `SELECT COUNT(*) as count FROM profile WHERE cubits>0 AND blacklisted=0;`
+    )) as { count: number }[];
+    return query[0].count;
+  }
+
+  public static async getCubitLeaderboard(
+    page: number
+  ): Promise<GameProfile[]> {
+    const offset = page * this.entries - this.entries;
+    const query = (await DB.query(
+      `SELECT * FROM profile WHERE cubits>0 AND blacklisted=0 ORDER BY cubits DESC LIMIT ? OFFSET ?`,
+      [this.entries, offset]
+    )) as Profile[];
+    return query.map((p) => new GameProfile(p));
   }
 }

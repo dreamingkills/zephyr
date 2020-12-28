@@ -64,4 +64,11 @@ export abstract class AnticheatService {
       guildId
     );
   }
+
+  public static async logVote(
+    voter: GameProfile,
+    isWeekend: boolean
+  ): Promise<void> {
+    return await ACSet.logVote(voter, isWeekend);
+  }
 }

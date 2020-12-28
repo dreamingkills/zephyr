@@ -144,4 +144,17 @@ export abstract class ACSet extends DBClass {
     );
     return;
   }
+
+  public static async logVote(
+    voter: GameProfile,
+    weekend: boolean
+  ): Promise<void> {
+    const formattedTimestamp = dayjs().format(`YYYY/MM/DD HH:mm:ss`);
+
+    await DB.query(
+      `INSERT INTO vote (voter, vote_time, weekend) VALUES (?, ?, ?);`,
+      [voter.discordId, formattedTimestamp, weekend]
+    );
+    return;
+  }
 }

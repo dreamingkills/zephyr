@@ -13,7 +13,8 @@ export default class ViewDye extends BaseCommand {
   allowDm = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    if (!this.options[0]) throw new ZephyrError.InvalidDyeIdentifierError();
+    if (!this.options[0] || !this.options[0].startsWith("$"))
+      throw new ZephyrError.InvalidDyeIdentifierError();
 
     const dyeId = this.options[0]?.toLowerCase();
     const dyeTarget = await ProfileService.getDyeByIdentifier(dyeId);
