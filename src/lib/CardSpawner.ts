@@ -320,7 +320,7 @@ export abstract class CardSpawner {
     if (this.guildLevels[guild.id] >= this.minSpawnThreshold) {
       this.guildLevels[guild.id] = 0;
       let rand = [false, true][Math.floor(Math.random() * 2)];
-      if (this.guildLevels[guild.id] === this.spawnThreshold) {
+      if (this.guildLevels[guild.id] >= this.spawnThreshold) {
         rand = true;
       }
       if (!rand) return;

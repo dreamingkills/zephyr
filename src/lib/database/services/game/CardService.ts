@@ -117,21 +117,21 @@ export abstract class CardService {
     ctx.drawImage(frame, 0, 0, 350, 500);
 
     // Handle dye mask (this was so annoying to set up I hate Windows)
-    if (card.dyeMaskUrl) {
-      // Default to the classic "Undyed Mask Gray" if the card is undyed.
-      let [r, g, b] = [card.dyeR || 185, card.dyeG || 185, card.dyeB || 185];
-      const { c, m, y } = rgbToCmy(r, g, b);
+    // Default to the classic "Undyed Mask Gray" if the card is undyed.
+    let [r, g, b] = [card.dyeR || 185, card.dyeG || 185, card.dyeB || 185];
+    const { c, m, y } = rgbToCmy(r, g, b);
 
-      // We need to convert the GM State to a buffer, so that
-      // canvas knows what to do with it.
-      const dyeBuffer = await this.toBufferPromise(
-        gm(card.dyeMaskUrl).colorize(c, m, y)
-      );
+    // We need to convert the GM State to a buffer, so that
+    // canvas knows what to do with it.
+    const dyeBuffer = await this.toBufferPromise(
+      gm(
+        card.dyeMaskUrl || `./src/assets/frames/default/mask-default.png`
+      ).colorize(c, m, y)
+    );
 
-      // Load the buffer and draw the dye mask on top of the frame.
-      const dyeImage = await loadImage(dyeBuffer);
-      ctx.drawImage(dyeImage, 0, 0, 350, 500);
-    }
+    // Load the buffer and draw the dye mask on top of the frame.
+    const dyeImage = await loadImage(dyeBuffer);
+    ctx.drawImage(dyeImage, 0, 0, 350, 500);
 
     // Draw the group icon
     const overlay = await loadImage(

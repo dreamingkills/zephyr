@@ -17,6 +17,7 @@ export default class BurnCard extends BaseCommand {
   description = "Burns a card or dye, giving you resources in exchange.";
   usage = ["$CMD$ [cards/dyes]"];
   allowDm = true;
+
   async exec(
     msg: Message,
     profile: GameProfile,
