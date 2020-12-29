@@ -50,7 +50,11 @@ export default class GiftCard extends BaseCommand {
 
     const tags = await ProfileService.getTags(profile);
 
-    const cardDescriptions = getDescriptions(cards, this.zephyr, tags);
+    const cardDescriptions = getDescriptions(
+      cards.slice(0, 5),
+      this.zephyr,
+      tags
+    );
 
     const embed = new MessageEmbed()
       .setAuthor(`Gift | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
@@ -59,7 +63,10 @@ export default class GiftCard extends BaseCommand {
           giftee.tag
         }?`
       )
-      .setDescription(cardDescriptions.join("\n"));
+      .setDescription(
+        cardDescriptions.join("\n") +
+          (cards.length > 5 ? `\n*... and ${cards.length - 5} more...` : ``)
+      );
 
     const conf = await msg.channel.createMessage({ embed });
 
