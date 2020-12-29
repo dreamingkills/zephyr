@@ -3,8 +3,8 @@ import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 
-export default class ToggleBlacklist extends BaseCommand {
-  names = ["toggledrops"];
+export default class ToggleReminders extends BaseCommand {
+  names = ["togglereminders"];
   description = `Toggles reminders being enabled/disabled.`;
   developerOnly = true;
 
