@@ -67,10 +67,9 @@ export class Zephyr extends Client {
     await this.cacheCards();
     const fonts = await FontLoader.init();
 
-    if (this.config.topgg.enabled) await this.startTopGg();
-
     const startTime = Date.now();
     this.once("ready", async () => {
+      if (this.config.topgg.enabled) await this.startTopGg();
       await this.commandLib.setup(this);
 
       const header = `===== ${chalk.hex(
