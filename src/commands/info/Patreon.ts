@@ -1,7 +1,6 @@
 import { Message } from "eris";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
-import { GameProfile } from "../../structures/game/Profile";
 
 export default class Patreon extends BaseCommand {
   names = ["patreon", "donate", "kofi", "ko-fi"];
@@ -9,7 +8,7 @@ export default class Patreon extends BaseCommand {
   usage = ["$CMD$"];
   allowDm = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(msg: Message): Promise<void> {
     const embed = new MessageEmbed()
       .setAuthor(
         `Patreon | ${msg.author.tag}`,

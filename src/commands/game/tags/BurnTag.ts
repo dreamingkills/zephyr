@@ -16,15 +16,19 @@ export default class BurnTag extends BaseCommand {
   usage = ["$CMD$ <tag>"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!this.options[0]) throw new ZephyrError.UnspecifiedBurnTagsError();
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    if (!options[0]) throw new ZephyrError.UnspecifiedBurnTagsError();
 
     const tags = await ProfileService.getTags(profile);
     const query = tags.filter(
-      (t) => t.name.toLowerCase() === this.options.join(" ").toLowerCase()
+      (t) => t.name.toLowerCase() === options.join(" ").toLowerCase()
     )[0];
 
-    if (!query) throw new ZephyrError.InvalidTagError(this.options[0]);
+    if (!query) throw new ZephyrError.InvalidTagError(options[0]);
 
     const cards = await CardService.getCardsByTag(query);
     if (cards.length < 1) throw new ZephyrError.NoCardsTaggedError(query);

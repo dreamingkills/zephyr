@@ -14,21 +14,23 @@ export default class DyeCard extends BaseCommand {
   usage = ["$CMD$ <$dye> <card>"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!this.options[0]?.startsWith("$"))
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    if (!options[0]?.startsWith("$"))
       throw new ZephyrError.InvalidDyeIdentifierError();
-    const targetDye = await ProfileService.getDyeByIdentifier(this.options[0]);
+    const targetDye = await ProfileService.getDyeByIdentifier(options[0]);
 
     if (targetDye.discordId !== msg.author.id)
       throw new ZephyrError.NotOwnerOfDyeError(targetDye.id);
     if (targetDye.charges < 1)
       throw new ZephyrError.UnchargedDyeError(targetDye.id);
 
-    if (!this.options[1]) throw new ZephyrError.InvalidCardReferenceError();
+    if (!options[1]) throw new ZephyrError.InvalidCardReferenceError();
 
-    const targetCard = await CardService.getUserCardByIdentifier(
-      this.options[1]
-    );
+    const targetCard = await CardService.getUserCardByIdentifier(options[1]);
 
     if (targetCard.discordId !== msg.author.id)
       throw new ZephyrError.NotOwnerOfCardError(targetCard);

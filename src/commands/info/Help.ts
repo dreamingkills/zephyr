@@ -10,15 +10,20 @@ export default class Help extends BaseCommand {
   usage = ["$CMD$", "$CMD$ [command/topic]"];
   allowDm = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[],
+    isDm: boolean
+  ): Promise<void> {
     let prefix: string;
-    if (!this.isDm) {
+    if (!isDm) {
       const guild = this.zephyr.guilds.get(msg.guildID!);
       prefix = this.zephyr.getPrefix(guild!.id);
     } else prefix = ".";
 
     const commands = this.zephyr.commandLib.commands;
-    const query = this.options[0]?.toLowerCase();
+    const query = options[0]?.toLowerCase();
 
     if (query) {
       const findCommand = commands.filter((c) => c.names.includes(query))[0];

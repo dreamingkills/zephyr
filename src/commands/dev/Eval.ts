@@ -16,9 +16,13 @@ export default class DevEval extends BaseCommand {
         .replace(/@/g, "@" + String.fromCharCode(8203));
     return text;
   }
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     try {
-      const code = this.options.join(" ");
+      const code = options.join(" ");
       let evaled = await eval(code);
 
       if (typeof evaled !== "string") {

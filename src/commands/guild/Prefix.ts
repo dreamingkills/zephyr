@@ -1,6 +1,7 @@
 import { Message } from "eris";
 import { GuildService } from "../../lib/database/services/guild/GuildService";
 import { BaseCommand } from "../../structures/command/Command";
+import { GameProfile } from "../../structures/game/Profile";
 
 export default class Prefix extends BaseCommand {
   names = ["prefix"];
@@ -8,8 +9,12 @@ export default class Prefix extends BaseCommand {
     `Changes the prefix of the bot.` +
     `\nRequires the **Manage Channels** permission.`;
 
-  async exec(msg: Message): Promise<void> {
-    const prefix = this.options[0];
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const prefix = options[0];
     const guild = this.zephyr.guilds.get(msg.guildID!);
     const author = guild?.members.get(msg.author.id)!;
     if (!prefix) {

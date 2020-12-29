@@ -14,8 +14,12 @@ export default class GiveItem extends BaseCommand {
   description = "Gives someone an item.";
   usage = ["$CMD$ <@mention> <item[s]>"];
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (this.options.length === 0)
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    if (options.length === 0)
       throw new ZephyrError.InvalidMentionItemError(false);
 
     let targetUser;
@@ -26,7 +30,7 @@ export default class GiveItem extends BaseCommand {
       target = await ProfileService.getProfile(targetUser.id);
     }
 
-    const itemsRaw = this.options
+    const itemsRaw = options
       .join(" ")
       .split(",")
       .map((i) => i.replace(/<((@!?\d+)|(:.+?:\d+))>/g, ``).trim());

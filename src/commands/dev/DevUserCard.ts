@@ -10,8 +10,12 @@ export default class DevUserCard extends BaseCommand {
   description = `Views debug information about a given user card.`;
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const identifier = this.options[0];
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const identifier = options[0];
     if (!identifier) throw new ZephyrError.InvalidCardReferenceError();
 
     const userCard = await CardService.getUserCardByIdentifier(identifier);

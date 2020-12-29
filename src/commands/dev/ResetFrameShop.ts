@@ -1,6 +1,5 @@
 import { Message } from "eris";
 import { BaseCommand } from "../../structures/command/Command";
-import { GameProfile } from "../../structures/game/Profile";
 import { ShopService } from "../../lib/database/services/game/ShopService";
 
 export default class ResetFrameShop extends BaseCommand {
@@ -8,7 +7,7 @@ export default class ResetFrameShop extends BaseCommand {
   description = `Resets the frame shop.`;
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(msg: Message): Promise<void> {
     await ShopService.resetFrameShop();
     await msg.channel.createMessage("OK");
     return;

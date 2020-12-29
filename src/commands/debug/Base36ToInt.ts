@@ -7,9 +7,13 @@ export default class Base36ToInt extends BaseCommand {
   description = "Developer command";
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const num = parseInt(this.options[0], 36);
-    await msg.channel.createMessage(`${this.options[0]} -> ${num}`);
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const num = parseInt(options[0], 36);
+    await msg.channel.createMessage(`${options[0]} -> ${num}`);
     return;
   }
 }

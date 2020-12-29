@@ -14,8 +14,12 @@ export default class GiftCard extends BaseCommand {
   names = ["gift", "give"];
   description = "Gives your card(s) to someone else.";
   usage = ["$CMD$ <card> <mention>"];
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const identifiers = this.options.filter((o) => !o.includes("<@"));
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const identifiers = options.filter((o) => !o.includes("<@"));
     const cards: GameUserCard[] = [];
     if (identifiers.length === 0) {
       const lastCard = await ProfileService.getLastCard(profile);

@@ -1,7 +1,6 @@
 import { Message } from "eris";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
-import { GameProfile } from "../../structures/game/Profile";
 import fs from "fs/promises";
 
 export default class CheckCardImages extends BaseCommand {
@@ -9,7 +8,7 @@ export default class CheckCardImages extends BaseCommand {
   description = `Scans card images for errors.`;
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(msg: Message): Promise<void> {
     const images = this.zephyr.getCards().map((c) => c.image);
 
     const failed = [];

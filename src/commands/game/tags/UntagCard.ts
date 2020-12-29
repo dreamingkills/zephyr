@@ -11,10 +11,14 @@ export default class UntagCard extends BaseCommand {
   usage = ["$CMD$ [cards]"];
   allowDm = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    if (!this.options[0]) throw new ZephyrError.InvalidCardReferenceError();
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    if (!options[0]) throw new ZephyrError.InvalidCardReferenceError();
     const cardsRaw = [];
-    const identifiers = this.options;
+    const identifiers = options;
     for (let i of identifiers) {
       const card = await CardService.getUserCardByIdentifier(i);
       if (card.discordId !== msg.author.id)

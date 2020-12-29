@@ -11,11 +11,15 @@ export default class SetPatron extends BaseCommand {
   description = `Marks someone as a Patron.`;
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     const targetUser = msg.mentions[0];
     if (!targetUser) throw new ZephyrError.InvalidMentionError();
 
-    const tier = parseInt(this.options[1], 10);
+    const tier = parseInt(options[1], 10);
     if (isNaN(tier)) throw new ZephyrError.InvalidAmountError("tier");
 
     const target = await ProfileService.getProfile(targetUser.id);

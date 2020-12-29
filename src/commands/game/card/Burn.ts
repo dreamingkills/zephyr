@@ -17,8 +17,12 @@ export default class BurnCard extends BaseCommand {
   description = "Burns a card or dye, giving you resources in exchange.";
   usage = ["$CMD$ [cards/dyes]"];
   allowDm = true;
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const identifiers = this.options;
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const identifiers = options;
 
     const burnTargets: (GameUserCard | GameDye)[] = [];
 

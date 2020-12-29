@@ -1,14 +1,13 @@
 import { Message } from "eris";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
-import { GameProfile } from "../../structures/game/Profile";
 
 export default class Stats extends BaseCommand {
   names = ["stats"];
   description = "Shows the bot's memory usage.";
   allowDm = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(msg: Message): Promise<void> {
     const usedMb = process.memoryUsage().heapUsed / 1000 / 1000;
     const usedPct = (usedMb / 7983) * 100;
     let ramStatusEmoji: string;

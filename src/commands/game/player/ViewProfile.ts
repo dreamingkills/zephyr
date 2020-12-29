@@ -12,12 +12,16 @@ export default class ViewProfile extends BaseCommand {
   description = "Displays your profile.";
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     let target: GameProfile | undefined;
     let targetUser: User | undefined;
-    if (this.options[0]) {
-      if (!isNaN(parseInt(this.options[0], 10))) {
-        const userId = this.options[0];
+    if (options[0]) {
+      if (!isNaN(parseInt(options[0], 10))) {
+        const userId = options[0];
         if (userId.length < 17) throw new ZephyrError.InvalidSnowflakeError();
 
         targetUser = await this.zephyr.fetchUser(userId);

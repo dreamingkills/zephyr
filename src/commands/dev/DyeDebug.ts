@@ -9,11 +9,15 @@ export default class DyeDebug extends BaseCommand {
   description = `Developer command.`;
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     const [r, g, b] = [
-      parseInt(this.options[0]),
-      parseInt(this.options[1]),
-      parseInt(this.options[2]),
+      parseInt(options[0]),
+      parseInt(options[1]),
+      parseInt(options[2]),
     ];
 
     const baseCard = this.zephyr.getCard(1);

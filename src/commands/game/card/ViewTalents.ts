@@ -14,10 +14,14 @@ export default class ViewTalent extends BaseCommand {
   usage = ["$CMD$ <card>"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     let card: GameUserCard;
 
-    const reference = this.options[0];
+    const reference = options[0];
     if (!reference) {
       card = await ProfileService.getLastCard(profile);
     } else card = await CardService.getUserCardByIdentifier(reference);

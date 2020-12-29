@@ -2,7 +2,6 @@ import { Message } from "eris";
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
-import { GameProfile } from "../../structures/game/Profile";
 import * as ZephyrError from "../../structures/error/ZephyrError";
 
 export default class RemoveBits extends BaseCommand {
@@ -10,7 +9,7 @@ export default class RemoveBits extends BaseCommand {
   description = `Removes bits from a user's balance.`;
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(msg: Message): Promise<void> {
     if (!msg.mentions[0]) throw new ZephyrError.InvalidMentionError();
     const amountRaw = msg.content
       .split(" ")

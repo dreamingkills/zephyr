@@ -11,15 +11,19 @@ export default class DeleteTag extends BaseCommand {
   usage = ["$CMD$ <tag name>"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!this.options[0]) throw new ZephyrError.UnspecifiedTagError();
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    if (!options[0]) throw new ZephyrError.UnspecifiedTagError();
     const userTags = await ProfileService.getTags(profile);
 
-    const tagQuery = this.options[0]?.toLowerCase();
+    const tagQuery = options[0]?.toLowerCase();
     const hasTag = userTags.filter((t) => t.name === tagQuery)[0];
 
     if (!hasTag)
-      throw new ZephyrError.InvalidTagError(this.options[0]?.toLowerCase());
+      throw new ZephyrError.InvalidTagError(options[0]?.toLowerCase());
 
     await ProfileService.deleteTag(hasTag);
 

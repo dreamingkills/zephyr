@@ -13,8 +13,12 @@ export default class ViewUserCard extends BaseCommand {
   usage = ["$CMD$ <card>"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const rawIdentifier = this.options[0];
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const rawIdentifier = options[0];
     let card;
     if (!rawIdentifier) {
       card = await ProfileService.getLastCard(profile);

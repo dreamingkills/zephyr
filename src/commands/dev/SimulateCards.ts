@@ -8,8 +8,12 @@ export default class SimulateCards extends BaseCommand {
   description = `Removes bits from a user's balance.`;
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const loopTime = parseInt(this.options[0], 10);
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const loopTime = parseInt(options[0], 10);
     if (isNaN(loopTime)) {
       msg.channel.createMessage("Enter a valid number.");
       return;

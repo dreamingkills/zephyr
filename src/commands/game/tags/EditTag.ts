@@ -16,16 +16,20 @@ export default class EditTag extends BaseCommand {
   ];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     const userTags = await ProfileService.getTags(profile);
 
-    const tagQuery = this.options[0]?.toLowerCase();
+    const tagQuery = options[0]?.toLowerCase();
     const hasTag = userTags.filter((t) => t.name === tagQuery)[0];
 
-    if (!hasTag) throw new ZephyrError.InvalidTagError(this.options[0]);
+    if (!hasTag) throw new ZephyrError.InvalidTagError(options[0]);
 
-    const firstParam = this.options[1]?.toLowerCase();
-    const secondParam = this.options[2]?.toLowerCase();
+    const firstParam = options[1]?.toLowerCase();
+    const secondParam = options[2]?.toLowerCase();
     if (secondParam) {
       if (firstParam.length > 12)
         throw new ZephyrError.UnspecifiedTagInCreationError();

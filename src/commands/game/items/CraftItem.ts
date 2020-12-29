@@ -18,11 +18,15 @@ export default class CraftItem extends BaseCommand {
   usage = ["$CMD$ <recipe name>"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!this.options[0]) throw new ZephyrError.UnspecifiedRecipeError();
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    if (!options[0]) throw new ZephyrError.UnspecifiedRecipeError();
 
     const recipeQuery = recipes.filter(
-      (r) => r.query === this.options.join(" ").toLowerCase()
+      (r) => r.query === options.join(" ").toLowerCase()
     )[0] as Recipe;
 
     if (!recipeQuery) throw new ZephyrError.RecipeNotFoundError();

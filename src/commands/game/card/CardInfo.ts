@@ -13,8 +13,12 @@ export default class CardInfo extends BaseCommand {
   description = "Shows you information a card.";
   usage = ["$CMD$ [card]"];
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const reference = this.options[0];
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const reference = options[0];
     let card: GameUserCard;
     if (!reference) {
       const lastCard = await ProfileService.getLastCard(profile);

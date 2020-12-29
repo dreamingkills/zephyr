@@ -1,7 +1,6 @@
 import { Message } from "eris";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
-import { GameProfile } from "../../structures/game/Profile";
 
 export default class Invite extends BaseCommand {
   names = ["invite", "support"];
@@ -10,7 +9,7 @@ export default class Invite extends BaseCommand {
   usage = ["$CMD$"];
   allowDm = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(msg: Message): Promise<void> {
     const embed = new MessageEmbed()
       .setAuthor(
         `Invite | ${msg.author.tag}`,

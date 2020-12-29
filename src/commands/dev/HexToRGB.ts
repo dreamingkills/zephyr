@@ -8,8 +8,12 @@ export default class HexToRGB extends BaseCommand {
   description = `Converts hexadecimal to RGB.`;
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const hex = this.options[0];
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const hex = options[0];
     const rgb = hexToRgb(hex);
 
     await msg.channel.createMessage(`R: ${rgb.r}\nG: ${rgb.g}\nB: ${rgb.b}`);

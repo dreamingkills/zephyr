@@ -12,11 +12,15 @@ export default class ViewDye extends BaseCommand {
   description = "Shows you a dye you own.";
   allowDm = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    if (!this.options[0] || !this.options[0].startsWith("$"))
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    if (!options[0] || !options[0].startsWith("$"))
       throw new ZephyrError.InvalidDyeIdentifierError();
 
-    const dyeId = this.options[0]?.toLowerCase();
+    const dyeId = options[0]?.toLowerCase();
     const dyeTarget = await ProfileService.getDyeByIdentifier(dyeId);
 
     const dyeOwner = await this.zephyr.fetchUser(dyeTarget.discordId);

@@ -1,6 +1,5 @@
 import { Message, PartialEmoji } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
-import { GameProfile } from "../../../structures/game/Profile";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { checkPermission } from "../../../lib/ZephyrUtils";
@@ -28,7 +27,7 @@ export default class TopWishlist extends BaseCommand {
     return description;
   }
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(msg: Message): Promise<void> {
     let page = 1;
     const topWishlistedCount = await CardService.getNumberOfTopWishlisted();
     const topWishlisted = await CardService.getTopWishlisted(page);

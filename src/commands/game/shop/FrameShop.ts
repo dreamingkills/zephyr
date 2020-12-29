@@ -15,11 +15,15 @@ export default class FrameShop extends BaseCommand {
   subcommands = ["buy <frame name>"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     const shop = await ShopService.getFrameShop();
-    const subcommand = this.options[0]?.toLowerCase();
+    const subcommand = options[0]?.toLowerCase();
     if (subcommand === "buy") {
-      const frameName = this.options.slice(1).join(" ")?.toLowerCase();
+      const frameName = options.slice(1).join(" ")?.toLowerCase();
       const itemFind = items.items.filter(
         (i) =>
           i.name.toLowerCase() === frameName + " frame" ||

@@ -10,9 +10,13 @@ export default class SetBlurb extends BaseCommand {
   usage = ["$CMD$ <up to 500 characters>"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const blurbRaw = this.options.join(" ");
-    const blurb = this.options.join(" ").slice(0, 500);
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const blurbRaw = options.join(" ");
+    const blurb = options.join(" ").slice(0, 500);
     await ProfileService.setProfileBlurb(profile, blurb);
 
     const embed = new MessageEmbed()

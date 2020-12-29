@@ -14,7 +14,11 @@ export default class Trade extends BaseCommand {
   description = "Trades one of your cards for someone else's card.";
   usage = ["$CMD$ <@mention> <your card> <their card>"];
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     const targetUser = msg.mentions[0];
     if (!targetUser) throw new ZephyrError.InvalidMentionError();
 
@@ -28,7 +32,7 @@ export default class Trade extends BaseCommand {
     if (target.blacklisted)
       throw new ZephyrError.AccountBlacklistedOtherError();
 
-    const refs = this.options.filter((v) => !v.includes("@"));
+    const refs = options.filter((v) => !v.includes("@"));
     if (!refs[0] || !refs[1])
       throw new ZephyrError.InvalidCardIdentifierTradeError();
 

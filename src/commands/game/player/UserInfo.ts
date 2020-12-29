@@ -11,12 +11,16 @@ export default class UserInfo extends BaseCommand {
   description = "Shows you information about a user.";
   allowDm = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     let targetUser: User | undefined;
     if (msg.mentions[0]) {
       targetUser = msg.mentions[0];
-    } else if (!isNaN(parseInt(this.options[0]))) {
-      const userId = parseInt(this.options[0]);
+    } else if (!isNaN(parseInt(options[0]))) {
+      const userId = parseInt(options[0]);
       if (userId.toString().length < 17)
         throw new ZephyrError.InvalidSnowflakeError();
 

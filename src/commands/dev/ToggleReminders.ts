@@ -1,6 +1,5 @@
 import { Message } from "eris";
 import { BaseCommand } from "../../structures/command/Command";
-import { GameProfile } from "../../structures/game/Profile";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 
 export default class ToggleReminders extends BaseCommand {
@@ -8,7 +7,7 @@ export default class ToggleReminders extends BaseCommand {
   description = `Toggles reminders being enabled/disabled.`;
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(msg: Message): Promise<void> {
     this.zephyr.dmHandler.remindersEnabled = !this.zephyr.dmHandler
       .remindersEnabled;
     const embed = new MessageEmbed()

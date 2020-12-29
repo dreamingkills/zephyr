@@ -12,24 +12,28 @@ export default class TagCard extends BaseCommand {
   usage = ["$CMD$ <tag> [cards]"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!this.options[0]) throw new ZephyrError.UnspecifiedTagError();
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    if (!options[0]) throw new ZephyrError.UnspecifiedTagError();
 
     const tags = await ProfileService.getTags(profile);
     if (tags.length === 0) throw new ZephyrError.NoTagsError();
 
-    const query = this.options[0]?.toLowerCase();
+    const query = options[0]?.toLowerCase();
     if (!query) throw new ZephyrError.UnspecifiedTagError();
 
     const queryIsTag = tags.map((t) => t.name).includes(query);
     let tag;
     let cards = [];
-    if (queryIsTag && !this.options[1]) {
+    if (queryIsTag && !options[1]) {
       tag = tags.filter((t) => t.name === query)[0];
       const card = await ProfileService.getLastCard(profile);
       cards.push(card);
     } else {
-      const trueQuery = this.options[0]?.toLowerCase();
+      const trueQuery = options[0]?.toLowerCase();
 
       const findTag = tags.filter(
         (t) =>
@@ -40,7 +44,7 @@ export default class TagCard extends BaseCommand {
 
       tag = findTag;
 
-      const identifiers = this.options.slice(1);
+      const identifiers = options.slice(1);
       for (let i of identifiers) {
         const card = await CardService.getUserCardByIdentifier(i);
         if (card.discordId !== msg.author.id)

@@ -10,8 +10,12 @@ export default class CardCollage extends BaseCommand {
   description = "Shows you a collage of cards.";
   usage = ["$CMD$ [card]"];
   developerOnly = true;
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const identifiers = this.options.filter((o) => !o.includes("<@"));
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const identifiers = options.filter((o) => !o.includes("<@"));
     if (identifiers.length === 0)
       throw new ZephyrError.InvalidCardReferenceError();
 

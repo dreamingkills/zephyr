@@ -33,8 +33,12 @@ export default class Wishlist extends BaseCommand {
     return;
   }
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const subcommand = this.options[0]?.toLowerCase();
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const subcommand = options[0]?.toLowerCase();
     let target: GameProfile | undefined;
     let targetUser: User | undefined;
     if (subcommand === "add") {
@@ -50,7 +54,7 @@ export default class Wishlist extends BaseCommand {
         throw new ZephyrError.WishlistFullError(profile.patron, prefix);
       }
 
-      const nameQuery = this.options.slice(1).join(" ")?.trim().toLowerCase();
+      const nameQuery = options.slice(1).join(" ")?.trim().toLowerCase();
       const find = this.zephyr
         .getCards()
         .filter((c) => c.name.toLowerCase() === nameQuery);
@@ -153,11 +157,11 @@ export default class Wishlist extends BaseCommand {
       return;
     } else if (subcommand === "delete" || subcommand === "remove") {
       const wishlist = await ProfileService.getWishlist(profile);
-      let num = parseInt(this.options[1], 10);
+      let num = parseInt(options[1], 10);
 
       if (isNaN(num)) {
-        if (this.options[1]) {
-          const query = this.options.slice(1)?.join(" ").toLowerCase();
+        if (options[1]) {
+          const query = options.slice(1)?.join(" ").toLowerCase();
           const item = wishlist.filter((i) => i.name.toLowerCase() === query);
           if (item[0]) {
             const index = wishlist.indexOf(item[0]);
@@ -210,11 +214,10 @@ export default class Wishlist extends BaseCommand {
     }
     if (msg.mentions[0]) {
       targetUser = msg.mentions[0];
-    } else if (!isNaN(parseInt(this.options[0]))) {
-      if (this.options[0].length < 17)
-        throw new ZephyrError.InvalidSnowflakeError();
+    } else if (!isNaN(parseInt(options[0]))) {
+      if (options[0].length < 17) throw new ZephyrError.InvalidSnowflakeError();
 
-      targetUser = await this.zephyr.fetchUser(this.options[0]);
+      targetUser = await this.zephyr.fetchUser(options[0]);
     } else {
       target = profile;
       targetUser = msg.author;

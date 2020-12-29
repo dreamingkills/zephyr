@@ -1,6 +1,5 @@
 import { Message } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
-import { GameProfile } from "../../../structures/game/Profile";
 import { recipes } from "../../../assets/recipes.json";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { renderRecipe } from "../../../lib/ZephyrUtils";
@@ -10,7 +9,7 @@ export default class ShowRecipes extends BaseCommand {
   description = "Shows recipes available to craft.";
   allowDm = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(msg: Message): Promise<void> {
     const embed = new MessageEmbed().setAuthor(
       `Recipes | ${msg.author.tag}`,
       msg.author.dynamicAvatarURL("png")

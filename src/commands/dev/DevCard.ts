@@ -9,8 +9,12 @@ export default class DevCard extends BaseCommand {
   description = `Views debug information about a given card.`;
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const cardId = parseInt(this.options[0], 10);
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const cardId = parseInt(options[0], 10);
     if (isNaN(cardId)) return;
 
     const card = this.zephyr.getCard(cardId);

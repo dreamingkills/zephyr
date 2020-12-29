@@ -86,8 +86,12 @@ export default class Leaderboards extends BaseCommand {
     return leaderboard;
   }
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const boardType = this.options[0]?.toLowerCase();
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const boardType = options[0]?.toLowerCase();
     let page = 1;
     let trueType: string;
     let totalEntries: number;

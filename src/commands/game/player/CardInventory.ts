@@ -27,13 +27,15 @@ export default class CardInventory extends BaseCommand {
     return cardDescriptions.join("\n");
   }
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     let target: GameProfile | undefined = undefined;
     let targetUser;
 
-    const id = this.options.filter(
-      (o) => !isNaN(parseInt(o)) && o.length >= 17
-    )[0];
+    const id = options.filter((o) => !isNaN(parseInt(o)) && o.length >= 17)[0];
     if (msg.mentions[0]) {
       targetUser = msg.mentions[0];
     } else if (id) {
@@ -50,12 +52,12 @@ export default class CardInventory extends BaseCommand {
     if (target.private && target.discordId !== msg.author.id)
       throw new ZephyrError.PrivateProfileError(targetUser.tag);
 
-    const optionsRaw = this.options.filter((v) => v.includes("="));
-    const options: Filter = {};
-    for (let opt of optionsRaw) {
+    const filtersRaw = options.filter((v) => v.includes("="));
+    const filters: Filter = {};
+    for (let opt of filtersRaw) {
       const key = opt.split("=")[0];
       const value = opt.split("=")[1];
-      options[key] = value;
+      filters[key] = value;
     }
 
     const userTags = await ProfileService.getTags(target);
@@ -63,23 +65,23 @@ export default class CardInventory extends BaseCommand {
     const size = await CardService.getUserInventorySize(
       target,
       userTags,
-      options
+      filters
     );
 
     if (
-      !options["page"] ||
-      isNaN(parseInt(<string>options["page"], 10)) ||
-      options["page"] < 1
+      !filters["page"] ||
+      isNaN(parseInt(<string>filters["page"], 10)) ||
+      filters["page"] < 1
     )
-      options["page"] = 1;
+      filters["page"] = 1;
     const totalPages = Math.ceil(size / 10) || 1;
-    if (options["page"] > totalPages) options["page"] = totalPages;
+    if (filters["page"] > totalPages) filters["page"] = totalPages;
 
-    let page = parseInt(options["page"] as string, 10);
+    let page = parseInt(filters["page"] as string, 10);
     const inventory = await CardService.getUserInventory(
       target,
       userTags,
-      options
+      filters
     );
 
     const embed = new MessageEmbed()
@@ -109,11 +111,11 @@ export default class CardInventory extends BaseCommand {
         if (emoji.name === "▶️" && page !== totalPages) page++;
         if (emoji.name === "⏭️" && page !== totalPages) page = totalPages;
 
-        options["page"] = page;
+        filters["page"] = page;
         const newCards = await CardService.getUserInventory(
           target!,
           userTags,
-          options
+          filters
         );
         embed.setDescription(this.renderInventory(newCards, userTags));
         embed.setFooter(`Page ${page} of ${totalPages} • ${size} entries`);

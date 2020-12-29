@@ -31,8 +31,12 @@ export default class TopGroup extends BaseCommand {
     }
     return description;
   }
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const groupRaw = this.options.join(" ").toLowerCase();
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const groupRaw = options.join(" ").toLowerCase();
     if (!groupRaw) throw new ZephyrError.UnspecifiedGroupError();
 
     const match = this.zephyr

@@ -19,10 +19,14 @@ export default class UseItem extends BaseCommand {
   usage = ["$CMD$ <item>", "$CMD$ <frame> <card>"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!this.options[0]) throw new ZephyrError.UnspecifiedItemError();
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    if (!options[0]) throw new ZephyrError.UnspecifiedItemError();
 
-    const target = this.options.join(" ")?.toLowerCase();
+    const target = options.join(" ")?.toLowerCase();
     const targetItem = items.items.filter((i) =>
       target.includes(i.name.toLowerCase())
     )[0] as BaseItem | undefined;
@@ -39,7 +43,7 @@ export default class UseItem extends BaseCommand {
 
     switch (targetItem.type) {
       case "FRAME": {
-        const cardIdentifier = this.options.slice(
+        const cardIdentifier = options.slice(
           targetItem.name.split(" ").length
         )[0];
         if (!cardIdentifier) throw new ZephyrError.InvalidCardReferenceError();

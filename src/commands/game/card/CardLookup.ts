@@ -64,15 +64,19 @@ export default class CardLookup extends BaseCommand {
     return embed;
   }
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     let nameQuery: string;
     let baseCard: GameBaseCard | undefined;
-    if (!this.options[0]) {
+    if (!options[0]) {
       const lastCard = await ProfileService.getLastCard(profile);
       const lastBase = this.zephyr.getCard(lastCard.baseCardId);
 
       baseCard = lastBase;
-    } else nameQuery = this.options.join(" ")?.trim();
+    } else nameQuery = options.join(" ")?.trim();
 
     if (baseCard) {
       const embed = await this.getCardStats(baseCard, msg.author);

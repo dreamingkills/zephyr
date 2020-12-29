@@ -12,8 +12,12 @@ export default class CreateTag extends BaseCommand {
   usage = ["$CMD$ <tag name> <emoji>"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (this.options.length > 2) throw new ZephyrError.TagContainsSpacesError();
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    if (options.length > 2) throw new ZephyrError.TagContainsSpacesError();
 
     const userTags = await ProfileService.getTags(profile);
     if (
@@ -27,14 +31,14 @@ export default class CreateTag extends BaseCommand {
       throw new ZephyrError.TagsFullError(profile.patron, prefix);
     }
 
-    const tag = this.options[0]?.toLowerCase();
+    const tag = options[0]?.toLowerCase();
     if (!tag || tag.length > 12)
       throw new ZephyrError.UnspecifiedTagInCreationError();
 
     if (userTags.filter((t) => t.name === tag)[0])
       throw new ZephyrError.DuplicateTagError(tag);
 
-    const emojiRaw = this.options[1];
+    const emojiRaw = options[1];
     const trueEmoji = emojiregex().exec(emojiRaw);
     if (!trueEmoji) throw new ZephyrError.InvalidEmojiTagError();
 

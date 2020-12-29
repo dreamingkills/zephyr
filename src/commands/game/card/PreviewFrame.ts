@@ -11,8 +11,12 @@ export default class PreviewFrame extends BaseCommand {
   usage = ["$CMD$ <frame>"];
   allowDm = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const query = this.options.join(" ").toLowerCase();
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const query = options.join(" ").toLowerCase();
     if (!query) throw new ZephyrError.NoFrameSpecifiedError();
     const frame = await ShopService.getFrameByName(query);
 

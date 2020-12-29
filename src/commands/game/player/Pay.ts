@@ -11,7 +11,12 @@ export default class Pay extends BaseCommand {
   names = ["pay", "venmo", "paypal", "cashapp"];
   description = "Gives someone some money.";
   usage = ["$CMD$ <@user> <amount>"];
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
+
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     if (!msg.mentions[0]) throw new ZephyrError.InvalidMentionError();
 
     const user = msg.mentions[0];
@@ -23,9 +28,7 @@ export default class Pay extends BaseCommand {
     if (target.blacklisted)
       throw new ZephyrError.AccountBlacklistedOtherError();
 
-    const amount = parseInt(
-      this.options.filter((p) => !isNaN(parseInt(p, 10)))[0]
-    );
+    const amount = parseInt(options.filter((p) => !isNaN(parseInt(p, 10)))[0]);
 
     if (isNaN(amount) || amount < 1)
       throw new ZephyrError.InvalidAmountError("bits");

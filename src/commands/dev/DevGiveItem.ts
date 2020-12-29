@@ -11,13 +11,16 @@ export default class DevUserCard extends BaseCommand {
   description = `Gives someone an item.`;
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     const targetUser = msg.mentions[0];
     if (!targetUser) throw new ZephyrError.InvalidMentionError();
 
     const targetItem = items.filter(
-      (i) =>
-        i.name.toLowerCase() === this.options.slice(1).join(" ").toLowerCase()
+      (i) => i.name.toLowerCase() === options.slice(1).join(" ").toLowerCase()
     )[0];
     if (!targetItem) throw new ZephyrError.InvalidItemError();
 

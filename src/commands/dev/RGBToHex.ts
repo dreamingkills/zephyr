@@ -8,10 +8,15 @@ export default class RGBToHex extends BaseCommand {
   description = `Converts RGB to hexadecimal.`;
   developerOnly = true;
 
-  async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    const r = parseInt(this.options[0]);
-    const g = parseInt(this.options[1]);
-    const b = parseInt(this.options[2]);
+  async exec(
+    msg: Message,
+    _profile: GameProfile,
+    options: string[],
+    _isDm: boolean
+  ): Promise<void> {
+    const r = parseInt(options[0]);
+    const g = parseInt(options[1]);
+    const b = parseInt(options[2]);
     await msg.channel.createMessage(rgbToHex(r, g, b));
     return;
   }

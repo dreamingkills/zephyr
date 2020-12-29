@@ -11,8 +11,12 @@ export default class Reminders extends BaseCommand {
   usage = ["$CMD$ [type]"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const subcommand = this.options[0]?.toLowerCase();
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const subcommand = options[0]?.toLowerCase();
     if (subcommand) {
       let message;
       if (["drop", "drops", "d"].indexOf(subcommand) > -1) {

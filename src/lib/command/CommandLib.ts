@@ -54,6 +54,7 @@ export class CommandLib {
       console.warn(`Duplicate command found: ${commandName}`);
 
     const command = commandMatch[0];
+
     if (
       command.developerOnly &&
       zephyr.config.developers.indexOf(message.author.id) < 0

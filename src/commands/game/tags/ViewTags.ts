@@ -11,17 +11,20 @@ export default class ViewTags extends BaseCommand {
   usage = ["$CMD$", "$CMD$ <@mention>", "$CMD$ <id>"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
     let target: GameProfile | undefined;
     let targetUser: User | undefined;
 
     if (msg.mentions[0]) {
       targetUser = msg.mentions[0];
-    } else if (!isNaN(parseInt(this.options[0]))) {
-      if (this.options[0].length < 17)
-        throw new ZephyrError.InvalidSnowflakeError();
+    } else if (!isNaN(parseInt(options[0]))) {
+      if (options[0].length < 17) throw new ZephyrError.InvalidSnowflakeError();
 
-      targetUser = await this.zephyr.fetchUser(this.options[0]);
+      targetUser = await this.zephyr.fetchUser(options[0]);
     } else {
       targetUser = msg.author;
       target = profile;

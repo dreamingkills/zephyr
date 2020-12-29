@@ -18,8 +18,12 @@ export default class UpgradeCard extends BaseCommand {
   usage = ["$CMD$ <card>"];
   allowDm = true;
 
-  async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const reference = this.options[0];
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    const reference = options[0];
     let card: GameUserCard;
     if (!reference) {
       const lastCard = await ProfileService.getLastCard(profile);
