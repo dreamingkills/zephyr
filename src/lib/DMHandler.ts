@@ -56,10 +56,13 @@ export class DMHandler {
           try {
             await dmChannel.createMessage(message);
             success.push({ id: p.discordId, type });
+            break;
           } catch {
             retries++;
           }
-          if (retries >= 3) throw Error;
+          if (retries >= 3) {
+            throw Error;
+          }
         }
       } catch (e) {
         failed.push(p);
@@ -70,6 +73,6 @@ export class DMHandler {
     if (success.length > 0) await ProfileService.setUserReminded(success);
     if (failed.length > 0) await ProfileService.disableReminders(failed);
 
-    setTimeout(() => this.handle(zephyr), 30000);
+    if (this.remindersEnabled) setTimeout(() => this.handle(zephyr), 30000);
   }
 }
