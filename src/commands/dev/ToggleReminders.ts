@@ -9,7 +9,8 @@ export default class ToggleReminders extends BaseCommand {
   developerOnly = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    this.zephyr.remindersEnabled = !this.zephyr.remindersEnabled;
+    this.zephyr.dmHandler.remindersEnabled = !this.zephyr.dmHandler
+      .remindersEnabled;
     const embed = new MessageEmbed()
       .setAuthor(
         `Toggle Reminders | ${msg.author.tag}`,
@@ -17,7 +18,7 @@ export default class ToggleReminders extends BaseCommand {
       )
       .setDescription(
         `Reminders have been ${
-          this.zephyr.dropsEnabled ? `enabled` : `disabled`
+          this.zephyr.dmHandler.remindersEnabled ? `enabled` : `disabled`
         }.`
       );
     await msg.channel.createMessage({ embed });

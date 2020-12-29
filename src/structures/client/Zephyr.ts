@@ -24,7 +24,6 @@ export class Zephyr extends Client {
   dmHandler = new DMHandler();
   config: typeof config;
   chance = new Chance();
-  remindersEnabled = false;
   dropsEnabled = true;
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
@@ -95,9 +94,7 @@ export class Zephyr extends Client {
           `\n\n${`=`.repeat(stripAnsi(header).length)}`
       );
 
-      setInterval(() => {
-        if (this.remindersEnabled) this.dmHandler.handle(this);
-      }, 30000);
+      await this.dmHandler.handle(this);
       setInterval(() => {
         this.editStatus(`online`, {
           name: `with cards | ${this.guilds.size} servers`,
@@ -323,6 +320,7 @@ export class Zephyr extends Client {
       return findUser;
     }
   }
+
   public async fetchGuild(
     guildId: string,
     ignoreCache: boolean = false

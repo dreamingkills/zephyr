@@ -3,11 +3,11 @@ import { ProfileService } from "./database/services/game/ProfileService";
 import dayjs from "dayjs";
 
 export class DMHandler {
-  public interval!: NodeJS.Timeout;
+  public remindersEnabled = true;
 
   public async handle(zephyr: Zephyr): Promise<void> {
     const eligible = await ProfileService.getAvailableReminderRecipients();
-    console.log("Eligible reminder recipients received");
+    console.log("Scanning. Found " + eligible.length);
     const success: { id: string; type: 1 | 2 | 3 }[] = [];
     const failed = [];
     for (let p of eligible) {
@@ -50,20 +50,26 @@ export class DMHandler {
         if (!type) continue;
 
         const dmChannel = await user.getDMChannel();
-        await dmChannel.createMessage(message);
-        success.push({ id: p.discordId, type });
-        console.log(`Success - ${user.tag}`);
+
+        let retries = 0;
+        while (retries < 3) {
+          try {
+            await dmChannel.createMessage(message);
+            success.push({ id: p.discordId, type });
+          } catch {
+            retries++;
+          }
+          if (retries >= 3) throw Error;
+        }
       } catch (e) {
         failed.push(p);
-        console.log(`Failed - ${p.discordId}`);
         continue;
       }
     }
 
-    console.log(`Success length: ${success.length}`);
-    console.log(`Failed length: ${failed.length}`);
-
     if (success.length > 0) await ProfileService.setUserReminded(success);
     if (failed.length > 0) await ProfileService.disableReminders(failed);
+
+    setTimeout(() => this.handle(zephyr), 30000);
   }
 }
