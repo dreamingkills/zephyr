@@ -29,7 +29,7 @@ export class Zephyr extends Client {
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
 
-  webhookListener = new WebhookListener();
+  webhookListener: WebhookListener | undefined;
   dbl: dblapi | undefined;
 
   private generalChannelNames = [
@@ -48,15 +48,26 @@ export class Zephyr extends Client {
     this.setMaxListeners(250);
   }
 
+  public async startTopGg(): Promise<void> {
+    this.webhookListener = new WebhookListener();
+    this.dbl = new dblapi(this.config.topgg.token, this);
+
+    await this.webhookListener.init(this);
+
+    await this.dbl.postStats(this.guilds.size);
+    setInterval(async () => {
+      if (this.dbl) {
+        await this.dbl.postStats(this.guilds.size);
+      }
+    }, 1800000);
+  }
+
   public async start() {
     await this.cachePrefixes();
     await this.cacheCards();
     const fonts = await FontLoader.init();
 
-    if (this.config.topgg.enabled) {
-      await this.webhookListener.init(this);
-      this.dbl = new dblapi(this.config.topgg.token, this);
-    }
+    if (this.config.topgg.enabled) await this.startTopGg();
 
     const startTime = Date.now();
     this.once("ready", async () => {
@@ -94,15 +105,6 @@ export class Zephyr extends Client {
           type: 0,
         });
       }, 300000);
-
-      // top.gg
-      if (this.config.topgg.enabled && this.dbl) {
-        setInterval(async () => {
-          if (!this.dbl) return;
-          const post = await this.dbl.postStats(this.guilds.size);
-          console.log(post);
-        }, 1800000);
-      }
     });
 
     this.on("messageCreate", async (message) => {
