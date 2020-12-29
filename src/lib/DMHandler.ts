@@ -7,6 +7,7 @@ export class DMHandler {
 
   public async handle(zephyr: Zephyr): Promise<void> {
     const eligible = await ProfileService.getAvailableReminderRecipients();
+    console.log("Eligible reminder recipients received");
     const success: { id: string; type: 1 | 2 | 3 }[] = [];
     const failed = [];
     for (let p of eligible) {
@@ -51,11 +52,16 @@ export class DMHandler {
         const dmChannel = await user.getDMChannel();
         await dmChannel.createMessage(message);
         success.push({ id: p.discordId, type });
+        console.log(`Success - ${user.tag}`);
       } catch (e) {
         failed.push(p);
+        console.log(`Failed - ${p.discordId}`);
         continue;
       }
     }
+
+    console.log(`Success length: ${success.length}`);
+    console.log(`Failed length: ${failed.length}`);
 
     if (success.length > 0) await ProfileService.setUserReminded(success);
     if (failed.length > 0) await ProfileService.disableReminders(failed);

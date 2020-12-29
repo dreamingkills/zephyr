@@ -3,20 +3,22 @@ import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 
-export default class ToggleDrops extends BaseCommand {
+export default class ToggleBlacklist extends BaseCommand {
   names = ["toggledrops"];
-  description = `Toggles drops being enabled/disabled.`;
+  description = `Toggles reminders being enabled/disabled.`;
   developerOnly = true;
 
   async exec(msg: Message, _profile: GameProfile): Promise<void> {
-    this.zephyr.dropsEnabled = !this.zephyr.dropsEnabled;
+    this.zephyr.remindersEnabled = !this.zephyr.remindersEnabled;
     const embed = new MessageEmbed()
       .setAuthor(
-        `Toggle Drops | ${msg.author.tag}`,
+        `Toggle Reminders | ${msg.author.tag}`,
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(
-        `Drops have been ${this.zephyr.dropsEnabled ? `enabled` : `disabled`}.`
+        `Reminders have been ${
+          this.zephyr.dropsEnabled ? `enabled` : `disabled`
+        }.`
       );
     await msg.channel.createMessage({ embed });
     return;
