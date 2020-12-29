@@ -8,12 +8,7 @@ export interface Command {
   usage: string[];
   subcommands: string[];
   allowDm: boolean;
-  exec(
-    msg: Message,
-    profile: GameProfile,
-    options: string[],
-    isDm: boolean
-  ): Promise<void>;
+  exec(msg: Message, profile: GameProfile, options: string[]): Promise<void>;
 }
 
 export abstract class BaseCommand implements Command {
@@ -29,8 +24,7 @@ export abstract class BaseCommand implements Command {
   abstract exec(
     msg: Message,
     profile: GameProfile,
-    options: string[],
-    isDm: boolean
+    options: string[]
   ): Promise<void>;
 
   public async run(msg: Message, profile: GameProfile, zephyr: Zephyr) {
@@ -40,7 +34,7 @@ export abstract class BaseCommand implements Command {
       .slice(1)
       .filter((v) => v);
 
-    await this.exec(msg, profile, options, msg.channel.type === 1);
+    await this.exec(msg, profile, options);
   }
 
   public selfDestruct(): string {

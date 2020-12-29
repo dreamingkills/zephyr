@@ -13,11 +13,10 @@ export default class Help extends BaseCommand {
   async exec(
     msg: Message,
     _profile: GameProfile,
-    options: string[],
-    isDm: boolean
+    options: string[]
   ): Promise<void> {
     let prefix: string;
-    if (!isDm) {
+    if (msg.guildID) {
       const guild = this.zephyr.guilds.get(msg.guildID!);
       prefix = this.zephyr.getPrefix(guild!.id);
     } else prefix = ".";

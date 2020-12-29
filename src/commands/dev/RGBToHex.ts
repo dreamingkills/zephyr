@@ -11,8 +11,7 @@ export default class RGBToHex extends BaseCommand {
   async exec(
     msg: Message,
     _profile: GameProfile,
-    options: string[],
-    _isDm: boolean
+    options: string[]
   ): Promise<void> {
     const r = parseInt(options[0]);
     const g = parseInt(options[1]);
