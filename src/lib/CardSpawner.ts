@@ -318,13 +318,13 @@ export abstract class CardSpawner {
     }, 1500);
 
     if (this.guildLevels[guild.id] >= this.minSpawnThreshold) {
-      this.guildLevels[guild.id] = 0;
       let rand = [false, true][Math.floor(Math.random() * 2)];
       if (this.guildLevels[guild.id] >= this.spawnThreshold) {
         rand = true;
       }
       if (!rand) return;
 
+      this.guildLevels[guild.id] = 0;
       const channelId = await GuildService.getDropChannel(guild.id);
 
       if (!channelId) return;
