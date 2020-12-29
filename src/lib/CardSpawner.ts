@@ -332,7 +332,9 @@ export abstract class CardSpawner {
       const channel = guild.channels.find(
         (c) => c.id === channelId
       ) as TextChannel;
-      await this.activityDrop(channel, zephyr);
+
+      if (channel.permissionsOf(zephyr.user.id).json["sendMessages"])
+        await this.activityDrop(channel, zephyr);
     }
   }
 }

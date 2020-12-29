@@ -31,7 +31,9 @@ export class CommandLib {
     if (message.channel.type === 1) {
       prefix = ".";
     } else {
-      const guild = zephyr.guilds.get(message.guildID!);
+      const guild = await zephyr.fetchGuild(message.guildID!);
+      if (!guild) return;
+
       prefix = zephyr.getPrefix(guild!.id);
     }
 
@@ -40,12 +42,14 @@ export class CommandLib {
       `g`
     ).exec(message.content.toLowerCase());
     if (!commandNameRegExp) return;
+
     const commandName = commandNameRegExp[0].slice(prefix.length);
 
     const commandMatch = this.commands.filter(
       (c) => c.names.indexOf(commandName) > -1
     );
     if (!commandMatch[0]) return;
+
     if (commandMatch.length > 1)
       console.warn(`Duplicate command found: ${commandName}`);
 
@@ -60,8 +64,12 @@ export class CommandLib {
           message.author.dynamicAvatarURL("png")
         )
         .setDescription(`This command is only usable by the developer.`);
-      await message.channel.createMessage({ embed });
-      return;
+      try {
+        await message.channel.createMessage({ embed });
+      } catch {
+      } finally {
+        return;
+      }
     }
 
     try {
@@ -85,7 +93,7 @@ export class CommandLib {
         } catch {}
       } else {
         if (e.name === "Missing Access") return;
-        console.log(e.name);
+        console.log(`ERROR NAME: ${e}\n${e}`);
         const embed = new MessageEmbed()
           .setAuthor(
             `Error | ${message.author.tag}`,
@@ -95,7 +103,6 @@ export class CommandLib {
         try {
           await message.channel.createMessage({ embed });
         } catch {}
-        console.error(e);
       }
     }
   }
