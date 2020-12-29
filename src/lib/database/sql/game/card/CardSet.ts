@@ -29,7 +29,7 @@ export abstract class CardSet extends DBClass {
     while (true) {
       try {
         const query = (await DB.query(
-          `INSERT INTO user_card (card_id, serial_number, discord_id, original_owner, wear, luck_coeff, frame, claim_time, dropper, fight_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO user_card (card_id, serial_number, discord_id, original_owner, wear, luck_coeff, frame, claim_time, dropper, fight_count, original_wear) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             card.id,
             issue,
@@ -41,6 +41,7 @@ export abstract class CardSet extends DBClass {
             claimTime,
             dropper ? dropper.discordId : null,
             fightCount,
+            wear,
           ]
         )) as { insertId: number };
         zephyr.getCard(card.id).serialTotal = issue;

@@ -16,6 +16,7 @@ import { DMHandler } from "../../lib/DMHandler";
 import { WebhookListener } from "../../webhook";
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
 import { AnticheatService } from "../../lib/database/services/meta/AnticheatService";
+import dblapi from "dblapi.js";
 
 export class Zephyr extends Client {
   version: string = "Primrose";
@@ -29,6 +30,7 @@ export class Zephyr extends Client {
   private cards: { [cardId: number]: GameBaseCard } = {};
 
   webhookListener = new WebhookListener();
+  dbl: dblapi | undefined;
 
   private generalChannelNames = [
     "welcome",
@@ -51,7 +53,10 @@ export class Zephyr extends Client {
     await this.cacheCards();
     const fonts = await FontLoader.init();
 
-    await this.webhookListener.init(this);
+    if (this.config.topgg.enabled) {
+      await this.webhookListener.init(this);
+      this.dbl = new dblapi(this.config.topgg.token, this);
+    }
 
     const startTime = Date.now();
     this.once("ready", async () => {
@@ -89,6 +94,15 @@ export class Zephyr extends Client {
           type: 0,
         });
       }, 300000);
+
+      // top.gg
+      if (this.config.topgg.enabled && this.dbl) {
+        setInterval(async () => {
+          if (!this.dbl) return;
+          const post = await this.dbl.postStats(this.guilds.size);
+          console.log(post);
+        }, 1800000);
+      }
     });
 
     this.on("messageCreate", async (message) => {
