@@ -58,8 +58,6 @@ export default class CardInfo extends BaseCommand {
       }
     } else dropper = "Server Activity";
 
-    const claimGuild = await this.zephyr.fetchGuild(claimInfo.guild_id);
-
     const cardImage = await CardService.checkCacheForCard(card, this.zephyr);
 
     const embed = new MessageEmbed()
@@ -70,11 +68,7 @@ export default class CardInfo extends BaseCommand {
       .setDescription(
         `Showing stats for \`${card.id.toString(36)}\`...` +
           `\n\n— Claimed at **${claimTime} UTC**` +
-          `\n— Claimed in **${
-            claimGuild
-              ? claimGuild.name
-              : `Unknown Guild (${claimInfo.guild_id})`
-          }**` +
+          `\n— Claimed in **${claimInfo.guild_id}**` +
           `\n— Dropped by **${dropper}**` +
           `\n— Claimed by **${claimer}**` +
           `\n\n— Claimed in **${
