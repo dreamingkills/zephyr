@@ -16,6 +16,7 @@ export class DMHandler {
         continue;
       }
       try {
+        console.log("Attempting to message " + p.discordId);
         const user = await zephyr.fetchUser(p.discordId);
         if (!user) {
           failed.push(p);
@@ -53,14 +54,17 @@ export class DMHandler {
 
         let retries = 0;
         while (retries < 3) {
+          console.log("Attempt " + retries + " to message " + p.discordId);
           try {
             await dmChannel.createMessage(message);
             success.push({ id: p.discordId, type });
+            console.log("Succesfully messaged " + p.discordId);
             break;
           } catch {
             retries++;
           }
           if (retries >= 3) {
+            console.log("Failed to message " + p.discordId);
             throw Error;
           }
         }
