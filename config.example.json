@@ -1,0 +1,30 @@
+{
+  "discord": {
+    "defaultPrefix": "",
+    "token": "",
+    "emojiId": {
+      "check": "",
+      "bits": "",
+      "warn": ""
+    },
+    "emoji": {
+      "check": "in the form <name:id>",
+      "bits": "",
+      "warn": ""
+    }
+  },
+  "topgg": {
+    "webhook": {
+      "auth": "",
+      "port": ""
+    }
+  },
+  "mariadb": {
+    "host": "localhost",
+    "port": 3360,
+    "user": "root",
+    "password": "pw",
+    "database": "zephyr"
+  },
+  "developers": ["put your discord id here"]
+}

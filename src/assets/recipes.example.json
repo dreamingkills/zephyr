@@ -1,0 +1,20 @@
+{
+  "recipes": [
+    {
+      "name": "string",
+      "query": "string",
+      "ingredients": [
+        {
+          "id": 0,
+          "count": 0
+        }
+      ],
+      "result": [
+        {
+          "id": 0,
+          "count": 0
+        }
+      ]
+    }
+  ]
+}

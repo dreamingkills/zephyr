@@ -58,3 +58,8 @@ export class GameFrame {
     this.dyeMaskUrl = data.dye_mask_url;
   }
 }
+
+export interface Subgroup {
+  name: string
+  group: string,
+}
