@@ -374,4 +374,15 @@ export abstract class ProfileSet extends DBClass {
     );
     return;
   }
+
+  public static async removeCubits(
+    profile: GameProfile,
+    amount: number
+  ): Promise<void> {
+    await DB.query(`UPDATE profile SET cubits=cubits-? WHERE discord_id=?;`, [
+      amount,
+      profile.discordId,
+    ]);
+    return;
+  }
 }

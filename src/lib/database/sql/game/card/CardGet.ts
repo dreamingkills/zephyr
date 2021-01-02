@@ -13,6 +13,12 @@ import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { Filter, FilterService } from "../../Filters";
 import { GameProfile } from "../../../../../structures/game/Profile";
 import { GameTag } from "../../../../../structures/game/Tag";
+import {
+  CardSticker,
+  GameCardSticker,
+  GameSticker,
+  Sticker,
+} from "../../../../../structures/game/Sticker";
 
 export type WearSpread = {
   0: number;
@@ -255,5 +261,23 @@ export abstract class CardGet extends DBClass {
       4: query.filter((w) => w.wear === 4)[0]?.count || 0,
       5: query.filter((w) => w.wear === 5)[0]?.count || 0,
     };
+  }
+
+  /*
+      Stickers
+  */
+  public static async getAllStickers(): Promise<GameSticker[]> {
+    const query = (await DB.query(`SELECT * FROM sticker;`)) as Sticker[];
+    return query.map((s) => new GameSticker(s));
+  }
+
+  public static async getCardStickers(
+    card: GameUserCard
+  ): Promise<GameCardSticker[]> {
+    const query = (await DB.query(
+      `SELECT * FROM card_sticker WHERE card_id=?;`,
+      [card.id]
+    )) as CardSticker[];
+    return query.map((s) => new GameCardSticker(s));
   }
 }

@@ -7,6 +7,7 @@ import { IssueHandler } from "../../../../IssueHandler";
 import { CardService } from "../../../services/game/CardService";
 import { Chance } from "chance";
 import { GameDye } from "../../../../../structures/game/Dye";
+import { GameSticker } from "../../../../../structures/game/Sticker";
 export abstract class CardSet extends DBClass {
   public static async createNewUserCard(
     card: GameBaseCard,
@@ -124,6 +125,18 @@ export abstract class CardSet extends DBClass {
     await DB.query(
       `UPDATE user_card SET dye_r=?, dye_g=?, dye_b=? WHERE id=?;`,
       [dye.dyeR, dye.dyeG, dye.dyeB, card.id]
+    );
+    return;
+  }
+
+  public static async addStickerToCard(
+    card: GameUserCard,
+    sticker: GameSticker,
+    position: number
+  ): Promise<void> {
+    await DB.query(
+      `INSERT INTO card_sticker (card_id, sticker_id, position) VALUES (?, ?, ?);`,
+      [card.id, sticker.id, position]
     );
     return;
   }

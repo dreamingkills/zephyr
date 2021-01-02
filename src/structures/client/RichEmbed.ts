@@ -1,3 +1,5 @@
+import { User } from "eris";
+
 interface EmbedField {
   name: string;
   value: string;
@@ -21,6 +23,17 @@ export class MessageEmbed {
   thumbnail?: {
     url: string;
   };
+
+  constructor(title?: string, user?: User) {
+    if (title && user) {
+      this.author = {
+        name: `${title} | ${user.tag}`,
+        icon_url: user.dynamicAvatarURL("png"),
+      };
+    } else if (title && !user) {
+      this.author = { name: `${title}` };
+    }
+  }
 
   public setTitle(title: string): MessageEmbed {
     this.title = title;
@@ -57,6 +70,13 @@ export class MessageEmbed {
     inline?: boolean;
   }): MessageEmbed {
     this.fields.push(field);
+    return this;
+  }
+
+  public addFields(
+    fields: { name: string; value: string; inline?: boolean }[]
+  ): MessageEmbed {
+    this.fields.push(...fields);
     return this;
   }
 

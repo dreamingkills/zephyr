@@ -328,4 +328,12 @@ export abstract class ProfileService {
     await ProfileSet.addVote(voter, isWeekend);
     return await voter.fetch();
   }
+
+  public static async removeCubits(
+    profile: GameProfile,
+    amount: number
+  ): Promise<GameProfile> {
+    await ProfileSet.removeCubits(profile, amount);
+    return await profile.fetch();
+  }
 }

@@ -1,4 +1,5 @@
 import { Message } from "eris";
+import { MessageEmbed } from "../client/RichEmbed";
 import { Zephyr } from "../client/Zephyr";
 import { GameProfile } from "../game/Profile";
 
@@ -39,5 +40,16 @@ export abstract class BaseCommand implements Command {
 
   public selfDestruct(): string {
     return "💥 Self destructing...";
+  }
+
+  public async handleError(msg: Message, error: Error): Promise<void> {
+    const embed = new MessageEmbed()
+      .setAuthor(
+        `Error | ${msg.author.tag}`,
+        msg.author.dynamicAvatarURL("png")
+      )
+      .setDescription(error.message);
+    await msg.channel.createMessage({ embed });
+    return;
   }
 }

@@ -14,6 +14,7 @@ export default class FrameShop extends BaseCommand {
   description = "Shows you what's on sale in the frame shop.";
   subcommands = ["buy <frame name>"];
   allowDm = true;
+  developerOnly = true;
 
   async exec(
     msg: Message,

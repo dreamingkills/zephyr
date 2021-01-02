@@ -17,6 +17,7 @@ import { WebhookListener } from "../../webhook";
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
 import { AnticheatService } from "../../lib/database/services/meta/AnticheatService";
 import dblapi from "dblapi.js";
+import { GameSticker } from "../game/Sticker";
 
 export class Zephyr extends Client {
   version: string = "Primrose";
@@ -27,6 +28,7 @@ export class Zephyr extends Client {
   dropsEnabled = true;
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
+  private stickers: { [stickerId: number]: GameSticker } = {};
 
   webhookListener: WebhookListener | undefined;
   dbl: dblapi | undefined;
@@ -64,6 +66,7 @@ export class Zephyr extends Client {
   public async start() {
     await this.cachePrefixes();
     await this.cacheCards();
+    await this.cacheStickers();
     const fonts = await FontLoader.init();
 
     const startTime = Date.now();
@@ -287,6 +290,25 @@ export class Zephyr extends Client {
   }
   public getCards(): GameBaseCard[] {
     return Object.values(this.cards);
+  }
+
+  /*
+      Sticker Caching
+  */
+  public async cacheStickers(): Promise<void> {
+    const stickers = await CardService.getAllStickers();
+    for (let sticker of stickers) {
+      this.stickers[sticker.id] = sticker;
+    }
+    return;
+  }
+
+  public getSticker(id: number): GameSticker | undefined {
+    return this.stickers[id];
+  }
+
+  public getStickerByItemId(itemId: number): GameSticker | undefined {
+    return Object.values(this.stickers).filter((s) => s.itemId === itemId)[0];
   }
 
   /*

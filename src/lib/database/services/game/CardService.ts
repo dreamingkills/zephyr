@@ -13,6 +13,10 @@ import gm from "gm";
 import { GameDye } from "../../../../structures/game/Dye";
 import { rgbToCmy } from "../../../ZephyrUtils";
 import { ProfileService } from "./ProfileService";
+import {
+  GameCardSticker,
+  GameSticker,
+} from "../../../../structures/game/Sticker";
 
 export abstract class CardService {
   // Used for card image generation
@@ -133,6 +137,30 @@ export abstract class CardService {
     const dyeImage = await loadImage(dyeBuffer);
     ctx.drawImage(dyeImage, 0, 0, 350, 500);
 
+    // Draw the stickers, if any
+    const stickers = await this.getCardStickers(card);
+    if (stickers.length > 0) {
+      for (let sticker of stickers) {
+        const gameSticker = zephyr.getSticker(sticker.stickerId);
+        if (!gameSticker) continue;
+
+        const stickerImage = await loadImage(gameSticker.imageUrl);
+
+        const posX =
+          82 +
+          (sticker.position - 1 - Math.floor((sticker.position - 1) / 4) * 4) *
+            62;
+        const posY = 90 + Math.floor((sticker.position - 1) / 4) * 68;
+
+        ctx.save();
+
+        ctx.translate(posX, posY);
+        ctx.drawImage(stickerImage, -64 / 2, -64 / 2, 64, 64);
+
+        ctx.restore();
+      }
+    }
+
     // Draw the group icon
     const overlay = await loadImage(
       `./src/assets/groups/${
@@ -210,6 +238,48 @@ export abstract class CardService {
     }
 
     const buf = canvas.toBuffer("image/jpeg");
+    return Buffer.alloc(buf.length, buf, "base64");
+  }
+
+  public static async generateStickerPreview(
+    card: GameUserCard,
+    zephyr: Zephyr,
+    sticker?: GameSticker,
+    position?: number,
+    useOverlay: boolean = true
+  ): Promise<Buffer> {
+    const cardBuffer = await CardService.checkCacheForCard(card, zephyr);
+
+    const canvas = createCanvas(350, 500);
+    const ctx = canvas.getContext("2d");
+
+    // const rot = parseInt(options[3]);
+
+    const cardImage = await loadImage(cardBuffer);
+    ctx.drawImage(cardImage, 0, 0);
+    if (useOverlay) {
+      const overlay = await loadImage(`./src/assets/stickers/overlay.png`);
+      ctx.drawImage(overlay, 0, 0, 350, 500);
+    }
+
+    if (sticker) {
+      if (!position) position = 1;
+      const stickerImage = await loadImage(sticker.imageUrl);
+
+      const posX = 82 + (position - Math.floor(position / 4) * 4) * 62;
+      const posY = 90 + Math.floor(position / 4) * 68;
+
+      ctx.save();
+
+      ctx.translate(posX, posY);
+      // ctx.rotate((Math.PI / 180) * rot);
+
+      ctx.drawImage(stickerImage, -64 / 2, -64 / 2, 64, 64);
+
+      ctx.restore();
+    }
+
+    const buf = canvas.toBuffer("image/png");
     return Buffer.alloc(buf.length, buf, "base64");
   }
 
@@ -369,6 +439,28 @@ export abstract class CardService {
     dye: GameDye
   ): Promise<GameUserCard> {
     await CardSet.setCardDye(card, dye);
+    return await card.fetch();
+  }
+
+  /*
+      Stickers
+  */
+  public static async getAllStickers(): Promise<GameSticker[]> {
+    return await CardGet.getAllStickers();
+  }
+
+  public static async getCardStickers(
+    card: GameUserCard
+  ): Promise<GameCardSticker[]> {
+    return await CardGet.getCardStickers(card);
+  }
+
+  public static async addStickerToCard(
+    card: GameUserCard,
+    sticker: GameSticker,
+    position: number
+  ): Promise<GameUserCard> {
+    await CardSet.addStickerToCard(card, sticker, position);
     return await card.fetch();
   }
 }

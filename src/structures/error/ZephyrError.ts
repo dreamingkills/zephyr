@@ -1,3 +1,4 @@
+import { BaseItem } from "../game/Item";
 import { GameTag } from "../game/Tag";
 import { GameUserCard } from "../game/UserCard";
 
@@ -151,6 +152,12 @@ export class NotEnoughDustError extends ZephyrError {
   }
 }
 
+export class NotEnoughCubitsError extends ZephyrError {
+  constructor(_has: number, needs: number) {
+    super(`You need \`${needs}\` cubits to buy that.`);
+  }
+}
+
 export class CannotPayYourselfError extends ZephyrError {
   constructor() {
     super(`You can't give bits to yourself.`);
@@ -227,7 +234,7 @@ export class InvalidItemError extends ZephyrError {
 
 export class NoItemInInventoryError extends ZephyrError {
   constructor(item: string) {
-    super(`You don't have any **${item}**.`);
+    super(`You don't have any \`${item}\`.`);
   }
 }
 
@@ -484,6 +491,7 @@ export class NotEnoughOfItemError extends ZephyrError {
     super(`Sorry, but you don't have enough **${item}** to craft that.`);
   }
 }
+
 /*
     Burning
              */
@@ -542,5 +550,49 @@ export class UnacceptableTradeTargetError extends ZephyrError {
 export class NotAPatronError extends ZephyrError {
   constructor() {
     super(`Sorry, you must be a $3+ Patron or higher to claim that reward.`);
+  }
+}
+
+/*
+    Stickers
+              */
+export class TooManyStickersError extends ZephyrError {
+  constructor(card: GameUserCard) {
+    super(`\`${card.id.toString(36)}\` has three stickers already.`);
+  }
+}
+
+export class StickerSlotTakenError extends ZephyrError {
+  constructor(card: GameUserCard, slot: number) {
+    super(
+      `Sticker slot \`${slot}\` on \`${card.id.toString(
+        36
+      )}\` is already occupied.`
+    );
+  }
+}
+
+export class NoStickerInSlotError extends ZephyrError {
+  constructor(card: GameUserCard, slot: number) {
+    super(
+      `There is no sticker in slot \`${slot}\` on \`${card.id.toString(36)}\`.`
+    );
+  }
+}
+
+export class NoStickerBoundToItemError extends ZephyrError {
+  constructor(item: BaseItem) {
+    super(
+      `\`${item.name}\` is not bound to a sticker. Please report this bug.`
+    );
+  }
+}
+
+/*
+    Shop v2
+*/
+export class ItemNotForSaleError extends ZephyrError {
+  constructor(item: BaseItem) {
+    super(`\`${item.name}\` is not currently available for purchase.`);
   }
 }

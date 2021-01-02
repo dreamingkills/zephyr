@@ -9,7 +9,7 @@ import { ShopService } from "../../../lib/database/services/game/ShopService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import chromajs from "chroma-js";
 import { createCanvas } from "canvas";
-import { ReactionCollector } from "eris-collector";
+import { ReactionCollector, MessageCollector } from "eris-collector";
 import { BaseItem } from "../../../structures/game/Item";
 
 export default class UseItem extends BaseCommand {
@@ -217,6 +217,102 @@ export default class UseItem extends BaseCommand {
           );
           break;
         }
+      }
+      case "STICKER": {
+        const targetSticker = this.zephyr.getStickerByItemId(targetItem.id);
+        if (!targetSticker)
+          throw new ZephyrError.NoStickerBoundToItemError(targetItem);
+
+        const identifier = options.slice(targetItem.name.split(" ").length)[0];
+        if (!identifier) throw new ZephyrError.InvalidCardReferenceError();
+
+        const card = await CardService.getUserCardByIdentifier(identifier);
+
+        if (card.discordId !== msg.author.id)
+          throw new ZephyrError.NotOwnerOfCardError(card);
+
+        if (card.wear !== 5)
+          throw new ZephyrError.CardConditionTooLowError(card.wear, 5);
+
+        const cardStickers = await CardService.getCardStickers(card);
+        if (cardStickers.length >= 3)
+          throw new ZephyrError.TooManyStickersError(card);
+
+        const preview = await CardService.generateStickerPreview(
+          card,
+          this.zephyr
+        );
+
+        const embed = new MessageEmbed()
+          .setAuthor(
+            `Add Sticker | ${msg.author.tag}`,
+            msg.author.dynamicAvatarURL("png")
+          )
+          .setDescription(
+            `Please enter the position (number) you'd like to place your sticker on.`
+          )
+          .setImage(`attachment://sticker-preview-${card.id}.png`)
+          .setFooter(`Enter a number 1-20.`);
+
+        await msg.channel.createMessage(
+          { embed },
+          {
+            file: preview,
+            name: `sticker-preview-${card.id}.png`,
+          }
+        );
+
+        const filter = (m: Message) =>
+          parseInt(m.content) >= 1 &&
+          parseInt(m.content) <= 20 &&
+          m.author.id === msg.author.id;
+        const collector = new MessageCollector(
+          this.zephyr,
+          msg.channel,
+          filter,
+          { time: 30000, max: 1 }
+        );
+
+        collector.on("collect", async (m: Message) => {
+          try {
+            const position = parseInt(m.content);
+            if (cardStickers.filter((s) => s.position === position)[0])
+              throw new ZephyrError.StickerSlotTakenError(card, position);
+
+            await ProfileService.removeItems(profile, [
+              { item: targetItem, count: 1 },
+            ]);
+
+            const addedSticker = await CardService.addStickerToCard(
+              card,
+              targetSticker,
+              position
+            );
+            const newCard = await CardService.updateCardCache(
+              addedSticker,
+              this.zephyr
+            );
+
+            const embed = new MessageEmbed()
+              .setAuthor(
+                `Add Sticker | ${msg.author.tag}`,
+                msg.author.dynamicAvatarURL("png")
+              )
+              .setDescription(
+                `You placed a **${targetItem.name}** at position **${position}**.`
+              )
+              .setImage(`attachment://sticker-added-${card.id}.png`);
+            await msg.channel.createMessage(
+              { embed },
+              { file: newCard, name: `sticker-added-${card.id}.png` }
+            );
+            return;
+          } catch (e) {
+            this.handleError(msg, e);
+            return;
+          }
+        });
+        break;
       }
     }
   }
