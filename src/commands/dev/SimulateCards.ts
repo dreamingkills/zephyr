@@ -30,7 +30,10 @@ export default class SimulateCards extends BaseCommand {
     };
 
     for (let i = 0; i < loopTime; i++) {
-      const tier = chance.weighted([0, 1, 2, 3, 4, 5], [95, 40, 15, 5, 2, 0.7]);
+      const tier = chance.weighted(
+        [0, 1, 2, 3, 4, 5],
+        [10, 25, 30, 23.6, 14.6, 6.6]
+      );
       rolls[tier as keyof typeof rolls] += 1;
     }
 

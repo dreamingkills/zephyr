@@ -19,12 +19,12 @@ export abstract class CardSet extends DBClass {
     fightCount: number,
     frame?: number
   ): Promise<GameUserCard> {
-    const rng = new Chance();
-    const wear = rng.weighted(
+    const chance = new Chance();
+    const wear = chance.weighted(
       [0, 1, 2, 3, 4, 5],
-      [15, 35, 50, 10.6, 1.25, 0.4]
+      [10, 25, 30, 23.6, 14.6, 6.6]
     );
-    const luckCoefficient = rng.floating({ min: 0, max: 1, fixed: 10 });
+    const luckCoefficient = chance.floating({ min: 0, max: 1, fixed: 10 });
     let issue = await IssueHandler.queueIssueGeneration(card, profile, price);
     let tries = 0;
     while (true) {
