@@ -20,7 +20,7 @@ import dblapi from "dblapi.js";
 import { GameSticker } from "../game/Sticker";
 
 export class Zephyr extends Client {
-  version: string = "Primrose";
+  version: string = "Foxglove";
   commandLib = new CommandLib();
   dmHandler = new DMHandler();
   config: typeof config;
