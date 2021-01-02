@@ -117,7 +117,6 @@ export default class Shop extends BaseCommand {
         ).setDescription(
           `Really purchase **1x** \`${targetItem.name}\` for \`${cubitPrice}\` cubits?`
         );
-
         const confirmation = await msg.channel.createMessage({ embed });
 
         const filter = (_msg: Message, emoji: PartialEmoji, userID: string) =>

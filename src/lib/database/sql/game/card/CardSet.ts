@@ -22,7 +22,7 @@ export abstract class CardSet extends DBClass {
     const chance = new Chance();
     const wear = chance.weighted(
       [0, 1, 2, 3, 4, 5],
-      [10, 25, 30, 23.6, 14.6, 6.6]
+      [12.5, 25, 35, 23.6, 14.6, 4]
     );
     const luckCoefficient = chance.floating({ min: 0, max: 1, fixed: 10 });
     let issue = await IssueHandler.queueIssueGeneration(card, profile, price);
