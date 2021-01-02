@@ -96,7 +96,7 @@ export default class Shop extends BaseCommand {
     }
 
     if (subcommand === "buy") {
-      const itemQuery = options.slice(1).join(" ");
+      const itemQuery = options.slice(1).join(" ")?.toLowerCase();
       const targetItem = items.find((i) => i.name.toLowerCase() === itemQuery);
 
       if (!targetItem) throw new ZephyrError.InvalidItemError();
@@ -117,6 +117,7 @@ export default class Shop extends BaseCommand {
         ).setDescription(
           `Really purchase **1x** \`${targetItem.name}\` for \`${cubitPrice}\` cubits?`
         );
+
         const confirmation = await msg.channel.createMessage({ embed });
 
         const filter = (_msg: Message, emoji: PartialEmoji, userID: string) =>
