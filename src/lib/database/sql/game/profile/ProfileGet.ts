@@ -94,7 +94,7 @@ export abstract class ProfileGet extends DBClass {
   */
   public static async getAvailableReminderRecipients(): Promise<GameProfile[]> {
     const query = (await DB.query(
-      `SELECT * FROM profile WHERE ((drop_reminder=1 OR claim_reminder=1) AND (drop_reminded=0 OR claim_reminded=0)) AND (drop_next < NOW() OR claim_next < NOW());`
+      `SELECT * FROM profile WHERE ((drop_reminder=1 AND drop_reminded=0 AND drop_next < NOW()) OR (claim_reminder=1 AND claim_reminded=0 AND claim_next < NOW()));`
     )) as Profile[];
     return query.map((p) => new GameProfile(p));
   }
