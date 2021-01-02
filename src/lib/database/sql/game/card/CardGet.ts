@@ -87,7 +87,10 @@ export abstract class CardGet extends DBClass {
     query +=
       (queryOptions.length > 0 ? ` AND` : ``) + queryOptions.join(` AND`);
 
-    let order = <string>options["order"] || <string>options["sort"];
+    let order =
+      <string>options["order"] ||
+      <string>options["sort"] ||
+      <string>options["o"];
     const reverse = order?.startsWith("!");
     if (reverse) order = order.slice(1);
 
