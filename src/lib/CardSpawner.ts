@@ -16,7 +16,7 @@ import { AnticheatService } from "./database/services/meta/AnticheatService";
 export abstract class CardSpawner {
   private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
   private static readonly timeout = 5000;
-  private static readonly minSpawnThreshold = 100;
+  private static readonly minSpawnThreshold = 250;
   private static readonly spawnThreshold = CardSpawner.minSpawnThreshold * 2;
   private static guildLevels: { [key: string]: number } = {};
   private static grabbing: Set<string> = new Set();
