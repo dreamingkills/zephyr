@@ -181,8 +181,11 @@ export default class Leaderboards extends BaseCommand {
         );
         await board.edit({ embed });
 
-        if (checkPermission("manageMessages", msg.textChannel, this.zephyr))
-          await board.removeReaction(emoji.name, userId);
+        if (checkPermission("manageMessages", msg.textChannel, this.zephyr)) {
+          try {
+            await board.removeReaction(emoji.name, userId);
+          } catch {}
+        }
       }
     );
     return;

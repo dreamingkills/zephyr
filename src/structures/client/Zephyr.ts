@@ -115,6 +115,10 @@ export class Zephyr extends Client {
         return;
       }
 
+      // check if we're allowed to send messages to this channel
+      if (!message.textChannel.permissionsOf(this.user.id).json["sendMessages"])
+        return;
+
       // Prefix resetter
       if (message.mentions[0]?.id === this.user.id) {
         const subcommand = message.content.split(" ")[1]?.toLowerCase();
@@ -145,14 +149,6 @@ export class Zephyr extends Client {
         );
         return;
       }
-
-      // check if we're allowed to send messages to this channel
-      if (
-        !(<TextChannel>message.channel).permissionsOf(this.user.id).json[
-          "sendMessages"
-        ]
-      )
-        return;
 
       // go ahead if we're allowed to speak
       await this.commandLib.process(message, this);
