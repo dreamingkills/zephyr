@@ -30,6 +30,7 @@ export default class RemoveBits extends BaseCommand {
       )
       .setFooter(`New balance: ${_target.bits.toLocaleString()}`);
 
-    await msg.channel.createMessage({ embed });
+    await this.send(msg.channel, embed);
+    return;
   }
 }

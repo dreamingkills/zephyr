@@ -19,6 +19,7 @@ export default class ResetClaimTimer extends BaseCommand {
       .setAuthor(`Reset Claim Timer | ${msg.author.tag}`, msg.author.avatarURL)
       .setDescription(`Reset **${msg.mentions[0].tag}**'s claim timer.`);
 
-    await msg.channel.createMessage({ embed });
+    await this.send(msg.channel, embed);
+    return;
   }
 }

@@ -42,7 +42,7 @@ export default class DevEval extends BaseCommand {
               .replace(this.zephyr.token!, `BOT_TOKEN`)}` +
             `\n\`\`\``
         );
-      await msg.channel.createMessage({ embed });
+      await this.send(msg.channel, embed);
     } catch (e) {
       const embed = new MessageEmbed()
         .setAuthor(
@@ -55,7 +55,7 @@ export default class DevEval extends BaseCommand {
             `\n${this.clean(e)}` +
             `\n\`\`\``
         );
-      await msg.channel.createMessage({ embed });
+      await this.send(msg.channel, embed);
     }
     return;
   }

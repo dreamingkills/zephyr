@@ -17,7 +17,8 @@ export default class ToggleDrops extends BaseCommand {
       .setDescription(
         `Drops have been ${this.zephyr.dropsEnabled ? `enabled` : `disabled`}.`
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
     return;
   }
 }

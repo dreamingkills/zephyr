@@ -26,6 +26,11 @@ export default class ForceFrame extends BaseCommand {
       frameId,
       this.zephyr
     );
-    await msg.channel.createMessage("OK", { file: pic, name: "card.png" });
+
+    await this.send(msg.channel, "OK", {
+      file: { file: pic, name: "card.png" },
+    });
+
+    return;
   }
 }

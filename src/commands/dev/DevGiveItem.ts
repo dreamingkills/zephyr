@@ -38,6 +38,8 @@ export default class DevUserCard extends BaseCommand {
       .setDescription(
         `Gave **1x** \`${targetItem.name}\` to **${targetUser.tag}**`
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
+    return;
   }
 }

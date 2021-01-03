@@ -20,7 +20,8 @@ export default class ToggleReminders extends BaseCommand {
           this.zephyr.dmHandler.remindersEnabled ? `enabled` : `disabled`
         }.`
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
     return;
   }
 }

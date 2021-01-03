@@ -25,7 +25,7 @@ export default class ToggleBlacklist extends BaseCommand {
     } else
       embed.setDescription(`Removed **${targetUser.tag}** from the blacklist.`);
 
-    await msg.channel.createMessage({ embed });
+    await this.send(msg.channel, embed);
     return;
   }
 }

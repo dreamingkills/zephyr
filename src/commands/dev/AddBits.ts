@@ -28,6 +28,7 @@ export default class AddBits extends BaseCommand {
       )
       .setFooter(`New balance: ${_target.bits.toLocaleString()}`);
 
-    await msg.channel.createMessage({ embed });
+    await this.send(msg.channel, embed);
+    return;
   }
 }

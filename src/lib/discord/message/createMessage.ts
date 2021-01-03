@@ -1,11 +1,13 @@
 import { Message, TextableChannel } from "eris";
-import { ErisFile } from "../../../structures/client/File";
+import { ErisFile } from "../../../structures/client/ErisFile";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { isFile } from "../../ZephyrUtils";
 
-function deriveFileExtension(url: string): string {
-  return url.split(".")[url.split(".").length - 1];
+function deriveFileExtension(url: string | Buffer): string {
+  if (url instanceof Buffer) {
+    return "";
+  } else return url.split(".")[url.split(".").length - 1];
 }
 
 export async function createMessage(

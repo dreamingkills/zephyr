@@ -38,7 +38,8 @@ export default class SimulateCards extends BaseCommand {
     }
 
     const after = Date.now();
-    await msg.channel.createMessage(
+    await this.send(
+      msg.channel,
       `Generated **${(
         rolls["0"] +
         rolls["1"] +

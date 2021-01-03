@@ -35,7 +35,7 @@ export default class SetPatron extends BaseCommand {
         )
         .setDescription(`Unmarked **${targetUser.tag}** as patron.`);
 
-      await msg.channel.createMessage({ embed });
+      await this.send(msg.channel, embed);
       return;
     } else {
       await ProfileService.setPatronTier(target, tier);
@@ -50,7 +50,7 @@ export default class SetPatron extends BaseCommand {
           `Marked **${targetUser.tag}** as a Tier **${tier}** patron.`
         );
 
-      await msg.channel.createMessage({ embed });
+      await this.send(msg.channel, embed);
       return;
     }
   }

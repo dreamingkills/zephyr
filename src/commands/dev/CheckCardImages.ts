@@ -35,7 +35,7 @@ export default class CheckCardImages extends BaseCommand {
       );
     }
 
-    await msg.channel.createMessage({ embed });
+    await this.send(msg.channel, embed);
     return;
   }
 }

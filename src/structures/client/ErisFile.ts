@@ -1,4 +1,4 @@
 export type ErisFile = {
-  file: string;
+  file: string | Buffer;
   name?: string;
 };
