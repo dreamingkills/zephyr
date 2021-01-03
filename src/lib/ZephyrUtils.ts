@@ -8,6 +8,7 @@ import { items } from "../assets/items.json";
 import { GameDye } from "../structures/game/Dye";
 import { GameUserCard } from "../structures/game/UserCard";
 import { GameTag } from "../structures/game/Tag";
+import { ErisFile } from "../structures/client/File";
 
 const mappedColors = colorNames.reduce(
   (o, { name, hex }) => Object.assign(o, { [name]: hex }),
@@ -218,6 +219,10 @@ function rgbToCmy(
   };
 }
 
+function isFile(body: any): body is ErisFile {
+  return !!(body as ErisFile).file;
+}
+
 export {
   padIfNotLeading,
   getTimeUntilNextDay,
@@ -230,4 +235,5 @@ export {
   renderRecipe,
   getDescriptions,
   rgbToCmy,
+  isFile,
 };

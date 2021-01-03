@@ -596,3 +596,14 @@ export class ItemNotForSaleError extends ZephyrError {
     super(`\`${item.name}\` is not currently available for purchase.`);
   }
 }
+
+/*
+    HTTP
+*/
+export class MessageFailedToSendError extends ZephyrError {
+  constructor() {
+    super(
+      `There was a problem connecting to Discord. Please try again in a few minutes.\nThis has been reported to the developer.`
+    );
+  }
+}
