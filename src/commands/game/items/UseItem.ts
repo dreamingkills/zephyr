@@ -266,6 +266,9 @@ export default class UseItem extends BaseCommand {
           filter,
           { time: 30000, max: 1 }
         );
+        collector.on("error", async (e: Error) => {
+          await this.handleError(msg, e);
+        });
 
         collector.on("collect", async (m: Message) => {
           try {

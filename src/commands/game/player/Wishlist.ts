@@ -95,6 +95,9 @@ export default class Wishlist extends BaseCommand {
           filter,
           { time: 15000, max: 1 }
         );
+        collector.on("error", async (e: Error) => {
+          await this.handleError(msg, e);
+        });
 
         collector.on("collect", async (m: Message) => {
           const index = unique[parseInt(m.content) - 1];

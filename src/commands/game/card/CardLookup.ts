@@ -121,6 +121,10 @@ export default class CardLookup extends BaseCommand {
       time: 15000,
       max: 1,
     });
+    collector.on("error", async (e: Error) => {
+      await this.handleError(msg, e);
+    });
+
     collector.on("collect", async (m: Message) => {
       const embed = await this.getCardStats(
         find[parseInt(m.content) - 1],
