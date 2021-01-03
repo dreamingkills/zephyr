@@ -1,6 +1,7 @@
 import { Zephyr } from "../structures/client/Zephyr";
 import { ProfileService } from "./database/services/game/ProfileService";
 import dayjs from "dayjs";
+import { createMessage } from "./discord/message/createMessage";
 
 export class DMHandler {
   public remindersEnabled = true;
@@ -53,7 +54,7 @@ export class DMHandler {
         let retries = 0;
         while (retries < 3) {
           try {
-            await dmChannel.createMessage(message);
+            await createMessage(dmChannel, message);
             success.push({ id: p.discordId, type });
             break;
           } catch {

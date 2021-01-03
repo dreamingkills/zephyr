@@ -50,7 +50,7 @@ export abstract class BaseCommand implements Command {
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(error.message);
-    await msg.channel.createMessage({ embed });
+    await createMessage(msg.channel, embed);
     return;
   }
 

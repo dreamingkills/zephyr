@@ -6,6 +6,7 @@ import { ProfileService } from "../database/services/game/ProfileService";
 import { Zephyr } from "../../structures/client/Zephyr";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import * as ZephyrError from "../../structures/error/ZephyrError";
+import { createMessage } from "../discord/message/createMessage";
 
 export class CommandLib {
   commands: BaseCommand[] = [];
@@ -66,7 +67,7 @@ export class CommandLib {
         )
         .setDescription(`This command is only usable by the developer.`);
       try {
-        await message.channel.createMessage({ embed });
+        await createMessage(message.channel, embed);
       } catch {
       } finally {
         return;
@@ -90,7 +91,7 @@ export class CommandLib {
           )
           .setDescription(e.message);
         try {
-          await message.channel.createMessage({ embed });
+          await createMessage(message.channel, embed);
         } catch {}
       } else {
         if (e.name === "Missing Access") return;
@@ -102,7 +103,7 @@ export class CommandLib {
           )
           .setDescription(`An unexpected error occurred. Please try again.`);
         try {
-          await message.channel.createMessage({ embed });
+          await createMessage(message.channel, embed);
         } catch {}
       }
     }

@@ -15,7 +15,7 @@ export default class SimulateCards extends BaseCommand {
   ): Promise<void> {
     const loopTime = parseInt(options[0], 10);
     if (isNaN(loopTime)) {
-      msg.channel.createMessage("Enter a valid number.");
+      this.send(msg.channel, "Enter a valid number.");
       return;
     }
     const chance = new Chance();

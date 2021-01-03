@@ -18,6 +18,7 @@ import { ProfileService } from "../../lib/database/services/game/ProfileService"
 import { AnticheatService } from "../../lib/database/services/meta/AnticheatService";
 import dblapi from "dblapi.js";
 import { GameSticker } from "../game/Sticker";
+import { createMessage } from "../../lib/discord/message/createMessage";
 
 export class Zephyr extends Client {
   version: string = "Foxglove";
@@ -131,13 +132,15 @@ export class Zephyr extends Client {
             this.config.discord.defaultPrefix
           );
 
-          await message.channel.createMessage(
+          await createMessage(
+            message.channel,
             `Reset your prefix to \`${this.config.discord.defaultPrefix}\``
           );
           return;
         }
 
-        await message.channel.createMessage(
+        await createMessage(
+          message.channel,
           `My prefix here is \`${this.getPrefix(message.guildID!)}\`!`
         );
         return;
@@ -212,7 +215,7 @@ export class Zephyr extends Client {
             `\n\n**Common configuration**` +
             `\n— \`${prefix}prefix <prefix>\` - changes the bot's prefix`
         );
-      await welcomeChannel.createMessage({ embed });
+      await createMessage(welcomeChannel, embed);
       return;
     });
 
@@ -394,7 +397,7 @@ export class Zephyr extends Client {
             voter.username
           }**! You've been given **${isWeekend ? 4 : 2}** cubits!`
         );
-      await dmChannel.createMessage({ embed });
+      await createMessage(dmChannel, embed);
     } catch {}
   }
 }

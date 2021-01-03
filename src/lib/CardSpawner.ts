@@ -12,6 +12,7 @@ import dayjs from "dayjs";
 import { GuildService } from "./database/services/guild/GuildService";
 import { GameBaseCard } from "../structures/game/BaseCard";
 import { AnticheatService } from "./database/services/meta/AnticheatService";
+import { createMessage } from "./discord/message/createMessage";
 
 export abstract class CardSpawner {
   private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
@@ -93,10 +94,13 @@ export abstract class CardSpawner {
     }
 
     const collage = await CardService.generateCardCollage(droppedCards, zephyr);
-    const drop = await channel.createMessage(`${title}\n`, {
-      file: collage,
-      name: "collage.png",
+    const drop = await createMessage(channel, `${title}\n`, {
+      file: {
+        file: collage,
+        name: "collage.png",
+      },
     });
+
     const filter = (_m: Message, emoji: PartialEmoji, userID: string) =>
       this.emojis.includes(emoji.name) && userID !== channel.client.user.id;
     const collector = new ReactionCollector(channel.client, drop, filter, {
@@ -132,7 +136,8 @@ export abstract class CardSpawner {
         if (until > now && !winners.has(profile.discordId)) {
           // Don't warn people more than once -- anti-spam
           if (!warned.has(profile.discordId)) {
-            await channel.createMessage(
+            await createMessage(
+              channel,
               `<@${userId}>, you must wait **${
                 getTimeUntil(now, until) || `<1s`
               }** before claiming another card.`
@@ -233,7 +238,7 @@ export abstract class CardSpawner {
             now.add(10, "minute").format(`YYYY/MM/DD HH:mm:ss`)
           );
 
-          await channel.createMessage(message);
+          await createMessage(channel, message);
 
           if (finished[0] && finished[1] && finished[2]) collector.stop();
         }, this.timeout);

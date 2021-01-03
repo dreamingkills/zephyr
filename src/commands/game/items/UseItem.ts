@@ -119,10 +119,9 @@ export default class UseItem extends BaseCommand {
             `You applied **${targetItem.name}** to \`${card.id.toString(36)}\`.`
           );
           embed.setImage(`attachment://success.png`);
-          await msg.channel.createMessage(
-            { embed },
-            { file: newCard, name: "success.png" }
-          );
+          await this.send(msg.channel, embed, {
+            file: { file: newCard, name: "success.png" },
+          });
 
           collector.stop();
           return;
@@ -172,7 +171,7 @@ export default class UseItem extends BaseCommand {
             }**${amount.toLocaleString()}**` +
               `\n— You now have **${newProfile.bits.toLocaleString()}** bits.`
           );
-        await msg.channel.createMessage({ embed });
+        await this.send(msg.channel, embed);
         break;
       }
       case "CONSUMABLE": {
@@ -210,10 +209,9 @@ export default class UseItem extends BaseCommand {
             .setThumbnail(`attachment://dye.png`)
             .setColor(hex);
 
-          await msg.channel.createMessage(
-            { embed },
-            { file: buf, name: "dye.png" }
-          );
+          await this.send(msg.channel, embed, {
+            file: { file: buf, name: "dye.png" },
+          });
           break;
         }
       }
@@ -253,13 +251,12 @@ export default class UseItem extends BaseCommand {
           .setImage(`attachment://sticker-preview-${card.id}.png`)
           .setFooter(`Enter a number 1-20.`);
 
-        await msg.channel.createMessage(
-          { embed },
-          {
+        await this.send(msg.channel, embed, {
+          file: {
             file: preview,
             name: `sticker-preview-${card.id}.png`,
-          }
-        );
+          },
+        });
 
         const filter = (m: Message) =>
           parseInt(m.content) >= 1 &&
@@ -301,10 +298,10 @@ export default class UseItem extends BaseCommand {
                 `You placed a **${targetItem.name}** at position **${position}**.`
               )
               .setImage(`attachment://sticker-added-${card.id}.png`);
-            await msg.channel.createMessage(
-              { embed },
-              { file: newCard, name: `sticker-added-${card.id}.png` }
-            );
+
+            await this.send(msg.channel, embed, {
+              file: { file: newCard, name: `sticker-added-${card.id}.png` },
+            });
             return;
           } catch (e) {
             this.handleError(msg, e);
