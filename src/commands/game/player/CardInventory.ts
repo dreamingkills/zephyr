@@ -109,11 +109,11 @@ export default class CardInventory extends BaseCommand {
     collector.on(
       "collect",
       async (_m: Message, emoji: PartialEmoji, userId: string) => {
-        if (emoji.name === "⏮️" && page !== 1) page = 1;
-        if (emoji.name === "◀️" && page !== 1) page--;
+        if (emoji.name === "⏮" && page !== 1) page = 1;
+        if (emoji.name === "◀" && page !== 1) page--;
         // numbers
-        if (emoji.name === "▶️" && page !== totalPages) page++;
-        if (emoji.name === "⏭️" && page !== totalPages) page = totalPages;
+        if (emoji.name === "▶" && page !== totalPages) page++;
+        if (emoji.name === "⏭" && page !== totalPages) page = totalPages;
 
         filters["page"] = page;
         const newCards = await CardService.getUserInventory(
@@ -130,9 +130,9 @@ export default class CardInventory extends BaseCommand {
       }
     );
 
-    if (totalPages > 2) await this.react(sent, `⏮️`);
-    if (totalPages > 1) await this.react(sent, `◀️`);
-    if (totalPages > 1) await this.react(sent, `▶️`);
-    if (totalPages > 2) await this.react(sent, `⏭️`);
+    if (totalPages > 2) await this.react(sent, `⏮`);
+    if (totalPages > 1) await this.react(sent, `◀`);
+    if (totalPages > 1) await this.react(sent, `▶`);
+    if (totalPages > 2) await this.react(sent, `⏭`);
   }
 }

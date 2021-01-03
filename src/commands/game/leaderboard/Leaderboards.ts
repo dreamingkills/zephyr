@@ -147,10 +147,10 @@ export default class Leaderboards extends BaseCommand {
     const board = await this.send(msg.channel, embed);
     if (totalPages < 2) return;
 
-    if (totalPages > 2) await this.react(board, `⏮️`);
-    if (totalPages > 1) await this.react(board, `◀️`);
-    if (totalPages > 1) await this.react(board, `▶️`);
-    if (totalPages > 2) await this.react(board, `⏭️`);
+    if (totalPages > 2) await this.react(board, `⏮`);
+    if (totalPages > 1) await this.react(board, `◀`);
+    if (totalPages > 1) await this.react(board, `▶`);
+    if (totalPages > 2) await this.react(board, `⏭`);
 
     const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id;
@@ -164,11 +164,11 @@ export default class Leaderboards extends BaseCommand {
     collector.on(
       "collect",
       async (_m: Message, emoji: PartialEmoji, userId: string) => {
-        if (emoji.name === "⏮️" && page !== 1) page = 1;
-        if (emoji.name === "◀️" && page !== 1) page--;
+        if (emoji.name === "⏮" && page !== 1) page = 1;
+        if (emoji.name === "◀" && page !== 1) page--;
         // numbers
-        if (emoji.name === "▶️" && page !== totalPages) page++;
-        if (emoji.name === "⏭️" && page !== totalPages) page = totalPages;
+        if (emoji.name === "▶" && page !== totalPages) page++;
+        if (emoji.name === "⏭" && page !== totalPages) page = totalPages;
 
         embed.setTitle(
           title +

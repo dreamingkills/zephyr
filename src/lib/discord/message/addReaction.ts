@@ -15,7 +15,9 @@ export async function addReaction(
       completed = true;
     } catch (e) {
       if (attempts === 3) {
-        console.log(e);
+        console.log(
+          `Failed trying to add reaction ${reaction} to message ${message.id}. Full stack:\n${e}`
+        );
       }
     }
   }

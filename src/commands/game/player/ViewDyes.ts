@@ -85,11 +85,11 @@ export default class ViewDyes extends BaseCommand {
       collector.on(
         "collect",
         async (_m: Message, emoji: PartialEmoji, userId: string) => {
-          if (emoji.name === "⏮️" && page !== 1) page = 1;
-          if (emoji.name === "◀️" && page !== 1) page--;
+          if (emoji.name === "⏮" && page !== 1) page = 1;
+          if (emoji.name === "◀" && page !== 1) page--;
           // numbers
-          if (emoji.name === "▶️" && page !== maxPage) page++;
-          if (emoji.name === "⏭️" && page !== maxPage) page = maxPage;
+          if (emoji.name === "▶" && page !== maxPage) page++;
+          if (emoji.name === "⏭" && page !== maxPage) page = maxPage;
 
           const newDyes = await ProfileService.getUserDyes(profile, page);
 
@@ -108,10 +108,10 @@ export default class ViewDyes extends BaseCommand {
       );
 
       try {
-        if (maxPage > 2) this.react(sent, `⏮️`);
-        if (maxPage > 1) this.react(sent, `◀️`);
-        if (maxPage > 1) this.react(sent, `▶️`);
-        if (maxPage > 2) this.react(sent, `⏭️`);
+        if (maxPage > 2) this.react(sent, `⏮`);
+        if (maxPage > 1) this.react(sent, `◀`);
+        if (maxPage > 1) this.react(sent, `▶`);
+        if (maxPage > 2) this.react(sent, `⏭`);
       } catch (e) {}
     }
   }
