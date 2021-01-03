@@ -91,6 +91,9 @@ export default class GiveItem extends BaseCommand {
       time: 30000,
       max: 1,
     });
+    collector.on("error", async (e: Error) => {
+      await this.handleError(msg, e);
+    });
 
     collector.on("collect", async () => {
       for (let i of realItems) {
@@ -101,14 +104,10 @@ export default class GiveItem extends BaseCommand {
             baseItems[realItems.indexOf(i)].name
           );
 
-          if (refetchItem.quantity < 1) {
-            await confirmation.edit({
-              embed: embed.setFooter(
-                `⚠️ You have no ${baseItems[realItems.indexOf(i)].name}.`
-              ),
-            });
-            return;
-          }
+          if (refetchItem.quantity < 1)
+            throw new ZephyrError.NoItemInInventoryError(
+              baseItems[realItems.indexOf(i)].name
+            );
         } catch {}
       }
 

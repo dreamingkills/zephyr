@@ -91,17 +91,14 @@ export default class UseItem extends BaseCommand {
             max: 1,
           }
         );
+        collector.on("error", async (e: Error) => {
+          await this.handleError(msg, e);
+        });
 
         collector.on("collect", async () => {
           const refetchCard = await card.fetch();
-          if (refetchCard.discordId !== msg.author.id) {
-            await confirmation.edit({
-              embed: embed.setFooter(
-                `⚠️ ${refetchCard.id.toString(36)} does not belong to you.`
-              ),
-            });
-            return;
-          }
+          if (refetchCard.discordId !== msg.author.id)
+            throw new ZephyrError.NotOwnerOfCardError(refetchCard);
 
           await confirmation.delete();
 

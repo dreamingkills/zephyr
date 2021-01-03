@@ -92,19 +92,16 @@ export default class BurnTag extends BaseCommand {
       time: 30000,
       max: 1,
     });
+    collector.on("error", async (e: Error) => {
+      await this.handleError(msg, e);
+    });
 
     collector.on("collect", async () => {
       // We need to check that this user is still the owner, or they can dupe bits
       for (let card of cards) {
         const refetchCard = await card.fetch();
-        if (refetchCard.discordId !== msg.author.id) {
-          await confirmation.edit({
-            embed: embed.setFooter(
-              `⚠️ ${card.id.toString(36)} does not belong to you.`
-            ),
-          });
-          return;
-        }
+        if (refetchCard.discordId !== msg.author.id)
+          throw new ZephyrError.NotOwnerOfCardError(card);
       }
 
       // Give the card to the bot

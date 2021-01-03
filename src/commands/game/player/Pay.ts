@@ -55,6 +55,10 @@ export default class Pay extends BaseCommand {
       max: 1,
     });
 
+    collector.on("error", async (e: Error) => {
+      await this.handleError(msg, e);
+    });
+
     collector.on("collect", async () => {
       await ProfileService.removeBitsFromProfile(profile, amount);
       await ProfileService.addBitsToProfile(target, amount);

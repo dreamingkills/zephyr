@@ -107,6 +107,10 @@ export abstract class CardSpawner {
     const collector = new ReactionCollector(channel.client, drop, filter, {
       time: 30000,
     });
+    collector.on("error", async (e: Error) => {
+      // we should do something here but idk what yet lol
+      console.log(e);
+    });
 
     const finished = [false, false, false];
     const started = [false, false, false];

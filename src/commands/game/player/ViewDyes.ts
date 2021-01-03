@@ -78,6 +78,9 @@ export default class ViewDyes extends BaseCommand {
       const collector = new ReactionCollector(this.zephyr, sent, filter, {
         time: 2 * 60 * 1000,
       });
+      collector.on("error", async (e: Error) => {
+        await this.handleError(msg, e);
+      });
 
       collector.on(
         "collect",

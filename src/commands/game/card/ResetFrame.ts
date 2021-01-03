@@ -43,6 +43,10 @@ export default class ResetFrame extends BaseCommand {
       time: 30000,
       max: 1,
     });
+    collector.on("error", async (e: Error) => {
+      await this.handleError(msg, e);
+    });
+
     collector.on("collect", async () => {
       await CardService.changeCardFrame(card, 1, this.zephyr);
       await confirmation.edit(
@@ -51,6 +55,7 @@ export default class ResetFrame extends BaseCommand {
       collector.en;
       return;
     });
+
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
         await confirmation.edit(

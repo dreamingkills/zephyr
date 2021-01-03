@@ -156,36 +156,23 @@ export default class BurnCard extends BaseCommand {
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
       emoji.id === this.zephyr.config.discord.emojiId.check;
+
     const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
       time: 15000,
       max: 1,
     });
+    collector.on("error", async (e: Error) => {
+      await this.handleError(msg, e);
+    });
 
     collector.on("collect", async () => {
       // We need to check that this user is still the owner, or they can dupe bits
-      for (let card of cardTargets) {
-        const refetchCard = await card.fetch();
-        if (refetchCard.discordId !== msg.author.id) {
-          await confirmation.edit({
-            embed: embed.setFooter(
-              `⚠️ ${card.id.toString(36)} does not belong to you.`
-            ),
-          });
-          return;
-        }
-      }
-      for (let dye of dyeTargets) {
-        try {
-          const refetchDye = await dye.fetch();
-          if (refetchDye.discordId !== msg.author.id)
-            throw new ZephyrError.NotOwnerOfDyeError(dye.id);
-        } catch {
-          await confirmation.edit({
-            embed: embed.setFooter(
-              `⚠️ ${dye.id.toString(36)} does not belong to you.`
-            ),
-          });
-          return;
+      for (let target of [...cardTargets, ...dyeTargets]) {
+        const refetch = await target.fetch();
+        if (refetch.discordId !== msg.author.id) {
+          if (refetch instanceof GameDye)
+            throw new ZephyrError.NotOwnerOfDyeError(refetch.id);
+          throw new ZephyrError.NotOwnerOfCardError(refetch);
         }
       }
 

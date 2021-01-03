@@ -76,6 +76,9 @@ export default class CraftItem extends BaseCommand {
       time: 30000,
       max: 1,
     });
+    collector.on("error", async (e: Error) => {
+      await this.handleError(msg, e);
+    });
 
     collector.on("collect", async () => {
       await ProfileService.removeItems(

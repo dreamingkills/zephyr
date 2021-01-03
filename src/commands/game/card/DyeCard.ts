@@ -76,29 +76,22 @@ export default class DyeCard extends BaseCommand {
       time: 15000,
       max: 1,
     });
+    collector.on("error", async (e: Error) => {
+      await this.handleError(msg, e);
+    });
 
     collector.on("collect", async () => {
       // We need to check that this user is still the owner of the card, or they can do some nasty stuff
       const refetchCard = await targetCard.fetch();
-      if (refetchCard.discordId !== msg.author.id) {
-        await confirmation.edit({
-          embed: embed.setFooter(
-            `⚠️ ${refetchCard.id.toString(36)} does not belong to you.`
-          ),
-        });
-        return;
-      }
+      if (refetchCard.discordId !== msg.author.id)
+        throw new ZephyrError.NotOwnerOfCardError(refetchCard);
 
       // Also check that their dye still has 1 charge
       const refetchDye = await targetDye.fetch();
-      if (refetchDye.charges < 1) {
-        await confirmation.edit({
-          embed: embed.setFooter(
-            `⚠️ $${targetDye.id.toString(36)} has no charges.`
-          ),
-        });
-        return;
-      }
+      if (refetchDye.discordId !== msg.author.id)
+        throw new ZephyrError.NotOwnerOfDyeError(refetchDye.id);
+      if (refetchDye.charges < 1)
+        throw new ZephyrError.UnchargedDyeError(dye.id);
 
       await confirmation.delete();
 
@@ -131,6 +124,7 @@ export default class DyeCard extends BaseCommand {
       });
       return;
     });
+
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
         await confirmation.edit({

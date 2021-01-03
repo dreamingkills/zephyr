@@ -61,6 +61,9 @@ export default class Shop extends BaseCommand {
         time: 30000,
         max: 1,
       });
+      collector.on("error", async (e: Error) => {
+        await this.handleError(msg, e);
+      });
 
       const prefix = this.zephyr.getPrefix(msg.guildID);
       collector.on("collect", async (_m: Message, emoji: PartialEmoji) => {
@@ -127,6 +130,9 @@ export default class Shop extends BaseCommand {
           filter,
           { time: 30000, max: 1 }
         );
+        collector.on("error", async (e: Error) => {
+          await this.handleError(msg, e);
+        });
 
         collector.on("collect", async () => {
           await ProfileService.removeCubits(profile, cubitPrice);

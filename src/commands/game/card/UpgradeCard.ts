@@ -86,6 +86,9 @@ export default class UpgradeCard extends BaseCommand {
       time: 15000,
       max: 1,
     });
+    collector.on("error", async (e: Error) => {
+      await this.handleError(msg, e);
+    });
 
     collector.on("collect", async () => {
       // We need to check that this user is still the owner, or they can do some nasty stuff

@@ -71,6 +71,10 @@ export default class Trade extends BaseCommand {
       time: 30000,
     });
 
+    collector.on("error", async (e: Error) => {
+      await this.handleError(msg, e);
+    });
+
     const confirmed: string[] = [];
 
     collector.on(
