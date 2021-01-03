@@ -1,4 +1,5 @@
 import { Message } from "eris";
+import { createMessage } from "../../lib/discord/message/createMessage";
 import { MessageEmbed } from "../client/RichEmbed";
 import { Zephyr } from "../client/Zephyr";
 import { GameProfile } from "../game/Profile";
@@ -52,4 +53,6 @@ export abstract class BaseCommand implements Command {
     await msg.channel.createMessage({ embed });
     return;
   }
+
+  public send = createMessage;
 }

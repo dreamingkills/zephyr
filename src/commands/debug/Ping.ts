@@ -1,5 +1,4 @@
 import { Message } from "eris";
-import { createMessage } from "../../lib/discord/message/createMessage";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 
@@ -13,7 +12,7 @@ export default class Ping extends BaseCommand {
     const embed = new MessageEmbed("Ping", msg.author).setDescription(
       `:satellite: Response time: ${responseTime}ms (inaccurate)`
     );
-    await createMessage(msg.channel, embed);
+    await this.send(msg.channel, embed);
     return;
   }
 }

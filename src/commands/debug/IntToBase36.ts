@@ -13,7 +13,7 @@ export default class IntToBase36 extends BaseCommand {
     options: string[]
   ): Promise<void> {
     const num = parseInt(options[0], 10);
-    const base36 = num.toString(36);
-    await msg.channel.createMessage(`${options[0]} -> ${base36}`);
+    await this.send(msg.channel, `${num} -> ${num.toString(36)}`);
+    return;
   }
 }

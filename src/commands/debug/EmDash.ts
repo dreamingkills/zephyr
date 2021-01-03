@@ -7,6 +7,7 @@ export default class EmDash extends BaseCommand {
   developerOnly = true;
 
   async exec(msg: Message): Promise<void> {
-    await msg.channel.createMessage("Here's your em dash: `—`");
+    await this.send(msg.channel, "Here's your em dash: `—`");
+    return;
   }
 }

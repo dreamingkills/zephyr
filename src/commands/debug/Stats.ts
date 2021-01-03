@@ -38,6 +38,7 @@ export default class Stats extends BaseCommand {
         rtfl ? rtfl.dynamicAvatarURL("png") : ""
       );
 
-    await msg.channel.createMessage({ embed });
+    await this.send(msg.channel, embed);
+    return;
   }
 }
