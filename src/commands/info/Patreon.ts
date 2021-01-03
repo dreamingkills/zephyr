@@ -18,6 +18,8 @@ export default class Patreon extends BaseCommand {
         `If you'd like to help fund the development of Zephyr and receive some cool perks, head over to the following link to become a patron!` +
           `\n— https://patreon.com/rtfl`
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
+    return;
   }
 }

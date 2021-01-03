@@ -16,6 +16,8 @@ export default class Vote extends BaseCommand {
         `You receive **2** cubits every time you vote.\nThis is doubled on weekends!\n— [Click here to vote!](https://top.gg/bot/791100707629432863)` +
           `\n\n**Cubits** can be spent on various cosmetic rewards for your cards.`
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
+    return;
   }
 }

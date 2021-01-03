@@ -80,7 +80,7 @@ export default class CardLookup extends BaseCommand {
 
     if (baseCard) {
       const embed = await this.getCardStats(baseCard, msg.author);
-      await msg.channel.createMessage({ embed });
+      await this.send(msg.channel, embed);
       return;
     }
 
@@ -92,7 +92,7 @@ export default class CardLookup extends BaseCommand {
 
     if (find.length === 1) {
       const embed = await this.getCardStats(find[0], msg.author);
-      await msg.channel.createMessage({ embed });
+      await this.send(msg.channel, embed);
       return;
     }
 
@@ -113,7 +113,7 @@ export default class CardLookup extends BaseCommand {
             .join("\n")
       );
 
-    const conf = await msg.channel.createMessage({ embed });
+    const conf = await this.send(msg.channel, embed);
 
     const filter = (m: Message) =>
       find[parseInt(m.content) - 1] && m.author.id === msg.author.id;
@@ -126,7 +126,7 @@ export default class CardLookup extends BaseCommand {
         find[parseInt(m.content) - 1],
         msg.author
       );
-      await msg.channel.createMessage({ embed });
+      await this.send(msg.channel, embed);
       return;
     });
     collector.on("end", async (_c: any, reason: string) => {

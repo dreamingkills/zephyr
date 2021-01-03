@@ -61,7 +61,7 @@ export default class Trade extends BaseCommand {
           `\n${getDescriptions([tradeeCard], this.zephyr, tradeeTags)}`
       );
 
-    const confirmation = await msg.channel.createMessage({ embed });
+    const confirmation = await this.send(msg.channel, embed);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       (userId === msg.author.id || userId === targetUser.id) &&

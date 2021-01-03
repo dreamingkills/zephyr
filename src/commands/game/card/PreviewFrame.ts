@@ -33,11 +33,11 @@ export default class PreviewFrame extends BaseCommand {
 
     const buffer = canvas.toBuffer("image/jpeg");
     const final = Buffer.alloc(buffer.length, buffer, "base64");
-    await msg.channel.createMessage(
-      {
-        content: `> **${msg.author.tag}** — Previewing **${frame.frameName} Frame**`,
-      },
-      { file: final, name: `frame.png` }
+
+    await this.send(
+      msg.channel,
+      `> **${msg.author.tag}** — Previewing **${frame.frameName} Frame**`,
+      { file: { file: final, name: `frame.png` } }
     );
     return;
   }

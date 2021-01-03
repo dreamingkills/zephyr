@@ -16,6 +16,8 @@ export default class ViewBits extends BaseCommand {
           this.zephyr.config.discord.emoji.bits
         }**${profile.bits.toLocaleString()}**.`
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
+    return;
   }
 }

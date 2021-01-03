@@ -54,7 +54,8 @@ export default class ViewTags extends BaseCommand {
               })
               .join("\n")}`
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
     return;
   }
 }

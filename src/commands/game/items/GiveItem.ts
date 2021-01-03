@@ -81,7 +81,7 @@ export default class GiveItem extends BaseCommand {
             .join("\n")
       );
 
-    const conf = await msg.channel.createMessage({ embed });
+    const conf = await this.send(msg.channel, embed);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&

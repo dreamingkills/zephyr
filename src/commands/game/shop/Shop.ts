@@ -53,7 +53,7 @@ export default class Shop extends BaseCommand {
         },
       ]);
 
-      const facade = await msg.channel.createMessage({ embed });
+      const facade = await this.send(msg.channel, embed);
 
       const filter = (_msg: Message, _emoji: PartialEmoji, userID: string) =>
         userID === msg.author.id;
@@ -117,7 +117,7 @@ export default class Shop extends BaseCommand {
         ).setDescription(
           `Really purchase **1x** \`${targetItem.name}\` for \`${cubitPrice}\` cubits?`
         );
-        const confirmation = await msg.channel.createMessage({ embed });
+        const confirmation = await this.send(msg.channel, embed);
 
         const filter = (_msg: Message, emoji: PartialEmoji, userID: string) =>
           userID === msg.author.id && emoji.name === "☑️";
@@ -141,7 +141,7 @@ export default class Shop extends BaseCommand {
             `You purchased **1x** \`${targetItem.name}\` for \`${cubitPrice}\` cubits.`
           );
 
-          await msg.channel.createMessage({ embed });
+          await this.send(msg.channel, embed);
           return;
         });
 

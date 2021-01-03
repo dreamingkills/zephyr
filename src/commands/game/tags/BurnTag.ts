@@ -83,7 +83,7 @@ export default class BurnTag extends BaseCommand {
       )
       .setDescription(description);
 
-    const conf = await msg.channel.createMessage({ embed: embed });
+    const conf = await this.send(msg.channel, embed);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&

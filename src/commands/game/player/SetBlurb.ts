@@ -33,6 +33,8 @@ export default class SetBlurb extends BaseCommand {
           `\n${blurb || "empty blurb"}` +
           `\n\`\`\``
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
+    return;
   }
 }

@@ -66,9 +66,9 @@ export default class ViewTalent extends BaseCommand {
       )
       .setThumbnail(`attachment://card.png`);
 
-    await msg.channel.createMessage(
-      { embed },
-      { file: cardImage, name: "card.png" }
-    );
+    await this.send(msg.channel, embed, {
+      file: { file: cardImage, name: "card.png" },
+    });
+    return;
   }
 }

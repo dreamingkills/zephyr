@@ -56,12 +56,11 @@ export default class ViewUserCard extends BaseCommand {
       )
       .setImage(`attachment://card.png`);
     // .setFooter(`Luck Coefficient: ${card.luckCoefficient}`);
-    await msg.channel.createMessage(
-      { embed },
-      {
+    await this.send(msg.channel, embed, {
+      file: {
         file: image,
         name: "card.png",
-      }
-    );
+      },
+    });
   }
 }

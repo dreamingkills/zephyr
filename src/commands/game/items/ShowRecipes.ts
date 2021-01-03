@@ -25,7 +25,7 @@ export default class ShowRecipes extends BaseCommand {
       });
     }
 
-    await msg.channel.createMessage({ embed });
+    await this.send(msg.channel, embed);
     return;
   }
 }

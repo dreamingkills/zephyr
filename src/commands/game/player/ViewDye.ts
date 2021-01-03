@@ -62,9 +62,9 @@ export default class ViewDye extends BaseCommand {
       .setThumbnail(`attachment://dyepreview.png`)
       .setColor(dyeHex);
 
-    await msg.channel.createMessage(
-      { embed },
-      { file: buf, name: `dyepreview.png` }
-    );
+    await this.send(msg.channel, embed, {
+      file: { file: buf, name: `dyepreview.png` },
+    });
+    return;
   }
 }

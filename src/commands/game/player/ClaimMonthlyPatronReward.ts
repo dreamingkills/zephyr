@@ -37,7 +37,7 @@ export default class ClaimMonthlyPatronReward extends BaseCommand {
         )
         .setDescription(`You claimed **1x** \`${frameVoucherItem.name}\`!`);
 
-      await msg.channel.createMessage({ embed });
+      await this.send(msg.channel, embed);
       return;
     } else {
       const nextFrameClaim = dayjs(information.nextFrameTime).startOf("month");
@@ -52,7 +52,7 @@ export default class ClaimMonthlyPatronReward extends BaseCommand {
             `You can claim your monthly reward again in **${timeUntil}**.`
           );
 
-        await msg.channel.createMessage({ embed });
+        await this.send(msg.channel, embed);
         return;
       } else {
         const frameVoucherItem = items.filter(
@@ -71,7 +71,7 @@ export default class ClaimMonthlyPatronReward extends BaseCommand {
           )
           .setDescription(`You claimed **1x** \`${frameVoucherItem.name}\`!`);
 
-        await msg.channel.createMessage({ embed });
+        await this.send(msg.channel, embed);
         return;
       }
     }

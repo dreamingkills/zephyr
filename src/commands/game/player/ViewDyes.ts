@@ -69,7 +69,7 @@ export default class ViewDyes extends BaseCommand {
           dyeCount === 1 ? `` : `s`
         }`
       );
-    const sent = await msg.channel.createMessage({ embed });
+    const sent = await this.send(msg.channel, embed);
 
     if (maxPage > 1) {
       const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>

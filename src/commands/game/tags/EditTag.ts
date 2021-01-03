@@ -63,7 +63,8 @@ export default class EditTag extends BaseCommand {
       .setDescription(
         `Edited tag ${hasTag.emoji} **${hasTag.name}** to ${newTag.emoji} **${newTag.name}**.`
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
     return;
   }
 }

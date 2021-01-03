@@ -128,7 +128,7 @@ export default class Leaderboards extends BaseCommand {
           `\n${this.leaderboardTypes.join("\n")}` +
           `\n\`\`\``
       );
-      await msg.channel.createMessage({ embed });
+      await this.send(msg.channel, embed);
       return;
     }
 
@@ -144,7 +144,7 @@ export default class Leaderboards extends BaseCommand {
       await this.getLeaderboard(trueType, page, msg.author.id, this.zephyr)
     );
     embed.setFooter(`Page ${page} of ${totalPages} • ${totalEntries} entries`);
-    const board = await msg.channel.createMessage({ embed });
+    const board = await this.send(msg.channel, embed);
     if (totalPages < 2) return;
 
     if (totalPages > 2) board.addReaction(`⏮️`);

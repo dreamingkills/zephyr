@@ -76,7 +76,7 @@ export default class UpgradeCard extends BaseCommand {
           } ${bitCost.toLocaleString()}**`
       )
       .setFooter(`🎲 Chance of success: ${successChance}%`);
-    const confirmation = await msg.channel.createMessage({ embed });
+    const confirmation = await this.send(msg.channel, embed);
     await confirmation.addReaction(
       `check:${this.zephyr.config.discord.emojiId.check}`
     );

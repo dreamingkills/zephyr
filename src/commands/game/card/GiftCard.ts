@@ -68,7 +68,7 @@ export default class GiftCard extends BaseCommand {
           (cards.length > 5 ? `\n*... and ${cards.length - 5} more...` : ``)
       );
 
-    const conf = await msg.channel.createMessage({ embed });
+    const conf = await this.send(msg.channel, embed);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&

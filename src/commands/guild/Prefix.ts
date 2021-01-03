@@ -19,14 +19,14 @@ export default class Prefix extends BaseCommand {
     const author = guild?.members.get(msg.author.id)!;
     if (!prefix) {
       const currentPrefix = this.zephyr.getPrefix(guild!.id);
-      await msg.channel.createMessage(`The current prefix is ${currentPrefix}`);
+      await this.send(msg.channel, `The current prefix is ${currentPrefix}`);
       return;
     }
     if (!author?.permission.json["manageChannels"]) return;
 
     await GuildService.setPrefix(guild!.id!, prefix);
     this.zephyr.setPrefix(guild!.id!, prefix);
-    await msg.channel.createMessage(`Set the prefix to ${prefix}`);
+    await this.send(msg.channel, `Set the prefix to ${prefix}`);
     return;
   }
 }

@@ -57,7 +57,8 @@ export default class DailyReward extends BaseCommand {
         dayjs(today).add(1, "day").startOf(`day`)
       )}.` + `\nYour current streak is ${_profile.dailyStreak.toLocaleString()}`
     );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
     return;
   }
 }

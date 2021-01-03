@@ -74,10 +74,9 @@ export default class UseItem extends BaseCommand {
           )
           .setImage(`attachment://preview.png`);
 
-        const confirmation = await msg.channel.createMessage(
-          { embed },
-          { file: preview, name: "preview.png" }
-        );
+        const confirmation = await this.send(msg.channel, embed, {
+          file: { file: preview, name: "preview.png" },
+        });
 
         const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
           userId === msg.author.id &&

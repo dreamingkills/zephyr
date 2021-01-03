@@ -43,6 +43,8 @@ export default class UntagCard extends BaseCommand {
           cards.length > 1 ? `s` : ``
         }.`
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
+    return;
   }
 }

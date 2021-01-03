@@ -46,7 +46,8 @@ export default class ViewBank extends BaseCommand {
               this.zephyr.config.discord.emoji.bits
             }**${newProfile.bits.toLocaleString()}**`
         );
-      await msg.channel.createMessage({ embed });
+
+      await this.send(msg.channel, embed);
       return;
     } else if (subcommand === "withdraw") {
       let amount = parseInt(options[1], 10);
@@ -80,7 +81,8 @@ export default class ViewBank extends BaseCommand {
               this.zephyr.config.discord.emoji.bits
             }**${newProfile.bits.toLocaleString()}**`
         );
-      await msg.channel.createMessage({ embed });
+
+      await this.send(msg.channel, embed);
       return;
     }
     const embed = new MessageEmbed()
@@ -91,6 +93,8 @@ export default class ViewBank extends BaseCommand {
             this.zephyr.config.discord.emoji.bits
           }**${profile.bitsBank.toLocaleString()}**`
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
+    return;
   }
 }

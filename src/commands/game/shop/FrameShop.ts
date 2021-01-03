@@ -38,7 +38,8 @@ export default class FrameShop extends BaseCommand {
           )
           .setDescription(`That item does not exist.`)
           .setFooter(`Please make sure your spelling is correct.`);
-        await msg.channel.createMessage({ embed });
+
+        await this.send(msg.channel, embed);
         return;
       }
 
@@ -54,7 +55,8 @@ export default class FrameShop extends BaseCommand {
             msg.author.dynamicAvatarURL("png")
           )
           .setDescription(`That item isn't currently for sale.`);
-        await msg.channel.createMessage({ embed });
+
+        await this.send(msg.channel, embed);
         return;
       }
 
@@ -84,7 +86,8 @@ export default class FrameShop extends BaseCommand {
               this.zephyr.config.discord.emoji.bits
             }**${newProfile.bits.toLocaleString()}**`
         );
-      await msg.channel.createMessage({ embed });
+
+      await this.send(msg.channel, embed);
       return;
     }
     const frames = [];
@@ -114,6 +117,8 @@ export default class FrameShop extends BaseCommand {
           `\nYou can also use \`${prefix}pf <frame>\` to preview a frame.`
       )
       .setFooter(`Shop resets in ${timeUntilNextDay}.`);
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
+    return;
   }
 }

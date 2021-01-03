@@ -66,7 +66,7 @@ export default class Help extends BaseCommand {
           .setAuthor(`Help | ${msg.author.tag}`, msg.author.avatarURL)
           .setDescription(description);
 
-        await msg.channel.createMessage({ embed });
+        await this.send(msg.channel, embed);
         return;
       } else throw new ZephyrError.InvalidHelpQueryError();
     }
@@ -122,6 +122,7 @@ export default class Help extends BaseCommand {
         inline: true,
       });
 
-    await msg.channel.createMessage({ embed });
+    await this.send(msg.channel, embed);
+    return;
   }
 }

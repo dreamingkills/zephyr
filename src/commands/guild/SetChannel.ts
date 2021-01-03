@@ -16,7 +16,9 @@ export default class SetChannel extends BaseCommand {
 
     let channelClean = msg.channel.id;
     await GuildService.setDropChannel(msg.guildID!, channelClean);
-    await msg.channel.createMessage(
+
+    await this.send(
+      msg.channel,
       `Set the Zephyr channel to <#${channelClean}>`
     );
     return;

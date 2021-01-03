@@ -66,7 +66,7 @@ export default class ViewProfile extends BaseCommand {
     if (target.discordId === msg.author.id && profile.private)
       embed.setFooter(`Your profile is currently private.`);
 
-    await msg.channel.createMessage({ embed });
+    await this.send(msg.channel, embed);
     return;
   }
 }

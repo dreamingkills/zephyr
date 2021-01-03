@@ -52,7 +52,8 @@ export default class CreateTag extends BaseCommand {
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(`Created tag ${trueEmoji[0]} \`${tag}\`!`);
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
     return;
   }
 }

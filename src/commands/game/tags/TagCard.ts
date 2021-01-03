@@ -68,6 +68,8 @@ export default class TagCard extends BaseCommand {
             : `**${cards.length}** card${cards.length > 1 ? `s` : ``}`
         } as ${tag.emoji} **${tag.name}**.`
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
+    return;
   }
 }

@@ -65,10 +65,9 @@ export default class DyeCard extends BaseCommand {
       this.zephyr
     );
 
-    const conf = await msg.channel.createMessage(
-      { embed },
-      { file: preview, name: "dyepreview.png" }
-    );
+    const conf = await this.send(msg.channel, embed, {
+      file: { file: preview, name: "dyepreview.png" },
+    });
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
@@ -127,10 +126,9 @@ export default class DyeCard extends BaseCommand {
           } remaining.`
         );
 
-      await msg.channel.createMessage(
-        { embed: successEmbed },
-        { file: dyedCardImage, name: "dyesuccess.png" }
-      );
+      await this.send(msg.channel, successEmbed, {
+        file: { file: dyedCardImage, name: "dyesuccess.png" },
+      });
       return;
     });
     collector.on("end", async (_collected: unknown, reason: string) => {

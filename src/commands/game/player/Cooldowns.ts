@@ -36,6 +36,8 @@ export default class Cooldowns extends BaseCommand {
       getTimeUntil(now, dayjs(profile.claimNext)) || "Now"
     }__
     `);
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
+    return;
   }
 }

@@ -94,7 +94,7 @@ export default class CardInventory extends BaseCommand {
       .setFooter(
         `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${size} cards`
       );
-    const sent = await msg.channel.createMessage({ embed });
+    const sent = await this.send(msg.channel, embed);
     if (totalPages < 2) return;
 
     const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>

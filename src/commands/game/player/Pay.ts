@@ -44,7 +44,7 @@ export default class Pay extends BaseCommand {
         } **${amount.toLocaleString()}** to **${user.tag}**?`
       );
 
-    const conf = await msg.channel.createMessage({ embed });
+    const conf = await this.send(msg.channel, embed);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&

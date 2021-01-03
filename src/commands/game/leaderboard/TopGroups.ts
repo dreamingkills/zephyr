@@ -78,7 +78,7 @@ export default class TopGroup extends BaseCommand {
       .setFooter(
         `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${topCollectorCount.toLocaleString()} entries`
       );
-    const board = await msg.channel.createMessage({ embed });
+    const board = await this.send(msg.channel, embed);
 
     if (totalPages < 2) return;
 

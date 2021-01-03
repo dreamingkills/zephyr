@@ -16,6 +16,8 @@ export default class TogglePrivate extends BaseCommand {
       .setDescription(
         `Your profile is now ${newProfile.private ? `private` : `public`}.`
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
+    return;
   }
 }

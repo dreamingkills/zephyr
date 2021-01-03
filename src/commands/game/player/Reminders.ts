@@ -37,7 +37,7 @@ export default class Reminders extends BaseCommand {
           msg.author.dynamicAvatarURL("png")
         )
         .setDescription(message);
-      await msg.channel.createMessage({ embed });
+      await this.send(msg.channel, embed);
       return;
     }
     const embed = new MessageEmbed()
@@ -50,7 +50,7 @@ export default class Reminders extends BaseCommand {
         `— Drops: **${profile.dropReminder ? `ON` : `OFF`}**` +
           `\n— Claims: **${profile.claimReminder ? `ON` : `OFF`}**`
       );
-    await msg.channel.createMessage({ embed });
+    await this.send(msg.channel, embed);
     return;
   }
 }

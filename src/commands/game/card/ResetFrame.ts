@@ -31,7 +31,8 @@ export default class ResetFrame extends BaseCommand {
     if (card.frameName?.includes("Default"))
       throw new ZephyrError.FrameAlreadyDefaultError(card);
 
-    const conf = await msg.channel.createMessage(
+    const conf = await this.send(
+      msg.channel,
       `${this.zephyr.config.discord.emoji.warn} Really reset the frame of \`${trueIdentifier}\`?`
     );
     await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);

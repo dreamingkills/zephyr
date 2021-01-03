@@ -47,7 +47,7 @@ export default class ItemInventory extends BaseCommand {
         `Page 1 of ${maxPage} • ${totalItems.toLocaleString()} entries`
       );
 
-    const sent = await msg.channel.createMessage({ embed });
+    const sent = await this.send(msg.channel, embed);
     if (maxPage > 1) {
       const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
         userId === msg.author.id;

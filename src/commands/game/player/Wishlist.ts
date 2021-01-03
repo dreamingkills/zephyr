@@ -29,7 +29,8 @@ export default class Wishlist extends BaseCommand {
           query.name
         } to your wishlist.`
       );
-    await channel.createMessage({ embed });
+
+    await this.send(channel, embed);
     return;
   }
 
@@ -84,7 +85,7 @@ export default class Wishlist extends BaseCommand {
                 .join("\n")
           );
 
-        const conf = await msg.channel.createMessage({ embed });
+        const conf = await this.send(msg.channel, embed);
 
         const filter = (m: Message) =>
           unique[parseInt(m.content) - 1] && m.author.id === msg.author.id;
@@ -115,7 +116,8 @@ export default class Wishlist extends BaseCommand {
                   match.name
                 } is already on your wishlist.`
               );
-            await msg.channel.createMessage({ embed });
+
+            await this.send(msg.channel, embed);
             return;
           }
 
@@ -176,7 +178,8 @@ export default class Wishlist extends BaseCommand {
                   item[0].groupName ? `**${item[0].groupName}** ` : ``
                 }${item[0].name} from your wishlist.`
               );
-            await msg.channel.createMessage({ embed });
+
+            await this.send(msg.channel, embed);
             return;
           }
         } else throw new ZephyrError.InvalidWishlistEntryError();
@@ -196,7 +199,8 @@ export default class Wishlist extends BaseCommand {
             target.name
           } from your wishlist.`
         );
-      await msg.channel.createMessage({ embed });
+
+      await this.send(msg.channel, embed);
       return;
     } else if (subcommand === "clear") {
       const wishlist = await ProfileService.getWishlist(profile);
@@ -209,7 +213,8 @@ export default class Wishlist extends BaseCommand {
           msg.author.dynamicAvatarURL("png")
         )
         .setDescription(`Cleared your wishlist.`);
-      await msg.channel.createMessage({ embed });
+
+      await this.send(msg.channel, embed);
       return;
     }
     if (msg.mentions[0]) {
@@ -255,7 +260,8 @@ export default class Wishlist extends BaseCommand {
           msg.guildID
         )}help wishlist for more information!`
       );
-    await msg.channel.createMessage({ embed });
+
+    await this.send(msg.channel, embed);
     return;
   }
 }

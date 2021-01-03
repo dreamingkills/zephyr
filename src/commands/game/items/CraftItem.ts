@@ -66,7 +66,7 @@ export default class CraftItem extends BaseCommand {
           `**Notice**: Crafting is not reversible!`
       );
 
-    const confirmation = await msg.channel.createMessage({ embed });
+    const confirmation = await this.send(msg.channel, embed);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&

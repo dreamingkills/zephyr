@@ -49,6 +49,7 @@ export default class UserInfo extends BaseCommand {
       )
       .setThumbnail(targetUser.dynamicAvatarURL("png"));
 
-    await msg.channel.createMessage({ embed });
+    await this.send(msg.channel, embed);
+    return;
   }
 }
