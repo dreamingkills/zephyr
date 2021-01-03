@@ -62,7 +62,9 @@ export async function createMessage(
       message = sent;
     } catch (e) {
       if (attempts === 3) {
-        console.log(e);
+        console.log(
+          `Failed trying to send message with content ${content} in channel ${channel.id}. Full stack:\n${e}`
+        );
       }
     }
   }
