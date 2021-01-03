@@ -8,7 +8,7 @@ import { items } from "../assets/items.json";
 import { GameDye } from "../structures/game/Dye";
 import { GameUserCard } from "../structures/game/UserCard";
 import { GameTag } from "../structures/game/Tag";
-import { ErisFile } from "../structures/client/File";
+import { ErisFile } from "../structures/client/ErisFile";
 
 const mappedColors = colorNames.reduce(
   (o, { name, hex }) => Object.assign(o, { [name]: hex }),
