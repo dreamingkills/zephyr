@@ -51,18 +51,12 @@ export class DMHandler {
 
         const dmChannel = await user.getDMChannel();
 
-        let retries = 0;
-        while (retries < 3) {
-          try {
-            await createMessage(dmChannel, message);
-            success.push({ id: p.discordId, type });
-            break;
-          } catch {
-            retries++;
-          }
-          if (retries >= 3) {
-            throw Error;
-          }
+        try {
+          await createMessage(dmChannel, message);
+          success.push({ id: p.discordId, type });
+          break;
+        } catch (e) {
+          throw e;
         }
       } catch (e) {
         failed.push(p);
