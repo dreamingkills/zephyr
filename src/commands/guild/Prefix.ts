@@ -2,6 +2,7 @@ import { Message } from "eris";
 import { GuildService } from "../../lib/database/services/guild/GuildService";
 import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
+import * as ZephyrError from "../../structures/error/ZephyrError";
 
 export default class Prefix extends BaseCommand {
   names = ["prefix"];
@@ -15,6 +16,8 @@ export default class Prefix extends BaseCommand {
     options: string[]
   ): Promise<void> {
     const prefix = options[0];
+    if (prefix.length > 8) throw new ZephyrError.PrefixTooLongError();
+
     const guild = this.zephyr.guilds.get(msg.guildID!);
     const author = guild?.members.get(msg.author.id)!;
     if (!prefix) {

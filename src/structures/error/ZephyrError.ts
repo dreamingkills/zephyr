@@ -13,6 +13,12 @@ abstract class ZephyrError extends Error {
   }
 }
 
+export class PrefixTooLongError extends ZephyrError {
+  constructor() {
+    super(`That prefix is too long. It must be 8 characters at most.`);
+  }
+}
+
 export class NotAllowedInDMError extends ZephyrError {
   constructor() {
     super(`You cannot do that here.`);
