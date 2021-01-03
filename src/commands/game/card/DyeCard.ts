@@ -91,7 +91,7 @@ export default class DyeCard extends BaseCommand {
       if (refetchDye.discordId !== msg.author.id)
         throw new ZephyrError.NotOwnerOfDyeError(refetchDye.id);
       if (refetchDye.charges < 1)
-        throw new ZephyrError.UnchargedDyeError(dye.id);
+        throw new ZephyrError.UnchargedDyeError(refetchDye.id);
 
       await confirmation.delete();
 
