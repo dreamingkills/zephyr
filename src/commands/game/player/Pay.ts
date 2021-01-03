@@ -44,13 +44,13 @@ export default class Pay extends BaseCommand {
         } **${amount.toLocaleString()}** to **${user.tag}**?`
       );
 
-    const conf = await this.send(msg.channel, embed);
+    const confirmation = await this.send(msg.channel, embed);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
       emoji.id === this.zephyr.config.discord.emojiId.check;
 
-    const collector = new ReactionCollector(this.zephyr, conf, filter, {
+    const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
       time: 30000,
       max: 1,
     });
@@ -66,7 +66,7 @@ export default class Pay extends BaseCommand {
         msg.guildID!
       );
 
-      await conf.edit({
+      await confirmation.edit({
         embed: embed.setFooter(`💸 You've paid successfully.`),
       });
 
@@ -76,16 +76,20 @@ export default class Pay extends BaseCommand {
 
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
-        await conf.edit({
-          embed: embed.setFooter(`🕒 This payment confirmation has expired.`),
+        await confirmation.edit({
+          embed: embed.setFooter(`🕒 This confirmation has expired.`),
         });
       }
 
       try {
-        await conf.removeReactions();
+        await confirmation.removeReactions();
       } catch {}
     });
 
-    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
+    await this.react(
+      confirmation,
+      `check:${this.zephyr.config.discord.emojiId.check}`
+    );
+    return;
   }
 }

@@ -609,7 +609,15 @@ export class ItemNotForSaleError extends ZephyrError {
 export class MessageFailedToSendError extends ZephyrError {
   constructor() {
     super(
-      `There was a problem connecting to Discord. Please try again in a few minutes.\nThis has been reported to the developer.`
+      `There was a problem connecting to Discord, and a message could not be sent. Please try again in a few minutes.\nThis has been reported to the developer.`
+    );
+  }
+}
+
+export class FailedToAddReactionError extends ZephyrError {
+  constructor() {
+    super(
+      `There was a problem connecting to Discord, and a reaction could not be added. Please try again in a few minutes.\nThis has been reported to the developer.`
     );
   }
 }

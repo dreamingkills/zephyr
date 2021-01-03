@@ -126,10 +126,9 @@ export default class CardInventory extends BaseCommand {
       }
     );
 
-    if (totalPages > 2) sent.addReaction(`⏮️`);
-    if (totalPages > 1) sent.addReaction(`◀️`);
-    // board.addReaction(`🔢`),
-    if (totalPages > 1) sent.addReaction(`▶️`);
-    if (totalPages > 2) sent.addReaction(`⏭️`);
+    if (totalPages > 2) await this.react(sent, `⏮️`);
+    if (totalPages > 1) await this.react(sent, `◀️`);
+    if (totalPages > 1) await this.react(sent, `▶️`);
+    if (totalPages > 2) await this.react(sent, `⏭️`);
   }
 }

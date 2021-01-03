@@ -13,6 +13,7 @@ import { GuildService } from "./database/services/guild/GuildService";
 import { GameBaseCard } from "../structures/game/BaseCard";
 import { AnticheatService } from "./database/services/meta/AnticheatService";
 import { createMessage } from "./discord/message/createMessage";
+import { addReaction } from "./discord/message/addReaction";
 
 export abstract class CardSpawner {
   private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
@@ -253,7 +254,7 @@ export abstract class CardSpawner {
     });
 
     try {
-      this.emojis.forEach((e) => drop.addReaction(e));
+      this.emojis.forEach((e) => addReaction(drop, e));
     } catch {}
 
     await CardService.incrementGenerated(cards);

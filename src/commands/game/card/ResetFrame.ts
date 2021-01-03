@@ -31,22 +31,21 @@ export default class ResetFrame extends BaseCommand {
     if (card.frameName?.includes("Default"))
       throw new ZephyrError.FrameAlreadyDefaultError(card);
 
-    const conf = await this.send(
+    const confirmation = await this.send(
       msg.channel,
       `${this.zephyr.config.discord.emoji.warn} Really reset the frame of \`${trueIdentifier}\`?`
     );
-    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
       emoji.id === this.zephyr.config.discord.emojiId.check;
-    const collector = new ReactionCollector(this.zephyr, conf, filter, {
+    const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
       time: 30000,
       max: 1,
     });
     collector.on("collect", async () => {
       await CardService.changeCardFrame(card, 1, this.zephyr);
-      await conf.edit(
+      await confirmation.edit(
         `${this.zephyr.config.discord.emoji.check} Reset the frame of \`${trueIdentifier}\`.`
       );
       collector.en;
@@ -54,15 +53,21 @@ export default class ResetFrame extends BaseCommand {
     });
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
-        await conf.edit(
+        await confirmation.edit(
           `${this.zephyr.config.discord.emoji.warn} Did not reset the frame.`
         );
-        await conf.removeReaction(
+        await confirmation.removeReaction(
           `check:${this.zephyr.config.discord.emojiId.check}`,
           this.zephyr.user.id
         );
         return;
       }
     });
+
+    await this.react(
+      confirmation,
+      `check:${this.zephyr.config.discord.emojiId.check}`
+    );
+    return;
   }
 }

@@ -114,8 +114,10 @@ export default class CraftItem extends BaseCommand {
       } catch {}
     });
 
-    await confirmation.addReaction(
+    await this.react(
+      confirmation,
       `check:${this.zephyr.config.discord.emojiId.check}`
     );
+    return;
   }
 }

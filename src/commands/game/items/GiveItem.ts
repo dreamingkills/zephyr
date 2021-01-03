@@ -81,13 +81,13 @@ export default class GiveItem extends BaseCommand {
             .join("\n")
       );
 
-    const conf = await this.send(msg.channel, embed);
+    const confirmation = await this.send(msg.channel, embed);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
       emoji.id === this.zephyr.config.discord.emojiId.check;
 
-    const collector = new ReactionCollector(this.zephyr, conf, filter, {
+    const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
       time: 30000,
       max: 1,
     });
@@ -102,7 +102,7 @@ export default class GiveItem extends BaseCommand {
           );
 
           if (refetchItem.quantity < 1) {
-            await conf.edit({
+            await confirmation.edit({
               embed: embed.setFooter(
                 `⚠️ You have no ${baseItems[realItems.indexOf(i)].name}.`
               ),
@@ -131,7 +131,7 @@ export default class GiveItem extends BaseCommand {
         msg.guildID!
       );
 
-      await conf.edit({
+      await confirmation.edit({
         embed: embed.setFooter(
           `🎁 ${realItems.length} item${
             realItems.length === 1 ? ` has` : `s have`
@@ -143,16 +143,20 @@ export default class GiveItem extends BaseCommand {
 
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
-        await conf.edit({
+        await confirmation.edit({
           embed: embed.setFooter(`🕒 This item gift offer has expired.`),
         });
       }
 
       try {
-        await conf.removeReactions();
+        await confirmation.removeReactions();
       } catch {}
     });
 
-    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
+    await this.react(
+      confirmation,
+      `check:${this.zephyr.config.discord.emojiId.check}`
+    );
+    return;
   }
 }

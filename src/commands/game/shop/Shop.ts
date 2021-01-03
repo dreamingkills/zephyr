@@ -91,7 +91,7 @@ export default class Shop extends BaseCommand {
         } catch {}
       });
 
-      await facade.addReaction(`1️⃣`);
+      await this.react(facade, `1️⃣`);
       return;
     }
 
@@ -157,7 +157,7 @@ export default class Shop extends BaseCommand {
           } catch {}
         });
 
-        await confirmation.addReaction("☑️");
+        await this.react(confirmation, "☑️");
         return;
       }
     }

@@ -65,14 +65,14 @@ export default class DyeCard extends BaseCommand {
       this.zephyr
     );
 
-    const conf = await this.send(msg.channel, embed, {
+    const confirmation = await this.send(msg.channel, embed, {
       file: { file: preview, name: "dyepreview.png" },
     });
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
       emoji.id === this.zephyr.config.discord.emojiId.check;
-    const collector = new ReactionCollector(this.zephyr, conf, filter, {
+    const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
       time: 15000,
       max: 1,
     });
@@ -81,7 +81,7 @@ export default class DyeCard extends BaseCommand {
       // We need to check that this user is still the owner of the card, or they can do some nasty stuff
       const refetchCard = await targetCard.fetch();
       if (refetchCard.discordId !== msg.author.id) {
-        await conf.edit({
+        await confirmation.edit({
           embed: embed.setFooter(
             `⚠️ ${refetchCard.id.toString(36)} does not belong to you.`
           ),
@@ -92,7 +92,7 @@ export default class DyeCard extends BaseCommand {
       // Also check that their dye still has 1 charge
       const refetchDye = await targetDye.fetch();
       if (refetchDye.charges < 1) {
-        await conf.edit({
+        await confirmation.edit({
           embed: embed.setFooter(
             `⚠️ $${targetDye.id.toString(36)} has no charges.`
           ),
@@ -100,7 +100,7 @@ export default class DyeCard extends BaseCommand {
         return;
       }
 
-      await conf.delete();
+      await confirmation.delete();
 
       const dyedCard = await CardService.setCardDye(targetCard, targetDye);
       await ProfileService.removeChargesFromDye(targetDye);
@@ -133,15 +133,19 @@ export default class DyeCard extends BaseCommand {
     });
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
-        await conf.edit({
+        await confirmation.edit({
           embed: embed.setFooter(`🕒 This dye confirmation has expired.`),
         });
       }
       try {
-        await conf.removeReactions();
+        await confirmation.removeReactions();
       } catch {}
     });
 
-    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
+    await this.react(
+      confirmation,
+      `check:${this.zephyr.config.discord.emojiId.check}`
+    );
+    return;
   }
 }

@@ -76,10 +76,8 @@ export default class UpgradeCard extends BaseCommand {
           } ${bitCost.toLocaleString()}**`
       )
       .setFooter(`🎲 Chance of success: ${successChance}%`);
+
     const confirmation = await this.send(msg.channel, embed);
-    await confirmation.addReaction(
-      `check:${this.zephyr.config.discord.emojiId.check}`
-    );
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
@@ -115,6 +113,7 @@ export default class UpgradeCard extends BaseCommand {
       }
       return;
     });
+
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
         await confirmation.edit({
@@ -125,5 +124,11 @@ export default class UpgradeCard extends BaseCommand {
         await confirmation.removeReactions();
       } catch {}
     });
+
+    await this.react(
+      confirmation,
+      `check:${this.zephyr.config.discord.emojiId.check}`
+    );
+    return;
   }
 }

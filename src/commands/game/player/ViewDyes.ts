@@ -105,11 +105,10 @@ export default class ViewDyes extends BaseCommand {
       );
 
       try {
-        if (maxPage > 2) sent.addReaction(`⏮️`);
-        if (maxPage > 1) sent.addReaction(`◀️`);
-        // board.addReaction(`🔢`),
-        if (maxPage > 1) sent.addReaction(`▶️`);
-        if (maxPage > 2) sent.addReaction(`⏭️`);
+        if (maxPage > 2) this.react(sent, `⏮️`);
+        if (maxPage > 1) this.react(sent, `◀️`);
+        if (maxPage > 1) this.react(sent, `▶️`);
+        if (maxPage > 2) this.react(sent, `⏭️`);
       } catch (e) {}
     }
   }

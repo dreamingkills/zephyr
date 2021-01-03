@@ -147,11 +147,10 @@ export default class Leaderboards extends BaseCommand {
     const board = await this.send(msg.channel, embed);
     if (totalPages < 2) return;
 
-    if (totalPages > 2) board.addReaction(`⏮️`);
-    if (totalPages > 1) board.addReaction(`◀️`);
-    // board.addReaction(`🔢`),
-    if (totalPages > 1) board.addReaction(`▶️`);
-    if (totalPages > 2) board.addReaction(`⏭️`);
+    if (totalPages > 2) await this.react(board, `⏮️`);
+    if (totalPages > 1) await this.react(board, `◀️`);
+    if (totalPages > 1) await this.react(board, `▶️`);
+    if (totalPages > 2) await this.react(board, `⏭️`);
 
     const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id;

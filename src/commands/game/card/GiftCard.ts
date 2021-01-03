@@ -68,12 +68,12 @@ export default class GiftCard extends BaseCommand {
           (cards.length > 5 ? `\n*... and ${cards.length - 5} more...` : ``)
       );
 
-    const conf = await this.send(msg.channel, embed);
+    const confirmation = await this.send(msg.channel, embed);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
       emoji.id === this.zephyr.config.discord.emojiId.check;
-    const collector = new ReactionCollector(this.zephyr, conf, filter, {
+    const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
       time: 30000,
       max: 1,
     });
@@ -83,7 +83,7 @@ export default class GiftCard extends BaseCommand {
         const refetchCard = await card.fetch();
 
         if (refetchCard.discordId !== msg.author.id) {
-          await conf.edit({
+          await confirmation.edit({
             embed: embed.setFooter(
               `⚠️ ${card.id.toString(36)} does not belong to you.`
             ),
@@ -101,7 +101,7 @@ export default class GiftCard extends BaseCommand {
         msg.guildID!
       );
 
-      await conf.edit({
+      await confirmation.edit({
         embed: embed.setFooter(
           `🎁 ${cards.length} card${
             cards.length === 1 ? ` has` : `s have`
@@ -113,16 +113,20 @@ export default class GiftCard extends BaseCommand {
 
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
-        await conf.edit({
+        await confirmation.edit({
           embed: embed.setFooter(`🕒 This gift offer has expired.`),
         });
       }
 
       try {
-        await conf.removeReactions();
+        await confirmation.removeReactions();
       } catch {}
     });
 
-    await conf.addReaction(`check:${this.zephyr.config.discord.emojiId.check}`);
+    await this.react(
+      confirmation,
+      `check:${this.zephyr.config.discord.emojiId.check}`
+    );
+    return;
   }
 }
