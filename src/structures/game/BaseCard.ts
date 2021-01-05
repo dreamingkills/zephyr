@@ -60,6 +60,11 @@ export class GameFrame {
 }
 
 export interface Subgroup {
-  name: string
-  group: string,
+  name: string;
+  group?: string;
+}
+
+export interface Member {
+  name: string;
+  group?: string;
 }

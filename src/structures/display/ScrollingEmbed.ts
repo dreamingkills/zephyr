@@ -1,11 +1,11 @@
-import { Message, PartialEmoji } from "eris";
-import { MessageEmbed } from "./RichEmbed";
-import { Zephyr } from "./Zephyr";
+import { EmbedField, Message, PartialEmoji } from "eris";
+import { MessageEmbed } from "../client/RichEmbed";
+import { Zephyr } from "../client/Zephyr";
 import { ReactionCollector } from "eris-collector";
 import { checkPermission } from "../../lib/ZephyrUtils";
 
 export interface ScrollingEmbedOptions {
-  initialItems: string;
+  initialItems: string | EmbedField[];
   totalPages: number;
   totalItems: number;
   startingPage: number;
@@ -14,17 +14,21 @@ export interface ScrollingEmbedOptions {
   itemNamePlural: string;
 }
 
+function isEmbedFields(value: string | EmbedField[]): value is EmbedField[] {
+  return !!((value[0] as EmbedField).name && (value[0] as EmbedField).value);
+}
+
 type OnPageChangeCallback = (
   page: number,
   message: Message,
   emoji: PartialEmoji,
   userId: string
-) => string | Promise<string>;
+) => string | Promise<string> | EmbedField[] | Promise<EmbedField[]>;
 
 export class ScrollingEmbed {
   private sentMessage!: Message;
   private currentPage = 1;
-  private currentItems: string;
+  private currentItems: string | EmbedField[];
   private options: ScrollingEmbedOptions;
   private onPageChangeCallback: OnPageChangeCallback = () => "";
 
@@ -70,9 +74,17 @@ export class ScrollingEmbed {
     userId === this.message.author.id;
 
   private generateEmbed() {
-    this.embed
-      .setDescription(`${this.options.embedDescription}\n${this.currentItems}`)
-      .setFooter(this.generateFooter());
+    this.embed.setFooter(this.generateFooter());
+
+    if (isEmbedFields(this.currentItems)) {
+      this.embed.setDescription(this.options.embedDescription);
+      this.embed.fields = [];
+      this.currentItems.forEach((item) => this.embed.addField(item));
+    } else {
+      this.embed.setDescription(
+        `${this.options.embedDescription}\n${this.currentItems}`
+      );
+    }
   }
 
   private generateFooter(): string {

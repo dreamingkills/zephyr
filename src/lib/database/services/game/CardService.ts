@@ -2,6 +2,7 @@ import { createCanvas, loadImage, Image } from "canvas";
 import {
   GameBaseCard,
   GameFrame,
+  Member,
   Subgroup,
 } from "../../../../structures/game/BaseCard";
 import { GameProfile } from "../../../../structures/game/Profile";
@@ -448,6 +449,14 @@ export abstract class CardService {
 
   public static async findSubgroups(subgroup: string): Promise<Subgroup[]> {
     return await CardGet.findSubgroups(subgroup);
+  }
+
+  public static async findGroups(group: string): Promise<string[]> {
+    return await CardGet.findGroups(group);
+  }
+
+  public static async findIndividuals(individual: string): Promise<Member[]> {
+    return await CardGet.findIndividuals(individual);
   }
 
   /*

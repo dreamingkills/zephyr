@@ -1,7 +1,7 @@
 import { Message } from "eris";
-import { MessageEmbed } from "./RichEmbed";
+import { MessageEmbed } from "../client/RichEmbed";
 import { MessageCollector } from "eris-collector";
-import { Zephyr } from "./Zephyr";
+import { Zephyr } from "../client/Zephyr";
 
 export class ChoiceEmbed {
   constructor(
@@ -29,7 +29,7 @@ export class ChoiceEmbed {
 
   private generateEmbed() {
     this.embed.setDescription(
-      this.embed.description +
+      (this.embed.description || "") +
         `\n${this.choices.map((c, idx) => `— \`${idx + 1}\` ${c}`).join("\n")}`
     );
   }

@@ -10,7 +10,7 @@ import { getDescriptions } from "../../../lib/ZephyrUtils";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { GameTag } from "../../../structures/game/Tag";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { ScrollingEmbed } from "../../../structures/client/ScrollingEmbed";
+import { ScrollingEmbed } from "../../../structures/display/ScrollingEmbed";
 
 export default class CardInventory extends BaseCommand {
   names = ["inventory", "inv", "i"];

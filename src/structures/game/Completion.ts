@@ -28,3 +28,27 @@ export interface TotalCompletion {
   complete: number;
   incomplete: number;
 }
+
+export interface GroupCompletion {
+  group_name: string;
+  subgroup_name: string;
+  is_complete: boolean;
+  missing: number;
+  have: number;
+}
+
+export class GameGroupCompletion {
+  groupName: string;
+  subgroupName: string;
+  isComplete: boolean;
+  missing: number;
+  have: number;
+
+  constructor(data: GroupCompletion) {
+    this.groupName = data.group_name;
+    this.subgroupName = data.subgroup_name;
+    this.isComplete = data.is_complete;
+    this.missing = data.missing;
+    this.have = data.have;
+  }
+}

@@ -6,7 +6,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { GameBaseCard } from "../../../structures/game/BaseCard";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
-import { ChoiceEmbed } from "../../../structures/client/ChoiceEmbed";
+import { ChoiceEmbed } from "../../../structures/display/ChoiceEmbed";
 
 export default class CardLookup extends BaseCommand {
   names = ["lookup", "lu"];
@@ -69,7 +69,7 @@ export default class CardLookup extends BaseCommand {
 
     const choice = await choiceEmbed.ask();
 
-    if (choice) {
+    if (choice !== undefined) {
       await msg.channel.createMessage({
         embed: await this.getCardStats(find[choice], msg.author),
       });
