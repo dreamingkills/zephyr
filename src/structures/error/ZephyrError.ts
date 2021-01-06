@@ -621,3 +621,11 @@ export class FailedToAddReactionError extends ZephyrError {
     );
   }
 }
+
+export class FailedToEditMessageError extends ZephyrError {
+  constructor() {
+    super(
+      `There was a problem connecting to Discord, and a message could not be edited. Please try again in a few minutes.\nThis has been reported to the developer.`
+    );
+  }
+}

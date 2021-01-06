@@ -15,49 +15,44 @@ export class DMHandler {
         failed.push(p);
         continue;
       }
+      const user = await zephyr.fetchUser(p.discordId);
+      if (!user) {
+        failed.push(p);
+        continue;
+      }
+      let [claim, drop] = [false, false];
+
+      const now = dayjs(Date.now());
+      const nextClaim = dayjs(p.claimNext);
+      const nextDrop = dayjs(p.dropNext);
+
+      if (nextClaim < now && p.claimReminder && !p.claimReminded) claim = true;
+      if (nextDrop < now && p.dropReminder && !p.dropReminded) drop = true;
+
+      if (!claim && !drop) continue;
+
+      let type: 1 | 2 | 3 | undefined;
+
+      let message = `**${user.tag}!** `;
+      if (claim && drop) {
+        message += `You can now **drop** and **claim** again!`;
+        type = 1;
+      } else if (claim && !drop) {
+        message += `You can now **claim** again!`;
+        type = 2;
+      } else if (!claim && drop) {
+        message += `You can now **drop** again!`;
+        type = 3;
+      }
+
+      if (!type) continue;
+
+      const dmChannel = await user.getDMChannel();
+
       try {
-        const user = await zephyr.fetchUser(p.discordId);
-        if (!user) {
-          failed.push(p);
-          continue;
-        }
-        let [claim, drop] = [false, false];
-
-        const now = dayjs(Date.now());
-        const nextClaim = dayjs(p.claimNext);
-        const nextDrop = dayjs(p.dropNext);
-
-        if (nextClaim < now && p.claimReminder && !p.claimReminded)
-          claim = true;
-        if (nextDrop < now && p.dropReminder && !p.dropReminded) drop = true;
-
-        if (!claim && !drop) continue;
-
-        let type: 1 | 2 | 3 | undefined;
-
-        let message = `**${user.tag}!** `;
-        if (claim && drop) {
-          message += `You can now **drop** and **claim** again!`;
-          type = 1;
-        } else if (claim && !drop) {
-          message += `You can now **claim** again!`;
-          type = 2;
-        } else if (!claim && drop) {
-          message += `You can now **drop** again!`;
-          type = 3;
-        }
-
-        if (!type) continue;
-
-        const dmChannel = await user.getDMChannel();
-
-        try {
-          await createMessage(dmChannel, message);
-          success.push({ id: p.discordId, type });
-          break;
-        } catch (e) {
-          throw e;
-        }
+        await createMessage(dmChannel, message);
+        success.push({ id: p.discordId, type });
+        break;
       } catch (e) {
         failed.push(p);
         continue;

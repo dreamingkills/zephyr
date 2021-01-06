@@ -98,13 +98,13 @@ export class Zephyr extends Client {
           `\n\n${`=`.repeat(stripAnsi(header).length)}`
       );
 
-      await this.dmHandler.handle(this);
       setInterval(() => {
         this.editStatus(`online`, {
           name: `with cards | ${this.guilds.size} servers`,
           type: 0,
         });
       }, 300000);
+      await this.dmHandler.handle(this);
     });
 
     this.on("messageCreate", async (message) => {
