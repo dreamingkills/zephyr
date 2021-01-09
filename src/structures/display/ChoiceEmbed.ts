@@ -5,7 +5,7 @@ import { Zephyr } from "../client/Zephyr";
 import { createMessage } from "../../lib/discord/message/createMessage";
 
 export class ChoiceEmbed {
-  readonly maxEntries = 2;
+  readonly maxEntries = 12;
   private hasMaxEntries: boolean;
   private choices: string[];
 

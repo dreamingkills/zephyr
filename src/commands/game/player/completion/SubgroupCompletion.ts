@@ -29,7 +29,10 @@ export default class SubgroupCompletion extends BaseCommand {
       const lastCard = await ProfileService.getLastCard(profile);
       const lastBase = this.zephyr.getCard(lastCard.baseCardId);
 
-      subgroup = { name: lastBase.subgroup!, group: lastBase.group! };
+      subgroup = {
+        name: lastBase.subgroup!,
+        group: lastBase.group ?? undefined,
+      };
     } else {
       const subgroups = await CardService.findSubgroups(sgQuery);
 

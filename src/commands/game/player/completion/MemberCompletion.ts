@@ -13,7 +13,7 @@ import { GameProfile } from "../../../../structures/game/Profile";
 export default class MemberCompletion extends BaseCommand {
   names = ["membercompletion", "mcomp"];
   description =
-    "Shows you how far you are to completion for a member of group/soloist";
+    "Shows you how far you are to completion for a member of a group/soloist";
   usage = ["$CMD$ <member name>"];
   allowDm = true;
 
@@ -30,7 +30,7 @@ export default class MemberCompletion extends BaseCommand {
       const lastCard = await ProfileService.getLastCard(profile);
       const lastBase = this.zephyr.getCard(lastCard.baseCardId);
 
-      individual = { name: lastBase.name, group: lastBase.group! };
+      individual = { name: lastBase.name, group: lastBase.group ?? undefined };
     } else {
       const individuals = await CardService.findIndividuals(nameQuery);
 
