@@ -169,9 +169,12 @@ export default class Shop extends BaseCommand {
     }
   }
 
-  private renderShop(type: `cubits`): EmbedField[] {
-    const emojis: { [key: string]: string } = { STICKER: "📑" };
+  private emojis: { [key: string]: string } = {
+    STICKER: "📑",
+    CONSUMABLE: `🍹`,
+  };
 
+  private renderShop(type: `cubits`): EmbedField[] {
     switch (type) {
       case `cubits`: {
         let products = [];
@@ -180,7 +183,7 @@ export default class Shop extends BaseCommand {
 
           if (!baseItem) continue;
           products.push({
-            name: `${emojis[baseItem.type]} ${baseItem.name}`,
+            name: `${this.emojis[baseItem.type]} ${baseItem.name}`,
             value: `:package: \`${item.price.toLocaleString()}\` cubits`,
           });
         }
