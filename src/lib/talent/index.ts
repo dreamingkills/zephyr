@@ -62,12 +62,10 @@ export function calculateTalent(
   talents.quickness += Math.floor(quicknessTalent * wearMultiplier);
 
   // Purity Talent
-  const wearDifference = Math.max(
-    0,
-    Math.min(card.wear - card.originalWear, card.originalWear, card.wear)
-  );
+  const wearDifference = Math.max(0, card.wear - card.originalWear);
+
   const purityTalent = Math.floor((10 / (1 + wearDifference)) * 2);
-  talents.purity += Math.floor(purityTalent * wearMultiplier);
+  talents.purity += Math.floor(purityTalent);
 
   /*
   // Print Talent
