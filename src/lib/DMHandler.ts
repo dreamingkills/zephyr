@@ -55,7 +55,7 @@ export class DMHandler {
       try {
         await createMessage(dmChannel, message);
         success.push({ id: p.discordId, type });
-        break;
+        continue;
       } catch {
         failed.push(p);
         continue;
