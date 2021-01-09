@@ -8,6 +8,7 @@ setup.sql
 
 # VSCode
 .VSCodeCounter/
+.vscode
 
 # Logs
 logs
