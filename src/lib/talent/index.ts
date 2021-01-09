@@ -63,9 +63,8 @@ export function calculateTalent(
 
   // Purity Talent
   const wearDifference = Math.max(
-    card.wear - card.originalWear,
-    card.originalWear,
-    card.wear
+    0,
+    Math.min(card.wear - card.originalWear, card.originalWear, card.wear)
   );
   const purityTalent = Math.floor((10 / (1 + wearDifference)) * 2);
   talents.purity += Math.floor(purityTalent * wearMultiplier);
