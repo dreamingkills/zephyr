@@ -10,6 +10,7 @@ export class DMHandler {
     const eligible = await ProfileService.getAvailableReminderRecipients();
     const success: { id: string; type: 1 | 2 | 3 }[] = [];
     const failed = [];
+    console.log(eligible.length);
     for (let p of eligible) {
       if (p.blacklisted) {
         failed.push(p);
@@ -55,11 +56,13 @@ export class DMHandler {
         await createMessage(dmChannel, message);
         success.push({ id: p.discordId, type });
         break;
-      } catch (e) {
+      } catch {
         failed.push(p);
         continue;
       }
     }
+
+    console.log(`Done - ${success.length}/${failed.length}`);
 
     if (success.length > 0) await ProfileService.setUserReminded(success);
     if (failed.length > 0) await ProfileService.disableReminders(failed);
