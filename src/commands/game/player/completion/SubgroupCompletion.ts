@@ -11,9 +11,9 @@ import { ProfileService } from "../../../../lib/database/services/game/ProfileSe
 import { InvalidSubgroupLookupQueryError } from "../../../../structures/error/ZephyrError";
 
 export default class SubgroupCompletion extends BaseCommand {
-  names = ["compl"];
-  description = "";
-  usage = [];
+  names = ["subgroupcompletion", "sgcomp"];
+  description = "Shows you how far you are to completion for a subgroup";
+  usage = ["$CMD$ <subgroup>"];
   allowDm = true;
 
   async exec(

@@ -11,9 +11,9 @@ import { Member as Individual } from "../../../../structures/game/BaseCard";
 import { GameProfile } from "../../../../structures/game/Profile";
 
 export default class MemberCompletion extends BaseCommand {
-  names = ["mcomp"];
-  description = "";
-  usage = [];
+  names = ["membercompletion", "mcomp"];
+  description = "Shows you how far you are to completion for a member of group/soloist";
+  usage = ["$CMD$ <member name>"];
   allowDm = true;
 
   async exec(

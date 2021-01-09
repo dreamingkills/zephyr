@@ -4,12 +4,19 @@ import { MessageCollector } from "eris-collector";
 import { Zephyr } from "../client/Zephyr";
 
 export class ChoiceEmbed {
+  readonly maxEntries = 2;
+  private hasMaxEntries: boolean;
+  private choices: string[];
+
   constructor(
     private zephyr: Zephyr,
     private originalMessage: Message,
     private embed: MessageEmbed,
-    private choices: string[]
-  ) {}
+    choices: string[]
+  ) {
+    this.hasMaxEntries = choices.length > this.maxEntries;
+    this.choices = choices.splice(0, this.maxEntries);
+  }
 
   private get filter() {
     return (m: Message) =>
@@ -32,6 +39,13 @@ export class ChoiceEmbed {
       (this.embed.description || "") +
         `\n${this.choices.map((c, idx) => `— \`${idx + 1}\` ${c}`).join("\n")}`
     );
+
+    if (this.hasMaxEntries)
+      this.embed.setFooter(
+        (this.embed.footer?.text ? this.embed.footer.text + "\n" : "") +
+          "There were too many results to display, try narrowing your search down.",
+        this.embed.footer?.icon_url
+      );
   }
 
   private listen(choiceMessage: Message): Promise<number | undefined> {

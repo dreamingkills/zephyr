@@ -8,8 +8,8 @@ import { GameProfile } from "../../../../structures/game/Profile";
 import { GridDisplay } from "../../../../structures/display/GridDisplay";
 
 export default class TotalCompletion extends BaseCommand {
-  names = ["tcomp"];
-  description = "";
+  names = ["completion", "comp"];
+  description = "Shows you how far you are to total completion";
   usage = [];
   allowDm = true;
 

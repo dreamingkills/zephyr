@@ -12,9 +12,9 @@ import { GameGroupCompletion } from "../../../../structures/game/Completion";
 import { GameProfile } from "../../../../structures/game/Profile";
 
 export default class GroupCompletion extends BaseCommand {
-  names = ["gcomp"];
-  description = "";
-  usage = [];
+  names = ["groupcompletion", "gcomp"];
+  description = "Shows you how far you are to completion for a group/soloist";
+  usage = ["$CMD$ <group>"];
   allowDm = true;
 
   readonly pageSize = 12;
