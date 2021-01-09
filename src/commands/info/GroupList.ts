@@ -18,7 +18,7 @@ export default class GroupList extends BaseCommand {
       }
     });
 
-    groups.sort((a, b) => (a > b ? 1 : -1));
+    groups.sort((a, b) => (a.toUpperCase() > b.toUpperCase() ? 1 : -1));
 
     let page = 1;
     let totalPages = Math.ceil(groups.length / 10);
