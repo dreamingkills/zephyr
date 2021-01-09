@@ -3,6 +3,7 @@ import { GameUserCard } from "../../../structures/game/UserCard";
 import { ProfileService } from "../../database/services/game/ProfileService";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { Message, TextableChannel } from "eris";
+import { GameDye } from "../../../structures/game/Dye";
 
 export async function verifyMultitradeItems(
   msg: Message,
@@ -20,6 +21,16 @@ export async function verifyMultitradeItems(
       )[0] as GameUserCard | undefined;
 
       if (cardInTrade) continue;
+      existingItems.push(item);
+      continue;
+    } else if (item instanceof GameDye) {
+      if (item.discordId !== profile.discordId) continue;
+
+      const dyeInTrade = existingItems.filter(
+        (t) => t instanceof GameDye && t.id === (<GameDye>item).id
+      )[0] as GameDye | undefined;
+
+      if (dyeInTrade) continue;
       existingItems.push(item);
       continue;
     } else if (isBitItem(item)) {

@@ -1,3 +1,4 @@
+import { GameDye } from "../../../structures/game/Dye";
 import { GameUserCard } from "../../../structures/game/UserCard";
 
 export function renderMultitradeInventory(
@@ -7,6 +8,8 @@ export function renderMultitradeInventory(
   const cards = tradeItems.filter(
     (i) => i instanceof GameUserCard
   ) as GameUserCard[];
+
+  const dyes = tradeItems.filter((i) => i instanceof GameDye) as GameDye[];
 
   const bits = (<InteractableBits>tradeItems.filter((i) => isBitItem(i))[0])
     ?.bits;
@@ -34,11 +37,15 @@ export function renderMultitradeInventory(
     bits ? `${bits.toLocaleString()} bits\n` : ``
   }${cubits ? `${cubits.toLocaleString()} cubits\n` : ``}${
     cards.length > 0
-      ? cards.map((c) => c.id.toString(36)).join(", ") + `\n`
+      ? cards.map((c) => c.id.toString(36)).join(`, `) + `\n`
+      : ``
+  }${
+    dyes.length > 0
+      ? dyes.map((d) => `$${d.id.toString(36)}`).join(`, `) + `\n`
       : ``
   }${
     trueBaseItems.length > 0
-      ? trueBaseItems.map((i) => `${i.count}x ${i.item.name}`).join(", ")
+      ? trueBaseItems.map((i) => `${i.count}x ${i.item.name}`).join(`, `)
       : ``
   }\n\`\`\``;
 }
