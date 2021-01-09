@@ -31,7 +31,7 @@ export default class Cooldowns extends BaseCommand {
           ) || `<1s`
         : `Now`
     }__\n\` ${prefix}vote\` **Vote**: __${
-      getTimeUntil(now, dayjs(profile.vote_last || 0).add(12, "hour")) || "Now"
+      getTimeUntil(now, dayjs(profile.voteLast || 0).add(12, "hour")) || "Now"
     }__\n\` ${prefix}drop\` **Drop**: __${
       getTimeUntil(now, dayjs(profile.dropNext)) || "Now"
     }__\n\`<none>\` **Claim**: __${

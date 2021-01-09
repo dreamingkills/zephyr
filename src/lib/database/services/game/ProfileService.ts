@@ -8,6 +8,7 @@ import { ProfileGet } from "../../sql/game/profile/ProfileGet";
 import { ProfileSet } from "../../sql/game/profile/ProfileSet";
 import { CardService } from "./CardService";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
+import { User } from "eris";
 
 export abstract class ProfileService {
   /*
@@ -225,10 +226,16 @@ export abstract class ProfileService {
     return await ProfileGet.getAvailableReminderRecipients();
   }
 
-  public static async setUserReminded(
-    users: { id: string; type: 1 | 2 | 3 }[]
-  ): Promise<void> {
-    return await ProfileSet.setUserReminded(users);
+  public static async setUserClaimReminded(users: User[]): Promise<void> {
+    return await ProfileSet.setUserClaimReminded(users);
+  }
+
+  public static async setUserDropReminded(users: User[]): Promise<void> {
+    return await ProfileSet.setUserDropReminded(users);
+  }
+
+  public static async setUserVoteReminded(users: User[]): Promise<void> {
+    return await ProfileSet.setUserVoteReminded(users);
   }
 
   public static async toggleDropReminders(
@@ -243,6 +250,14 @@ export abstract class ProfileService {
     profiles: GameProfile[]
   ): Promise<void> {
     return await ProfileSet.toggleClaimReminders(
+      profiles.map((p) => p.discordId)
+    );
+  }
+
+  public static async toggleVoteReminders(
+    profiles: GameProfile[]
+  ): Promise<void> {
+    return await ProfileSet.toggleVoteReminders(
       profiles.map((p) => p.discordId)
     );
   }

@@ -19,16 +19,21 @@ export default class Reminders extends BaseCommand {
     const subcommand = options[0]?.toLowerCase();
     if (subcommand) {
       let message;
-      if (["drop", "drops", "d"].indexOf(subcommand) > -1) {
+      if (["drop", "drops", "d"].includes(subcommand)) {
         await ProfileService.toggleDropReminders([profile]);
         if (profile.dropReminder) {
           message = "You have disabled drop reminders.";
         } else message = "You have enabled drop reminders.";
-      } else if (["claim", "claims", "c"].indexOf(subcommand) > -1) {
+      } else if (["claim", "claims", "c"].includes(subcommand)) {
         await ProfileService.toggleClaimReminders([profile]);
         if (profile.claimReminder) {
           message = "You have disabled claim reminders.";
         } else message = "You have enabled claim reminders.";
+      } else if (["vote", "v"].includes(subcommand)) {
+        await ProfileService.toggleVoteReminders([profile]);
+        if (profile.voteReminder) {
+          message = `You have disabled vote reminders.`;
+        } else message = `You have enabled vote reminders.`;
       } else throw new ZephyrError.InvalidReminderTypeError();
 
       const embed = new MessageEmbed()
