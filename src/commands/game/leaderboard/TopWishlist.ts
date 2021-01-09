@@ -34,7 +34,7 @@ export default class TopWishlist extends BaseCommand {
 
     const totalPages = Math.ceil(topWishlistedCount / 10);
 
-    const title = `Top wishlisted cards `;
+    const title = `Top wishlisted cards`;
     const embed = new MessageEmbed()
       .setAuthor(
         `Top Collectors | ${msg.author.tag}`,
