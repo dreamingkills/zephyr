@@ -1,8 +1,7 @@
 # Discord
 config.json
 src/assets/*
-!src/assets/items.example.json
-!src/assets/recipes.example.json
+!src/assets/*.example.json
 cache/
 setup.sql
 

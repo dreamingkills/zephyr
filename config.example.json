@@ -1,19 +1,30 @@
 {
   "discord": {
-    "defaultPrefix": "",
-    "token": "",
+    "defaultPrefix": ".",
+    "token": "discord api token",
+    "secondaryChannel": "discord channel id",
     "emojiId": {
-      "check": "",
+      "check": "discord emoji id",
       "bits": "",
-      "warn": ""
+      "warn": "",
+      "clock": "",
+      "bank": "",
+      "star": "",
+      "blank": ""
     },
     "emoji": {
-      "check": "in the form <name:id>",
+      "check": "in the form <:emojiName:emojiID>",
       "bits": "",
-      "warn": ""
+      "warn": "",
+      "clock": "",
+      "bank": "",
+      "star": "",
+      "blank": ""
     }
   },
   "topgg": {
+    "token": "",
+    "enabled": false,
     "webhook": {
       "auth": "",
       "port": ""
@@ -21,9 +32,8 @@
   },
   "mariadb": {
     "host": "localhost",
-    "port": 3360,
-    "user": "root",
-    "password": "pw",
+    "user": "zephyr",
+    "password": "zephyr",
     "database": "zephyr"
   },
   "developers": ["put your discord id here"]
