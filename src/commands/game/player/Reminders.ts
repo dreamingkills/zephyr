@@ -29,7 +29,7 @@ export default class Reminders extends BaseCommand {
         if (profile.claimReminder) {
           message = "You have disabled claim reminders.";
         } else message = "You have enabled claim reminders.";
-      } else if (["vote", "v"].includes(subcommand)) {
+      } else if (["vote", "votes", "v"].includes(subcommand)) {
         await ProfileService.toggleVoteReminders([profile]);
         if (profile.voteReminder) {
           message = `You have disabled vote reminders.`;
@@ -53,7 +53,8 @@ export default class Reminders extends BaseCommand {
       .setTitle(`${msg.author.tag}'s reminders`)
       .setDescription(
         `— Drops: **${profile.dropReminder ? `ON` : `OFF`}**` +
-          `\n— Claims: **${profile.claimReminder ? `ON` : `OFF`}**`
+          `\n— Claims: **${profile.claimReminder ? `ON` : `OFF`}**` +
+          `\n— Votes: **${profile.voteReminder ? `ON` : `OFF`}**`
       );
     await this.send(msg.channel, embed);
     return;
