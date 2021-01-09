@@ -600,6 +600,12 @@ export class NoStickerBoundToItemError extends ZephyrError {
   }
 }
 
+export class InvalidStickerError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid sticker name.`);
+  }
+}
+
 /*
     Shop v2
 */

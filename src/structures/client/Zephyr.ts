@@ -310,6 +310,12 @@ export class Zephyr extends Client {
     return Object.values(this.stickers).filter((s) => s.itemId === itemId)[0];
   }
 
+  public getStickerByName(name: string): GameSticker | undefined {
+    return Object.values(this.stickers).filter(
+      (s) => s.name.toLowerCase() === name.toLowerCase()
+    )[0];
+  }
+
   /*
       Functions-That-Probably-Should-Be-In-Eris-Anyway-But-Whatever
   */
