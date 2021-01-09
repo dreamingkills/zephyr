@@ -2,6 +2,7 @@ import { Message } from "eris";
 import { MessageEmbed } from "../client/RichEmbed";
 import { MessageCollector } from "eris-collector";
 import { Zephyr } from "../client/Zephyr";
+import { createMessage } from "../../lib/discord/message/createMessage";
 
 export class ChoiceEmbed {
   readonly maxEntries = 2;
@@ -27,9 +28,10 @@ export class ChoiceEmbed {
   async ask(): Promise<number | undefined> {
     this.generateEmbed();
 
-    const choiceMessage = await this.originalMessage.channel.createMessage({
-      embed: this.embed,
-    });
+    const choiceMessage = await createMessage(
+      this.originalMessage.channel,
+      this.embed
+    );
 
     return this.listen(choiceMessage);
   }
@@ -49,7 +51,7 @@ export class ChoiceEmbed {
   }
 
   private listen(choiceMessage: Message): Promise<number | undefined> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const collector = new MessageCollector(
         this.zephyr,
         this.originalMessage.channel,
@@ -62,6 +64,10 @@ export class ChoiceEmbed {
 
       collector.on("collect", async (m: Message) => {
         resolve(parseInt(m.content, 10) - 1);
+      });
+
+      collector.on("error", (e: Error) => {
+        reject(e);
       });
 
       collector.on("end", async (_c: any, reason: string) => {

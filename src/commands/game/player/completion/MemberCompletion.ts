@@ -12,7 +12,8 @@ import { GameProfile } from "../../../../structures/game/Profile";
 
 export default class MemberCompletion extends BaseCommand {
   names = ["membercompletion", "mcomp"];
-  description = "Shows you how far you are to completion for a member of group/soloist";
+  description =
+    "Shows you how far you are to completion for a member of group/soloist";
   usage = ["$CMD$ <member name>"];
   allowDm = true;
 
@@ -106,6 +107,6 @@ export default class MemberCompletion extends BaseCommand {
 
     gridDisplay.render(embed);
 
-    await msg.channel.createMessage({ embed });
+    await this.send(msg.channel, embed);
   }
 }

@@ -104,6 +104,6 @@ export default class SubgroupCompletion extends BaseCommand {
 
     gridDisplay.render(embed);
 
-    await msg.channel.createMessage({ embed });
+    await this.send(msg.channel, embed);
   }
 }

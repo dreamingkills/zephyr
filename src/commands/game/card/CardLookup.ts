@@ -30,7 +30,7 @@ export default class CardLookup extends BaseCommand {
 
     if (baseCard) {
       const embed = await this.getCardStats(baseCard, msg.author);
-      await msg.channel.createMessage({ embed });
+      await this.send(msg.channel, embed);
       return;
     }
 
@@ -42,7 +42,7 @@ export default class CardLookup extends BaseCommand {
 
     if (find.length === 1) {
       const embed = await this.getCardStats(find[0], msg.author);
-      await msg.channel.createMessage({ embed });
+      await this.send(msg.channel, embed);
       return;
     }
 
@@ -70,9 +70,10 @@ export default class CardLookup extends BaseCommand {
     const choice = await choiceEmbed.ask();
 
     if (choice !== undefined) {
-      await msg.channel.createMessage({
-        embed: await this.getCardStats(find[choice], msg.author),
-      });
+      await this.send(
+        msg.channel,
+        await this.getCardStats(find[choice], msg.author)
+      );
     }
   }
 

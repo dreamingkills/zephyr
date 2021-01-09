@@ -3,6 +3,7 @@ import { MessageEmbed } from "../client/RichEmbed";
 import { Zephyr } from "../client/Zephyr";
 import { ReactionCollector } from "eris-collector";
 import { checkPermission } from "../../lib/ZephyrUtils";
+import { createMessage } from "../../lib/discord/message/createMessage";
 
 export interface ScrollingEmbedOptions {
   initialItems: string | EmbedField[];
@@ -59,9 +60,7 @@ export class ScrollingEmbed {
   public async send() {
     this.generateEmbed();
 
-    this.sentMessage = await this.message.channel.createMessage({
-      embed: this.embed,
-    });
+    this.sentMessage = await createMessage(this.message.channel, this.embed);
 
     await this.react();
   }
@@ -108,53 +107,64 @@ export class ScrollingEmbed {
   }
 
   private async react() {
-    if (this.options.totalPages < 2) return;
+    return new Promise(async (resolve, reject) => {
+      if (this.options.totalPages < 2) return;
 
-    const collector = new ReactionCollector(
-      this.zephyr,
-      this.sentMessage,
-      this.filter,
-      {
-        time: 2 * 60 * 1000,
-      }
-    );
+      const collector = new ReactionCollector(
+        this.zephyr,
+        this.sentMessage,
+        this.filter,
+        {
+          time: 2 * 60 * 1000,
+        }
+      );
 
-    collector.on(
-      "collect",
-      async (message: Message, emoji: PartialEmoji, userId: string) => {
-        this.removeReaction(emoji, userId);
+      collector.on(
+        "collect",
+        async (message: Message, emoji: PartialEmoji, userId: string) => {
+          this.removeReaction(emoji, userId);
 
-        let page = this.currentPage;
+          let page = this.currentPage;
 
-        if (emoji.name === "⏮️" && page !== 1) page = 1;
-        if (emoji.name === "◀️" && page !== 1) page--;
-        if (emoji.name === "▶️" && page !== this.options.totalPages) page++;
-        if (emoji.name === "⏭️" && this.currentPage !== this.options.totalPages)
-          page = this.options.totalPages;
+          if (emoji.name === "⏮️" && page !== 1) page = 1;
+          if (emoji.name === "◀️" && page !== 1) page--;
+          if (emoji.name === "▶️" && page !== this.options.totalPages) page++;
+          if (
+            emoji.name === "⏭️" &&
+            this.currentPage !== this.options.totalPages
+          )
+            page = this.options.totalPages;
 
-        if (page === this.currentPage) return;
+          if (page === this.currentPage) return;
 
-        this.currentPage = page;
+          this.currentPage = page;
 
-        Promise.resolve(
-          this.onPageChangeCallback(this.currentPage, message, emoji, userId)
-        ).then((items) => {
-          this.currentItems = items;
+          Promise.resolve(
+            this.onPageChangeCallback(this.currentPage, message, emoji, userId)
+          ).then((items) => {
+            this.currentItems = items;
 
-          this.generateEmbed();
+            this.generateEmbed();
 
-          this.sentMessage.edit({ embed: this.embed });
-        });
-      }
-    );
+            this.sentMessage.edit({ embed: this.embed });
+          });
+        }
+      );
 
-    if (this.options.totalPages > -1 && this.options.totalPages > 2)
-      await this.sentMessage.addReaction(`⏮️`);
-    if (this.options.totalPages > 1) await this.sentMessage.addReaction(`◀️`);
+      collector.on("error", (e: Error) => {
+        reject(e);
+      });
 
-    if (this.options.totalPages > 1) await this.sentMessage.addReaction(`▶️`);
-    if (this.options.totalPages > -1 && this.options.totalPages > 2)
-      await this.sentMessage.addReaction(`⏭️`);
+      if (this.options.totalPages > -1 && this.options.totalPages > 2)
+        await this.sentMessage.addReaction(`⏮️`);
+      if (this.options.totalPages > 1) await this.sentMessage.addReaction(`◀️`);
+
+      if (this.options.totalPages > 1) await this.sentMessage.addReaction(`▶️`);
+      if (this.options.totalPages > -1 && this.options.totalPages > 2)
+        await this.sentMessage.addReaction(`⏭️`);
+
+      resolve(undefined);
+    });
   }
 
   private async removeReaction(emoji: PartialEmoji, userId: string) {
