@@ -29,6 +29,8 @@ export class DMHandler {
       if (nextClaim < now && p.claimReminder && !p.claimReminded) claim = true;
       if (nextDrop < now && p.dropReminder && !p.dropReminded) drop = true;
 
+      console.log(`${user.id} - ${claim} - ${drop}`);
+
       if (!claim && !drop) continue;
 
       let type: 1 | 2 | 3 | undefined;
