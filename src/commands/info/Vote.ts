@@ -13,7 +13,7 @@ export default class Vote extends BaseCommand {
     const embed = new MessageEmbed()
       .setAuthor(`Vote | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
       .setDescription(
-        `You receive **2** cubits every time you vote.\nThis is doubled on weekends!\n— [Click here to vote!](https://top.gg/bot/791100707629432863)` +
+        `You receive **2** cubits every time you vote.\nThis is doubled on weekends!\n— [Click here to vote!](https://top.gg/bot/791100707629432863/vote)` +
           `\n\n**Cubits** can be spent on various cosmetic rewards for your cards.`
       );
 
