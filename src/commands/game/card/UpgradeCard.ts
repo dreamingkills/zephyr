@@ -44,7 +44,7 @@ export default class UpgradeCard extends BaseCommand {
     const bitCost = [150, 250, 400, 600, 850][card.wear];
 
     if (bitCost > profile.bits)
-      throw new ZephyrError.NotEnoughBitsError(profile.bits, bitCost);
+      throw new ZephyrError.NotEnoughBitsToUpgradeError(bitCost);
 
     const dustItem = items.filter((i) => i.type === "DUST")[card.wear];
     const dustUserItem = await ProfileService.getItem(

@@ -148,6 +148,12 @@ export class NotEnoughBitsInBankError extends ZephyrError {
   }
 }
 
+export class NotEnoughBitsToUpgradeError extends ZephyrError {
+  constructor(needs: number) {
+    super(`You need **${needs.toLocaleString()}** bits to do that.`);
+  }
+}
+
 export class NotEnoughDustError extends ZephyrError {
   constructor(has: number, needs: number, tier: number) {
     super(
