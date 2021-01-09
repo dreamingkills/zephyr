@@ -65,7 +65,7 @@ export default class GiftCard extends BaseCommand {
       )
       .setDescription(
         cardDescriptions.join("\n") +
-          (cards.length > 5 ? `\n*... and ${cards.length - 5} more...` : ``)
+          (cards.length > 5 ? `\n*... and ${cards.length - 5} more...*` : ``)
       );
 
     const confirmation = await this.send(msg.channel, embed);
