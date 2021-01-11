@@ -4,6 +4,7 @@ import { Zephyr } from "../client/Zephyr";
 import { ReactionCollector } from "eris-collector";
 import { checkPermission } from "../../lib/ZephyrUtils";
 import { createMessage } from "../../lib/discord/message/createMessage";
+import { addReaction } from "../../lib/discord/message/addReaction";
 
 export interface ScrollingEmbedOptions {
   initialItems: string | EmbedField[];
@@ -156,12 +157,14 @@ export class ScrollingEmbed {
       });
 
       if (this.options.totalPages > -1 && this.options.totalPages > 2)
-        await this.sentMessage.addReaction(`⏮️`);
-      if (this.options.totalPages > 1) await this.sentMessage.addReaction(`◀️`);
+        await addReaction(this.sentMessage, `⏮️`);
+      if (this.options.totalPages > 1)
+        await addReaction(this.sentMessage, `◀️`);
 
-      if (this.options.totalPages > 1) await this.sentMessage.addReaction(`▶️`);
+      if (this.options.totalPages > 1)
+        await addReaction(this.sentMessage, `▶️`);
       if (this.options.totalPages > -1 && this.options.totalPages > 2)
-        await this.sentMessage.addReaction(`⏭️`);
+        await addReaction(this.sentMessage, `⏭️`);
 
       resolve(undefined);
     });
