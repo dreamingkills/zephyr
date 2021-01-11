@@ -373,7 +373,7 @@ export abstract class ProfileSet extends DBClass {
     const formattedTimestamp = dayjs().format(`YYYY/MM/DD HH:mm:ss`);
 
     await DB.query(
-      `UPDATE profile SET cubits=cubits+?, vote_last=? WHERE discord_id=?;`,
+      `UPDATE profile SET cubits=cubits+?, vote_last=?, vote_reminded=0 WHERE discord_id=?;`,
       [isWeekend ? 4 : 2, formattedTimestamp, profile.discordId]
     );
     return;
