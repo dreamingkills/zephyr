@@ -190,10 +190,13 @@ export abstract class CardGet extends DBClass {
     });
   }
 
-  public static async getCardsByTagId(id: number): Promise<GameUserCard[]> {
+  public static async getCardsByTagId(
+    id: number,
+    profile: GameProfile
+  ): Promise<GameUserCard[]> {
     const query = (await DB.query(
-      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.tag_id=?;`,
-      [id]
+      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.tag_id=? AND user_card.discord_id=?;`,
+      [id, profile.discordId]
     )) as UserCard[];
     return query.map((c) => new GameUserCard(c));
   }

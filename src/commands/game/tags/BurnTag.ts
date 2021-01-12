@@ -30,7 +30,7 @@ export default class BurnTag extends BaseCommand {
 
     if (!query) throw new ZephyrError.InvalidTagError(options[0]);
 
-    const cards = await CardService.getCardsByTag(query);
+    const cards = await CardService.getCardsByTag(query, profile);
     if (cards.length < 1) throw new ZephyrError.NoCardsTaggedError(query);
 
     const individualRewards = cards.map((c) => {
