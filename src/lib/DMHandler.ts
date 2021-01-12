@@ -54,8 +54,6 @@ export class DMHandler {
         types.push("**vote**");
       }
 
-      if (!types[0]) continue;
-
       if (types.length === 1) {
         message = types[0];
       } else if (types.length === 2) {
