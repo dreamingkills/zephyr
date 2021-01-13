@@ -31,6 +31,9 @@ export default class ViewBits extends BaseCommand {
       targetProfile = profile;
     }
 
+    if (targetProfile.private && targetProfile.discordId !== msg.author.id)
+      throw new ZephyrError.PrivateProfileError(targetUser.tag);
+
     const embed = new MessageEmbed(`Balance`, msg.author)
       .setTitle(`${targetUser.tag}'s balance`)
       .addFields([
