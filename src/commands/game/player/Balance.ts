@@ -33,13 +33,20 @@ export default class ViewBits extends BaseCommand {
 
     const embed = new MessageEmbed(`Balance`, msg.author)
       .setTitle(`${targetUser.tag}'s balance`)
-      .setDescription(
-        `${
-          targetUser.id === msg.author.id ? `You have` : `${targetUser.tag} has`
-        } ${
-          this.zephyr.config.discord.emoji.bits
-        } **${targetProfile.bits.toLocaleString()}** and **${targetProfile.cubits.toLocaleString()}** cubits.`
-      );
+      .addFields([
+        {
+          name: `${this.zephyr.config.discord.emoji.blank} Bits`,
+          value: `${
+            this.zephyr.config.discord.emoji.bits
+          } \`${targetProfile.bits.toLocaleString()}\``,
+          inline: true,
+        },
+        {
+          name: `${this.zephyr.config.discord.emoji.blank} Cubits`,
+          value: `:package: \`${targetProfile.cubits.toLocaleString()}\``,
+          inline: true,
+        },
+      ]);
 
     await this.send(msg.channel, embed);
     return;
