@@ -40,6 +40,8 @@ export class GridDisplay {
     });
   }
 
+  // { into, groupsOf } gets destructured which
+  // is why the type annotation looks odd
   private createChunks({
     into,
     groupsOf,
