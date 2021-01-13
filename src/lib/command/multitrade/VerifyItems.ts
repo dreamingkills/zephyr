@@ -4,6 +4,11 @@ import { ProfileService } from "../../database/services/game/ProfileService";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { Message, TextableChannel } from "eris";
 import { GameDye } from "../../../structures/game/Dye";
+import {
+  isBitItem,
+  isCubitItem,
+  isInteractableItem,
+} from "./typeguards/MultitradeTypeguards";
 
 export async function verifyMultitradeItems(
   msg: Message,
@@ -128,16 +133,4 @@ export async function verifyMultitradeItems(
       }
     }
   }
-}
-
-function isInteractableItem(value: any): value is InteractableItem {
-  return value.hasOwnProperty("item") && value.hasOwnProperty("count");
-}
-
-function isBitItem(value: any): value is InteractableBits {
-  return value.hasOwnProperty("bits");
-}
-
-function isCubitItem(value: any): value is InteractableCubits {
-  return value.hasOwnProperty("cubits");
 }

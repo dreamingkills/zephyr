@@ -8,6 +8,7 @@ import { ReactionCollector, MessageCollector } from "eris-collector";
 import { processItems } from "../../../lib/command/multitrade/ProcessItems";
 import { verifyMultitradeItems } from "../../../lib/command/multitrade/VerifyItems";
 import { renderMultitradeInventory } from "../../../lib/command/multitrade/RenderInventory";
+import { transferItems } from "../../../lib/command/multitrade/TransferItems";
 
 export default class MultiTrade extends BaseCommand {
   names = ["multitrade", "mt"];
@@ -215,6 +216,14 @@ export default class MultiTrade extends BaseCommand {
       );
       return;
     }
+
+    await transferItems(senderItems, targetProfile);
+    await transferItems(recipientItems, profile);
+
+    await this.edit(
+      tradeMessage,
+      tradeInterfaceEmbed.setFooter(`This trade has been completed.`)
+    );
 
     return;
   }

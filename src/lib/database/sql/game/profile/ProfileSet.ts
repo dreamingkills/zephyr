@@ -311,6 +311,7 @@ export abstract class ProfileSet extends DBClass {
       amount,
       id,
     ]);
+
     return;
   }
 
@@ -322,11 +323,25 @@ export abstract class ProfileSet extends DBClass {
       amount,
       id,
     ]);
+
     return;
   }
 
   public static async burnDyes(dyes: GameDye[]): Promise<void> {
     await DB.query(`DELETE FROM dye WHERE id IN (?);`, [dyes.map((d) => d.id)]);
+
+    return;
+  }
+
+  public static async transferDyesToUser(
+    dyes: GameDye[],
+    profile: GameProfile
+  ): Promise<void> {
+    await DB.query(`UPDATE dye SET discord_id=? WHERE id IN (?);`, [
+      profile.discordId,
+      dyes.map((i) => i.id),
+    ]);
+
     return;
   }
 
@@ -379,6 +394,17 @@ export abstract class ProfileSet extends DBClass {
     return;
   }
 
+  public static async addCubits(
+    profile: GameProfile,
+    amount: number
+  ): Promise<void> {
+    await DB.query(`UPDATE profile SET cubits=cubits+? WHERE discord_id=?;`, [
+      amount,
+      profile.discordId,
+    ]);
+
+    return;
+  }
   public static async removeCubits(
     profile: GameProfile,
     amount: number
@@ -387,6 +413,7 @@ export abstract class ProfileSet extends DBClass {
       amount,
       profile.discordId,
     ]);
+
     return;
   }
 }

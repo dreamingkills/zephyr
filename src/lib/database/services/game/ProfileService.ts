@@ -314,6 +314,13 @@ export abstract class ProfileService {
     return await ProfileSet.burnDyes(dyes);
   }
 
+  public static async transferDyesToUser(
+    dyes: GameDye[],
+    profile: GameProfile
+  ): Promise<void> {
+    return await ProfileSet.transferDyesToUser(dyes, profile);
+  }
+
   public static async setPatronTier(
     profile: GameProfile,
     tier: number
@@ -344,11 +351,20 @@ export abstract class ProfileService {
     return await voter.fetch();
   }
 
+  public static async addCubits(
+    profile: GameProfile,
+    amount: number
+  ): Promise<GameProfile> {
+    await ProfileSet.addCubits(profile, amount);
+
+    return await profile.fetch();
+  }
   public static async removeCubits(
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
     await ProfileSet.removeCubits(profile, amount);
+
     return await profile.fetch();
   }
 }
