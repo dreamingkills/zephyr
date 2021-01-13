@@ -23,10 +23,11 @@ export async function transferItems(
     (i) => !isInteractableItem(i)
   ) as InteractableItem[];
 
-  const bits =
-    (<InteractableBits>tradeItems.find((i) => isBitItem(i)))?.bits || 0;
-  const cubits =
-    (<InteractableCubits>tradeItems.find((i) => isCubitItem(i)))?.cubits || 0;
+  const { bits } =
+    (tradeItems.find((i) => isBitItem(i)) as InteractableBits) || 0;
+
+  const { cubits } =
+    (tradeItems.find((i) => isCubitItem(i)) as InteractableCubits) || 0;
 
   if (cards.length > 0) await CardService.transferCardsToUser(cards, receiver);
   if (items.length > 0) await ProfileService.addItems(receiver, items);
