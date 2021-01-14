@@ -108,6 +108,8 @@ export default class MultiTrade extends BaseCommand {
 
       messageCollector.on("collect", async (m: Message) => {
         const isSender = this.isSender(msg.author, m.author.id);
+        if ((isSender && senderConfirmed) || (!isSender && recipientConfirmed))
+          return;
 
         const selectProfile = isSender ? profile : targetProfile;
         const selectItems = isSender ? senderItems : recipientItems;
