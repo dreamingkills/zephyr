@@ -155,6 +155,7 @@ export default class MultiTrade extends BaseCommand {
         reactionFilter,
         {
           time: 300000,
+          dispose: true,
         }
       );
 
@@ -251,6 +252,10 @@ export default class MultiTrade extends BaseCommand {
 
     await transferItems(senderItems, targetProfile, profile);
     await transferItems(recipientItems, profile, targetProfile);
+
+    console.log(
+      `Multitrade completed between ${profile.discordId} (initiator) and ${targetProfile.discordId} (recipient)`
+    );
 
     await this.edit(
       tradeMessage,
