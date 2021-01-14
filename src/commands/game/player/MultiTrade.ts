@@ -130,7 +130,8 @@ export default class MultiTrade extends BaseCommand {
 
         const rendered = renderMultitradeInventory(
           isSender ? senderItems : recipientItems,
-          isSender ? senderConfirmed : recipientConfirmed
+          isSender ? senderConfirmed : recipientConfirmed,
+          isSender ? senderAccepted : recipientAccepted
         );
 
         if (isSender) {
@@ -176,15 +177,46 @@ export default class MultiTrade extends BaseCommand {
             case "🔒": {
               if (isSender) {
                 senderConfirmed = true;
-              } else recipientConfirmed = true;
+                const rendered = renderMultitradeInventory(
+                  senderItems,
+                  true,
+                  false
+                );
+                tradeInterfaceEmbed.fields[0].value = rendered;
+              } else {
+                recipientConfirmed = true;
+                const rendered = renderMultitradeInventory(
+                  recipientItems,
+                  true,
+                  false
+                );
+                tradeInterfaceEmbed.fields[1].value = rendered;
+              }
+              await this.edit(tradeMessage, tradeInterfaceEmbed);
               break;
             }
             case "☑": {
               if (!(senderConfirmed && recipientConfirmed)) break;
 
-              if (isSender) {
+              if (isSender && senderConfirmed) {
                 senderAccepted = true;
-              } else recipientAccepted = true;
+                const rendered = renderMultitradeInventory(
+                  senderItems,
+                  true,
+                  true
+                );
+                tradeInterfaceEmbed.fields[0].value = rendered;
+              } else if (!isSender && recipientConfirmed) {
+                recipientAccepted = true;
+                const rendered = renderMultitradeInventory(
+                  recipientItems,
+                  true,
+                  true
+                );
+                tradeInterfaceEmbed.fields[1].value = rendered;
+              }
+
+              await this.edit(tradeMessage, tradeInterfaceEmbed);
 
               if (senderAccepted && recipientAccepted) {
                 reactionCollector.stop();
@@ -217,12 +249,14 @@ export default class MultiTrade extends BaseCommand {
       return;
     }
 
-    await transferItems(senderItems, targetProfile);
-    await transferItems(recipientItems, profile);
+    await transferItems(senderItems, targetProfile, profile);
+    await transferItems(recipientItems, profile, targetProfile);
 
     await this.edit(
       tradeMessage,
-      tradeInterfaceEmbed.setFooter(`This trade has been completed.`)
+      tradeInterfaceEmbed
+        .setFooter(`This trade has been completed.`)
+        .setColor(`26BF30`)
     );
 
     return;

@@ -3,7 +3,8 @@ import { GameUserCard } from "../../../structures/game/UserCard";
 
 export function renderMultitradeInventory(
   tradeItems: TradeItemResolvable[],
-  confirmed: boolean
+  confirmed: boolean,
+  accepted: boolean
 ): string {
   const cards = tradeItems.filter(
     (i) => i instanceof GameUserCard
@@ -33,7 +34,13 @@ export function renderMultitradeInventory(
     }
   }
 
-  return `\`\`\`diff\n${confirmed ? `+ Confirmed +` : `- Unconfirmed -`}\n\n${
+  let status = accepted
+    ? `+ Accepted +`
+    : confirmed
+    ? `+ Confirmed +`
+    : `- Unconfirmed -`;
+
+  return `\`\`\`diff\n${status}\n\n${
     bits ? `${bits.toLocaleString()} bits\n` : ``
   }${cubits ? `${cubits.toLocaleString()} cubits\n` : ``}${
     cards.length > 0
