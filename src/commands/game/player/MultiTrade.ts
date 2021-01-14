@@ -13,8 +13,6 @@ import { transferItems } from "../../../lib/command/multitrade/TransferItems";
 export default class MultiTrade extends BaseCommand {
   names = ["multitrade", "mt"];
   description = "Initiates a multitrade.";
-  allowDm = true;
-  developerOnly = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const targetUser = msg.mentions[0];
