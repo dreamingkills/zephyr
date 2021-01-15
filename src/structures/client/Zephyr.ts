@@ -21,7 +21,7 @@ import { GameSticker } from "../game/Sticker";
 import { createMessage } from "../../lib/discord/message/createMessage";
 
 export class Zephyr extends Client {
-  version: string = "Hyacinth";
+  version: string = "Artemisia";
   commandLib = new CommandLib();
   dmHandler = new DMHandler();
   config: typeof config;
