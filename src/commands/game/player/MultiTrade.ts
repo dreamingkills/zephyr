@@ -156,6 +156,7 @@ export default class MultiTrade extends BaseCommand {
         reactionFilter,
         {
           time: 300000,
+          dispose: true,
         }
       );
 
