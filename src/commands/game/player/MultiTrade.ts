@@ -9,6 +9,7 @@ import { processItems } from "../../../lib/command/multitrade/ProcessItems";
 import { verifyMultitradeItems } from "../../../lib/command/multitrade/VerifyItems";
 import { renderMultitradeInventory } from "../../../lib/command/multitrade/RenderInventory";
 import { transferItems } from "../../../lib/command/multitrade/TransferItems";
+import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 
 export default class MultiTrade extends BaseCommand {
   names = ["multitrade", "mt"];
@@ -251,6 +252,13 @@ export default class MultiTrade extends BaseCommand {
 
     await transferItems(senderItems, targetProfile, profile);
     await transferItems(recipientItems, profile, targetProfile);
+
+    await AnticheatService.logMultitrade(
+      senderItems,
+      recipientItems,
+      profile,
+      targetProfile
+    );
 
     await this.edit(
       tradeMessage,

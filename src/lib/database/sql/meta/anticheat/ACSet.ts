@@ -3,6 +3,9 @@ import { DB, DBClass } from "../../..";
 import { GameItem } from "../../../../../structures/game/Item";
 import { GameProfile } from "../../../../../structures/game/Profile";
 import { GameUserCard } from "../../../../../structures/game/UserCard";
+import { Chance } from "chance";
+import { getCurrentTimestamp } from "../../../../utility/time/TimeUtils";
+import { processMultitradeLogs } from "../../../../command/multitrade/ProcessLogs";
 
 export abstract class ACSet extends DBClass {
   public static async logGift(
@@ -11,7 +14,6 @@ export abstract class ACSet extends DBClass {
     cards: GameUserCard[],
     guildId: string
   ): Promise<void> {
-    const formattedTimestamp = dayjs().format(`YYYY/MM/DD HH:mm:ss`);
     const values = [];
 
     for (let card of cards) {
@@ -20,7 +22,7 @@ export abstract class ACSet extends DBClass {
           recipient.discordId
         )}, ${DB.connection.escape(card.id)}, ${DB.connection.escape(
           guildId
-        )}, ${DB.connection.escape(formattedTimestamp)})`
+        )}, ${DB.connection.escape(getCurrentTimestamp())})`
       );
     }
 
@@ -80,8 +82,6 @@ export abstract class ACSet extends DBClass {
     amount: number,
     guildId: string
   ): Promise<void> {
-    const formattedTimestamp = dayjs().format(`YYYY/MM/DD HH:mm:ss`);
-
     await DB.query(
       `INSERT INTO bit_transaction (giver, recipient, amount, guild_id, transaction_time) VALUES (?, ?, ?, ?, ?);`,
       [
@@ -89,7 +89,7 @@ export abstract class ACSet extends DBClass {
         recipient.discordId,
         amount,
         guildId,
-        formattedTimestamp,
+        getCurrentTimestamp(),
       ]
     );
     return;
@@ -101,7 +101,6 @@ export abstract class ACSet extends DBClass {
     items: GameItem[],
     guildId: string
   ): Promise<void> {
-    const formattedTimestamp = dayjs().format(`YYYY/MM/DD HH:mm:ss`);
     const values = [];
 
     for (let item of items) {
@@ -110,7 +109,7 @@ export abstract class ACSet extends DBClass {
           recipient.discordId
         )}, ${DB.connection.escape(item.itemId)}, ${DB.connection.escape(
           guildId
-        )}, ${DB.connection.escape(formattedTimestamp)})`
+        )}, ${DB.connection.escape(getCurrentTimestamp())})`
       );
     }
 
@@ -129,8 +128,6 @@ export abstract class ACSet extends DBClass {
     receiverCard: GameUserCard,
     guildId: string
   ): Promise<void> {
-    const formattedTimestamp = dayjs().format(`YYYY/MM/DD HH:mm:ss`);
-
     await DB.query(
       `INSERT INTO trade (sender, receiver, sender_card_id, receiver_card_id, guild_id, trade_time) VALUES (?, ?, ?, ?, ?, ?);`,
       [
@@ -139,7 +136,7 @@ export abstract class ACSet extends DBClass {
         senderCard.id,
         receiverCard.id,
         guildId,
-        formattedTimestamp,
+        getCurrentTimestamp(),
       ]
     );
     return;
@@ -149,11 +146,43 @@ export abstract class ACSet extends DBClass {
     voter: GameProfile,
     weekend: boolean
   ): Promise<void> {
-    const formattedTimestamp = dayjs().format(`YYYY/MM/DD HH:mm:ss`);
-
     await DB.query(
       `INSERT INTO vote (voter, vote_time, weekend) VALUES (?, ?, ?);`,
-      [voter.discordId, formattedTimestamp, weekend]
+      [voter.discordId, getCurrentTimestamp(), weekend]
+    );
+    return;
+  }
+
+  public static async logMultitrade(
+    senderItems: TradeItemResolvable[],
+    receiverItems: TradeItemResolvable[],
+    sender: GameProfile,
+    receiver: GameProfile
+  ): Promise<void> {
+    const formattedTimestamp = getCurrentTimestamp();
+    const uuid = new Chance().guid();
+
+    const processed = [
+      ...processMultitradeLogs(
+        senderItems,
+        sender,
+        receiver,
+        uuid,
+        formattedTimestamp
+      ),
+      ...processMultitradeLogs(
+        receiverItems,
+        receiver,
+        sender,
+        uuid,
+        formattedTimestamp
+      ),
+    ];
+
+    await DB.query(
+      `INSERT INTO multitrade (trade_uuid, sender, receiver, item_type, item_value, quantity, trade_time) VALUES ${processed.join(
+        ", "
+      )};`
     );
     return;
   }

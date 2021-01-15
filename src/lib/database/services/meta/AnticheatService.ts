@@ -111,4 +111,18 @@ export abstract class AnticheatService {
   }> {
     return await ACGet.getClaimInformation(card);
   }
+
+  public static async logMultitrade(
+    senderItems: TradeItemResolvable[],
+    receiverItems: TradeItemResolvable[],
+    sender: GameProfile,
+    receiver: GameProfile
+  ): Promise<void> {
+    return await ACSet.logMultitrade(
+      senderItems,
+      receiverItems,
+      sender,
+      receiver
+    );
+  }
 }

@@ -13,6 +13,14 @@ abstract class ZephyrError extends Error {
   }
 }
 
+export class UnexpectedError extends ZephyrError {
+  constructor(e: any) {
+    super(
+      `An unexpected error occurred. This has been reported to the developer.`
+    );
+    console.log(e);
+  }
+}
 export class PrefixTooLongError extends ZephyrError {
   constructor() {
     super(`That prefix is too long. It must be 8 characters at most.`);
