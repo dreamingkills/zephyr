@@ -14,6 +14,89 @@ export default class CardLookup extends BaseCommand {
   usage = ["$CMD$ <name>"];
   allowDm = true;
 
+  async exec(
+    msg: Message,
+    profile: GameProfile,
+    options: string[]
+  ): Promise<void> {
+    let nameQuery: string;
+    let baseCard: GameBaseCard | undefined;
+    if (!options[0]) {
+      const lastCard = await ProfileService.getLastCard(profile);
+      const lastBase = this.zephyr.getCard(lastCard.baseCardId);
+
+      baseCard = lastBase;
+    } else nameQuery = options.join(" ")?.trim();
+
+    if (baseCard) {
+      const embed = await this.getCardStats(baseCard, msg.author);
+      await this.send(msg.channel, embed);
+      return;
+    }
+
+    const find = this.zephyr.getCards().filter((c) => {
+      return c.name.toLowerCase() === nameQuery.toLowerCase();
+    });
+
+    if (!find[0]) throw new ZephyrError.InvalidLookupQueryError();
+
+    if (find.length === 1) {
+      const embed = await this.getCardStats(find[0], msg.author);
+      await this.send(msg.channel, embed, {
+        file: { file: find[0].image, name: `card.png` },
+      });
+      return;
+    }
+
+    const embed = new MessageEmbed()
+      .setAuthor(
+        `Lookup | ${msg.author.tag}`,
+        msg.author.dynamicAvatarURL("png")
+      )
+      .setDescription(
+        `I found multiple matches for **${find[0].name}**.\nPlease reply with a number to confirm which person you're talking about.\n` +
+          find
+            .map(
+              (u, index) =>
+                `— \`${index + 1}\` ${u.group ? `**${u.group}** ` : ``}${
+                  u.name
+                }${u.subgroup ? ` (${u.subgroup})` : ``}`
+            )
+            .join("\n")
+      );
+
+    const conf = await this.send(msg.channel, embed);
+
+    const filter = (m: Message) =>
+      find[parseInt(m.content) - 1] && m.author.id === msg.author.id;
+    const collector = new MessageCollector(this.zephyr, msg.channel, filter, {
+      time: 15000,
+      max: 1,
+    });
+    collector.on("error", async (e: Error) => {
+      await this.handleError(msg, e);
+    });
+
+    collector.on("collect", async (m: Message) => {
+      const embed = await this.getCardStats(
+        find[parseInt(m.content) - 1],
+        msg.author
+      );
+
+      await this.send(msg.channel, embed, {
+        file: { file: find[parseInt(m.content) - 1].image, name: `card.png` },
+      });
+      return;
+    });
+    collector.on("end", async (_c: any, reason: string) => {
+      if (reason === "time") {
+        await conf.edit({
+          embed: embed.setFooter(`🕒 This lookup has timed out.`),
+        });
+      }
+    });
+  }
+
   private async getCardStats(
     card: GameBaseCard,
     author: User
@@ -59,86 +142,9 @@ export default class CardLookup extends BaseCommand {
           `\n— \`★★★☆☆\` **${wearSpread[3].toLocaleString()}**` +
           `\n— \`★★★★☆\` **${wearSpread[4].toLocaleString()}**` +
           `\n— \`★★★★★\` **${wearSpread[5].toLocaleString()}**`
-      );
+      )
+      .setThumbnail(`attachment://card.png`);
 
     return embed;
-  }
-
-  async exec(
-    msg: Message,
-    profile: GameProfile,
-    options: string[]
-  ): Promise<void> {
-    let nameQuery: string;
-    let baseCard: GameBaseCard | undefined;
-    if (!options[0]) {
-      const lastCard = await ProfileService.getLastCard(profile);
-      const lastBase = this.zephyr.getCard(lastCard.baseCardId);
-
-      baseCard = lastBase;
-    } else nameQuery = options.join(" ")?.trim();
-
-    if (baseCard) {
-      const embed = await this.getCardStats(baseCard, msg.author);
-      await this.send(msg.channel, embed);
-      return;
-    }
-
-    const find = this.zephyr
-      .getCards()
-      .filter((c) => c.name.toLowerCase() === nameQuery.toLowerCase());
-
-    if (!find[0]) throw new ZephyrError.InvalidLookupQueryError();
-
-    if (find.length === 1) {
-      const embed = await this.getCardStats(find[0], msg.author);
-      await this.send(msg.channel, embed);
-      return;
-    }
-
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Lookup | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(
-        `I found multiple matches for **${find[0].name}**.\nPlease reply with a number to confirm which person you're talking about.\n` +
-          find
-            .map(
-              (u, index) =>
-                `— \`${index + 1}\` ${u.group ? `**${u.group}** ` : ``}${
-                  u.name
-                }${u.subgroup ? ` (${u.subgroup})` : ``}`
-            )
-            .join("\n")
-      );
-
-    const conf = await this.send(msg.channel, embed);
-
-    const filter = (m: Message) =>
-      find[parseInt(m.content) - 1] && m.author.id === msg.author.id;
-    const collector = new MessageCollector(this.zephyr, msg.channel, filter, {
-      time: 15000,
-      max: 1,
-    });
-    collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
-    });
-
-    collector.on("collect", async (m: Message) => {
-      const embed = await this.getCardStats(
-        find[parseInt(m.content) - 1],
-        msg.author
-      );
-      await this.send(msg.channel, embed);
-      return;
-    });
-    collector.on("end", async (_c: any, reason: string) => {
-      if (reason === "time") {
-        await conf.edit({
-          embed: embed.setFooter(`🕒 This lookup has timed out.`),
-        });
-      }
-    });
   }
 }

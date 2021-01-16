@@ -32,25 +32,40 @@ export type WearSpread = {
 export abstract class CardGet extends DBClass {
   public static async getAllCards(): Promise<GameBaseCard[]> {
     const query = (await DB.query(`SELECT
-                                    id,
+                                    card_base.id,
                                     flavor_text,
-                                    group_name,
-                                    subgroup_name,
-                                    individual_name,
+                                    subgroup.group_name,
+                                    idol.idol_name,
+                                    subgroup.subgroup_name,
+                                    subgroup.archived,
                                     rarity,
                                     image_url,
                                     serial_total,
                                     serial_limit,
                                     num_generated,
                                     emoji
-                                   FROM card_base;`)) as BaseCard[];
+                                   FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE idol_id > 0;`)) as BaseCard[];
     return query.map((c) => new GameBaseCard(c));
   }
 
   public static async getCardById(id: number): Promise<GameBaseCard> {
-    const query = (await DB.query(`SELECT * FROM card_base WHERE id=?;`, [
-      id,
-    ])) as BaseCard[];
+    const query = (await DB.query(
+      `SELECT
+    card_base.id,
+    flavor_text,
+    subgroup.group_name,
+    idol.idol_name,
+    subgroup.subgroup_name,
+    subgroup.archived,
+    rarity,
+    image_url,
+    serial_total,
+    serial_limit,
+    num_generated,
+    emoji
+   FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE card_base.id=? AND idol_id > 0;`,
+      [id]
+    )) as BaseCard[];
     return new GameBaseCard(query[0]);
   }
 

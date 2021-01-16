@@ -2,14 +2,16 @@ export interface BaseCard {
   id: number;
   flavor_text: string | null;
   group_name: string | null;
+  idol_name: string;
+  birthday: string;
   subgroup_name: string | null;
-  individual_name: string;
   image_url: string;
   rarity: number;
   serial_total: number;
   serial_limit: number;
   num_generated: number;
   emoji: string | null;
+  archived: boolean;
 }
 
 export interface Frame {
@@ -31,18 +33,20 @@ export class GameBaseCard {
   serialLimit: number;
   totalGenerated: number;
   emoji: string | null;
+  archived: boolean;
   constructor(card: BaseCard) {
     this.id = card.id;
     this.flavor = card.flavor_text;
     this.group = card.group_name;
     this.subgroup = card.subgroup_name;
-    this.name = card.individual_name;
+    this.name = card.idol_name;
     this.image = card.image_url;
     this.rarity = card.rarity;
     this.serialLimit = card.serial_limit;
     this.serialTotal = card.serial_total;
     this.totalGenerated = card.num_generated;
     this.emoji = card.emoji;
+    this.archived = card.archived;
   }
 }
 
