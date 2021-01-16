@@ -210,8 +210,8 @@ export default class UseItem extends BaseCommand {
           await this.send(msg.channel, embed, {
             file: { file: buf, name: "dye.png" },
           });
-          break;
         }
+        break;
       }
       case "STICKER": {
         const targetSticker = this.zephyr.getStickerByItemId(targetItem.id);

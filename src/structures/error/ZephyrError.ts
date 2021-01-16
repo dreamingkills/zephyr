@@ -13,6 +13,14 @@ abstract class ZephyrError extends Error {
   }
 }
 
+export class UnexpectedError extends ZephyrError {
+  constructor(e: any) {
+    super(
+      `An unexpected error occurred. This has been reported to the developer.`
+    );
+    console.log(e);
+  }
+}
 export class PrefixTooLongError extends ZephyrError {
   constructor() {
     super(`That prefix is too long. It must be 8 characters at most.`);
@@ -276,6 +284,12 @@ export class NoFrameSpecifiedError extends ZephyrError {
   }
 }
 
+export class CannotRemoveFrameError extends ZephyrError {
+  constructor() {
+    super(`You cannot remove that frame.`);
+  }
+}
+
 /*
     Timers
             */
@@ -521,7 +535,7 @@ export class NotEnoughOfItemError extends ZephyrError {
              */
 export class CardBurnedError extends ZephyrError {
   constructor(card: GameUserCard) {
-    super(`:fire: \`${card.id.toString(36)}\` has been burned!`);
+    super(`:fire: \`${card.id.toString(36)}\` was burned.`);
   }
 }
 

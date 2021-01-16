@@ -82,6 +82,8 @@ export abstract class LeaderboardGet extends DBClass {
       last_card: number | null;
       cubits: number;
       vote_last: string | null;
+      vote_reminder: boolean;
+      vote_reminded: boolean;
     }[];
     return query.map((p) => {
       return { profile: new GameProfile(p), count: p.count };

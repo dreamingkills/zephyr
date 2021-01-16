@@ -53,13 +53,13 @@ export default class ViewProfile extends BaseCommand {
           } **${target.bits.toLocaleString()}**.` +
           `\n— ${
             targetIsSender ? `You have` : `${targetUser.tag} has`
-          } **${cardsAmount.toLocaleString()}** card${
-            cardsAmount === 1 ? `` : `s`
+          } **${target.cubits.toLocaleString()}** cubit${
+            target.cubits === 1 ? `` : `s`
           }.` +
           `\n— ${
             targetIsSender ? `You have` : `${targetUser.tag} has`
-          } **${target.cubits.toLocaleString()}** cubit${
-            target.cubits === 1 ? `` : `s`
+          } **${cardsAmount.toLocaleString()}** card${
+            cardsAmount === 1 ? `` : `s`
           }.`
       );
 

@@ -33,6 +33,8 @@ export interface Profile {
   claim_reminded: boolean;
   drop_reminder: boolean;
   drop_reminded: boolean;
+  vote_reminder: boolean;
+  vote_reminded: boolean;
 
   /*
       Other
@@ -60,7 +62,9 @@ export class GameProfile {
   blacklisted: boolean;
   lastCard: number | null;
   cubits: number;
-  vote_last: string | null;
+  voteLast: string | null;
+  voteReminder: boolean;
+  voteReminded: boolean;
   constructor(data: Profile) {
     this.discordId = data.discord_id;
     this.private = data.private;
@@ -74,12 +78,14 @@ export class GameProfile {
     this.claimNext = data.claim_next;
     this.premiumCurrency = data.premium_currency;
     this.cubits = data.cubits;
-    this.vote_last = data.vote_last;
+    this.voteLast = data.vote_last;
 
     this.dropReminder = data.drop_reminder;
     this.dropReminded = data.drop_reminded;
     this.claimReminder = data.claim_reminder;
     this.claimReminded = data.claim_reminded;
+    this.voteReminder = data.vote_reminder;
+    this.voteReminded = data.vote_reminded;
     this.blacklisted = data.blacklisted;
     this.lastCard = data.last_card;
   }

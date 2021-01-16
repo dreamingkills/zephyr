@@ -34,25 +34,42 @@ export type WearSpread = {
 export abstract class CardGet extends DBClass {
   public static async getAllCards(): Promise<GameBaseCard[]> {
     const query = (await DB.query(`SELECT
-                                    id,
+                                    card_base.id,
                                     flavor_text,
-                                    group_name,
-                                    subgroup_name,
-                                    individual_name,
+                                    subgroup.group_name,
+                                    idol.idol_name,
+                                    idol.birthday,
+                                    subgroup.subgroup_name,
+                                    subgroup.archived,
                                     rarity,
                                     image_url,
                                     serial_total,
                                     serial_limit,
                                     num_generated,
                                     emoji
-                                   FROM card_base;`)) as BaseCard[];
+                                   FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE idol_id > 0;`)) as BaseCard[];
     return query.map((c) => new GameBaseCard(c));
   }
 
   public static async getCardById(id: number): Promise<GameBaseCard> {
-    const query = (await DB.query(`SELECT * FROM card_base WHERE id=?;`, [
-      id,
-    ])) as BaseCard[];
+    const query = (await DB.query(
+      `SELECT
+    card_base.id,
+    flavor_text,
+    subgroup.group_name,
+    idol.idol_name,
+    idol.birthday,
+    subgroup.subgroup_name,
+    subgroup.archived,
+    rarity,
+    image_url,
+    serial_total,
+    serial_limit,
+    num_generated,
+    emoji
+   FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE card_base.id=? AND idol_id > 0;`,
+      [id]
+    )) as BaseCard[];
     return new GameBaseCard(query[0]);
   }
 
@@ -96,19 +113,19 @@ export abstract class CardGet extends DBClass {
     const reverse = order?.startsWith("!");
     if (reverse) order = order.slice(1);
 
-    if (["issue", "i", "serial"].indexOf(order) > -1) {
+    if (["issue", "i", "serial"].includes(order)) {
       query += ` ORDER BY serial_number ${reverse ? `DESC` : `ASC`}`;
-    } else if (["wear", "w"].indexOf(order) > -1) {
+    } else if (["wear", "w"].includes(order)) {
       query += ` ORDER BY wear ${reverse ? `ASC` : `DESC`}`;
-    } else if (["luck", "lc"].indexOf(order) > -1) {
+    } else if (["luck", "lc"].includes(order)) {
       query += ` ORDER BY luck_coeff ${reverse ? `ASC` : `DESC`}`;
-    } else if (["group", "g"].indexOf(order) > -1) {
+    } else if (["group", "g"].includes(order)) {
       query += ` ORDER BY card_base.group_name ${reverse ? `DESC` : `ASC`}`;
-    } else if (["name", "n"].indexOf(order) > -1) {
+    } else if (["name", "n"].includes(order)) {
       query += ` ORDER BY card_base.individual_name ${
         reverse ? `DESC` : `ASC`
       }`;
-    } else if (["subgroup", "sg"].indexOf(order) > -1) {
+    } else if (["subgroup", "sg"].includes(order)) {
       query += ` ORDER BY card_base.subgroup_name ${reverse ? `DESC` : `ASC`}`;
     } else query += ` ORDER BY user_card.id ${reverse ? `ASC` : `DESC`}`;
 
@@ -192,10 +209,13 @@ export abstract class CardGet extends DBClass {
     });
   }
 
-  public static async getCardsByTagId(id: number): Promise<GameUserCard[]> {
+  public static async getCardsByTagId(
+    id: number,
+    profile: GameProfile
+  ): Promise<GameUserCard[]> {
     const query = (await DB.query(
-      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.tag_id=?;`,
-      [id]
+      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.tag_id=? AND user_card.discord_id=?;`,
+      [id, profile.discordId]
     )) as UserCard[];
     return query.map((c) => new GameUserCard(c));
   }

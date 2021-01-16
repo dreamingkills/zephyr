@@ -55,12 +55,25 @@ export async function createMessage(
   let message;
 
   let attempts = 0;
+  let errorCode;
   while (attempts < 3 && !message) {
     try {
       attempts++;
       const sent = await channel.createMessage({ content, embed }, file);
       message = sent;
     } catch (e) {
+      if (e) {
+        errorCode = (e as string).match(/(?<=\[).+?(?=\])/g)?.[0];
+      }
+
+      /*
+        Discord Error Codes:
+          50007 - Cannot send messages to this user
+          50013 - Missing Permissions
+          50001 - Missing Access
+      */
+      if (errorCode && ["50007"].includes(errorCode)) break;
+
       if (attempts === 3) {
         console.log(
           `Failed trying to send message with content ${content} in channel ${channel.id}. Full stack:\n${e}`

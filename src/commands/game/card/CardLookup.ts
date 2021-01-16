@@ -34,15 +34,17 @@ export default class CardLookup extends BaseCommand {
       return;
     }
 
-    const find = this.zephyr
-      .getCards()
-      .filter((c) => c.name.toLowerCase() === nameQuery.toLowerCase());
+    const find = this.zephyr.getCards().filter((c) => {
+      return c.name.toLowerCase() === nameQuery.toLowerCase();
+    });
 
     if (!find[0]) throw new ZephyrError.InvalidLookupQueryError();
 
     if (find.length === 1) {
       const embed = await this.getCardStats(find[0], msg.author);
-      await this.send(msg.channel, embed);
+      await this.send(msg.channel, embed, {
+        file: { file: find[0].image, name: `card.png` },
+      });
       return;
     }
 
@@ -122,5 +124,16 @@ export default class CardLookup extends BaseCommand {
     );
 
     return embed;
-  }
-}
+
+      await this.send(msg.channel, embed, {
+        file: { file: find[parseInt(m.content) - 1].image, name: `card.png` },
+      });
+      return;
+    });
+    collector.on("end", async (_c: any, reason: string) => {
+      if (reason === "time") {
+        await conf.edit({
+          embed: embed.setFooter(`🕒 This lookup has timed out.`),
+        });
+      }
+    });

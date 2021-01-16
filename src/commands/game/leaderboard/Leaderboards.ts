@@ -4,7 +4,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { ReactionCollector } from "eris-collector";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, escapeMarkdown } from "../../../lib/ZephyrUtils";
 import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class Leaderboards extends BaseCommand {
@@ -32,7 +32,8 @@ export default class Leaderboards extends BaseCommand {
           }\` `;
           if (profile.private && profile.discordId !== authorId) {
             leaderboard += `*Private User*`;
-          } else leaderboard += user ? user.tag : `*Unknown User*`;
+          } else
+            leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
           leaderboard += ` — ${this.zephyr.config.discord.emoji.bits}**${(
             profile.bits + profile.bitsBank
           ).toLocaleString()}**\n`;
@@ -48,7 +49,8 @@ export default class Leaderboards extends BaseCommand {
           }\` `;
           if (profile.private && profile.discordId !== authorId) {
             leaderboard += `*Private User*`;
-          } else leaderboard += user ? user.tag : `*Unknown User*`;
+          } else
+            leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
           leaderboard += ` — **${profile.dailyStreak.toLocaleString()} days**\n`;
         }
         break;
@@ -63,7 +65,8 @@ export default class Leaderboards extends BaseCommand {
           leaderboard += `\`#${board.indexOf(entry) + 1 + (page * 10 - 10)}\` `;
           if (entry.profile.private && entry.profile.discordId !== authorId) {
             leaderboard += `*Private User*`;
-          } else leaderboard += user ? user.tag : `*Unknown User*`;
+          } else
+            leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
           leaderboard += ` — **${entry.count} cards**\n`;
         }
         break;
@@ -77,7 +80,8 @@ export default class Leaderboards extends BaseCommand {
           }\` `;
           if (profile.private && profile.discordId !== authorId) {
             leaderboard += `*Private User*`;
-          } else leaderboard += user ? user.tag : `*Unknown User*`;
+          } else
+            leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
           leaderboard += ` — **${profile.cubits.toLocaleString()}** cubits\n`;
         }
         break;

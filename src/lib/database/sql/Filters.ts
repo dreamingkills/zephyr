@@ -12,7 +12,7 @@ export class FilterService {
     for (let [prop, value] of Object.entries(options)) {
       prop = prop.toLowerCase();
 
-      if (["issue", "i", "serial"].indexOf(prop) > -1) {
+      if (["issue", "i", "serial"].includes(prop)) {
         let trueIssue = -1;
         if (!isNaN(parseInt(value.toString(), 10))) {
           trueIssue = parseInt(value.toString(), 10);
@@ -38,25 +38,25 @@ export class FilterService {
           queryOptions.push(
             ` user_card.serial_number=${DB.connection.escape(trueIssue)}`
           );
-      } else if (["name", "n", "member"].indexOf(prop) > -1) {
+      } else if (["name", "n", "member"].includes(prop)) {
         queryOptions.push(
           ` (alphanum(card_base.individual_name)) LIKE CONCAT('%',alphanum(${DB.connection.escape(
             value
           )}),"%")`
         );
-      } else if (["group", "g"].indexOf(prop) > -1) {
+      } else if (["group", "g"].includes(prop)) {
         queryOptions.push(
           ` (alphanum(card_base.group_name)) LIKE CONCAT("%",alphanum(${DB.connection.escape(
             value
           )}),"%")`
         );
-      } else if (["subgroup", "sg"].indexOf(prop) > -1) {
+      } else if (["subgroup", "sg"].includes(prop)) {
         queryOptions.push(
           ` alphanum(card_base.subgroup_name) LIKE CONCAT("%",alphanum(${DB.connection.escape(
             value
           )}), "%")`
         );
-      } else if (["wear", "w", "condition", "c"].indexOf(prop) > -1) {
+      } else if (["wear", "w", "condition", "c"].includes(prop)) {
         let trueWear = -1;
         if (!isNaN(parseInt(value.toString(), 10))) {
           trueWear = parseInt(value.toString(), 10);
@@ -64,20 +64,20 @@ export class FilterService {
           trueWear = parseInt(value.toString().slice(1), 10);
         } else {
           let stringValue = value.toString();
-          if (["<", ">"].indexOf(stringValue[0]) > -1)
+          if (["<", ">"].includes(stringValue[0]))
             stringValue = stringValue.slice(1);
 
-          if (["mint", "m"].indexOf(stringValue) > -1) {
+          if (["mint", "m"].includes(stringValue)) {
             trueWear = 5;
-          } else if (["great", "gr"].indexOf(stringValue) > -1) {
+          } else if (["great", "gr"].includes(stringValue)) {
             trueWear = 4;
-          } else if (["good", "g"].indexOf(stringValue) > -1) {
+          } else if (["good", "g"].includes(stringValue)) {
             trueWear = 3;
-          } else if (["average", "a"].indexOf(stringValue) > -1) {
+          } else if (["average", "a"].includes(stringValue)) {
             trueWear = 2;
-          } else if (["poor", "p"].indexOf(stringValue) > -1) {
+          } else if (["poor", "p"].includes(stringValue)) {
             trueWear = 1;
-          } else if (["damaged", "d"].indexOf(stringValue) > -1) trueWear = 0;
+          } else if (["damaged", "d"].includes(stringValue)) trueWear = 0;
         }
 
         if (trueWear < 0) continue;
@@ -94,7 +94,7 @@ export class FilterService {
           queryOptions.push(
             ` user_card.wear=${DB.connection.escape(trueWear)}`
           );
-      } else if (["tag", "t"].indexOf(prop) > -1) {
+      } else if (["tag", "t"].includes(prop)) {
         const tag = tags.filter(
           (t) => t.name === value.toString()?.toLowerCase()
         )[0];
@@ -110,7 +110,7 @@ export class FilterService {
         }
 
         queryOptions.push(` user_card.tag_id=-1`);
-      } else if (["frame", "f"].indexOf(prop) > -1) {
+      } else if (["frame", "f"].includes(prop)) {
         if (value === "true") {
           queryOptions.push(` user_card.frame!=1`);
         } else if (value === "false") {

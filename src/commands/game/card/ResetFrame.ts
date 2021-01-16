@@ -31,6 +31,9 @@ export default class ResetFrame extends BaseCommand {
     if (card.frameName?.includes("Default"))
       throw new ZephyrError.FrameAlreadyDefaultError(card);
 
+    if (card.frameName?.includes("Signature"))
+      throw new ZephyrError.CannotRemoveFrameError();
+
     const confirmation = await this.send(
       msg.channel,
       `${this.zephyr.config.discord.emoji.warn} Really reset the frame of \`${trueIdentifier}\`?`

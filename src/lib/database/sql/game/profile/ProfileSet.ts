@@ -7,6 +7,7 @@ import { getNearestColor, rgbToHex } from "../../../../ZephyrUtils";
 import { BaseItem } from "../../../../../structures/game/Item";
 import { GameUserCard } from "../../../../../structures/game/UserCard";
 import dayjs from "dayjs";
+import { User } from "eris";
 
 export abstract class ProfileSet extends DBClass {
   /*
@@ -249,6 +250,14 @@ export abstract class ProfileSet extends DBClass {
     return;
   }
 
+  public static async toggleVoteReminders(discordId: string[]): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET vote_reminder=1-vote_reminder WHERE discord_id IN (?);`,
+      [discordId]
+    );
+    return;
+  }
+
   public static async disableReminders(discordId: string[]): Promise<void> {
     await DB.query(
       `UPDATE profile SET claim_reminder=0,drop_reminder=0 WHERE discord_id IN (?);`,
@@ -257,33 +266,28 @@ export abstract class ProfileSet extends DBClass {
     return;
   }
 
-  public static async setUserReminded(
-    users: { id: string; type: 1 | 2 | 3 }[]
-  ): Promise<void> {
-    const onlyClaims = users.filter((u) => u.type === 2).map((o) => o.id);
-    const onlyDrops = users.filter((u) => u.type === 3).map((o) => o.id);
-    const onlyBoth = users.filter((u) => u.type === 1).map((o) => o.id);
+  public static async setUserClaimReminded(users: User[]): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET claim_reminded=1 WHERE discord_id IN (?);`,
+      [users.map((u) => u.id)]
+    );
+    return;
+  }
 
-    Promise.all([
-      onlyClaims.length > 0
-        ? DB.query(
-            `UPDATE profile SET claim_reminded=1 WHERE discord_id IN (?);`,
-            [onlyClaims]
-          )
-        : false,
-      onlyDrops.length > 0
-        ? DB.query(
-            `UPDATE profile SET drop_reminded=1 WHERE discord_id IN (?);`,
-            [onlyDrops]
-          )
-        : false,
-      onlyBoth.length > 0
-        ? DB.query(
-            `UPDATE profile SET claim_reminded=1, drop_reminded=1 WHERE discord_id IN (?);`,
-            [onlyBoth]
-          )
-        : false,
-    ]);
+  public static async setUserDropReminded(users: User[]): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET drop_reminded=1 WHERE discord_id IN (?);`,
+      [users.map((u) => u.id)]
+    );
+    return;
+  }
+
+  public static async setUserVoteReminded(users: User[]): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET vote_reminded=1 WHERE discord_id IN (?);`,
+      [users.map((u) => u.id)]
+    );
+    return;
   }
 
   public static async addDye(
@@ -307,6 +311,7 @@ export abstract class ProfileSet extends DBClass {
       amount,
       id,
     ]);
+
     return;
   }
 
@@ -318,11 +323,25 @@ export abstract class ProfileSet extends DBClass {
       amount,
       id,
     ]);
+
     return;
   }
 
   public static async burnDyes(dyes: GameDye[]): Promise<void> {
     await DB.query(`DELETE FROM dye WHERE id IN (?);`, [dyes.map((d) => d.id)]);
+
+    return;
+  }
+
+  public static async transferDyesToUser(
+    dyes: GameDye[],
+    profile: GameProfile
+  ): Promise<void> {
+    await DB.query(`UPDATE dye SET discord_id=? WHERE id IN (?);`, [
+      profile.discordId,
+      dyes.map((i) => i.id),
+    ]);
+
     return;
   }
 
@@ -369,12 +388,23 @@ export abstract class ProfileSet extends DBClass {
     const formattedTimestamp = dayjs().format(`YYYY/MM/DD HH:mm:ss`);
 
     await DB.query(
-      `UPDATE profile SET cubits=cubits+?, vote_last=? WHERE discord_id=?;`,
+      `UPDATE profile SET cubits=cubits+?, vote_last=?, vote_reminded=0 WHERE discord_id=?;`,
       [isWeekend ? 4 : 2, formattedTimestamp, profile.discordId]
     );
     return;
   }
 
+  public static async addCubits(
+    profile: GameProfile,
+    amount: number
+  ): Promise<void> {
+    await DB.query(`UPDATE profile SET cubits=cubits+? WHERE discord_id=?;`, [
+      amount,
+      profile.discordId,
+    ]);
+
+    return;
+  }
   public static async removeCubits(
     profile: GameProfile,
     amount: number
@@ -383,6 +413,7 @@ export abstract class ProfileSet extends DBClass {
       amount,
       profile.discordId,
     ]);
+
     return;
   }
 }

@@ -402,8 +402,11 @@ export abstract class CardService {
     return await CardSet.increaseCardWear(card);
   }
 
-  public static async getCardsByTag(tag: GameTag): Promise<GameUserCard[]> {
-    return await CardGet.getCardsByTagId(tag.id);
+  public static async getCardsByTag(
+    tag: GameTag,
+    profile: GameProfile
+  ): Promise<GameUserCard[]> {
+    return await CardGet.getCardsByTagId(tag.id, profile);
   }
 
   public static async getUntaggedCards(

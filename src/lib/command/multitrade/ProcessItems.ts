@@ -49,7 +49,7 @@ export async function processItems(
     let baseItem = items.filter(
       (i) =>
         i.name.toLowerCase() === item.toLowerCase() ||
-        (i.aliases && i.aliases.indexOf(item.toLowerCase()) > -1)
+        (i.aliases && i.aliases.includes(item.toLowerCase()))
     )[0];
     if (!baseItem) {
       const noNumber = item.split(" ").slice(1).join(" ").toLowerCase();
@@ -61,7 +61,7 @@ export async function processItems(
       baseItem = items.filter(
         (i) =>
           i.name.toLowerCase() === noNumber.toLowerCase() ||
-          (i.aliases && i.aliases.indexOf(noNumber.toLowerCase()))
+          (i.aliases && i.aliases.includes(noNumber.toLowerCase()))
       )[0];
     }
 

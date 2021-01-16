@@ -223,6 +223,11 @@ function isFile(body: any): body is ErisFile {
   return !!(body as ErisFile).file;
 }
 
+function escapeMarkdown(value: string): string {
+  const unescaped = value.replace(/\\(\*|_|`|~|\\)/g, "$1"); // un-escape backslashed characters
+  return unescaped.replace(/(\*|_|`|~|\\)/g, "\\$1"); // escape *, _, `, ~, \
+}
+
 export {
   padIfNotLeading,
   getTimeUntilNextDay,
@@ -236,4 +241,5 @@ export {
   getDescriptions,
   rgbToCmy,
   isFile,
+  escapeMarkdown,
 };
