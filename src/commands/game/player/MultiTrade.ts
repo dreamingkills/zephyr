@@ -85,7 +85,6 @@ export default class MultiTrade extends BaseCommand {
 
     await this.react(tradeMessage, "❌");
     await this.react(tradeMessage, "🔒");
-    await this.react(tradeMessage, "☑");
 
     const [senderItems, recipientItems] = [[], []] as [
       TradeItemResolvable[],
@@ -197,6 +196,10 @@ export default class MultiTrade extends BaseCommand {
                 tradeInterfaceEmbed.fields[1].value = rendered;
               }
               await this.edit(tradeMessage, tradeInterfaceEmbed);
+
+              if (senderConfirmed && recipientConfirmed)
+                await this.react(tradeMessage, "☑");
+
               break;
             }
             case "☑": {
@@ -253,15 +256,17 @@ export default class MultiTrade extends BaseCommand {
       return;
     }
 
-    await transferItems(senderItems, targetProfile, profile);
-    await transferItems(recipientItems, profile, targetProfile);
+    if (senderItems.length > 0 && recipientItems.length > 0) {
+      await transferItems(senderItems, targetProfile, profile);
+      await transferItems(recipientItems, profile, targetProfile);
 
-    await AnticheatService.logMultitrade(
-      senderItems,
-      recipientItems,
-      profile,
-      targetProfile
-    );
+      await AnticheatService.logMultitrade(
+        senderItems,
+        recipientItems,
+        profile,
+        targetProfile
+      );
+    }
 
     await this.edit(
       tradeMessage,
