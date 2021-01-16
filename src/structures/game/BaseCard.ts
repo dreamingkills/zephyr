@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export interface BaseCard {
   id: number;
   flavor_text: string | null;
@@ -34,6 +36,7 @@ export class GameBaseCard {
   totalGenerated: number;
   emoji: string | null;
   archived: boolean;
+  birthday: string | undefined;
   constructor(card: BaseCard) {
     this.id = card.id;
     this.flavor = card.flavor_text;
@@ -47,6 +50,8 @@ export class GameBaseCard {
     this.totalGenerated = card.num_generated;
     this.emoji = card.emoji;
     this.archived = card.archived;
+    if (card.birthday)
+      this.birthday = dayjs(card.birthday).format(`YYYY-MM-DD`);
   }
 }
 

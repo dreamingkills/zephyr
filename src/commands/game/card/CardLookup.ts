@@ -121,6 +121,7 @@ export default class CardLookup extends BaseCommand {
         `Name — **${card.name}**` +
           (card.group ? `\nGroup — **${card.group}**` : ``) +
           (card.subgroup ? `\nTheme — **${card.subgroup}**` : ``) +
+          (card.birthday ? `\nBirthday — **${card.birthday}**` : ``) +
           `\n\n**${
             card.name
           }** is on **${timesWishlisted.toLocaleString()}** wishlists.` +
