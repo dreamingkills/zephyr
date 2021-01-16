@@ -1,11 +1,13 @@
 # Discord
 config.json
-src/assets/
+src/assets/*
+!src/assets/*.example.json
 cache/
 setup.sql
 
 # VSCode
 .VSCodeCounter/
+.vscode
 
 # Logs
 logs
