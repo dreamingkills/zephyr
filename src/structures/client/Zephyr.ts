@@ -22,7 +22,7 @@ import { createMessage } from "../../lib/discord/message/createMessage";
 import dayjs from "dayjs";
 
 export class Zephyr extends Client {
-  version: string = "Artemisia";
+  version: string = "Marigold";
   commandLib = new CommandLib();
   dmHandler = new DMHandler();
   config: typeof config;
