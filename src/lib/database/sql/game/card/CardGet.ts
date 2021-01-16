@@ -138,7 +138,7 @@ export abstract class CardGet extends DBClass {
     options: Filter,
     tags: GameTag[]
   ): Promise<number> {
-    let query = `SELECT COUNT(*) AS count FROM user_card LEFT JOIN card_base ON user_card.card_id=card_base.id WHERE discord_id=${DB.connection.escape(
+    let query = `SELECT COUNT(*) AS count FROM user_card LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE discord_id=${DB.connection.escape(
       profile.discordId
     )}`;
     const queryOptions = FilterService.parseOptions(options, tags);
