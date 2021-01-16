@@ -129,18 +129,6 @@ export class InvalidLookupQueryError extends ZephyrError {
   }
 }
 
-export class InvalidSubgroupLookupQueryError extends ZephyrError {
-  constructor() {
-    super(`Sorry, but I couldn't find any subgroups by that name.`);
-  }
-}
-
-export class InvalidGroupLookupQueryError extends ZephyrError {
-  constructor() {
-    super(`Sorry, but I couldn't find any groups by that name.`);
-  }
-}
-
 /*
     Profile
              */
@@ -665,20 +653,5 @@ export class FailedToEditMessageError extends ZephyrError {
     super(
       `There was a problem connecting to Discord, and a message could not be edited. Please try again in a few minutes.\nThis has been reported to the developer.`
     );
-  }
-}
-
-/*
-    Completion
-*/
-export class MissingSubgroupOptionsError extends ZephyrError {
-  constructor() {
-    super("Please specify a subgroup to lookup");
-  }
-}
-
-export class MissingGroupOptionsError extends ZephyrError {
-  constructor() {
-    super("Please specify a group to lookup");
   }
 }

@@ -4,8 +4,6 @@ import {
   Frame,
   GameBaseCard,
   GameFrame,
-  Subgroup,
-  Member,
 } from "../../../../../structures/game/BaseCard";
 import {
   GameUserCard,
@@ -286,42 +284,6 @@ export abstract class CardGet extends DBClass {
       4: query.filter((w) => w.wear === 4)[0]?.count || 0,
       5: query.filter((w) => w.wear === 5)[0]?.count || 0,
     };
-  }
-
-  public static async findSubgroups(keyword: string): Promise<Subgroup[]> {
-    return (await DB.query(
-      `SELECT group_name AS "group", subgroup_name AS name FROM card_base
-       WHERE alphanum(card_base.subgroup_name) LIKE CONCAT('%', alphanum(${DB.connection.escape(
-         keyword
-       )}), '%')
-       GROUP BY group_name, subgroup_name
-       ORDER BY 1
-      `
-    )) as Subgroup[];
-  }
-
-  public static async findGroups(keyword: string): Promise<string[]> {
-    return ((await DB.query(
-      `SELECT COALESCE(group_name, individual_name) as group_name
-       FROM card_base
-       WHERE alphanum(COALESCE(group_name, individual_name)) LIKE CONCAT('%', alphanum(${DB.connection.escape(
-         keyword
-       )}), '%')
-       GROUP BY group_name
-       ORDER BY 1
-      `
-    )) as { group_name: string }[]).map((g) => g.group_name);
-  }
-
-  public static async findIndividuals(keyword: string): Promise<Member[]> {
-    return (await DB.query(`
-      SELECT individual_name AS name, group_name as "group"
-      FROM card_base
-      WHERE alphanum(individual_name) LIKE CONCAT('%', alphanum(${DB.connection.escape(
-        keyword
-      )}), '%')
-      GROUP BY individual_name 
-      ORDER BY 2 desc, 1 asc`)) as Member[];
   }
 
   /*

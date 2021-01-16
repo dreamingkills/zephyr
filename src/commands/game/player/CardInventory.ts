@@ -1,16 +1,15 @@
-import { Message } from "eris";
+import { Message, PartialEmoji } from "eris";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { Filter } from "../../../lib/database/sql/Filters";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { GameUserCard } from "../../../structures/game/UserCard";
-
-import { getDescriptions } from "../../../lib/ZephyrUtils";
+import { ReactionCollector } from "eris-collector";
+import { checkPermission, getDescriptions } from "../../../lib/ZephyrUtils";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { GameTag } from "../../../structures/game/Tag";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { ScrollingEmbed } from "../../../structures/display/ScrollingEmbed";
 
 export default class CardInventory extends BaseCommand {
   names = ["inventory", "inv", "i"];
@@ -20,6 +19,13 @@ export default class CardInventory extends BaseCommand {
     "Filters:\n— group=LOONA\n— name=JinSoul\n— issue=>5\n— issue=<5\n— issue=5",
   ];
   allowDm = true;
+
+  private renderInventory(cards: GameUserCard[], tags: GameTag[]): string {
+    if (cards.length === 0) return "No cards here!";
+
+    const cardDescriptions = getDescriptions(cards, this.zephyr, tags);
+    return cardDescriptions.join("\n");
+  }
 
   async exec(
     msg: Message,
@@ -68,7 +74,6 @@ export default class CardInventory extends BaseCommand {
       filters["page"] < 1
     )
       filters["page"] = 1;
-
     const totalPages = Math.ceil(size / 10) || 1;
     if (filters["page"] > totalPages) filters["page"] = totalPages;
 
@@ -84,35 +89,50 @@ export default class CardInventory extends BaseCommand {
         `Inventory | ${msg.author.tag}`,
         msg.author.dynamicAvatarURL("png")
       )
-      .setTitle(`${targetUser.tag}'s cards`);
-
-    const scrollingEmbed = new ScrollingEmbed(this.zephyr, msg, embed, {
-      totalPages,
-      totalItems: size,
-      startingPage: page,
-      initialItems: this.renderInventory(inventory, userTags),
-      itemName: "card",
-    });
-
-    scrollingEmbed.onPageChange(async (page) => {
-      filters["page"] = page;
-
-      const newCards = await CardService.getUserInventory(
-        target!,
-        userTags,
-        filters
+      .setTitle(`${targetUser.tag}'s cards`)
+      .setDescription(this.renderInventory(inventory, userTags))
+      .setFooter(
+        `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${size} cards`
       );
+    const sent = await this.send(msg.channel, embed);
+    if (totalPages < 2) return;
 
-      return this.renderInventory(newCards, userTags);
+    const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
+      userId === msg.author.id;
+    const collector = new ReactionCollector(this.zephyr, sent, filter, {
+      time: 2 * 60 * 1000,
+    });
+    collector.on("error", async (e: Error) => {
+      await this.handleError(msg, e);
     });
 
-    await scrollingEmbed.send();
-  }
+    collector.on(
+      "collect",
+      async (_m: Message, emoji: PartialEmoji, userId: string) => {
+        if (emoji.name === "⏮" && page !== 1) page = 1;
+        if (emoji.name === "◀" && page !== 1) page--;
+        // numbers
+        if (emoji.name === "▶" && page !== totalPages) page++;
+        if (emoji.name === "⏭" && page !== totalPages) page = totalPages;
 
-  private renderInventory(cards: GameUserCard[], tags: GameTag[]): string {
-    if (cards.length === 0) return "No cards here!";
+        filters["page"] = page;
+        const newCards = await CardService.getUserInventory(
+          target!,
+          userTags,
+          filters
+        );
+        embed.setDescription(this.renderInventory(newCards, userTags));
+        embed.setFooter(`Page ${page} of ${totalPages} • ${size} entries`);
+        await sent.edit({ embed });
 
-    const cardDescriptions = getDescriptions(cards, this.zephyr, tags);
-    return cardDescriptions.join("\n");
+        if (checkPermission("manageMessages", msg.textChannel, this.zephyr))
+          await sent.removeReaction(emoji.name, userId);
+      }
+    );
+
+    if (totalPages > 2) await this.react(sent, `⏮`);
+    if (totalPages > 1) await this.react(sent, `◀`);
+    if (totalPages > 1) await this.react(sent, `▶`);
+    if (totalPages > 2) await this.react(sent, `⏭`);
   }
 }

@@ -40,7 +40,7 @@ export class FilterService {
           );
       } else if (["name", "n", "member"].includes(prop)) {
         queryOptions.push(
-          ` (alphanum(card_base.individual_name)) LIKE CONCAT('%',alphanum(${DB.connection.escape(
+          ` (alphanum(card_base.individual_name)) LIKE CONCAT("%",alphanum(${DB.connection.escape(
             value
           )}),"%")`
         );
