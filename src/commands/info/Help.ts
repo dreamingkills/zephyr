@@ -93,7 +93,7 @@ export default class Help extends BaseCommand {
       })
       .addField({
         name: `Information`,
-        value: `\`timers\`, \`reminders\`, \`lookup\`, \`recipes\`, \`previewframe\`, \`previewsticker\`, \`top\`, \`topgroup\`, \`topwishlist\`, \`grouplist\``,
+        value: `\`timers\`, \`reminders\`, \`lookup\`, \`recipes\`, \`previewframe\`, \`previewsticker\`, \`top\`, \`topgroup\`, \`topwishlist\`, \`grouplist\`, \`birthdays\``,
         inline: true,
       })
       .addField({
@@ -108,7 +108,7 @@ export default class Help extends BaseCommand {
       })
       .addField({
         name: `Economy`,
-        value: `\`pay\`, \`shop\`, \`gift\`, \`giveitem\`, \`trade\``,
+        value: `\`pay\`, \`shop\`, \`gift\`, \`giveitem\`, \`trade\`, \`multitrade\``,
         inline: true,
       })
       .addField({
