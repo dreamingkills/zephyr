@@ -118,11 +118,11 @@ export abstract class CardGet extends DBClass {
     } else if (["luck", "lc"].includes(order)) {
       query += ` ORDER BY luck_coeff ${reverse ? `ASC` : `DESC`}`;
     } else if (["group", "g"].includes(order)) {
-      query += ` ORDER BY card_base.group_name ${reverse ? `DESC` : `ASC`}`;
+      query += ` ORDER BY subgroup.group_name ${reverse ? `DESC` : `ASC`}`;
     } else if (["name", "n"].includes(order)) {
       query += ` ORDER BY idol.idol_name ${reverse ? `DESC` : `ASC`}`;
     } else if (["subgroup", "sg"].includes(order)) {
-      query += ` ORDER BY card_base.subgroup_name ${reverse ? `DESC` : `ASC`}`;
+      query += ` ORDER BY subgroup.subgroup_name ${reverse ? `DESC` : `ASC`}`;
     } else query += ` ORDER BY user_card.id ${reverse ? `ASC` : `DESC`}`;
 
     query += ` LIMIT 10 OFFSET ${DB.connection.escape(
