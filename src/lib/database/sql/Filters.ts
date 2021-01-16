@@ -40,19 +40,19 @@ export class FilterService {
           );
       } else if (["name", "n", "member"].includes(prop)) {
         queryOptions.push(
-          ` (alphanum(card_base.individual_name)) LIKE CONCAT("%",alphanum(${DB.connection.escape(
+          ` (alphanum(idol.idol_name)) LIKE CONCAT("%",alphanum(${DB.connection.escape(
             value
           )}),"%")`
         );
       } else if (["group", "g"].includes(prop)) {
         queryOptions.push(
-          ` (alphanum(card_base.group_name)) LIKE CONCAT("%",alphanum(${DB.connection.escape(
+          ` (alphanum(subgroup.group_name)) LIKE CONCAT("%",alphanum(${DB.connection.escape(
             value
           )}),"%")`
         );
       } else if (["subgroup", "sg"].includes(prop)) {
         queryOptions.push(
-          ` alphanum(card_base.subgroup_name) LIKE CONCAT("%",alphanum(${DB.connection.escape(
+          ` alphanum(subgroup.subgroup_name) LIKE CONCAT("%",alphanum(${DB.connection.escape(
             value
           )}), "%")`
         );

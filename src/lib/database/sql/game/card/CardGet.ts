@@ -96,7 +96,7 @@ export abstract class CardGet extends DBClass {
     tags: GameTag[]
   ): Promise<GameUserCard[]> {
     let query = `SELECT user_card.* FROM user_card 
-                  LEFT JOIN card_base ON user_card.card_id=card_base.id WHERE discord_id=${DB.connection.escape(
+                  LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE discord_id=${DB.connection.escape(
                     profile.discordId
                   )}`;
     const queryOptions = FilterService.parseOptions(options, tags);
@@ -120,9 +120,7 @@ export abstract class CardGet extends DBClass {
     } else if (["group", "g"].includes(order)) {
       query += ` ORDER BY card_base.group_name ${reverse ? `DESC` : `ASC`}`;
     } else if (["name", "n"].includes(order)) {
-      query += ` ORDER BY card_base.individual_name ${
-        reverse ? `DESC` : `ASC`
-      }`;
+      query += ` ORDER BY idol.idol_name ${reverse ? `DESC` : `ASC`}`;
     } else if (["subgroup", "sg"].includes(order)) {
       query += ` ORDER BY card_base.subgroup_name ${reverse ? `DESC` : `ASC`}`;
     } else query += ` ORDER BY user_card.id ${reverse ? `ASC` : `DESC`}`;
