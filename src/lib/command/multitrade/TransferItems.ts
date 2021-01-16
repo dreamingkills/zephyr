@@ -42,7 +42,7 @@ export async function transferItems(
   }
   if (cubits > 0) {
     await ProfileService.addCubits(receiver, cubits);
-    await ProfileService.removeBitsFromProfile(giver, bits);
+    await ProfileService.removeCubits(giver, cubits);
   }
 
   return;

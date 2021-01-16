@@ -19,6 +19,9 @@ export default class MultiTrade extends BaseCommand {
     const targetUser = msg.mentions[0];
     if (!targetUser) throw new ZephyrError.InvalidMentionError();
 
+    if (targetUser.id === msg.author.id)
+      throw new ZephyrError.UnacceptableTradeTargetError();
+
     const targetProfile = await ProfileService.getProfile(targetUser.id);
 
     const tradeMessage = await this.send(
