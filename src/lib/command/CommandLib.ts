@@ -46,8 +46,8 @@ export class CommandLib {
 
     const commandName = commandNameRegExp[0].slice(prefix.length);
 
-    const commandMatch = this.commands.filter(
-      (c) => c.names.indexOf(commandName) > -1
+    const commandMatch = this.commands.filter((c) =>
+      c.names.includes(commandName)
     );
     if (!commandMatch[0]) return;
 
@@ -58,7 +58,7 @@ export class CommandLib {
 
     if (
       command.developerOnly &&
-      zephyr.config.developers.indexOf(message.author.id) < 0
+      !zephyr.config.developers.includes(message.author.id)
     ) {
       const embed = new MessageEmbed()
         .setAuthor(

@@ -111,19 +111,19 @@ export abstract class CardGet extends DBClass {
     const reverse = order?.startsWith("!");
     if (reverse) order = order.slice(1);
 
-    if (["issue", "i", "serial"].indexOf(order) > -1) {
+    if (["issue", "i", "serial"].includes(order)) {
       query += ` ORDER BY serial_number ${reverse ? `DESC` : `ASC`}`;
-    } else if (["wear", "w"].indexOf(order) > -1) {
+    } else if (["wear", "w"].includes(order)) {
       query += ` ORDER BY wear ${reverse ? `ASC` : `DESC`}`;
-    } else if (["luck", "lc"].indexOf(order) > -1) {
+    } else if (["luck", "lc"].includes(order)) {
       query += ` ORDER BY luck_coeff ${reverse ? `ASC` : `DESC`}`;
-    } else if (["group", "g"].indexOf(order) > -1) {
+    } else if (["group", "g"].includes(order)) {
       query += ` ORDER BY card_base.group_name ${reverse ? `DESC` : `ASC`}`;
-    } else if (["name", "n"].indexOf(order) > -1) {
+    } else if (["name", "n"].includes(order)) {
       query += ` ORDER BY card_base.individual_name ${
         reverse ? `DESC` : `ASC`
       }`;
-    } else if (["subgroup", "sg"].indexOf(order) > -1) {
+    } else if (["subgroup", "sg"].includes(order)) {
       query += ` ORDER BY card_base.subgroup_name ${reverse ? `DESC` : `ASC`}`;
     } else query += ` ORDER BY user_card.id ${reverse ? `ASC` : `DESC`}`;
 

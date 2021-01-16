@@ -96,7 +96,7 @@ export default class MultiTrade extends BaseCommand {
       let [senderAccepted, recipientAccepted] = [false, false];
 
       const messageFilter = (m: Message) =>
-        [targetUser.id, msg.author.id].indexOf(m.author.id) > -1;
+        [targetUser.id, msg.author.id].includes(m.author.id);
       const messageCollector = new MessageCollector(
         this.zephyr,
         msg.channel,
@@ -150,8 +150,8 @@ export default class MultiTrade extends BaseCommand {
         emoji: PartialEmoji,
         userId: string
       ) =>
-        [targetUser.id, msg.author.id].indexOf(userId) > -1 &&
-        ["❌", "🔒", "☑"].indexOf(emoji.name) > -1;
+        [targetUser.id, msg.author.id].includes(userId) &&
+        ["❌", "🔒", "☑"].includes(emoji.name);
       const reactionCollector = new ReactionCollector(
         this.zephyr,
         tradeMessage,

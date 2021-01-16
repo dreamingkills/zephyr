@@ -80,7 +80,7 @@ export default class Trade extends BaseCommand {
     collector.on(
       "collect",
       async (_m: Message, _emoji: PartialEmoji, userId: string) => {
-        if (confirmed.indexOf(userId) < 0) confirmed.push(userId);
+        if (!confirmed.includes(userId)) confirmed.push(userId);
 
         if (confirmed.length === 2) {
           const recheckTraderCard = await traderCard.fetch();

@@ -58,9 +58,9 @@ export default class CardLookup extends BaseCommand {
           find
             .map(
               (u, index) =>
-                `— \`${index + 1}\` ${u.group ? `**${u.group}** ` : ``}${
-                  u.name
-                }${u.subgroup ? ` (${u.subgroup})` : ``}`
+                `— \`${index + 1}\` **${u.group || `Soloist`}** ${u.name}${
+                  u.subgroup ? ` (${u.subgroup})` : ``
+                }`
             )
             .join("\n")
       );
