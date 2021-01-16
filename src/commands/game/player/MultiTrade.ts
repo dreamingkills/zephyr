@@ -33,7 +33,7 @@ export default class MultiTrade extends BaseCommand {
         this.zephyr,
         tradeMessage,
         filter,
-        { time: 5000, max: 1 }
+        { time: 15000, max: 1 }
       );
       collector.on("error", (e: Error) => this.handleError(msg, e));
 
@@ -156,7 +156,6 @@ export default class MultiTrade extends BaseCommand {
         reactionFilter,
         {
           time: 300000,
-          dispose: true,
         }
       );
 
