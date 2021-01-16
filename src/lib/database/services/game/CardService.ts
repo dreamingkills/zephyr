@@ -1,10 +1,5 @@
 import { createCanvas, loadImage, Image } from "canvas";
-import {
-  GameBaseCard,
-  GameFrame,
-  Member,
-  Subgroup,
-} from "../../../../structures/game/BaseCard";
+import { GameBaseCard, GameFrame } from "../../../../structures/game/BaseCard";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameUserCard } from "../../../../structures/game/UserCard";
 import { Filter } from "../../sql/Filters";
@@ -448,18 +443,6 @@ export abstract class CardService {
   ): Promise<GameUserCard> {
     await CardSet.setCardDye(card, dye);
     return await card.fetch();
-  }
-
-  public static async findSubgroups(subgroup: string): Promise<Subgroup[]> {
-    return await CardGet.findSubgroups(subgroup);
-  }
-
-  public static async findGroups(group: string): Promise<string[]> {
-    return await CardGet.findGroups(group);
-  }
-
-  public static async findIndividuals(individual: string): Promise<Member[]> {
-    return await CardGet.findIndividuals(individual);
   }
 
   /*
