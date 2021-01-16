@@ -14,26 +14,9 @@ export default class TopGroup extends BaseCommand {
   usage = ["$CMD$ <group name>"];
   allowDm = true;
 
-  private async renderBody(
-    collectors: { discordId: string; amount: number }[],
-    page: number
-  ): Promise<string> {
-    let description = "";
-    const pad = `#${page * 10}`.length;
-    for (let col of collectors) {
-      const user = await this.zephyr.fetchUser(col.discordId);
-      const profile = await ProfileService.getProfile(col.discordId);
-      description += `\`${(
-        `#` + (page * 10 - 10 + collectors.indexOf(col) + 1).toString()
-      ).padStart(pad, " ")}\` ${
-        profile.private ? `*Private User*` : user ? user.tag : "*Unknown User*"
-      } — **${col.amount.toLocaleString()}** cards\n`;
-    }
-    return description;
-  }
   async exec(
     msg: Message,
-    _profile: GameProfile,
+    profile: GameProfile,
     options: string[]
   ): Promise<void> {
     const groupRaw = options.join(" ").toLowerCase();
@@ -74,7 +57,7 @@ export default class TopGroup extends BaseCommand {
           10 * page > topCollectorCount ? topCollectorCount : 10 * page
         })`
       )
-      .setDescription(await this.renderBody(topCollectors, page))
+      .setDescription(await this.renderBody(topCollectors, page, profile))
       .setFooter(
         `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${topCollectorCount.toLocaleString()} entries`
       );
@@ -115,7 +98,9 @@ export default class TopGroup extends BaseCommand {
             10 * page > topCollectorCount ? topCollectorCount : 10 * page
           })`
         );
-        embed.setDescription(await this.renderBody(newTopCollectors, page));
+        embed.setDescription(
+          await this.renderBody(newTopCollectors, page, profile)
+        );
         embed.setFooter(
           `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${topCollectorCount.toLocaleString()} entries`
         );
@@ -126,5 +111,28 @@ export default class TopGroup extends BaseCommand {
       }
     );
     return;
+  }
+
+  private async renderBody(
+    collectors: { discordId: string; amount: number }[],
+    page: number,
+    sender: GameProfile
+  ): Promise<string> {
+    let description = "";
+    const pad = `#${page * 10}`.length;
+    for (let col of collectors) {
+      const user = await this.zephyr.fetchUser(col.discordId);
+      const profile = await ProfileService.getProfile(col.discordId);
+      description += `\`${(
+        `#` + (page * 10 - 10 + collectors.indexOf(col) + 1).toString()
+      ).padStart(pad, " ")}\` ${
+        profile.private && profile.discordId !== sender.discordId
+          ? `*Private User*`
+          : user
+          ? user.tag
+          : "*Unknown User*"
+      } — **${col.amount.toLocaleString()}** cards\n`;
+    }
+    return description;
   }
 }
