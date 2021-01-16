@@ -272,6 +272,12 @@ export class NoFrameSpecifiedError extends ZephyrError {
   }
 }
 
+export class CannotRemoveFrameError extends ZephyrError {
+  constructor() {
+    super(`You cannot remove that frame.`);
+  }
+}
+
 /*
     Timers
             */
