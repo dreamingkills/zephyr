@@ -4,7 +4,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, escapeMarkdown } from "../../../lib/ZephyrUtils";
 import { ReactionCollector } from "eris-collector";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 
@@ -129,7 +129,7 @@ export default class TopGroup extends BaseCommand {
         profile.private && profile.discordId !== sender.discordId
           ? `*Private User*`
           : user
-          ? user.tag
+          ? escapeMarkdown(user.tag)
           : "*Unknown User*"
       } — **${col.amount.toLocaleString()}** cards\n`;
     }
