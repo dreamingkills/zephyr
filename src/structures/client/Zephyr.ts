@@ -19,6 +19,7 @@ import { AnticheatService } from "../../lib/database/services/meta/AnticheatServ
 import dblapi from "dblapi.js";
 import { GameSticker } from "../game/Sticker";
 import { createMessage } from "../../lib/discord/message/createMessage";
+import dayjs from "dayjs";
 
 export class Zephyr extends Client {
   version: string = "Artemisia";
@@ -264,6 +265,7 @@ export class Zephyr extends Client {
     amount: number,
     wishlist: GameWishlist[] = []
   ): GameBaseCard[] {
+    const today = dayjs().format(`MM-DD`);
     const cards: GameBaseCard[] = [];
     const eligibleCards = Object.values(this.cards).filter((c) => c.rarity > 0);
     if (wishlist.length > 0) {
@@ -277,7 +279,9 @@ export class Zephyr extends Client {
       }
     }
 
-    const weightings = eligibleCards.map((c) => c.rarity);
+    const weightings = eligibleCards.map(
+      (c) => c.rarity + (c.birthday?.slice(5) === today ? 150 : 0)
+    );
 
     while (cards.length < amount) {
       const randomCard = this.chance.weighted(eligibleCards, weightings);
