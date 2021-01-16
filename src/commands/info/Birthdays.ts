@@ -19,17 +19,19 @@ export default class Birthdays extends BaseCommand {
       }
     });
 
-    const embed = new MessageEmbed(`Birthdays`, msg.author).setDescription(
-      birthdays.length === 0
-        ? `:confused: There are no birthdays today.`
-        : `:birthday: Today's birthdays are...\n` +
-            birthdays
-              .map((c) => {
-                const age = dayjs().year() - dayjs(c.birthday).year();
-                return `— **${c.group || `Soloist`}** ${c.name} (${age})`;
-              })
-              .join("\n")
-    );
+    const embed = new MessageEmbed(`Birthdays`, msg.author)
+      .setDescription(
+        birthdays.length === 0
+          ? `:confused: There are no birthdays today.`
+          : `:birthday: Today's birthdays are...\n` +
+              birthdays
+                .map((c) => {
+                  const age = dayjs().year() - dayjs(c.birthday).year();
+                  return `— **${c.group || `Soloist`}** ${c.name} (${age})`;
+                })
+                .join("\n")
+      )
+      .setFooter(`All idols have a 2.5x droprate on their birthday!`);
 
     await this.send(msg.channel, embed);
     return;
