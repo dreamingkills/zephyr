@@ -14,56 +14,6 @@ export default class CardLookup extends BaseCommand {
   usage = ["$CMD$ <name>"];
   allowDm = true;
 
-  private async getCardStats(
-    card: GameBaseCard,
-    author: User
-  ): Promise<MessageEmbed> {
-    card = await this.zephyr.refreshCard(card.id);
-    const timesDestroyed = await CardService.getTimesCardDestroyed(
-      card,
-      this.zephyr
-    );
-    const timesWishlisted = await CardService.getTimesCardWishlisted(card);
-    const avgClaimTime = await CardService.getAverageClaimTime(card);
-    const wearSpread = await CardService.getCardWearSpread(card, this.zephyr);
-
-    const embed = new MessageEmbed().setAuthor(
-      `Lookup | ${author.tag}`,
-      author.dynamicAvatarURL("png")
-    );
-
-    embed
-      //.setTitle(`Lookup - ${card.group ? `${card.group} ` : ``}${card.name}`)
-      .setDescription(
-        `Name — **${card.name}**` +
-          (card.group ? `\nGroup — **${card.group}**` : ``) +
-          (card.subgroup ? `\nTheme — **${card.subgroup}**` : ``) +
-          `\n\n**${
-            card.name
-          }** is on **${timesWishlisted.toLocaleString()}** wishlists.` +
-          `\n\nTotal generated: **${card.totalGenerated.toLocaleString()}**` +
-          `\nTotal claimed: **${card.serialTotal.toLocaleString()}**` +
-          `\nTotal burned: **${timesDestroyed.toLocaleString()}**` +
-          `\n\nClaim rate: **${(
-            (card.serialTotal / Math.max(card.totalGenerated, 1)) *
-            100
-          ).toFixed(2)}%**` +
-          `\nAverage claim time: **${Math.max(
-            avgClaimTime / 1000 - 5,
-            0
-          ).toFixed(2)}s**\n\n` +
-          `**Condition Spread**` +
-          `\n— \`☆☆☆☆☆\` **${wearSpread[0].toLocaleString()}**` +
-          `\n— \`★☆☆☆☆\` **${wearSpread[1].toLocaleString()}**` +
-          `\n— \`★★☆☆☆\` **${wearSpread[2].toLocaleString()}**` +
-          `\n— \`★★★☆☆\` **${wearSpread[3].toLocaleString()}**` +
-          `\n— \`★★★★☆\` **${wearSpread[4].toLocaleString()}**` +
-          `\n— \`★★★★★\` **${wearSpread[5].toLocaleString()}**`
-      );
-
-    return embed;
-  }
-
   async exec(
     msg: Message,
     profile: GameProfile,
@@ -84,15 +34,17 @@ export default class CardLookup extends BaseCommand {
       return;
     }
 
-    const find = this.zephyr
-      .getCards()
-      .filter((c) => c.name.toLowerCase() === nameQuery.toLowerCase());
+    const find = this.zephyr.getCards().filter((c) => {
+      return c.name.toLowerCase() === nameQuery.toLowerCase();
+    });
 
     if (!find[0]) throw new ZephyrError.InvalidLookupQueryError();
 
     if (find.length === 1) {
       const embed = await this.getCardStats(find[0], msg.author);
-      await this.send(msg.channel, embed);
+      await this.send(msg.channel, embed, {
+        file: { file: find[0].image, name: `card.png` },
+      });
       return;
     }
 
@@ -130,7 +82,10 @@ export default class CardLookup extends BaseCommand {
         find[parseInt(m.content) - 1],
         msg.author
       );
-      await this.send(msg.channel, embed);
+
+      await this.send(msg.channel, embed, {
+        file: { file: find[parseInt(m.content) - 1].image, name: `card.png` },
+      });
       return;
     });
     collector.on("end", async (_c: any, reason: string) => {
@@ -140,5 +95,57 @@ export default class CardLookup extends BaseCommand {
         });
       }
     });
+  }
+
+  private async getCardStats(
+    card: GameBaseCard,
+    author: User
+  ): Promise<MessageEmbed> {
+    card = await this.zephyr.refreshCard(card.id);
+    const timesDestroyed = await CardService.getTimesCardDestroyed(
+      card,
+      this.zephyr
+    );
+    const timesWishlisted = await CardService.getTimesCardWishlisted(card);
+    const avgClaimTime = await CardService.getAverageClaimTime(card);
+    const wearSpread = await CardService.getCardWearSpread(card, this.zephyr);
+
+    const embed = new MessageEmbed().setAuthor(
+      `Lookup | ${author.tag}`,
+      author.dynamicAvatarURL("png")
+    );
+
+    embed
+      //.setTitle(`Lookup - ${card.group ? `${card.group} ` : ``}${card.name}`)
+      .setDescription(
+        `Name — **${card.name}**` +
+          (card.group ? `\nGroup — **${card.group}**` : ``) +
+          (card.subgroup ? `\nTheme — **${card.subgroup}**` : ``) +
+          (card.birthday ? `\nBirthday — **${card.birthday}**` : ``) +
+          `\n\n**${
+            card.name
+          }** is on **${timesWishlisted.toLocaleString()}** wishlists.` +
+          `\n\nTotal generated: **${card.totalGenerated.toLocaleString()}**` +
+          `\nTotal claimed: **${card.serialTotal.toLocaleString()}**` +
+          `\nTotal burned: **${timesDestroyed.toLocaleString()}**` +
+          `\n\nClaim rate: **${(
+            (card.serialTotal / Math.max(card.totalGenerated, 1)) *
+            100
+          ).toFixed(2)}%**` +
+          `\nAverage claim time: **${Math.max(
+            avgClaimTime / 1000 - 5,
+            0
+          ).toFixed(2)}s**\n\n` +
+          `**Condition Spread**` +
+          `\n— \`☆☆☆☆☆\` **${wearSpread[0].toLocaleString()}**` +
+          `\n— \`★☆☆☆☆\` **${wearSpread[1].toLocaleString()}**` +
+          `\n— \`★★☆☆☆\` **${wearSpread[2].toLocaleString()}**` +
+          `\n— \`★★★☆☆\` **${wearSpread[3].toLocaleString()}**` +
+          `\n— \`★★★★☆\` **${wearSpread[4].toLocaleString()}**` +
+          `\n— \`★★★★★\` **${wearSpread[5].toLocaleString()}**`
+      )
+      .setThumbnail(`attachment://card.png`);
+
+    return embed;
   }
 }
