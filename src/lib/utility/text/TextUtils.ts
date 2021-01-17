@@ -3,7 +3,7 @@ import { GameDye } from "../../../structures/game/Dye";
 import { Recipe } from "../../../structures/game/Recipe";
 import { GameTag } from "../../../structures/game/Tag";
 import { GameUserCard } from "../../../structures/game/UserCard";
-import { items } from "../../../assets/items.json";
+import items from "../../../assets/items.json";
 
 export function strToInt(text: string): number {
   let result = parseInt(text.replace(/[, ]+/g, ""), 10);

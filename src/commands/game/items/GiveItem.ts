@@ -41,7 +41,7 @@ export default class GiveItem extends BaseCommand {
     const baseItems: BaseItem[] = [];
 
     for (let i of itemsRaw) {
-      const target = items.items.filter(
+      const target = items.filter(
         (t) => t.name.toLowerCase() === i.toLowerCase()
       );
 

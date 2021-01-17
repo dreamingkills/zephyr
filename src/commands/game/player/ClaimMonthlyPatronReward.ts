@@ -5,7 +5,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { items } from "../../../assets/items.json";
+import items from "../../../assets/items.json";
 import { BaseItem } from "../../../structures/game/Item";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { PatreonService } from "../../../lib/database/services/meta/PatreonService";

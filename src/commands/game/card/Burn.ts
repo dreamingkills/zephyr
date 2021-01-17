@@ -7,7 +7,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
-import { items } from "../../../assets/items.json";
+import items from "../../../assets/items.json";
 import { BaseItem } from "../../../structures/game/Item";
 import { GameDye } from "../../../structures/game/Dye";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";

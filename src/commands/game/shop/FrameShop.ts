@@ -25,7 +25,7 @@ export default class FrameShop extends BaseCommand {
     const subcommand = options[0]?.toLowerCase();
     if (subcommand === "buy") {
       const frameName = options.slice(1).join(" ")?.toLowerCase();
-      const itemFind = items.items.filter(
+      const itemFind = items.filter(
         (i) =>
           i.name.toLowerCase() === frameName + " frame" ||
           i.name.toLowerCase() === frameName

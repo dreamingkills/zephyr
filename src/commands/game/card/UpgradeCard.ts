@@ -9,7 +9,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { Dust } from "../../../structures/game/Dust";
-import { items } from "../../../assets/items.json";
+import items from "../../../assets/items.json";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 
 export default class UpgradeCard extends BaseCommand {

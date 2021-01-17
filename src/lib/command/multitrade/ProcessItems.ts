@@ -1,6 +1,6 @@
 import { CardService } from "../../database/services/game/CardService";
 import { ProfileService } from "../../database/services/game/ProfileService";
-import { items } from "../../../assets/items.json";
+import items from "../../../assets/items.json";
 import { strToInt } from "../../utility/text/TextUtils";
 
 export async function processItems(

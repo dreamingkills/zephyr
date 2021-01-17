@@ -7,7 +7,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { ReactionCollector } from "eris-collector";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseItem } from "../../../structures/game/Item";
-import { items } from "../../../assets/items.json";
+import items from "../../../assets/items.json";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 
 export default class BurnUntagged extends BaseCommand {

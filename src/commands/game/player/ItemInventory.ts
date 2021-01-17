@@ -20,9 +20,7 @@ export default class ItemInventory extends BaseCommand {
       return (
         inv
           .map((i) => {
-            const itemEntry = items.items.filter(
-              (item) => item.id === i.itemId
-            )[0];
+            const itemEntry = items.filter((item) => item.id === i.itemId)[0];
             return `— \`${itemEntry.name}\` **x${i.quantity}**`;
           })
           .join("\n") + `\n\nCheck \`${prefix}help use\` for usage information.`

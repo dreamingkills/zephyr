@@ -28,7 +28,7 @@ export default class UseItem extends BaseCommand {
     if (!options[0]) throw new ZephyrError.UnspecifiedItemError();
 
     const target = options.join(" ")?.toLowerCase();
-    const targetItem = items.items.filter((i) =>
+    const targetItem = items.filter((i) =>
       target.includes(i.name.toLowerCase())
     )[0] as BaseItem | undefined;
 
