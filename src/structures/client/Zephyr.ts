@@ -117,7 +117,11 @@ export class Zephyr extends Client {
       }
 
       // check if we're allowed to send messages to this channel
-      if (!message.textChannel.permissionsOf(this.user.id).json["sendMessages"])
+      if (
+        !(<TextChannel>message.channel).permissionsOf(this.user.id).json[
+          "sendMessages"
+        ]
+      )
         return;
 
       // Prefix resetter
