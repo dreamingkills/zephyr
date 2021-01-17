@@ -112,6 +112,11 @@ export default class Help extends BaseCommand {
         inline: true,
       })
       .addField({
+        name: `Album`,
+        value: `\`album\`, \`albums\`, \`renamealbum\`, \`addcardtoalbum\`, \`removecardfromalbum\``,
+        inline: true,
+      })
+      .addField({
         name: `Misc`,
         value: `\`patreon\`, \`stats\`, \`vote\``,
         inline: true,
