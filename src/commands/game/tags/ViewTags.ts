@@ -39,15 +39,13 @@ export default class ViewTags extends BaseCommand {
     const userTags = await ProfileService.getTags(target);
     userTags.sort((a, b) => (a.name[0] > b.name[0] ? 1 : -1));
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Tag List | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(`Tag List`, msg.author)
       .setTitle(`${targetUser.tag}'s tags`)
       .setDescription(
         userTags.length === 0
-          ? `You have no tags.`
+          ? targetUser.id === msg.author.id
+            ? `You have no tags.`
+            : `**${targetUser.tag}** has no tags.`
           : `${userTags
               .map((t) => {
                 return `${t.emoji} — \`${t.name}\``;
