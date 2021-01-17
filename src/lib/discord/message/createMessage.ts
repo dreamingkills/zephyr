@@ -63,7 +63,7 @@ export async function createMessage(
       message = sent;
     } catch (e) {
       if (e) {
-        errorCode = (e as string).match(/(?<=\[).+?(?=\])/g)?.[0];
+        errorCode = e.toString().match(/(?<=\[).+?(?=\])/g)?.[0];
       }
 
       /*
