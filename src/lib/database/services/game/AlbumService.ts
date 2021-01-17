@@ -102,15 +102,10 @@ export abstract class AlbumService {
     const canvas = createCanvas(1024, 700);
     const ctx = canvas.getContext("2d");
 
-    console.log("Point A");
-    console.log(album.backgroundUrl);
-
     const image = await loadImage(album.backgroundUrl);
     ctx.drawImage(image, 0, 0, 1024, 700);
 
-    console.log("Point B");
     for (let card of cards) {
-      console.log(`Point C - ${cards.indexOf(card)}`);
       const posX = 22 + 245 * (card.slot - Math.floor(card.slot / 4) * 4); // 25 + 350x
       const posY = 350 * Math.floor(card.slot / 4);
 
@@ -118,8 +113,6 @@ export abstract class AlbumService {
       const image = await loadImage(buffer);
       ctx.drawImage(image, posX, posY, 245, 350);
     }
-
-    console.log("Point C");
 
     const buf = canvas.toBuffer("image/jpeg");
     return Buffer.alloc(buf.length, buf, "base64");
@@ -134,12 +127,10 @@ export abstract class AlbumService {
     page: number,
     zephyr: Zephyr
   ): Promise<Buffer> {
-    console.log("Point 0");
     const collage = await this.generateAlbumImage(album, cards, page, zephyr);
 
     // fs will throw an error if the directory already exists.
     // TODO - Change this do detect directory, removing need for error handling.
-    console.log("Point 1");
     try {
       await fs.mkdir(`./cache/albums/${album.id}`);
     } catch (e) {}
@@ -148,14 +139,11 @@ export abstract class AlbumService {
     // The card image file stays in the temp folder while it's building.
     // Once it's finished, it's moved to the cache folder to avoid
     // showing users incomplete card images.
-    console.log("Point 2");
     await fs.writeFile(`./cache/albums/temp/${album.id}`, collage);
     await fs.rename(
       `./cache/albums/temp/${album.id}`,
       `./cache/albums/${album.id}/${page}`
     );
-
-    console.log("Point 3");
 
     return await fs.readFile(`./cache/albums/${album.id}/${page}`);
   }

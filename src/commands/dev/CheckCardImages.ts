@@ -27,7 +27,6 @@ export default class CheckCardImages extends BaseCommand {
     if (failed.length === 0) {
       embed.setDescription(`:ok_hand: All files were scanned successfully.`);
     } else {
-      console.log(failed);
       embed.setDescription(
         `**${failed.length}** file${
           failed.length === 1 ? `` : `s`

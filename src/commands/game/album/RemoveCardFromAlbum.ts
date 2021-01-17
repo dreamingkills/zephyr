@@ -35,15 +35,6 @@ export default class RemoveCardFromAlbum extends BaseCommand {
 
     await AlbumService.removeCardsFromAlbum([targetCard]);
 
-    console.log("poop");
-    console.log(
-      albumCards.filter(
-        (c) =>
-          c.card.id !== targetCard.id &&
-          c.slot >= page * 8 - 8 &&
-          c.slot <= page * 8
-      )
-    );
     await AlbumService.updateAlbumCache(
       isInAlbum,
       albumCards.filter(
@@ -55,8 +46,6 @@ export default class RemoveCardFromAlbum extends BaseCommand {
       page,
       this.zephyr
     );
-
-    console.log("fart");
 
     const embed = new MessageEmbed(`Remove Card`, msg.author).setDescription(
       `\`${targetCard.id.toString(
