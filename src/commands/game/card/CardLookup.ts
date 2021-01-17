@@ -19,26 +19,34 @@ export default class CardLookup extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    let nameQuery: string;
-    let baseCard: GameBaseCard | undefined;
     if (!options[0]) {
       const lastCard = await ProfileService.getLastCard(profile);
       const lastBase = this.zephyr.getCard(lastCard.baseCardId);
 
-      baseCard = lastBase;
-    } else nameQuery = options.join(" ")?.trim();
-
-    if (baseCard) {
-      const embed = await this.getCardStats(baseCard, msg.author);
+      const embed = await this.getCardStats(lastBase, msg.author);
       await this.send(msg.channel, embed);
       return;
     }
 
+    let nameQuery = options
+      .join(" ")
+      .toLowerCase()
+      .trim()
+      .replace(/([()])/g, ``);
+
+    if (!nameQuery) throw new ZephyrError.InvalidLookupQueryError();
+
     const find = this.zephyr.getCards().filter((c) => {
-      return c.name.toLowerCase() === nameQuery.toLowerCase();
+      return `${c.group ? c.group : ``} ${c.name} ${
+        c.subgroup ? c.subgroup : ``
+      }`
+        .trim()
+        .toLowerCase()
+        .includes(nameQuery);
     });
 
-    if (!find[0]) throw new ZephyrError.InvalidLookupQueryError();
+    if (!find[0]) throw new ZephyrError.NoResultsFoundInLookupError();
+    if (find.length > 25) throw new ZephyrError.LookupQueryTooBroadError();
 
     if (find.length === 1) {
       const embed = await this.getCardStats(find[0], msg.author);
@@ -54,7 +62,7 @@ export default class CardLookup extends BaseCommand {
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(
-        `I found multiple matches for **${find[0].name}**.\nPlease reply with a number to confirm which person you're talking about.\n` +
+        `I found multiple matches for **${nameQuery}**.\nPlease reply with a number to confirm which person you're talking about.\n` +
           find
             .map(
               (u, index) =>

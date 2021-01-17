@@ -123,9 +123,24 @@ export class InvalidHelpQueryError extends ZephyrError {
   }
 }
 
+/*
+    Lookup
+            */
 export class InvalidLookupQueryError extends ZephyrError {
   constructor() {
-    super(`Sorry, but I couldn't find anyone by that name.`);
+    super(`Please enter a valid search term.`);
+  }
+}
+
+export class NoResultsFoundInLookupError extends ZephyrError {
+  constructor() {
+    super(`I couldn't find anyone using that search term.`);
+  }
+}
+
+export class LookupQueryTooBroadError extends ZephyrError {
+  constructor() {
+    super(`That search is too broad. Please narrow it down.`);
   }
 }
 
