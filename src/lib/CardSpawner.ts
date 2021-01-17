@@ -307,6 +307,8 @@ export abstract class CardSpawner {
   }
 
   public static async processMessage(guild: Guild, user: User, zephyr: Zephyr) {
+    if (!zephyr.dropsEnabled) return;
+
     if (this.userCooldowns.has(user.id) || this.guildCooldowns.has(guild.id))
       // If they're on cooldown, ignore.
       return;
