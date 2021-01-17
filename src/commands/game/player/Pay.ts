@@ -6,6 +6,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ReactionCollector } from "eris-collector";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { strToInt } from "../../../lib/utility/text/TextUtils";
 
 export default class Pay extends BaseCommand {
   names = ["pay", "venmo", "paypal", "cashapp"];
@@ -28,7 +29,7 @@ export default class Pay extends BaseCommand {
     if (target.blacklisted)
       throw new ZephyrError.AccountBlacklistedOtherError();
 
-    const amount = parseInt(options.filter((p) => !isNaN(parseInt(p, 10)))[0]);
+    const amount = strToInt(options.filter((p) => !isNaN(parseInt(p, 10)))[0]);
 
     if (isNaN(amount) || amount < 1)
       throw new ZephyrError.InvalidAmountError("bits");
