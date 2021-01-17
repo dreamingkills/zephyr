@@ -3,6 +3,7 @@ import { ErisFile } from "../../../structures/client/ErisFile";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { isFile } from "../../ZephyrUtils";
+import { retryOperation } from "../Retry";
 
 function deriveFileExtension(url: string | Buffer): string {
   if (url instanceof Buffer) {
@@ -15,8 +16,8 @@ export async function createMessage(
   body: string | MessageEmbed | ErisFile,
   options?: { embed?: MessageEmbed; file?: ErisFile }
 ): Promise<Message<TextableChannel>> {
-  let embed;
-  let content;
+  let embed: MessageEmbed;
+  let content: string;
   let file: { file: string | Buffer; name: string } | undefined;
 
   if (isFile(body)) {
@@ -52,35 +53,18 @@ export async function createMessage(
     }
   }
 
-  let message;
+  let message: Message<TextableChannel>;
 
-  let attempts = 0;
-  let errorCode;
-  while (attempts < 3 && !message) {
-    try {
-      attempts++;
-      const sent = await channel.createMessage({ content, embed }, file);
-      message = sent;
-    } catch (e) {
-      if (e) {
-        errorCode = e.toString().match(/(?<=\[).+?(?=\])/g)?.[0];
-      }
-
-      /*
-        Discord Error Codes:
-          50007 - Cannot send messages to this user
-          50013 - Missing Permissions
-          50001 - Missing Access
-      */
-      if (errorCode && ["50007"].includes(errorCode)) break;
-
-      if (attempts === 3) {
-        console.log(
-          `Failed trying to send message with content ${content} in channel ${channel.id}. Full stack:\n${e}`
-        );
-      }
-    }
-  }
+  message = await retryOperation(
+    async () => channel.createMessage({ content, embed }, file),
+    3000,
+    3
+  ).catch((e) => {
+    console.log(
+      `Failed trying to send message with content ${content} in channel ${channel.id}. Full stack:\n${e}`
+    );
+    throw new ZephyrError.MessageFailedToSendError();
+  });
 
   if (!message) throw new ZephyrError.MessageFailedToSendError();
   return message;

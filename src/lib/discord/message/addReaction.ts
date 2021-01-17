@@ -1,27 +1,21 @@
 import { Message } from "eris";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { retryOperation } from "../Retry";
 
 export async function addReaction(
   message: Message,
   reaction: string
 ): Promise<void> {
-  let attempts = 0;
-  let completed = false;
+  await retryOperation(
+    async () => message.addReaction(reaction),
+    3000,
+    3
+  ).catch((e) => {
+    console.log(
+      `Failed trying to add reaction ${reaction} to message ${message.id}. Full stack:\n${e}`
+    );
+    throw new ZephyrError.FailedToAddReactionError();
+  });
 
-  while (attempts < 3 && !completed) {
-    try {
-      attempts++;
-      await message.addReaction(reaction);
-      completed = true;
-    } catch (e) {
-      if (attempts === 3) {
-        console.log(
-          `Failed trying to add reaction ${reaction} to message ${message.id}. Full stack:\n${e}`
-        );
-      }
-    }
-  }
-
-  if (!completed) throw new ZephyrError.FailedToAddReactionError();
   return;
 }

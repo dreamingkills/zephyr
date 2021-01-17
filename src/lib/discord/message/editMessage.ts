@@ -1,14 +1,15 @@
 import { Message, TextableChannel } from "eris";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { retryOperation } from "../Retry";
 
 export async function editMessage(
   msg: Message,
   body: string | MessageEmbed,
   options?: { embed?: MessageEmbed }
 ): Promise<Message<TextableChannel>> {
-  let embed;
-  let content;
+  let embed: MessageEmbed;
+  let content: string;
 
   if (body instanceof MessageEmbed) {
     embed = body;
@@ -20,23 +21,19 @@ export async function editMessage(
     }
   }
 
-  let message;
+  let message: Message<TextableChannel>;
 
-  let attempts = 0;
-  while (attempts < 3 && !message) {
-    try {
-      attempts++;
-      const sent = await msg.edit({ content, embed });
-      message = sent;
-    } catch (e) {
-      if (attempts === 3) {
-        console.log(
-          `Failed trying to edit message ${msg.id} with content ${content} in channel ${msg.channel.id}. Full stack:\n${e}`
-        );
-      }
-    }
-  }
+  message = await retryOperation(
+    async () => msg.edit({ content, embed }),
+    3000,
+    3
+  ).catch((e) => {
+    console.log(
+      `Failed trying to edit message ${msg.id} with content ${content} in channel ${msg.channel.id}. Full stack:\n${e}`
+    );
+    throw new ZephyrError.FailedToEditMessageError();
+  });
 
-  if (!message) throw new ZephyrError.MessageFailedToSendError();
+  if (!message) throw new ZephyrError.FailedToEditMessageError();
   return message;
 }
