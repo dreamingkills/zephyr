@@ -33,7 +33,6 @@ export abstract class CardGet extends DBClass {
   public static async getAllCards(): Promise<GameBaseCard[]> {
     const query = (await DB.query(`SELECT
                                     card_base.id,
-                                    flavor_text,
                                     subgroup.group_name,
                                     idol.idol_name,
                                     idol.birthday,
@@ -53,7 +52,6 @@ export abstract class CardGet extends DBClass {
     const query = (await DB.query(
       `SELECT
     card_base.id,
-    flavor_text,
     subgroup.group_name,
     idol.idol_name,
     idol.birthday,

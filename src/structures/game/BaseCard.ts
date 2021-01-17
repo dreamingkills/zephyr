@@ -2,7 +2,6 @@ import dayjs from "dayjs";
 
 export interface BaseCard {
   id: number;
-  flavor_text: string | null;
   group_name: string | null;
   idol_name: string;
   birthday: string;
@@ -39,7 +38,6 @@ export class GameBaseCard {
   birthday: string | undefined;
   constructor(card: BaseCard) {
     this.id = card.id;
-    this.flavor = card.flavor_text;
     this.group = card.group_name;
     this.subgroup = card.subgroup_name;
     this.name = card.idol_name;
