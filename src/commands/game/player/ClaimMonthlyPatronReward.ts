@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { Message } from "eris";
-import { getTimeUntil } from "../../../lib/ZephyrUtils";
+import { getTimeUntil } from "../../../lib/utility/time/TimeUtils";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";

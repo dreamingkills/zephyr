@@ -5,7 +5,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
-import { getDescriptions } from "../../../lib/ZephyrUtils";
+import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 
 export default class ViewUserCard extends BaseCommand {
   names = ["card", "show", "view", "v"];

@@ -6,10 +6,11 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { ReactionCollector } from "eris-collector";
-import { checkPermission, getDescriptions } from "../../../lib/ZephyrUtils";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { GameTag } from "../../../structures/game/Tag";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 
 export default class CardInventory extends BaseCommand {
   names = ["inventory", "inv", "i"];

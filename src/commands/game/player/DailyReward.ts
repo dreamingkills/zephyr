@@ -5,7 +5,8 @@ import { GameProfile } from "../../../structures/game/Profile";
 import dayjs from "dayjs";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { Chance } from "chance";
-import { getTimeUntil } from "../../../lib/ZephyrUtils";
+import { getTimeUntil } from "../../../lib/utility/time/TimeUtils";
+
 export default class DailyReward extends BaseCommand {
   names = ["daily"];
   description = "Shows you the status of your daily reward.";

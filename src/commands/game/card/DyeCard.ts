@@ -6,7 +6,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ReactionCollector } from "eris-collector";
-import { getDescriptions } from "../../../lib/ZephyrUtils";
+import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 
 export default class DyeCard extends BaseCommand {
   names = ["dye"];

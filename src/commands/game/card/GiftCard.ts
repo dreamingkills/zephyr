@@ -8,7 +8,7 @@ import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
-import { getDescriptions } from "../../../lib/ZephyrUtils";
+import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 
 export default class GiftCard extends BaseCommand {
   names = ["gift", "give"];

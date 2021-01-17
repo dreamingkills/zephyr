@@ -5,7 +5,7 @@ import { CardSpawner } from "../../../lib/CardSpawner";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import dayjs from "dayjs";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { getTimeUntil } from "../../../lib/ZephyrUtils";
+import { getTimeUntil } from "../../../lib/utility/time/TimeUtils";
 import { GuildService } from "../../../lib/database/services/guild/GuildService";
 
 export default class DropCards extends BaseCommand {

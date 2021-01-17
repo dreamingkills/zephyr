@@ -4,8 +4,9 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { ReactionCollector } from "eris-collector";
-import { checkPermission, escapeMarkdown } from "../../../lib/ZephyrUtils";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 import { Zephyr } from "../../../structures/client/Zephyr";
+import { escapeMarkdown } from "../../../lib/utility/text/TextUtils";
 
 export default class Leaderboards extends BaseCommand {
   names = ["leaderboards", "leaderboard", "top"];

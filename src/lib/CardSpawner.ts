@@ -7,7 +7,7 @@ import { ProfileService } from "./database/services/game/ProfileService";
 import { GameUserCard } from "../structures/game/UserCard";
 import { Chance } from "chance";
 import { Zephyr } from "../structures/client/Zephyr";
-import { getTimeUntil } from "../lib/ZephyrUtils";
+import { getTimeUntil } from "../lib/utility/time/TimeUtils";
 import dayjs from "dayjs";
 import { GuildService } from "./database/services/guild/GuildService";
 import { GameBaseCard } from "../structures/game/BaseCard";

@@ -7,7 +7,7 @@ import { items } from "../../../assets/items.json";
 import { BaseItem } from "../../../structures/game/Item";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
-import { renderRecipe } from "../../../lib/ZephyrUtils";
+import { renderRecipe } from "../../../lib/utility/text/TextUtils";
 import { Recipe } from "../../../structures/game/Recipe";
 import { ReactionCollector } from "eris-collector";
 

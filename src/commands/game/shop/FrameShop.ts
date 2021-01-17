@@ -7,7 +7,7 @@ import items from "../../../assets/items.json";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import dayjs from "dayjs";
-import { getTimeUntilNextDay } from "../../../lib/ZephyrUtils";
+import { getTimeUntilNextDay } from "../../../lib/utility/time/TimeUtils";
 
 export default class FrameShop extends BaseCommand {
   names = ["frameshop", "fs"];

@@ -3,7 +3,10 @@ import { GameProfile } from "../../../../../structures/game/Profile";
 import { ProfileService } from "../../../services/game/ProfileService";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { GameDye } from "../../../../../structures/game/Dye";
-import { getNearestColor, rgbToHex } from "../../../../ZephyrUtils";
+import {
+  getNearestColor,
+  rgbToHex,
+} from "../../../../utility/color/ColorUtils";
 import { BaseItem } from "../../../../../structures/game/Item";
 import { GameUserCard } from "../../../../../structures/game/UserCard";
 import dayjs from "dayjs";

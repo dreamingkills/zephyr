@@ -4,7 +4,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { rgbToHex } from "../../../lib/ZephyrUtils";
+import { rgbToHex } from "../../../lib/utility/color/ColorUtils";
 import { createCanvas } from "canvas";
 
 export default class ViewDye extends BaseCommand {

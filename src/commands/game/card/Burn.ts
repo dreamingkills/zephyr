@@ -10,7 +10,7 @@ import { GameUserCard } from "../../../structures/game/UserCard";
 import { items } from "../../../assets/items.json";
 import { BaseItem } from "../../../structures/game/Item";
 import { GameDye } from "../../../structures/game/Dye";
-import { getDescriptions } from "../../../lib/ZephyrUtils";
+import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 
 export default class BurnCard extends BaseCommand {
   names = ["burn", "b"];

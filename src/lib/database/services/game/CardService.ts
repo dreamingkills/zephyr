@@ -11,7 +11,7 @@ import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { GameTag } from "../../../../structures/game/Tag";
 import gm from "gm";
 import { GameDye } from "../../../../structures/game/Dye";
-import { rgbToCmy } from "../../../ZephyrUtils";
+import { rgbToCmy } from "../../../utility/color/ColorUtils";
 import { ProfileService } from "./ProfileService";
 import {
   GameCardSticker,

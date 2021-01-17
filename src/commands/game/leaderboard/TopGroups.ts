@@ -4,9 +4,10 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
-import { checkPermission, escapeMarkdown } from "../../../lib/ZephyrUtils";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 import { ReactionCollector } from "eris-collector";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
+import { escapeMarkdown } from "../../../lib/utility/text/TextUtils";
 
 export default class TopGroup extends BaseCommand {
   names = ["topgroup", "tg"];

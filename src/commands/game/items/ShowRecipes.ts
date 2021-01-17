@@ -2,7 +2,7 @@ import { Message } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { recipes } from "../../../assets/recipes.json";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
-import { renderRecipe } from "../../../lib/ZephyrUtils";
+import { renderRecipe } from "../../../lib/utility/text/TextUtils";
 
 export default class ShowRecipes extends BaseCommand {
   names = ["recipes"];
