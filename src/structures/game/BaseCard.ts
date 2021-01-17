@@ -24,7 +24,6 @@ export interface Frame {
 
 export class GameBaseCard {
   id: number;
-  flavor: string | null;
   group: string | null;
   subgroup: string | null;
   name: string;
