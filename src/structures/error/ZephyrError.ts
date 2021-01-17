@@ -1,3 +1,4 @@
+import { User } from "eris";
 import { BaseItem } from "../game/Item";
 import { GameTag } from "../game/Tag";
 import { GameUserCard } from "../game/UserCard";
@@ -668,5 +669,96 @@ export class FailedToEditMessageError extends ZephyrError {
     super(
       `There was a problem connecting to Discord, and a message could not be edited. Please try again in a few minutes.\nThis has been reported to the developer.`
     );
+  }
+}
+
+/*
+    Albums
+*/
+export class NonexistentAlbumIdError extends ZephyrError {
+  constructor() {
+    super(`No album exists with that ID.`);
+  }
+}
+
+export class NonexistentAlbumNameError extends ZephyrError {
+  constructor(target?: User) {
+    super(
+      (target ? `${target.tag} has` : `You have`) + ` no albums by that name.`
+    );
+  }
+}
+
+export class InvalidAlbumNameError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid album name.`);
+  }
+}
+
+export class InvalidAlbumNameCreationError extends ZephyrError {
+  constructor() {
+    super(
+      `Please enter a valid album name.\nThey must be **less than or equal to 12 characters** and contain **no spaces**.\nEmoji and symbols are **permitted**.`
+    );
+  }
+}
+
+export class UnspecifiedNewAlbumNameError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid name to change your album to.`);
+  }
+}
+
+export class AlbumNameTakenError extends ZephyrError {
+  constructor(name: string) {
+    super(`You already have an album named \`${name}\`.`);
+  }
+}
+
+export class NotEnoughAlbumPagesError extends ZephyrError {
+  constructor() {
+    super(`You don't have enough pages in your album for that.`);
+  }
+}
+
+export class AlbumFullError extends ZephyrError {
+  constructor() {
+    super(`That album is full!`);
+  }
+}
+
+export class AlbumPageFullError extends ZephyrError {
+  constructor() {
+    super(`That page is full!`);
+  }
+}
+
+export class AlbumSlotTakenError extends ZephyrError {
+  constructor() {
+    super(`That slot is already taken.`);
+  }
+}
+
+export class InvalidPageError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid page number.`);
+  }
+}
+
+export class InvalidSlotError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid slot.`);
+  }
+}
+
+export class CardInAlbumError extends ZephyrError {
+  constructor(card: GameUserCard) {
+    super(`\`${card.id.toString(36)}\` is already in an album.`);
+  }
+}
+
+export class CardNotInAlbumError extends ZephyrError {
+  constructor(card: GameUserCard) {
+    super(`\`${card.id.toString(36)}\` is not in an album.`);
   }
 }

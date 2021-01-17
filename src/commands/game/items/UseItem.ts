@@ -11,6 +11,7 @@ import chromajs from "chroma-js";
 import { createCanvas } from "canvas";
 import { ReactionCollector, MessageCollector } from "eris-collector";
 import { BaseItem } from "../../../structures/game/Item";
+import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 
 export default class UseItem extends BaseCommand {
   names = ["use"];
@@ -210,6 +211,41 @@ export default class UseItem extends BaseCommand {
           await this.send(msg.channel, embed, {
             file: { file: buf, name: "dye.png" },
           });
+          return;
+        } else if (targetItem.id === 38) {
+          const albums = await AlbumService.getAlbumsByProfile(profile);
+
+          const defaultAlbums = albums.filter((a) =>
+            a.name.toLowerCase().includes(`album`)
+          );
+
+          let unique =
+            defaultAlbums.length === 0 ? 0 : defaultAlbums.length + 1;
+
+          while (
+            !albums.filter((a) => a.name.toLowerCase() === `albums (${unique})`)
+          ) {
+            unique++;
+          }
+
+          const newAlbum = await AlbumService.createAlbum(
+            `album${unique === 0 ? `` : `(${unique})`}`,
+            profile
+          );
+
+          await ProfileService.removeItems(profile, [
+            { item: targetItem, count: 1 },
+          ]);
+
+          const embed = new MessageEmbed(
+            `Sealed Book`,
+            msg.author
+          ).setDescription(
+            `You unsealed the book and received an \`${newAlbum.name}\`.`
+          );
+
+          await this.send(msg.channel, embed);
+          return;
         }
         break;
       }
