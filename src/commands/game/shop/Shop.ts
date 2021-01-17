@@ -2,7 +2,7 @@ import { EmbedField, Message, PartialEmoji } from "eris";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
-import shop from "../../../assets/cubitshop.json";
+import shop from "../../../assets/shop.json";
 import items from "../../../assets/items.json";
 import { ReactionCollector } from "eris-collector";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
@@ -51,6 +51,10 @@ export default class Shop extends BaseCommand {
           name: `:one: Cubit Shop`,
           value: `Purchase cosmetics for your cards.`,
         },
+        {
+          name: `:two: Bit Shop`,
+          value: `Purchase useful items...`,
+        },
       ]);
 
       const facade = await this.send(msg.channel, embed);
@@ -76,6 +80,14 @@ export default class Shop extends BaseCommand {
           embed.setFooter(
             `Use ${prefix}shop buy <item> to purchase something!`
           );
+        } else if (emoji.name === `2️⃣`) {
+          const rendered = this.renderShop(`bits`);
+
+          embed.setDescription(`Viewing the **Bit** shop...`);
+          embed.fields = [...embed.fields, ...rendered];
+          embed.setFooter(
+            `Use ${prefix}shop buy <item> to purchase something!`
+          );
         }
 
         await facade.edit({ embed });
@@ -95,6 +107,7 @@ export default class Shop extends BaseCommand {
       });
 
       await this.react(facade, `1️⃣`);
+      await this.react(facade, `2️⃣`);
       return;
     }
 
@@ -104,21 +117,24 @@ export default class Shop extends BaseCommand {
 
       if (!targetItem) throw new ZephyrError.InvalidItemError();
 
-      const cubitShopProduct = shop.find((p) => p.itemId === targetItem.id);
+      const shopProduct = [...shop.bits, ...shop.cubits].find(
+        (p) => p.itemId === targetItem.id
+      );
 
-      if (cubitShopProduct) {
-        const cubitPrice = cubitShopProduct.price;
-        if (profile.cubits < cubitPrice)
-          throw new ZephyrError.NotEnoughCubitsError(
-            profile.cubits,
-            cubitPrice
+      if (shopProduct) {
+        const price = shopProduct.price;
+        const currency = shop.bits.includes(shopProduct) ? `bits` : `cubits`;
+        if (profile[currency] < price)
+          throw new ZephyrError.NotEnoughCurrencyToBuyError(
+            currency,
+            profile[currency]
           );
 
         const embed = new MessageEmbed(
           `Confirm Purchase`,
           msg.author
         ).setDescription(
-          `Really purchase **1x** \`${targetItem.name}\` for \`${cubitPrice}\` cubits?`
+          `Really purchase **1x** \`${targetItem.name}\` for \`${price}\` ${currency}?`
         );
         const confirmation = await this.send(msg.channel, embed);
 
@@ -135,7 +151,11 @@ export default class Shop extends BaseCommand {
         });
 
         collector.on("collect", async () => {
-          await ProfileService.removeCubits(profile, cubitPrice);
+          if (currency === `cubits`) {
+            await ProfileService.removeCubits(profile, price);
+          } else if (currency === `bits`) {
+            await ProfileService.removeBitsFromProfile(profile, price);
+          }
           await ProfileService.addItems(profile, [
             { item: targetItem, count: 1 },
           ]);
@@ -144,7 +164,7 @@ export default class Shop extends BaseCommand {
             `Purchase Successful`,
             msg.author
           ).setDescription(
-            `You purchased **1x** \`${targetItem.name}\` for \`${cubitPrice}\` cubits.`
+            `You purchased **1x** \`${targetItem.name}\` for \`${price}\` ${currency}.`
           );
 
           await this.send(msg.channel, embed);
@@ -174,17 +194,32 @@ export default class Shop extends BaseCommand {
     CONSUMABLE: `🍹`,
   };
 
-  private renderShop(type: `cubits`): EmbedField[] {
+  private renderShop(type: `cubits` | `bits`): EmbedField[] {
     switch (type) {
       case `cubits`: {
         let products = [];
-        for (let item of shop) {
+        for (let item of shop.cubits) {
           const baseItem = items.find((i) => i.id === item.itemId);
 
           if (!baseItem) continue;
           products.push({
             name: `${this.emojis[baseItem.type]} ${baseItem.name}`,
             value: `:package: \`${item.price.toLocaleString()}\` cubits`,
+          });
+        }
+        return products;
+      }
+      case `bits`: {
+        let products = [];
+        for (let item of shop.bits) {
+          const baseItem = items.find((i) => i.id === item.itemId);
+
+          if (!baseItem) continue;
+          products.push({
+            name: `${this.emojis[baseItem.type]} ${baseItem.name}`,
+            value: `${
+              this.zephyr.config.discord.emoji.bits
+            } \`${item.price.toLocaleString()}\` bits`,
           });
         }
         return products;

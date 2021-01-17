@@ -762,3 +762,9 @@ export class CardNotInAlbumError extends ZephyrError {
     super(`\`${card.id.toString(36)}\` is not in an album.`);
   }
 }
+
+export class NotEnoughCurrencyToBuyError extends ZephyrError {
+  constructor(type: string, amount: number) {
+    super(`You need **${amount.toLocaleString()} ${type}** to buy that.`);
+  }
+}
