@@ -1,6 +1,7 @@
 import { CardService } from "../../database/services/game/CardService";
 import { ProfileService } from "../../database/services/game/ProfileService";
 import { items } from "../../../assets/items.json";
+import { strToInt } from "../../utility/text/TextUtils";
 
 export async function processItems(
   stringItems: string[]
@@ -26,7 +27,7 @@ export async function processItems(
 
     if (split.length === 2) {
       if (split[1] === "bits") {
-        const amount = parseInt(split[0], 10);
+        const amount = strToInt(split[0]);
 
         if (!isNaN(amount) && amount > 0) {
           bits = (bits || 0) + amount;
@@ -35,7 +36,7 @@ export async function processItems(
       }
 
       if (split[1] === "cubits") {
-        const amount = parseInt(split[0], 10);
+        const amount = strToInt(split[0]);
 
         if (!isNaN(amount) && amount > 0) {
           cubits = (cubits || 0) + amount;

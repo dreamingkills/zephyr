@@ -256,9 +256,11 @@ export default class MultiTrade extends BaseCommand {
       return;
     }
 
-    if (senderItems.length > 0 && recipientItems.length > 0) {
-      await transferItems(senderItems, targetProfile, profile);
-      await transferItems(recipientItems, profile, targetProfile);
+    if (senderItems.length > 0 || recipientItems.length > 0) {
+      if (senderItems.length > 0)
+        await transferItems(senderItems, targetProfile, profile);
+      if (recipientItems.length > 0)
+        await transferItems(recipientItems, profile, targetProfile);
 
       await AnticheatService.logMultitrade(
         senderItems,
