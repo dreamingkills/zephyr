@@ -31,6 +31,9 @@ export default class UserInfo extends BaseCommand {
 
     const target = await ProfileService.getProfile(targetUser.id);
 
+    if (target.private && target.discordId !== msg.author.id)
+      throw new ZephyrError.PrivateProfileError(targetUser.tag);
+
     const timesVoted = await AnticheatService.getNumberOfVotes(target);
     const timesClaimed = await AnticheatService.getNumberOfClaimedCards(target);
     const timesGifted = await AnticheatService.getNumberOfCardsGifted(target);
