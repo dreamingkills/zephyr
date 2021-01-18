@@ -1,3 +1,6 @@
+# Orpheus
+src/orpheus/
+
 # Discord
 config.json
 src/assets/
@@ -6,6 +9,7 @@ setup.sql
 
 # VSCode
 .VSCodeCounter/
+.vscode
 
 # Logs
 logs
