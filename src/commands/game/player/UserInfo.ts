@@ -19,12 +19,12 @@ export default class UserInfo extends BaseCommand {
     let targetUser: User | undefined;
     if (msg.mentions[0]) {
       targetUser = msg.mentions[0];
-    } else if (!isNaN(parseInt(options[0]))) {
-      const userId = parseInt(options[0]);
-      if (userId.toString().length < 17)
+    } else if (options[0]) {
+      const userId = options[0];
+      if (isNaN(parseInt(userId)) || options[0].length < 17)
         throw new ZephyrError.InvalidSnowflakeError();
 
-      targetUser = await this.zephyr.fetchUser(userId.toString());
+      targetUser = await this.zephyr.fetchUser(userId);
     } else targetUser = msg.author;
 
     if (!targetUser) throw new ZephyrError.UserNotFoundError();
