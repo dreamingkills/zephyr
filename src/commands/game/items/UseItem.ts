@@ -212,6 +212,31 @@ export default class UseItem extends BaseCommand {
             file: { file: buf, name: "dye.png" },
           });
           return;
+        } else if (targetItem.id === 22) {
+          const dyeIdentifier = options[1];
+          if (!dyeIdentifier || !dyeIdentifier.startsWith("$"))
+            throw new ZephyrError.InvalidDyeIdentifierError();
+
+          const targetDye = await ProfileService.getDyeByIdentifier(
+            dyeIdentifier
+          );
+          if (targetDye.discordId !== msg.author.id)
+            throw new ZephyrError.NotOwnerOfDyeError(targetDye.id);
+
+          await ProfileService.addChargesToDye(targetDye, 1);
+          await ProfileService.removeItems(profile, [
+            { item: targetItem, count: 1 },
+          ]);
+
+          const embed = new MessageEmbed(
+            `Recharge Dye`,
+            msg.author
+          ).setDescription(
+            `You added 1 charge to \`$${targetDye.id.toString(36)}\`.`
+          );
+          await this.send(msg.channel, embed);
+
+          return;
         } else if (targetItem.id === 38) {
           const albums = await AlbumService.getAlbumsByProfile(profile);
 
