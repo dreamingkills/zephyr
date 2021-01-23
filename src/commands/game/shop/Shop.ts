@@ -188,11 +188,6 @@ export default class Shop extends BaseCommand {
     }
   }
 
-  private emojis: { [key: string]: string } = {
-    STICKER: "📑",
-    CONSUMABLE: `🍹`,
-  };
-
   private renderShop(type: `cubits` | `bits`): EmbedField[] {
     switch (type) {
       case `cubits`: {
@@ -202,7 +197,7 @@ export default class Shop extends BaseCommand {
 
           if (!baseItem) continue;
           products.push({
-            name: `${this.emojis[baseItem.id]} ${baseItem.names[0]}`,
+            name: `${baseItem.emoji} ${baseItem.names[0]}`,
             value: `:package: \`${item.price.toLocaleString()}\` cubits`,
           });
         }
@@ -215,7 +210,7 @@ export default class Shop extends BaseCommand {
 
           if (!baseItem) continue;
           products.push({
-            name: `${this.emojis[baseItem.id]} ${baseItem.names[0]}`,
+            name: `${baseItem.emoji} ${baseItem.names[0]}`,
             value: `${
               this.zephyr.config.discord.emoji.bits
             } \`${item.price.toLocaleString()}\` bits`,

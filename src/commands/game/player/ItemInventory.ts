@@ -13,22 +13,6 @@ export default class ItemInventory extends BaseCommand {
   description = "Shows items that belong to you.";
   allowDm = true;
 
-  private renderInventory(inv: GameItem[], prefix: string): string {
-    if (inv.length === 0) {
-      return `You have no items.`;
-    } else
-      return (
-        inv
-          .map((i) => {
-            const itemEntry = items.filter((item) => item.id === i.itemId)[0];
-            return `— \`${itemEntry?.names[0] || `Unknown Item`}\` **x${
-              i.quantity
-            }**`;
-          })
-          .join("\n") + `\n\nCheck \`${prefix}help use\` for usage information.`
-      );
-  }
-
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     let page = 1;
     const inventory = await ProfileService.getItems(profile, page);
@@ -84,5 +68,21 @@ export default class ItemInventory extends BaseCommand {
         if (maxPage > 2) await this.react(sent, `⏭`);
       } catch (e) {}
     }
+  }
+
+  private renderInventory(inv: GameItem[], prefix: string): string {
+    if (inv.length === 0) {
+      return `You have no items.`;
+    } else
+      return (
+        inv
+          .map((i) => {
+            const itemEntry = items.filter((item) => item.id === i.itemId)[0];
+            return `— \`${itemEntry?.names[0] || `Unknown Item`}\` **x${
+              i.quantity
+            }**`;
+          })
+          .join("\n") + `\n\nCheck \`${prefix}help use\` for usage information.`
+      );
   }
 }

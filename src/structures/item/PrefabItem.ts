@@ -9,6 +9,7 @@ export interface PrefabItem {
   requiredArguments?: number;
   description?: string;
   usage?: string;
+  emoji: string;
   use?: (
     msg: Message,
     profile: GameProfile,
