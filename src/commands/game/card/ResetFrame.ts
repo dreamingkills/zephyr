@@ -5,7 +5,6 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
-import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 
 export default class ResetFrame extends BaseCommand {
   names = ["resetframe", "rf"];
@@ -21,7 +20,7 @@ export default class ResetFrame extends BaseCommand {
     const rawIdentifier = options[0];
     let card: GameUserCard;
     if (!rawIdentifier) {
-      card = await ProfileService.getLastCard(profile);
+      card = await CardService.getLastCard(profile);
     } else card = await CardService.getUserCardByIdentifier(rawIdentifier);
     const trueIdentifier = card.id.toString(36);
 

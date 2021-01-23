@@ -26,7 +26,7 @@ export default class BurnCard extends BaseCommand {
     const burnTargets: (GameUserCard | GameDye)[] = [];
 
     if (options.length === 0) {
-      const lastCard = await ProfileService.getLastCard(profile);
+      const lastCard = await CardService.getLastCard(profile);
       burnTargets.push(lastCard);
     }
 

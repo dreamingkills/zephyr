@@ -6,7 +6,6 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { calculateTalent } from "../../../lib/talent";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { GameUserCard } from "../../../structures/game/UserCard";
-import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 
 export default class ViewTalent extends BaseCommand {
   names = ["talent", "ta"];
@@ -23,7 +22,7 @@ export default class ViewTalent extends BaseCommand {
 
     const reference = options[0];
     if (!reference) {
-      card = await ProfileService.getLastCard(profile);
+      card = await CardService.getLastCard(profile);
     } else card = await CardService.getUserCardByIdentifier(reference);
 
     if (card.discordId !== msg.author.id)

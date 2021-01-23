@@ -30,7 +30,7 @@ export default class TagCard extends BaseCommand {
     let cards = [];
     if (queryIsTag && !options[1]) {
       tag = tags.filter((t) => t.name === query)[0];
-      const card = await ProfileService.getLastCard(profile);
+      const card = await CardService.getLastCard(profile);
       cards.push(card);
     } else {
       const trueQuery = options[0]?.toLowerCase();

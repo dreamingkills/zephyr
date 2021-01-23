@@ -79,7 +79,6 @@ export abstract class LeaderboardGet extends DBClass {
       patron: number;
       count: number;
       blacklisted: boolean;
-      last_card: number | null;
       cubits: number;
       vote_last: string | null;
       vote_reminder: boolean;

@@ -19,6 +19,7 @@ import {
   GameSticker,
   Sticker,
 } from "../../../../../structures/game/Sticker";
+import { ProfileService } from "../../../services/game/ProfileService";
 
 export type WearSpread = {
   0: number;
@@ -121,7 +122,8 @@ export abstract class CardGet extends DBClass {
       query += ` ORDER BY idol.idol_name ${reverse ? `DESC` : `ASC`}`;
     } else if (["subgroup", "sg"].includes(order)) {
       query += ` ORDER BY subgroup.subgroup_name ${reverse ? `DESC` : `ASC`}`;
-    } else query += ` ORDER BY user_card.id ${reverse ? `ASC` : `DESC`}`;
+    } else
+      query += ` ORDER BY user_card.updated_at ${reverse ? `ASC` : `DESC`}`;
 
     query += ` LIMIT 10 OFFSET ${DB.connection.escape(
       (isNaN(page) ? 1 : page) * 10 - 10
@@ -298,5 +300,13 @@ export abstract class CardGet extends DBClass {
       [card.id]
     )) as CardSticker[];
     return query.map((s) => new GameCardSticker(s));
+  }
+
+  public static async getLastCard(profile: GameProfile): Promise<GameUserCard> {
+    const tags = await ProfileService.getTags(profile);
+    const inventory = await this.getUserInventory(profile, { page: 1 }, tags);
+
+    if (!inventory[0]) throw new ZephyrError.InvalidCardReferenceError();
+    return inventory[0];
   }
 }

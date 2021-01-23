@@ -7,7 +7,6 @@ import {
   getNearestColor,
   rgbToHex,
 } from "../../../../utility/color/ColorUtils";
-import { GameUserCard } from "../../../../../structures/game/UserCard";
 import dayjs from "dayjs";
 import { User } from "eris";
 import { PrefabItem } from "../../../../../structures/item/PrefabItem";
@@ -364,23 +363,6 @@ export abstract class ProfileSet extends DBClass {
       `UPDATE profile SET blacklisted=1-blacklisted WHERE discord_id=?;`,
       [profile.discordId]
     );
-    return;
-  }
-
-  public static async setLastCard(
-    profile: GameProfile,
-    card: GameUserCard | null
-  ): Promise<void> {
-    if (card) {
-      await DB.query(`UPDATE profile SET last_card=? WHERE discord_id=?;`, [
-        card.id,
-        profile.discordId,
-      ]);
-    } else {
-      await DB.query(`UPDATE profile SET last_card=NULL WHERE discord_id=?;`, [
-        profile.discordId,
-      ]);
-    }
     return;
   }
 

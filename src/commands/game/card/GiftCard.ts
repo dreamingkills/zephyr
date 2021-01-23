@@ -22,7 +22,7 @@ export default class GiftCard extends BaseCommand {
     const identifiers = options.filter((o) => !o.includes("<@"));
     const cards: GameUserCard[] = [];
     if (identifiers.length === 0) {
-      const lastCard = await ProfileService.getLastCard(profile);
+      const lastCard = await CardService.getLastCard(profile);
       cards.push(lastCard);
     }
 

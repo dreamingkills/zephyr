@@ -40,7 +40,6 @@ export interface Profile {
       Other
   */
   daily_streak: number;
-  last_card: number | null;
 }
 
 export class GameProfile {
@@ -60,7 +59,6 @@ export class GameProfile {
   premiumCurrency: number;
   patron: number;
   blacklisted: boolean;
-  lastCard: number | null;
   cubits: number;
   voteLast: string | null;
   voteReminder: boolean;
@@ -87,7 +85,6 @@ export class GameProfile {
     this.voteReminder = data.vote_reminder;
     this.voteReminded = data.vote_reminded;
     this.blacklisted = data.blacklisted;
-    this.lastCard = data.last_card;
   }
 
   public async fetch(): Promise<GameProfile> {

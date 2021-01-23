@@ -12,7 +12,6 @@ import { GameTag } from "../../../../structures/game/Tag";
 import gm from "gm";
 import { GameDye } from "../../../../structures/game/Dye";
 import { rgbToCmy } from "../../../utility/color/ColorUtils";
-import { ProfileService } from "./ProfileService";
 import {
   GameCardSticker,
   GameSticker,
@@ -65,7 +64,6 @@ export abstract class CardService {
       fightCount,
       frame
     );
-    await ProfileService.setLastCard(profile, newCard);
     return newCard;
   }
 
@@ -292,7 +290,6 @@ export abstract class CardService {
       await AlbumService.removeCardsFromAlbums(inAlbum, albums, zephyr);
 
     await CardSet.transferCardsToUser(cards, profile.discordId);
-    await ProfileService.setLastCard(profile, cards[cards.length - 1]);
     return;
   }
 
@@ -450,5 +447,9 @@ export abstract class CardService {
   ): Promise<GameUserCard> {
     await CardSet.addStickerToCard(card, sticker, position);
     return await card.fetch();
+  }
+
+  public static async getLastCard(profile: GameProfile): Promise<GameUserCard> {
+    return await CardGet.getLastCard(profile);
   }
 }

@@ -22,7 +22,7 @@ export default class ViewUserCard extends BaseCommand {
     const rawIdentifier = options[0];
     let card;
     if (!rawIdentifier) {
-      card = await ProfileService.getLastCard(profile);
+      card = await CardService.getLastCard(profile);
     } else card = await CardService.getUserCardByIdentifier(rawIdentifier);
 
     if (card.discordId === this.zephyr.user.id)
