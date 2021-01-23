@@ -125,7 +125,7 @@ export abstract class CardGet extends DBClass {
     } else
       query += ` ORDER BY user_card.updated_at ${reverse ? `ASC` : `DESC`}`;
 
-    query += `, user_card.id ASC LIMIT 10 OFFSET ${DB.connection.escape(
+    query += `, user_card.id DESC LIMIT 10 OFFSET ${DB.connection.escape(
       (isNaN(page) ? 1 : page) * 10 - 10
     )};`;
 
