@@ -90,7 +90,7 @@ export class NoItemsSpecifiedError extends ZephyrError {
 
 export class UnspecifiedItemError extends ZephyrError {
   constructor() {
-    super(`Please specify an item to use.`);
+    super(`Please specify an item.`);
   }
 }
 

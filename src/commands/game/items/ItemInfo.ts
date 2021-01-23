@@ -8,6 +8,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class ItemInfo extends BaseCommand {
   names = ["iteminfo", "ii"];
+  usage = ["$CMD$ <item>"];
   description =
     "Shows information about an item. Includes aliases and a short description.";
   allowDm = true;
@@ -17,7 +18,7 @@ export default class ItemInfo extends BaseCommand {
     _profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!options[0]) throw new ZephyrError.InvalidItemError();
+    if (!options[0]) throw new ZephyrError.UnspecifiedItemError();
 
     const itemQuery = options
       .filter((i) => i.toLowerCase() !== "--dev")
