@@ -127,10 +127,7 @@ export default class Shop extends BaseCommand {
         const price = shopProduct.price;
         const currency = shop.bits.includes(shopProduct) ? `bits` : `cubits`;
         if (profile[currency] < price)
-          throw new ZephyrError.NotEnoughCurrencyToBuyError(
-            currency,
-            profile[currency]
-          );
+          throw new ZephyrError.NotEnoughCurrencyToBuyError(currency, price);
 
         const embed = new MessageEmbed(
           `Confirm Purchase`,
