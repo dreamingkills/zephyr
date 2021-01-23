@@ -33,7 +33,11 @@ export default class RemoveCardFromAlbum extends BaseCommand {
       Math.ceil(albumCards.find((c) => c.card.id === targetCard.id)!.slot / 8)
     );
 
-    await AlbumService.removeCardsFromAlbum([targetCard]);
+    await AlbumService.removeCardsFromAlbums(
+      [targetCard],
+      [isInAlbum],
+      this.zephyr
+    );
 
     await AlbumService.updateAlbumCache(
       isInAlbum,

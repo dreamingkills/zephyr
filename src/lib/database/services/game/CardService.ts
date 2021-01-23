@@ -275,14 +275,21 @@ export abstract class CardService {
 
   public static async transferCardsToUser(
     cards: GameUserCard[],
-    profile: GameProfile
+    profile: GameProfile,
+    zephyr: Zephyr
   ): Promise<void> {
     const inAlbum = [];
+    const albums = [];
     for (let card of cards) {
       const isInAlbum = await AlbumService.cardIsInAlbum(card);
-      if (isInAlbum) inAlbum.push(card);
+      if (isInAlbum) {
+        inAlbum.push(card);
+        albums.push(isInAlbum);
+      }
     }
-    if (inAlbum.length > 0) await AlbumService.removeCardsFromAlbum(inAlbum);
+
+    if (inAlbum.length > 0)
+      await AlbumService.removeCardsFromAlbums(inAlbum, albums, zephyr);
 
     await CardSet.transferCardsToUser(cards, profile.discordId);
     await ProfileService.setLastCard(profile, cards[cards.length - 1]);

@@ -161,10 +161,16 @@ export abstract class AlbumService {
     }
   }
 
-  public static async removeCardsFromAlbum(
-    cards: AlbumCard[] | GameUserCard[]
+  public static async removeCardsFromAlbums(
+    cards: AlbumCard[] | GameUserCard[],
+    albums: GameAlbum[],
+    zephyr: Zephyr
   ): Promise<void> {
-    return await AlbumSet.removeCardsFromAlbum(cards);
+    await AlbumSet.removeCardsFromAlbum(cards);
+    for (let album of albums) {
+      const albumCards = await this.getCardsByAlbum(album);
+      await this.updateAlbumCache(album, albumCards, 1, zephyr);
+    }
   }
 
   public static async cardIsInAlbum(

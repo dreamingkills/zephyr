@@ -103,8 +103,16 @@ export default class Trade extends BaseCommand {
             return;
           }
 
-          await CardService.transferCardsToUser([traderCard], target);
-          await CardService.transferCardsToUser([tradeeCard], profile);
+          await CardService.transferCardsToUser(
+            [traderCard],
+            target,
+            this.zephyr
+          );
+          await CardService.transferCardsToUser(
+            [tradeeCard],
+            profile,
+            this.zephyr
+          );
 
           await AnticheatService.logTrade(
             profile,

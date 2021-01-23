@@ -1,3 +1,4 @@
+import { Zephyr } from "../../../structures/client/Zephyr";
 import { GameDye } from "../../../structures/game/Dye";
 import { GameProfile } from "../../../structures/game/Profile";
 import { GameUserCard } from "../../../structures/game/UserCard";
@@ -12,7 +13,8 @@ import {
 export async function transferItems(
   tradeItems: TradeItemResolvable[],
   receiver: GameProfile,
-  giver: GameProfile
+  giver: GameProfile,
+  zephyr: Zephyr
 ): Promise<void> {
   const cards = tradeItems.filter(
     (i) => i instanceof GameUserCard
@@ -30,7 +32,8 @@ export async function transferItems(
   const { cubits } =
     (tradeItems.find((i) => isCubitItem(i)) as InteractableCubits) || 0;
 
-  if (cards.length > 0) await CardService.transferCardsToUser(cards, receiver);
+  if (cards.length > 0)
+    await CardService.transferCardsToUser(cards, receiver, zephyr);
   if (items.length > 0) {
     await ProfileService.addItems(receiver, items);
     await ProfileService.removeItems(giver, items);

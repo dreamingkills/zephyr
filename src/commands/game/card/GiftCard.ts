@@ -89,7 +89,7 @@ export default class GiftCard extends BaseCommand {
       }
 
       await ProfileService.setLastCard(profile, null);
-      await CardService.transferCardsToUser(cards, gifteeProfile);
+      await CardService.transferCardsToUser(cards, gifteeProfile, this.zephyr);
       await AnticheatService.logGift(
         profile,
         gifteeProfile,
