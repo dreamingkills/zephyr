@@ -88,7 +88,6 @@ export default class GiftCard extends BaseCommand {
           throw new ZephyrError.NotOwnerOfCardError(refetchCard);
       }
 
-      await ProfileService.setLastCard(profile, null);
       await CardService.transferCardsToUser(cards, gifteeProfile, this.zephyr);
       await AnticheatService.logGift(
         profile,
