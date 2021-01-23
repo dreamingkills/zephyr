@@ -44,7 +44,7 @@ export default class UseItem extends BaseCommand {
       targetItem.names[0]
     );
 
-    if (targetUserItem.quantity <= 0)
+    if ((targetUserItem.quantity || 0) <= 0)
       throw new ZephyrError.NoItemInInventoryError(targetItem.names[0]);
 
     // If the item has no code attached to it, display generic message.
@@ -65,7 +65,9 @@ export default class UseItem extends BaseCommand {
 
     const embed = new MessageEmbed(`Use Item`, msg.author)
       .setDescription(
-        `Really use **${targetItem.useCost}x** \`${targetItem.names[0]}\`?`
+        `Really use ${
+          targetItem.useCost ? `**${targetItem.useCost}x** ` : ``
+        }\`${targetItem.names[0]}\`?`
       )
       .setFooter(`This action is irreversible.`);
 
