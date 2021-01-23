@@ -1,10 +1,3 @@
-export interface BaseItem {
-  id: number;
-  name: string;
-  aliases?: string[];
-  type: string;
-}
-
 export interface Item {
   id: number;
   discord_id: string;

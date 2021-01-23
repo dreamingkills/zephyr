@@ -2,12 +2,13 @@ import { Message, PartialEmoji } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import items from "../../../assets/items.json";
+import { items } from "../../../assets/items";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
-import { BaseItem, GameItem } from "../../../structures/game/Item";
+import { GameItem } from "../../../structures/game/Item";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ReactionCollector } from "eris-collector";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
+import { PrefabItem } from "../../../structures/item/PrefabItem";
 
 export default class GiveItem extends BaseCommand {
   names = ["giveitem", "gi"];
@@ -38,21 +39,21 @@ export default class GiveItem extends BaseCommand {
     if (itemsRaw.length < 1) throw new ZephyrError.NoItemsSpecifiedError();
 
     const realItems: GameItem[] = [];
-    const baseItems: BaseItem[] = [];
+    const baseItems: PrefabItem[] = [];
 
     for (let i of itemsRaw) {
-      const target = items.filter(
-        (t) => t.name.toLowerCase() === i.toLowerCase()
+      const target = items.filter((t) =>
+        t.names.map((n) => n.toLowerCase()).includes(i)
       );
 
       if (target[0]) {
         const inventoryItem = await ProfileService.getItem(
           profile,
           target[0].id,
-          target[0].name
+          target[0].names[0]
         );
         if (inventoryItem.quantity === 0)
-          throw new ZephyrError.NoItemInInventoryError(target[0].name);
+          throw new ZephyrError.NoItemInInventoryError(target[0].names[0]);
 
         baseItems.push(target[0]);
         realItems.push(inventoryItem);
@@ -77,7 +78,7 @@ export default class GiveItem extends BaseCommand {
           realItems.length === 1 ? `` : `s`
         } to ${targetUser.tag}?\n` +
           realItems
-            .map((_i, idx) => `— \`${baseItems[idx].name}\` **x1**`)
+            .map((_i, idx) => `— \`${baseItems[idx].names[0]}\` **x1**`)
             .join("\n")
       );
 
@@ -101,12 +102,12 @@ export default class GiveItem extends BaseCommand {
           const refetchItem = await ProfileService.getItem(
             profile,
             i.itemId,
-            baseItems[realItems.indexOf(i)].name
+            baseItems[realItems.indexOf(i)].names[0]
           );
 
           if (refetchItem.quantity < 1)
             throw new ZephyrError.NoItemInInventoryError(
-              baseItems[realItems.indexOf(i)].name
+              baseItems[realItems.indexOf(i)].names[0]
             );
         } catch {}
       }

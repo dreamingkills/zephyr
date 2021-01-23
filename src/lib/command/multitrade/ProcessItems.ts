@@ -1,6 +1,6 @@
 import { CardService } from "../../database/services/game/CardService";
 import { ProfileService } from "../../database/services/game/ProfileService";
-import items from "../../../assets/items.json";
+import { items } from "../../../assets/items";
 import { strToInt } from "../../utility/text/TextUtils";
 
 export async function processItems(
@@ -47,10 +47,8 @@ export async function processItems(
 
     // Single Item Detection
     let amount = 1;
-    let baseItem = items.filter(
-      (i) =>
-        i.name.toLowerCase() === item.toLowerCase() ||
-        (i.aliases && i.aliases.includes(item.toLowerCase()))
+    let baseItem = items.filter((i) =>
+      i.names.map((n) => n.toLowerCase()).includes(item.toLowerCase())
     )[0];
     if (!baseItem) {
       const noNumber = item.split(" ").slice(1).join(" ").toLowerCase();
@@ -59,10 +57,8 @@ export async function processItems(
 
       amount = derivedAmount;
 
-      baseItem = items.filter(
-        (i) =>
-          i.name.toLowerCase() === noNumber.toLowerCase() ||
-          (i.aliases && i.aliases.includes(noNumber.toLowerCase()))
+      baseItem = items.filter((i) =>
+        i.names.map((n) => n.toLowerCase()).includes(noNumber.toLowerCase())
       )[0];
     }
 

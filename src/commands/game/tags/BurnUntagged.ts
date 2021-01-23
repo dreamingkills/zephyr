@@ -6,9 +6,9 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { ReactionCollector } from "eris-collector";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
-import { BaseItem } from "../../../structures/game/Item";
-import items from "../../../assets/items.json";
+import { items } from "../../../assets/items";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
+import { PrefabItem } from "../../../structures/item/PrefabItem";
 
 export default class BurnUntagged extends BaseCommand {
   names = ["burnuntagged", "bu"];
@@ -25,9 +25,11 @@ export default class BurnUntagged extends BaseCommand {
       return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
     });
     const bitReward = individualRewards.reduce((acc, bits) => acc + bits);
-    const dustRewards: { item: BaseItem; count: number }[] = [];
+    const dustRewards: { item: PrefabItem; count: number }[] = [];
 
-    const dustItems = items.filter((i) => i.type === "DUST") as BaseItem[];
+    const dustItems = items.filter((i) =>
+      i.names.find((n) => n.includes("Dust"))
+    ) as PrefabItem[];
 
     for (let card of cards) {
       if (card.wear === 0) continue;
@@ -61,7 +63,7 @@ export default class BurnUntagged extends BaseCommand {
       dustRewards
         .map(
           (r) =>
-            `:white_medium_small_square: **${r.count}x** \`${r.item.name}\``
+            `:white_medium_small_square: **${r.count}x** \`${r.item.names[0]}\``
         )
         .join("\n");
 

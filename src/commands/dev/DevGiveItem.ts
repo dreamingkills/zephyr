@@ -3,7 +3,7 @@ import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 import * as ZephyrError from "../../structures/error/ZephyrError";
-import items from "../../assets/items.json";
+import { items } from "../../assets/items";
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
 
 export default class DevUserCard extends BaseCommand {
@@ -19,8 +19,10 @@ export default class DevUserCard extends BaseCommand {
     const targetUser = msg.mentions[0];
     if (!targetUser) throw new ZephyrError.InvalidMentionError();
 
-    const targetItem = items.filter(
-      (i) => i.name.toLowerCase() === options.slice(1).join(" ").toLowerCase()
+    const targetItem = items.filter((i) =>
+      i.names
+        .map((n) => n.toLowerCase())
+        .includes(options.slice(1).join(" ").toLowerCase())
     )[0];
     if (!targetItem) throw new ZephyrError.InvalidItemError();
 
@@ -36,7 +38,7 @@ export default class DevUserCard extends BaseCommand {
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(
-        `Gave **1x** \`${targetItem.name}\` to **${targetUser.tag}**`
+        `Gave **1x** \`${targetItem.names[0]}\` to **${targetUser.tag}**`
       );
 
     await this.send(msg.channel, embed);

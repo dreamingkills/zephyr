@@ -78,7 +78,7 @@ export default class Help extends BaseCommand {
       )
       .addField({
         name: "Basic",
-        value: `\`daily\`, \`drop\`, \`burn\`, \`profile\``,
+        value: `\`daily\`, \`drop\`, \`burn\`, \`profile\`, \`balance\``,
         inline: true,
       })
       .addField({

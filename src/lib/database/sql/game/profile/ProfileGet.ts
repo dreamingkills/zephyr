@@ -64,7 +64,7 @@ export abstract class ProfileGet extends DBClass {
 
   public static async getNumberOfItems(discordId: string): Promise<number> {
     const query = (await DB.query(
-      `SELECT COUNT(DISTINCT item_id) AS count FROM user_item WHERE discord_id=?;`,
+      `SELECT COUNT(DISTINCT item_id) AS count FROM user_item WHERE discord_id=? AND quantity>0;`,
       [discordId]
     )) as { count: number }[];
     return query[0].count;

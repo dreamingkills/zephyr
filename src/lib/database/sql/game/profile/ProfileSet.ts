@@ -7,10 +7,10 @@ import {
   getNearestColor,
   rgbToHex,
 } from "../../../../utility/color/ColorUtils";
-import { BaseItem } from "../../../../../structures/game/Item";
 import { GameUserCard } from "../../../../../structures/game/UserCard";
 import dayjs from "dayjs";
 import { User } from "eris";
+import { PrefabItem } from "../../../../../structures/item/PrefabItem";
 
 export abstract class ProfileSet extends DBClass {
   /*
@@ -172,7 +172,7 @@ export abstract class ProfileSet extends DBClass {
   */
   public static async addItems(
     discordId: string,
-    items: { item: BaseItem; count: number }[]
+    items: { item: PrefabItem; count: number }[]
   ): Promise<void> {
     for (let item of items) {
       await DB.query(
@@ -185,7 +185,7 @@ export abstract class ProfileSet extends DBClass {
 
   public static async removeItems(
     discordId: string,
-    items: { item: BaseItem; count: number }[]
+    items: { item: PrefabItem; count: number }[]
   ): Promise<void> {
     for (let item of items) {
       await DB.query(

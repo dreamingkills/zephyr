@@ -5,8 +5,8 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 
-export default class ViewBits extends BaseCommand {
-  names = ["bits", "$", "bal", "cubits"];
+export default class Balance extends BaseCommand {
+  names = ["balance", "bits", "$", "bal", "cubits"];
   description = "Shows you your balance.";
   allowDm = true;
 

@@ -3,7 +3,7 @@ import { GameDye } from "../../../structures/game/Dye";
 import { Recipe } from "../../../structures/game/Recipe";
 import { GameTag } from "../../../structures/game/Tag";
 import { GameUserCard } from "../../../structures/game/UserCard";
-import items from "../../../assets/items.json";
+import { items } from "../../../assets/items";
 
 export function strToInt(text: string): number {
   let result = parseInt(text.replace(/[, ]+/g, ""), 10);
@@ -29,12 +29,12 @@ export function renderRecipe(recipe: Recipe): string {
   return `\`\`\`diff\n${recipe.ingredients
     .map((i) => {
       const baseItem = items.filter((b) => b.id === i.itemId)[0];
-      return `- ${i.count}x ${baseItem?.name || "Unknown Item"}`;
+      return `- ${i.count}x ${baseItem?.names[0] || "Unknown Item"}`;
     })
     .join("\n")}\`\`\`\`\`\`diff\n${recipe.result
     .map((i) => {
       const baseItem = items.filter((b) => b.id === i.itemId)[0];
-      return `+ ${i.count}x ${baseItem?.name || "Unknown Item"}`;
+      return `+ ${i.count}x ${baseItem?.names[0] || "Unknown Item"}`;
     })
     .join("\n")}\n\`\`\``;
 }

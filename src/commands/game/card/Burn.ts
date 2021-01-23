@@ -7,10 +7,10 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
-import items from "../../../assets/items.json";
-import { BaseItem } from "../../../structures/game/Item";
+import { items } from "../../../assets/items";
 import { GameDye } from "../../../structures/game/Dye";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
+import { PrefabItem } from "../../../structures/item/PrefabItem";
 
 export default class BurnCard extends BaseCommand {
   names = ["burn", "b"];
@@ -23,16 +23,14 @@ export default class BurnCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    const identifiers = options;
-
     const burnTargets: (GameUserCard | GameDye)[] = [];
 
-    if (identifiers.length === 0) {
+    if (options.length === 0) {
       const lastCard = await ProfileService.getLastCard(profile);
       burnTargets.push(lastCard);
     }
 
-    for (let id of identifiers) {
+    for (let id of options) {
       if (id.startsWith("$")) {
         if (isNaN(parseInt(id.slice(1), 36)))
           throw new ZephyrError.InvalidDyeIdentifierBurnError(id);
@@ -56,19 +54,24 @@ export default class BurnCard extends BaseCommand {
       }
     }
 
-    const itemRewards: { item: BaseItem; count: number }[] = [];
+    const itemRewards: { item: PrefabItem; count: number }[] = [];
 
     const dyeTargets = burnTargets.filter(
       (t) => t instanceof GameDye
     ) as GameDye[];
-    if (dyeTargets[0]) {
-      const glassItem = items.filter((i) => i.name === "Glass")[0];
+
+    if (dyeTargets.length > 0) {
+      const glassItem = items.find((i) => i.names.includes(`Glass`));
+      if (!glassItem) throw new ZephyrError.ItemMissingError(`Glass`);
+
       itemRewards.push({ item: glassItem, count: dyeTargets.length });
 
-      const droplets = dyeTargets.filter((d) => d.charges > 0);
-      if (droplets.length > 0) {
-        const dropletItem = items.filter((i) => i.name === "Droplet")[0];
-        itemRewards.push({ item: dropletItem, count: droplets.length });
+      const droplets = dyeTargets.filter((d) => d.charges > 0).length;
+      if (droplets > 0) {
+        const dropletItem = items.find((i) => i.names.includes(`Droplet`));
+        if (!dropletItem) throw new ZephyrError.ItemMissingError(`Droplet`);
+
+        itemRewards.push({ item: dropletItem, count: droplets });
       }
     }
 
@@ -84,7 +87,9 @@ export default class BurnCard extends BaseCommand {
     ];
     const bitReward = individualRewards.reduce((acc, bits) => acc + bits);
 
-    const dustItems = items.filter((i) => i.type === "DUST") as BaseItem[];
+    const dustItems = items.filter((i) =>
+      i.names[0].includes("Dust")
+    ) as PrefabItem[];
 
     for (let card of cardTargets) {
       if (card.wear === 0) continue;
@@ -135,7 +140,7 @@ export default class BurnCard extends BaseCommand {
 
     for (let item of itemRewards) {
       rewardsText.push(
-        `:white_medium_small_square: **${item.count}x** \`${item.item.name}\``
+        `:white_medium_small_square: **${item.count}x** \`${item.item.names[0]}\``
       );
     }
 

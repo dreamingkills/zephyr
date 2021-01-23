@@ -3,7 +3,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import shop from "../../../assets/shop.json";
-import items from "../../../assets/items.json";
+import { items } from "../../../assets/items";
 import { ReactionCollector } from "eris-collector";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
@@ -113,7 +113,9 @@ export default class Shop extends BaseCommand {
 
     if (subcommand === "buy") {
       const itemQuery = options.slice(1).join(" ")?.toLowerCase();
-      const targetItem = items.find((i) => i.name.toLowerCase() === itemQuery);
+      const targetItem = items.find((i) =>
+        i.names.map((n) => n.toLowerCase()).includes(itemQuery)
+      );
 
       if (!targetItem) throw new ZephyrError.InvalidItemError();
 
@@ -134,7 +136,7 @@ export default class Shop extends BaseCommand {
           `Confirm Purchase`,
           msg.author
         ).setDescription(
-          `Really purchase **1x** \`${targetItem.name}\` for \`${price}\` ${currency}?`
+          `Really purchase **1x** \`${targetItem.names[0]}\` for \`${price}\` ${currency}?`
         );
         const confirmation = await this.send(msg.channel, embed);
 
@@ -164,7 +166,7 @@ export default class Shop extends BaseCommand {
             `Purchase Successful`,
             msg.author
           ).setDescription(
-            `You purchased **1x** \`${targetItem.name}\` for \`${price}\` ${currency}.`
+            `You purchased **1x** \`${targetItem.names[0]}\` for \`${price}\` ${currency}.`
           );
 
           await this.send(msg.channel, embed);
@@ -203,7 +205,7 @@ export default class Shop extends BaseCommand {
 
           if (!baseItem) continue;
           products.push({
-            name: `${this.emojis[baseItem.type]} ${baseItem.name}`,
+            name: `${this.emojis[baseItem.id]} ${baseItem.names[0]}`,
             value: `:package: \`${item.price.toLocaleString()}\` cubits`,
           });
         }
@@ -216,7 +218,7 @@ export default class Shop extends BaseCommand {
 
           if (!baseItem) continue;
           products.push({
-            name: `${this.emojis[baseItem.type]} ${baseItem.name}`,
+            name: `${this.emojis[baseItem.id]} ${baseItem.names[0]}`,
             value: `${
               this.zephyr.config.discord.emoji.bits
             } \`${item.price.toLocaleString()}\` bits`,

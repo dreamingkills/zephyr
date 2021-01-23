@@ -9,7 +9,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { Dust } from "../../../structures/game/Dust";
-import items from "../../../assets/items.json";
+import { items } from "../../../assets/items";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 
 export default class UpgradeCard extends BaseCommand {
@@ -46,11 +46,13 @@ export default class UpgradeCard extends BaseCommand {
     if (bitCost > profile.bits)
       throw new ZephyrError.NotEnoughBitsToUpgradeError(bitCost);
 
-    const dustItem = items.filter((i) => i.type === "DUST")[card.wear];
+    const dustItem = items.filter((i) => i.names[0].includes("Dust"))[
+      card.wear
+    ];
     const dustUserItem = await ProfileService.getItem(
       profile,
       dustItem.id,
-      dustItem.name
+      dustItem.names[0]
     );
 
     if (dustCost > dustUserItem.quantity)
@@ -70,7 +72,7 @@ export default class UpgradeCard extends BaseCommand {
         `Are you sure you want to upgrade this card?` +
           `\n${getDescriptions([card], this.zephyr, tags)}` +
           `\n\nThis will cost...` +
-          `\n— **${dustCost.toLocaleString()}x** \`${dustItem.name}\`` +
+          `\n— **${dustCost.toLocaleString()}x** \`${dustItem.names[0]}\`` +
           `\n— **${
             this.zephyr.config.discord.emoji.bits
           } ${bitCost.toLocaleString()}**`

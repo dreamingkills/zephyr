@@ -1,7 +1,7 @@
 import { User } from "eris";
-import { BaseItem } from "../game/Item";
 import { GameTag } from "../game/Tag";
 import { GameUserCard } from "../game/UserCard";
+import { PrefabItem } from "../item/PrefabItem";
 
 abstract class ZephyrError extends Error {
   name = "ZephyrError";
@@ -291,6 +291,30 @@ export class NoFrameSpecifiedError extends ZephyrError {
 export class CannotRemoveFrameError extends ZephyrError {
   constructor() {
     super(`You cannot remove that frame.`);
+  }
+}
+
+export class InvalidItemArgumentsError extends ZephyrError {
+  constructor(item: PrefabItem, prefix: string) {
+    super(
+      `Please specify valid parameters to use that item.\nSee \`${prefix}iteminfo ${item.names[0].toLowerCase()}\` for more information.`
+    );
+  }
+}
+
+export class ItemSelfRetrievalError extends ZephyrError {
+  constructor(itemName: string) {
+    super(
+      `There was an error obtaining a self-reference to \`${itemName}\`. Your items have not been consumed.`
+    );
+  }
+}
+
+export class ItemMissingError extends ZephyrError {
+  constructor(itemName: string) {
+    super(
+      `There was an error obtaining the item ${itemName}. It does not exist, but it should.`
+    );
   }
 }
 
@@ -623,9 +647,9 @@ export class NoStickerInSlotError extends ZephyrError {
 }
 
 export class NoStickerBoundToItemError extends ZephyrError {
-  constructor(item: BaseItem) {
+  constructor(item: PrefabItem) {
     super(
-      `\`${item.name}\` is not bound to a sticker. Please report this bug.`
+      `\`${item.names[0]}\` is not bound to a sticker. Please report this bug.`
     );
   }
 }
@@ -640,8 +664,8 @@ export class InvalidStickerError extends ZephyrError {
     Shop v2
 */
 export class ItemNotForSaleError extends ZephyrError {
-  constructor(item: BaseItem) {
-    super(`\`${item.name}\` is not currently available for purchase.`);
+  constructor(item: PrefabItem) {
+    super(`\`${item.names[0]}\` is not currently available for purchase.`);
   }
 }
 

@@ -1,5 +1,5 @@
 import { GameDye } from "../../../../structures/game/Dye";
-import { BaseItem, GameItem } from "../../../../structures/game/Item";
+import { GameItem } from "../../../../structures/game/Item";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameTag } from "../../../../structures/game/Tag";
 import { GameUserCard } from "../../../../structures/game/UserCard";
@@ -9,6 +9,8 @@ import { ProfileSet } from "../../sql/game/profile/ProfileSet";
 import { CardService } from "./CardService";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { User } from "eris";
+import { PrefabItem } from "../../../../structures/item/PrefabItem";
+import { items } from "../../../../assets/items";
 
 export abstract class ProfileService {
   /*
@@ -175,14 +177,14 @@ export abstract class ProfileService {
 
   public static async addItems(
     profile: GameProfile,
-    items: { item: BaseItem; count: number }[]
+    items: { item: PrefabItem; count: number }[]
   ): Promise<void> {
     return await ProfileSet.addItems(profile.discordId, items);
   }
 
   public static async removeItems(
     profile: GameProfile,
-    items: { item: BaseItem; count: number }[]
+    items: { item: PrefabItem; count: number }[]
   ): Promise<void> {
     return await ProfileSet.removeItems(profile.discordId, items);
   }
@@ -290,15 +292,17 @@ export abstract class ProfileService {
   public static async addChargesToDye(
     dye: GameDye,
     amount: number = 1
-  ): Promise<void> {
-    return await ProfileSet.addChargesToDye(dye.id, amount);
+  ): Promise<GameDye> {
+    await ProfileSet.addChargesToDye(dye.id, amount);
+    return await dye.fetch();
   }
 
   public static async removeChargesFromDye(
     dye: GameDye,
     amount: number = 1
-  ): Promise<void> {
-    return await ProfileSet.removeChargesFromDye(dye.id, amount);
+  ): Promise<GameDye> {
+    await ProfileSet.removeChargesFromDye(dye.id, amount);
+    return await dye.fetch();
   }
 
   public static async getDyeById(id: number): Promise<GameDye> {
@@ -366,5 +370,9 @@ export abstract class ProfileService {
     await ProfileSet.removeCubits(profile, amount);
 
     return await profile.fetch();
+  }
+
+  public static getPrefabItemById(id: number): PrefabItem {
+    return items.filter((i) => i.id === id)[0];
   }
 }
