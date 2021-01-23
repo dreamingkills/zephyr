@@ -6,6 +6,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
+import { rgbToHex } from "../../../lib/utility/color/ColorUtils";
 
 export default class ViewUserCard extends BaseCommand {
   names = ["card", "show", "view", "v"];
@@ -54,7 +55,8 @@ export default class ViewUserCard extends BaseCommand {
         }\n` +
           `\nOwner: ${targetUser ? `**${targetUser.tag}**` : `*Unknown User*`}`
       )
-      .setImage(`attachment://card.png`);
+      .setImage(`attachment://card.png`)
+      .setColor(rgbToHex(card.dyeR || 185, card.dyeG || 185, card.dyeB || 185));
     // .setFooter(`Luck Coefficient: ${card.luckCoefficient}`);
     await this.send(msg.channel, embed, {
       file: {
