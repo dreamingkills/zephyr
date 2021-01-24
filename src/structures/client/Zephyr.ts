@@ -20,6 +20,7 @@ import dblapi from "dblapi.js";
 import { GameSticker } from "../game/Sticker";
 import { createMessage } from "../../lib/discord/message/createMessage";
 import dayjs from "dayjs";
+import { ItemService } from "../../lib/ItemService";
 
 export class Zephyr extends Client {
   version: string = "Camellia";
@@ -69,6 +70,7 @@ export class Zephyr extends Client {
     await this.cachePrefixes();
     await this.cacheCards();
     await this.cacheStickers();
+    ItemService.refreshItems();
     const fonts = await FontLoader.init();
 
     const startTime = Date.now();
