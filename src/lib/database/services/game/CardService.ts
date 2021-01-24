@@ -121,7 +121,12 @@ export abstract class CardService {
 
     // Handle dye mask (this was so annoying to set up I hate Windows)
     // Default to the classic "Undyed Mask Gray" if the card is undyed.
-    let [r, g, b] = [card.dyeR || 185, card.dyeG || 185, card.dyeB || 185];
+    let [r, g, b] = [
+      isNaN(card.dyeR) ? 185 : card.dyeR,
+      isNaN(card.dyeG) ? 185 : card.dyeG,
+      isNaN(card.dyeB) ? 185 : card.dyeB,
+    ];
+
     const { c, m, y } = rgbToCmy(r, g, b);
 
     // We need to convert the GM State to a buffer, so that
