@@ -122,6 +122,8 @@ export abstract class CardGet extends DBClass {
       query += ` ORDER BY idol.idol_name ${reverse ? `DESC` : `ASC`}`;
     } else if (["subgroup", "sg"].includes(order)) {
       query += ` ORDER BY subgroup.subgroup_name ${reverse ? `DESC` : `ASC`}`;
+    } else if (["claim", "c"].includes(order)) {
+      query += ` ORDER BY user_card.id ${reverse ? `DESC` : `ASC`}`;
     } else
       query += ` ORDER BY user_card.updated_at ${reverse ? `ASC` : `DESC`}`;
 
