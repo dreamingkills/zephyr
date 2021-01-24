@@ -28,7 +28,7 @@ export default class ViewTalent extends BaseCommand {
     if (card.discordId !== msg.author.id)
       throw new ZephyrError.NotOwnerOfCardError(card);
 
-    const base = this.zephyr.getCard(card.baseCardId);
+    const base = this.zephyr.getCard(card.baseCardId)!;
 
     const talent = calculateTalent(profile, card, base);
     const nonzeroTalents = Object.entries(talent)

@@ -20,7 +20,7 @@ export default class CardLookup extends BaseCommand {
   ): Promise<void> {
     if (!options[0]) {
       const lastCard = await CardService.getLastCard(profile);
-      const lastBase = this.zephyr.getCard(lastCard.baseCardId);
+      const lastBase = this.zephyr.getCard(lastCard.baseCardId)!;
 
       const embed = await this.getCardStats(lastBase, msg.author);
       await this.send(msg.channel, embed);

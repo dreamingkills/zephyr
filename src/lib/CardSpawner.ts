@@ -42,7 +42,7 @@ export abstract class CardSpawner {
       const winnerId: string = new Chance().pickone(Array.from(takers));
       winner = await ProfileService.getProfile(winnerId);
     }
-    const baseCard = zephyr.getCard(card.baseCardId);
+    const baseCard = zephyr.getCard(card.baseCardId)!;
 
     const now = Date.now();
     const newCard = await CardService.createNewUserCard(
@@ -209,7 +209,7 @@ export abstract class CardSpawner {
             } and claimed `;
           }
 
-          const baseCard = zephyr.getCard(fight.card.baseCardId);
+          const baseCard = zephyr.getCard(fight.card.baseCardId)!;
 
           message +=
             `\`${fight.card.id.toString(36)}\` **${baseCard.name}**` +

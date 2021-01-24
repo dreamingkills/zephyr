@@ -38,7 +38,7 @@ export default class ViewUserCard extends BaseCommand {
 
     const targetUser = await this.zephyr.fetchUser(targetProfile.discordId);
 
-    const baseCard = this.zephyr.getCard(card.baseCardId);
+    const baseCard = this.zephyr.getCard(card.baseCardId)!;
     const image = await CardService.checkCacheForCard(card, this.zephyr);
 
     const userTags = await ProfileService.getTags(targetProfile);

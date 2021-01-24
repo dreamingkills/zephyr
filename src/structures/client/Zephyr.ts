@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import stripAnsi from "strip-ansi";
-import { Client, Guild, TextChannel, User } from "eris";
+import { Client, Guild, PrivateChannel, TextChannel, User } from "eris";
 import config from "../../../config.json";
 import { CommandLib } from "../../lib/command/CommandLib";
 import { GuildService } from "../../lib/database/services/guild/GuildService";
@@ -115,17 +115,15 @@ export class Zephyr extends Client {
 
       await this.fetchUser(message.author.id);
 
-      if (message.channel.type === 1) {
+      if (message.channel instanceof PrivateChannel) {
         await this.commandLib.process(message, this);
         return;
       }
 
+      if (!(message.channel instanceof TextChannel)) return;
+
       // check if we're allowed to send messages to this channel
-      if (
-        !(<TextChannel>message.channel).permissionsOf(this.user.id).json[
-          "sendMessages"
-        ]
-      )
+      if (!message.channel.permissionsOf(this.user.id).json["sendMessages"])
         return;
 
       // Prefix resetter
@@ -253,13 +251,17 @@ export class Zephyr extends Client {
   */
   public async cacheCards(): Promise<void> {
     const cards = await CardService.getAllCards();
+
+    const newCardObject: { [key: number]: GameBaseCard } = {};
+
     for (let card of cards) {
-      this.cards[card.id] = card;
+      newCardObject[card.id] = card;
+      this.cards = newCardObject;
     }
     return;
   }
 
-  public getCard(id: number): GameBaseCard {
+  public getCard(id: number): GameBaseCard | undefined {
     return this.cards[id];
   }
 

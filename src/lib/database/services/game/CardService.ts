@@ -99,7 +99,7 @@ export abstract class CardService {
     zephyr: Zephyr
   ): Promise<Buffer> {
     // Need information off the base card to do anything.
-    const baseCard = zephyr.getCard(card.baseCardId);
+    const baseCard = zephyr.getCard(card.baseCardId)!;
 
     // Create the card canvas
     const canvas = createCanvas(350, 500);

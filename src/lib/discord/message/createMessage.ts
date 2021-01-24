@@ -53,19 +53,21 @@ export async function createMessage(
     }
   }
 
-  let message: Message<TextableChannel>;
+  let message;
 
   message = await retryOperation(
     async () => channel.createMessage({ content, embed }, file),
     3000,
     3
   ).catch((e) => {
-    console.log(
-      `Failed trying to send message with content ${content} in channel ${channel.id}. Full stack:\n${e}`
-    );
+    if (channel.type !== 1) {
+      console.log(
+        `Failed trying to send message with content ${content} in channel ${channel.id}. Full stack:\n${e}`
+      );
+    }
+
     throw new ZephyrError.MessageFailedToSendError();
   });
 
-  if (!message) throw new ZephyrError.MessageFailedToSendError();
   return message;
 }

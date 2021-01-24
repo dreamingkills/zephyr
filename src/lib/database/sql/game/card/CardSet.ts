@@ -45,7 +45,7 @@ export abstract class CardSet extends DBClass {
             wear,
           ]
         )) as { insertId: number };
-        zephyr.getCard(card.id).serialTotal = issue;
+        zephyr.getCard(card.id)!.serialTotal = issue;
         return await CardService.getUserCardById(query.insertId);
       } catch (e) {
         if (++tries === 3) throw e;
