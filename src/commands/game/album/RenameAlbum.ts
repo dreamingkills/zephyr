@@ -7,6 +7,7 @@ import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 
 export default class RenameAlbum extends BaseCommand {
   names = ["renamealbum", "ra"];
+  usage = ["$CMD$ <album name> <new name>"];
   description = "Changes the name of an album.";
   allowDm = true;
 
