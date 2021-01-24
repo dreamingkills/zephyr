@@ -3,10 +3,10 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import shop from "../../../assets/shop.json";
-import { items } from "../../../assets/items";
 import { ReactionCollector } from "eris-collector";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
+import { ItemService } from "../../../lib/ItemService";
 
 export default class Shop extends BaseCommand {
   names = [`shop`];
@@ -113,9 +113,7 @@ export default class Shop extends BaseCommand {
 
     if (subcommand === "buy") {
       const itemQuery = options.slice(1).join(" ")?.toLowerCase();
-      const targetItem = items.find((i) =>
-        i.names.map((n) => n.toLowerCase()).includes(itemQuery)
-      );
+      const targetItem = ItemService.getItemByName(itemQuery);
 
       if (!targetItem) throw new ZephyrError.InvalidItemError();
 
@@ -193,7 +191,7 @@ export default class Shop extends BaseCommand {
       case `cubits`: {
         let products = [];
         for (let item of shop.cubits) {
-          const baseItem = items.find((i) => i.id === item.itemId);
+          const baseItem = ItemService.getItemById(item.itemId);
 
           if (!baseItem) continue;
           products.push({
@@ -206,7 +204,7 @@ export default class Shop extends BaseCommand {
       case `bits`: {
         let products = [];
         for (let item of shop.bits) {
-          const baseItem = items.find((i) => i.id === item.itemId);
+          const baseItem = ItemService.getItemById(item.itemId);
 
           if (!baseItem) continue;
           products.push({

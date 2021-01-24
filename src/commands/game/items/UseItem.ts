@@ -2,11 +2,10 @@ import { Message, PartialEmoji } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { items } from "../../../assets/items";
-import { PrefabItem } from "../../../structures/item/PrefabItem";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { ReactionCollector } from "eris-collector";
+import { ItemService } from "../../../lib/ItemService";
 
 export default class UseItem extends BaseCommand {
   names = ["use"];
@@ -24,18 +23,15 @@ export default class UseItem extends BaseCommand {
 
     // Item names may contain spaces, so join everything after `.use`.
     const query = options.join(" ")?.toLowerCase();
-    let itemName: string;
 
     // If our query matches any item names or aliases, that's our item.
-    const targetItem = items.filter((i) => {
-      const find = i.names.find((n) => query.includes(n.toLowerCase()));
-      if (find) {
-        itemName = find;
-        return find;
-      }
-    })[0] as PrefabItem | undefined;
+    const targetItem = ItemService.getItemByName(query);
 
     if (!targetItem) throw new ZephyrError.InvalidItemError();
+
+    const itemName = targetItem.names
+      .map((n) => n.toLowerCase())
+      .find((n) => n === query)!;
 
     // Get the quantity of the item the user has.
     const targetUserItem = await ProfileService.getItem(
@@ -56,11 +52,16 @@ export default class UseItem extends BaseCommand {
       return;
     }
 
-    const parameters = options.slice(itemName!.split(" ").length);
+    const parameters = options.slice(itemName.split(" ").length);
 
     if (parameters.length < (targetItem.requiredArguments || 0)) {
       const prefix = this.zephyr.getPrefix(msg.guildID);
       throw new ZephyrError.InvalidItemArgumentsError(targetItem, prefix);
+    }
+
+    if (!targetItem.confirmation) {
+      await targetItem.use(msg, profile, parameters, this.zephyr);
+      return;
     }
 
     const embed = new MessageEmbed(`Use Item`, msg.author)

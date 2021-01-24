@@ -7,6 +7,7 @@ export interface PrefabItem {
   names: string[];
   useCost?: number;
   requiredArguments?: number;
+  confirmation?: boolean;
   description?: string;
   usage?: string;
   emoji: string;

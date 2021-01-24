@@ -2,11 +2,11 @@ import { Message, PartialEmoji } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
-import { items } from "../../../assets/items";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ReactionCollector } from "eris-collector";
 import { GameItem } from "../../../structures/game/Item";
 import { checkPermission } from "../../../lib/ZephyrUtils";
+import { ItemService } from "../../../lib/ItemService";
 
 export default class ItemInventory extends BaseCommand {
   names = ["items"];
@@ -77,7 +77,7 @@ export default class ItemInventory extends BaseCommand {
       return (
         inv
           .map((i) => {
-            const itemEntry = items.filter((item) => item.id === i.itemId)[0];
+            const itemEntry = ItemService.getItemById(i.itemId);
             return `— \`${itemEntry?.names[0] || `Unknown Item`}\` **x${
               i.quantity
             }**`;

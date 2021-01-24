@@ -5,10 +5,9 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { items } from "../../../assets/items";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { PatreonService } from "../../../lib/database/services/meta/PatreonService";
-import { PrefabItem } from "../../../structures/item/PrefabItem";
+import { ItemService } from "../../../lib/ItemService";
 
 export default class ClaimMonthlyPatronReward extends BaseCommand {
   names = ["monthly"];
@@ -21,9 +20,10 @@ export default class ClaimMonthlyPatronReward extends BaseCommand {
     const information = await PatreonService.getPatronInformation(profile);
 
     if (!information.nextFrameTime) {
-      const frameVoucherItem = items.filter((i) =>
-        i.names.includes("Patron Frame Voucher")
-      )[0] as PrefabItem;
+      const frameVoucherItem = ItemService.getItemByName(
+        `Patron Frame Voucher`
+      );
+      if (!frameVoucherItem) throw new ZephyrError.InvalidItemError();
 
       await ProfileService.addItems(profile, [
         { item: frameVoucherItem, count: 1 },
@@ -55,9 +55,10 @@ export default class ClaimMonthlyPatronReward extends BaseCommand {
         await this.send(msg.channel, embed);
         return;
       } else {
-        const frameVoucherItem = items.filter((i) =>
-          i.names.includes("Patron Frame Voucher")
-        )[0] as PrefabItem;
+        const frameVoucherItem = ItemService.getItemByName(
+          `Patron Frame Voucher`
+        );
+        if (!frameVoucherItem) throw new ZephyrError.InvalidItemError();
 
         await ProfileService.addItems(profile, [
           { item: frameVoucherItem, count: 1 },

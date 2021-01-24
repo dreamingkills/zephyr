@@ -2,9 +2,8 @@ import { Message } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { items } from "../../../assets/items";
-import { PrefabItem } from "../../../structures/item/PrefabItem";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { ItemService } from "../../../lib/ItemService";
 
 export default class ItemInfo extends BaseCommand {
   names = ["iteminfo", "ii"];
@@ -24,9 +23,7 @@ export default class ItemInfo extends BaseCommand {
       .filter((i) => i.toLowerCase() !== "--dev")
       .join(" ")
       .toLowerCase();
-    const targetItem = items.filter((i) =>
-      i.names.map((n) => n.toLowerCase()).includes(itemQuery)
-    )[0] as PrefabItem | undefined;
+    const targetItem = ItemService.getItemByName(itemQuery);
 
     if (!targetItem) throw new ZephyrError.InvalidItemError();
 
@@ -49,7 +46,9 @@ export default class ItemInfo extends BaseCommand {
 
     if (options.map((o) => o.toLowerCase()).includes("--dev"))
       embed.setFooter(
-        `id ${targetItem.id} / use?: ${!!targetItem.use} / idx ${items.indexOf(
+        `id ${
+          targetItem.id
+        } / use?: ${!!targetItem.use} / idx ${ItemService.items.indexOf(
           targetItem
         )}`
       );

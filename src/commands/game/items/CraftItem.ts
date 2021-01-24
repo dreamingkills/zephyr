@@ -3,13 +3,13 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import recipes from "../../../assets/recipes.json";
-import { items } from "../../../assets/items";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { renderRecipe } from "../../../lib/utility/text/TextUtils";
 import { Recipe } from "../../../structures/game/Recipe";
 import { ReactionCollector } from "eris-collector";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
+import { ItemService } from "../../../lib/ItemService";
 
 export default class CraftItem extends BaseCommand {
   names = ["craft"];
@@ -31,8 +31,8 @@ export default class CraftItem extends BaseCommand {
 
     if (!recipeQuery) throw new ZephyrError.RecipeNotFoundError();
 
-    const requiredBaseItems = recipeQuery.ingredients.map(
-      (i) => items.filter((b) => b.id === i.itemId)[0]
+    const requiredBaseItems = recipeQuery.ingredients.map((i) =>
+      ItemService.getItemById(i.itemId)
     ) as PrefabItem[];
     const requiredItemCounts = recipeQuery.ingredients.map((i) => i.count);
 
@@ -93,7 +93,7 @@ export default class CraftItem extends BaseCommand {
       await ProfileService.addItems(
         profile,
         recipeQuery.result.map((r) => {
-          const resultBaseItem = items.filter((i) => i.id === r.itemId)[0];
+          const resultBaseItem = ItemService.getItemById(r.itemId)!;
           return { item: resultBaseItem, count: r.count };
         })
       );
