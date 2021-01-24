@@ -7,8 +7,9 @@ import { CardService } from "../../../lib/database/services/game/CardService";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 
 export default class RemoveCardFromAlbum extends BaseCommand {
-  names = ["removecardfromalbum", "rc"];
-  description = "Removes a card from an album.";
+  names = [`removecardfromalbum`, `rc`];
+  usage = [`$CMD$ <card>`];
+  description = `Removes a card from an album.`;
   allowDm = true;
 
   async exec(
