@@ -59,9 +59,9 @@ export default class ViewTalent extends BaseCommand {
         msg.author.dynamicAvatarURL("png")
       )
       .setDescription(
-        `Card: ${base.group ? `**${base.group}** ` : ``}${base.name}${
-          base.subgroup ? ` (${base.subgroup})` : ``
-        }` + talents
+        `Card: ${base.group ? `**${base.group}**` : `**Soloist**`} ${
+          base.name
+        }${base.subgroup ? ` (${base.subgroup})` : ``}` + talents
       )
       .setThumbnail(`attachment://card.png`);
 

@@ -20,7 +20,7 @@ export default class TopWishlist extends BaseCommand {
     for (let t of top) {
       description += `\`${(
         `#` + (page * 10 - 10 + top.indexOf(t) + 1).toString()
-      ).padStart(pad, " ")}\` ${t.group ? `**${t.group}** ` : ``}${
+      ).padStart(pad, " ")}\` ${t.group ? `**${t.group}**` : `**Soloist**`} ${
         t.name
       } — **${t.count.toLocaleString()}** wishlists\n`;
     }

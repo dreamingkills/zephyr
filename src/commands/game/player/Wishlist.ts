@@ -25,7 +25,7 @@ export default class Wishlist extends BaseCommand {
     const embed = new MessageEmbed()
       .setAuthor(`Wishlist | ${author.tag}`, author.dynamicAvatarURL("png"))
       .setDescription(
-        `Added ${query.group ? `**${query.group}** ` : ``}${
+        `Added ${query.group ? `**${query.group}**` : `**Soloist**`} ${
           query.name
         } to your wishlist.`
       );
@@ -78,9 +78,9 @@ export default class Wishlist extends BaseCommand {
               unique
                 .map(
                   (u, index) =>
-                    `— \`${index + 1}\` ${u.group ? `**${u.group}** ` : ``}${
-                      u.name
-                    }`
+                    `— \`${index + 1}\` ${
+                      u.group ? `**${u.group}**` : `**Soloist**`
+                    } ${u.name}`
                 )
                 .join("\n")
           );
@@ -115,9 +115,9 @@ export default class Wishlist extends BaseCommand {
                 msg.author.dynamicAvatarURL("png")
               )
               .setDescription(
-                `${match.groupName ? `**${match.groupName}** ` : ``}${
-                  match.name
-                } is already on your wishlist.`
+                `${
+                  match.groupName ? `**${match.groupName}**` : `**Soloist**`
+                } ${match.name} is already on your wishlist.`
               );
 
             await this.send(msg.channel, embed);
@@ -178,8 +178,8 @@ export default class Wishlist extends BaseCommand {
               )
               .setDescription(
                 `Removed ${
-                  item[0].groupName ? `**${item[0].groupName}** ` : ``
-                }${item[0].name} from your wishlist.`
+                  item[0].groupName ? `**${item[0].groupName}**` : `**Soloist**`
+                } ${item[0].name} from your wishlist.`
               );
 
             await this.send(msg.channel, embed);
@@ -198,9 +198,9 @@ export default class Wishlist extends BaseCommand {
           msg.author.dynamicAvatarURL("png")
         )
         .setDescription(
-          `Removed ${target.groupName ? `**${target.groupName}** ` : ``}${
-            target.name
-          } from your wishlist.`
+          `Removed ${
+            target.groupName ? `**${target.groupName}**` : `**Soloist**`
+          } ${target.name} from your wishlist.`
         );
 
       await this.send(msg.channel, embed);
@@ -253,7 +253,7 @@ export default class Wishlist extends BaseCommand {
                 return `\`${(index++)
                   .toString()
                   .padStart(wishlist.length.toString().length)}\` ${
-                  i.groupName ? `**${i.groupName}** ` : ``
+                  i.groupName ? `**${i.groupName}**` : `**Soloist**`
                 }${i.name}`;
               })
               .join("\n")}`

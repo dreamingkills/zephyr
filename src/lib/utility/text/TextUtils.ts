@@ -98,7 +98,7 @@ export function getDescriptions(
           padRight,
           " "
         )}\`` +
-          ` ${baseCard.group ? `**${baseCard.group}** ` : ``}${baseCard.name}` +
+          ` **${baseCard.group || `Soloist`}** ${baseCard.name}` +
           (baseCard.emoji ? ` ${baseCard.emoji}` : ``)
       );
     } else if (t instanceof GameDye) {
