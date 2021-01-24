@@ -107,13 +107,13 @@ export async function verifyMultitradeItems(
         const userItem = await ProfileService.getItem(
           profile,
           item.item.id,
-          item.item.name
+          item.item.names[0]
         );
 
         if ((itemInTrade?.count || 0) + item.count > userItem.quantity) {
           await handleError(
             msg,
-            new ZephyrError.NotEnoughOfItemError(item.item.name)
+            new ZephyrError.NotEnoughOfItemError(item.item.names[0])
           );
           continue;
         }
@@ -127,7 +127,7 @@ export async function verifyMultitradeItems(
       } catch {
         await handleError(
           msg,
-          new ZephyrError.NoItemInInventoryError(item.item.name)
+          new ZephyrError.NoItemInInventoryError(item.item.names[0])
         );
         continue;
       }

@@ -52,7 +52,7 @@ export function renderMultitradeInventory(
       : ``
   }${
     trueBaseItems.length > 0
-      ? trueBaseItems.map((i) => `${i.count}x ${i.item.name}`).join(`, `)
+      ? trueBaseItems.map((i) => `${i.count}x ${i.item.names[0]}`).join(`, `)
       : ``
   }\n\`\`\``;
 }

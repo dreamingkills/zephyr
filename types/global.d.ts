@@ -1,10 +1,10 @@
 import { GameDye } from "../src/structures/game/Dye";
-import { BaseItem } from "../src/structures/game/Item";
 import { GameUserCard } from "../src/structures/game/UserCard";
+import { PrefabItem } from "../src/structures/item/PrefabItem";
 
 declare type InteractableBits = { bits: number };
 declare type InteractableCubits = { cubits: number };
-declare type InteractableItem = { item: BaseItem; count: number };
+declare type InteractableItem = { item: PrefabItem; count: number };
 declare type TradeItemResolvable =
   | GameUserCard
   | GameDye
@@ -23,7 +23,7 @@ declare global {
     cubits: number;
   }
   interface InteractableItem {
-    item: BaseItem;
+    item: PrefabItem;
     count: number;
   }
   interface AlbumCard {
