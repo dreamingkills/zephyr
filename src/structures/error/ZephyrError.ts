@@ -799,3 +799,11 @@ export class NotEnoughCurrencyToBuyError extends ZephyrError {
     super(`You need **${amount.toLocaleString()} ${type}** to buy that.`);
   }
 }
+
+export class CannotReactError extends ZephyrError {
+  constructor() {
+    super(
+      `I cannot react to messages here. Please make sure I have the \`Add Reactions\` permission.`
+    );
+  }
+}

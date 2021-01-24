@@ -7,12 +7,20 @@ import dayjs from "dayjs";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { getTimeUntil } from "../../../lib/utility/time/TimeUtils";
 import { GuildService } from "../../../lib/database/services/guild/GuildService";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class DropCards extends BaseCommand {
   names = ["drop"];
   description = "Drops three random cards in the channel.";
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     if (!this.zephyr.dropsEnabled) throw new ZephyrError.DropsDisabledError();
+
+    const reactPermission = checkPermission(
+      `addReactions`,
+      msg.channel,
+      this.zephyr
+    );
+    if (!reactPermission) throw new ZephyrError.CannotReactError();
 
     const dropChannel = await GuildService.getDropChannel(msg.guildID!);
 

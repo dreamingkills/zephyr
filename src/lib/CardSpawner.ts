@@ -14,6 +14,7 @@ import { GameBaseCard } from "../structures/game/BaseCard";
 import { AnticheatService } from "./database/services/meta/AnticheatService";
 import { createMessage } from "./discord/message/createMessage";
 import { addReaction } from "./discord/message/addReaction";
+import { checkPermission } from "./ZephyrUtils";
 
 export abstract class CardSpawner {
   private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
@@ -345,8 +346,15 @@ export abstract class CardSpawner {
         (c) => c.id === channelId
       ) as TextChannel;
 
-      if (channel.permissionsOf(zephyr.user.id).json["sendMessages"])
-        await this.activityDrop(channel, zephyr);
+      const reactPermission = checkPermission(`addReactions`, channel, zephyr);
+      const messagePermission = checkPermission(
+        `addReactions`,
+        channel,
+        zephyr
+      );
+      if (!reactPermission || !messagePermission) return;
+
+      await this.activityDrop(channel, zephyr);
     }
   }
 }
