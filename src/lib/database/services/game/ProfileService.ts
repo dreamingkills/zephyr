@@ -7,7 +7,7 @@ import { ProfileGet } from "../../sql/game/profile/ProfileGet";
 import { ProfileSet } from "../../sql/game/profile/ProfileSet";
 import { User } from "eris";
 import { PrefabItem } from "../../../../structures/item/PrefabItem";
-import { items } from "../../../../assets/items";
+import { items } from "../../../../assets/Items";
 
 export abstract class ProfileService {
   /*
