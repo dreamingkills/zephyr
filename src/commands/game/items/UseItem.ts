@@ -31,7 +31,7 @@ export default class UseItem extends BaseCommand {
 
     const itemName = targetItem.names
       .map((n) => n.toLowerCase())
-      .find((n) => n === query)!;
+      .find((n) => query.includes(n))!;
 
     // Get the quantity of the item the user has.
     const targetUserItem = await ProfileService.getItem(
