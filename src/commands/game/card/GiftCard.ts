@@ -31,6 +31,7 @@ export default class GiftCard extends BaseCommand {
       if (!ref) throw new ZephyrError.InvalidCardReferenceError();
 
       const card = await CardService.getUserCardByIdentifier(ref);
+      if (cards.find((c) => c.id === card.id)) continue;
 
       if (card.discordId !== msg.author.id)
         throw new ZephyrError.NotOwnerOfCardError(card);
