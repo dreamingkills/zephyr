@@ -7,6 +7,7 @@ import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ReactionCollector } from "eris-collector";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
+import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 
 export default class DyeCard extends BaseCommand {
   names = ["dye"];
@@ -24,9 +25,9 @@ export default class DyeCard extends BaseCommand {
     const targetDye = await ProfileService.getDyeByIdentifier(options[0]);
 
     if (targetDye.discordId !== msg.author.id)
-      throw new ZephyrError.NotOwnerOfDyeError(targetDye.id);
+      throw new ZephyrError.NotOwnerOfDyeError(targetDye);
     if (targetDye.charges < 1)
-      throw new ZephyrError.UnchargedDyeError(targetDye.id);
+      throw new ZephyrError.UnchargedDyeError(targetDye);
 
     if (!options[1]) throw new ZephyrError.InvalidCardReferenceError();
 
@@ -34,8 +35,12 @@ export default class DyeCard extends BaseCommand {
 
     if (targetCard.discordId !== msg.author.id)
       throw new ZephyrError.NotOwnerOfCardError(targetCard);
+
     if (targetCard.wear !== 5)
       throw new ZephyrError.CardConditionTooLowError(targetCard.wear, 5);
+
+    const isInAlbum = await AlbumService.cardIsInAlbum(targetCard);
+    if (isInAlbum) throw new ZephyrError.CardInAlbumError(targetCard);
 
     [targetCard.dyeR, targetCard.dyeG, targetCard.dyeB] = [
       targetDye.dyeR,
@@ -76,6 +81,7 @@ export default class DyeCard extends BaseCommand {
       time: 15000,
       max: 1,
     });
+
     collector.on("error", async (e: Error) => {
       await this.handleError(msg, e);
     });
@@ -86,12 +92,15 @@ export default class DyeCard extends BaseCommand {
       if (refetchCard.discordId !== msg.author.id)
         throw new ZephyrError.NotOwnerOfCardError(refetchCard);
 
+      const isInAlbum = await AlbumService.cardIsInAlbum(refetchCard);
+      if (isInAlbum) throw new ZephyrError.CardInAlbumError(refetchCard);
+
       // Also check that their dye still has 1 charge
       const refetchDye = await targetDye.fetch();
       if (refetchDye.discordId !== msg.author.id)
-        throw new ZephyrError.NotOwnerOfDyeError(refetchDye.id);
+        throw new ZephyrError.NotOwnerOfDyeError(refetchDye);
       if (refetchDye.charges < 1)
-        throw new ZephyrError.UnchargedDyeError(refetchDye.id);
+        throw new ZephyrError.UnchargedDyeError(refetchDye);
 
       await confirmation.delete();
 

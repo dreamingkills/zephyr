@@ -41,7 +41,7 @@ export default class AddCardToAlbum extends BaseCommand {
       throw new ZephyrError.NotOwnerOfCardError(targetCard);
 
     const isInAlbum = await AlbumService.cardIsInAlbum(targetCard);
-    if (isInAlbum) throw new ZephyrError.CardInAlbumError(targetCard);
+    if (isInAlbum) throw new ZephyrError.CardAlreadyInAlbumError(targetCard);
 
     let targetPage: number, targetSlot: number;
 

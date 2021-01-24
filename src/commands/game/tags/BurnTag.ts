@@ -9,6 +9,8 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { items } from "../../../assets/Items";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
+import { AlbumService } from "../../../lib/database/services/game/AlbumService";
+import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class BurnTag extends BaseCommand {
   names = ["burntag", "bt"];
@@ -30,7 +32,14 @@ export default class BurnTag extends BaseCommand {
 
     if (!query) throw new ZephyrError.InvalidTagError(options[0]);
 
-    const cards = await CardService.getCardsByTag(query, profile);
+    const cardsRaw = await CardService.getCardsByTag(query, profile);
+
+    const cards: GameUserCard[] = [];
+    for (let card of cardsRaw) {
+      const isInAlbum = await AlbumService.cardIsInAlbum(card);
+      if (!isInAlbum) cards.push(card);
+    }
+
     if (cards.length < 1) throw new ZephyrError.NoCardsTaggedError(query);
 
     const individualRewards = cards.map((c) => {

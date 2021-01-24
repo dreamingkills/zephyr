@@ -9,6 +9,7 @@ import { GameUserCard } from "../../../structures/game/UserCard";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
+import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 
 export default class GiftCard extends BaseCommand {
   names = ["gift", "give"];
@@ -30,8 +31,12 @@ export default class GiftCard extends BaseCommand {
       if (!ref) throw new ZephyrError.InvalidCardReferenceError();
 
       const card = await CardService.getUserCardByIdentifier(ref);
+
       if (card.discordId !== msg.author.id)
         throw new ZephyrError.NotOwnerOfCardError(card);
+
+      const isInAlbum = await AlbumService.cardIsInAlbum(card);
+      if (isInAlbum) throw new ZephyrError.CardInAlbumError(card);
 
       cards.push(card);
     }
@@ -88,7 +93,7 @@ export default class GiftCard extends BaseCommand {
           throw new ZephyrError.NotOwnerOfCardError(refetchCard);
       }
 
-      await CardService.transferCardsToUser(cards, gifteeProfile, this.zephyr);
+      await CardService.transferCardsToUser(cards, gifteeProfile);
       await AnticheatService.logGift(
         profile,
         gifteeProfile,

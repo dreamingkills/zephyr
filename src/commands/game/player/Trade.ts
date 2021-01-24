@@ -8,6 +8,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { ReactionCollector } from "eris-collector";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
+import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 
 export default class Trade extends BaseCommand {
   names = ["trade"];
@@ -37,12 +38,19 @@ export default class Trade extends BaseCommand {
       throw new ZephyrError.InvalidCardIdentifierTradeError();
 
     const traderCard = await CardService.getUserCardByIdentifier(refs[0]);
+
     if (traderCard.discordId !== msg.author.id)
       throw new ZephyrError.NotOwnerOfCardError(traderCard);
+
+    const traderCardIsInAlbum = await AlbumService.cardIsInAlbum(traderCard);
+    if (traderCardIsInAlbum) throw new ZephyrError.CardInAlbumError(traderCard);
 
     const tradeeCard = await CardService.getUserCardByIdentifier(refs[1]);
     if (tradeeCard.discordId !== target.discordId)
       throw new ZephyrError.TradeeNotOwnerOfCardError(tradeeCard);
+
+    const tradeeCardIsInAlbum = await AlbumService.cardIsInAlbum(tradeeCard);
+    if (tradeeCardIsInAlbum) throw new ZephyrError.CardInAlbumError(tradeeCard);
 
     const traderTags = await ProfileService.getTags(profile);
     const tradeeTags = await ProfileService.getTags(target);
@@ -103,16 +111,8 @@ export default class Trade extends BaseCommand {
             return;
           }
 
-          await CardService.transferCardsToUser(
-            [traderCard],
-            target,
-            this.zephyr
-          );
-          await CardService.transferCardsToUser(
-            [tradeeCard],
-            profile,
-            this.zephyr
-          );
+          await CardService.transferCardsToUser([traderCard], target);
+          await CardService.transferCardsToUser([tradeeCard], profile);
 
           await AnticheatService.logTrade(
             profile,

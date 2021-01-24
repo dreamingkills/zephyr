@@ -11,6 +11,7 @@ import { items } from "../../../assets/Items";
 import { GameDye } from "../../../structures/game/Dye";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
+import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 
 export default class BurnCard extends BaseCommand {
   names = ["burn", "b"];
@@ -38,7 +39,7 @@ export default class BurnCard extends BaseCommand {
         // Parse as a dye
         const dyeTarget = await ProfileService.getDyeByIdentifier(id);
         if (dyeTarget.discordId !== msg.author.id)
-          throw new ZephyrError.NotOwnerOfDyeError(dyeTarget.id);
+          throw new ZephyrError.NotOwnerOfDyeError(dyeTarget);
 
         burnTargets.push(dyeTarget);
       } else {
@@ -49,6 +50,9 @@ export default class BurnCard extends BaseCommand {
         const cardTarget = await CardService.getUserCardByIdentifier(id);
         if (cardTarget.discordId !== msg.author.id)
           throw new ZephyrError.NotOwnerOfCardError(cardTarget);
+
+        const isInAlbum = await AlbumService.cardIsInAlbum(cardTarget);
+        if (isInAlbum) throw new ZephyrError.CardInAlbumError(cardTarget);
 
         burnTargets.push(cardTarget);
       }
@@ -174,10 +178,16 @@ export default class BurnCard extends BaseCommand {
       // We need to check that this user is still the owner, or they can dupe bits
       for (let target of [...cardTargets, ...dyeTargets]) {
         const refetch = await target.fetch();
-        if (refetch.discordId !== msg.author.id) {
-          if (refetch instanceof GameDye)
-            throw new ZephyrError.NotOwnerOfDyeError(refetch.id);
-          throw new ZephyrError.NotOwnerOfCardError(refetch);
+
+        if (refetch instanceof GameDye) {
+          if (refetch.discordId !== msg.author.id)
+            throw new ZephyrError.NotOwnerOfDyeError(refetch);
+        } else if (refetch instanceof GameUserCard) {
+          if (refetch.discordId !== msg.author.id)
+            throw new ZephyrError.NotOwnerOfCardError(refetch);
+
+          const isInAlbum = await AlbumService.cardIsInAlbum(refetch);
+          if (isInAlbum) throw new ZephyrError.CardInAlbumError(refetch);
         }
       }
 

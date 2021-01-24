@@ -9,6 +9,8 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { items } from "../../../assets/Items";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
+import { AlbumService } from "../../../lib/database/services/game/AlbumService";
+import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class BurnUntagged extends BaseCommand {
   names = ["burnuntagged", "bu"];
@@ -17,7 +19,13 @@ export default class BurnUntagged extends BaseCommand {
   allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const cards = await CardService.getUntaggedCards(profile);
+    const cardsRaw = await CardService.getUntaggedCards(profile);
+
+    const cards: GameUserCard[] = [];
+    for (let card of cardsRaw) {
+      const isInAlbum = await AlbumService.cardIsInAlbum(card);
+      if (!isInAlbum) cards.push(card);
+    }
 
     if (cards.length < 1) throw new ZephyrError.NoUntaggedCardsError();
 

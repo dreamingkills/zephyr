@@ -1,4 +1,5 @@
 import { User } from "eris";
+import { GameDye } from "../game/Dye";
 import { GameTag } from "../game/Tag";
 import { GameUserCard } from "../game/UserCard";
 import { PrefabItem } from "../item/PrefabItem";
@@ -508,14 +509,14 @@ export class InvalidDyeIdentifierError extends ZephyrError {
 }
 
 export class UnchargedDyeError extends ZephyrError {
-  constructor(id: number) {
-    super(`\`$${id.toString(36)}\` has no charges!`);
+  constructor(dye: GameDye) {
+    super(`\`$${dye.id.toString(36)}\` has no charges!`);
   }
 }
 
 export class NotOwnerOfDyeError extends ZephyrError {
-  constructor(id: number) {
-    super(`\`$${id.toString(36)}\` does not belong to you.`);
+  constructor(dye: GameDye) {
+    super(`\`$${dye.id.toString(36)}\` does not belong to you.`);
   }
 }
 
@@ -776,6 +777,12 @@ export class InvalidSlotError extends ZephyrError {
 }
 
 export class CardInAlbumError extends ZephyrError {
+  constructor(card: GameUserCard) {
+    super(`\`${card.id.toString(36)}\` is currently in an album.`);
+  }
+}
+
+export class CardAlreadyInAlbumError extends ZephyrError {
   constructor(card: GameUserCard) {
     super(`\`${card.id.toString(36)}\` is already in an album.`);
   }

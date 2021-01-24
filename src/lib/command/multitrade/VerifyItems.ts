@@ -9,6 +9,7 @@ import {
   isCubitItem,
   isInteractableItem,
 } from "./typeguards/MultitradeTypeguards";
+import { AlbumService } from "../../database/services/game/AlbumService";
 
 export async function verifyMultitradeItems(
   msg: Message,
@@ -26,6 +27,13 @@ export async function verifyMultitradeItems(
       )[0] as GameUserCard | undefined;
 
       if (cardInTrade) continue;
+
+      const isInAlbum = await AlbumService.cardIsInAlbum(item);
+      if (isInAlbum) {
+        await handleError(msg, new ZephyrError.CardInAlbumError(item));
+        continue;
+      }
+
       existingItems.push(item);
       continue;
     } else if (item instanceof GameDye) {

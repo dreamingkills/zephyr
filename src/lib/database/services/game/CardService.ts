@@ -16,7 +16,6 @@ import {
   GameCardSticker,
   GameSticker,
 } from "../../../../structures/game/Sticker";
-import { AlbumService } from "./AlbumService";
 
 export abstract class CardService {
   // Used for card image generation
@@ -278,22 +277,8 @@ export abstract class CardService {
 
   public static async transferCardsToUser(
     cards: GameUserCard[],
-    profile: GameProfile,
-    zephyr: Zephyr
+    profile: GameProfile
   ): Promise<void> {
-    const inAlbum = [];
-    const albums = [];
-    for (let card of cards) {
-      const isInAlbum = await AlbumService.cardIsInAlbum(card);
-      if (isInAlbum) {
-        inAlbum.push(card);
-        albums.push(isInAlbum);
-      }
-    }
-
-    if (inAlbum.length > 0)
-      await AlbumService.removeCardsFromAlbums(inAlbum, albums, zephyr);
-
     await CardSet.transferCardsToUser(cards, profile.discordId);
     return;
   }
