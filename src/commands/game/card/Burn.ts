@@ -38,6 +38,12 @@ export default class BurnCard extends BaseCommand {
 
         // Parse as a dye
         const dyeTarget = await ProfileService.getDyeByIdentifier(id);
+
+        if (
+          burnTargets.find((i) => i instanceof GameDye && i.id === dyeTarget.id)
+        )
+          continue;
+
         if (dyeTarget.discordId !== msg.author.id)
           throw new ZephyrError.NotOwnerOfDyeError(dyeTarget);
 
@@ -48,6 +54,14 @@ export default class BurnCard extends BaseCommand {
 
         // Parse as a card
         const cardTarget = await CardService.getUserCardByIdentifier(id);
+
+        if (
+          burnTargets.find(
+            (i) => i instanceof GameUserCard && i.id === cardTarget.id
+          )
+        )
+          continue;
+
         if (cardTarget.discordId !== msg.author.id)
           throw new ZephyrError.NotOwnerOfCardError(cardTarget);
 
