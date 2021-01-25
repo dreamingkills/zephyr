@@ -45,11 +45,15 @@ export class FilterService {
           )}),"%")`
         );
       } else if (["group", "g"].includes(prop)) {
-        queryOptions.push(
-          ` (alphanum(subgroup.group_name)) LIKE CONCAT("%",alphanum(${DB.connection.escape(
-            value
-          )}),"%")`
-        );
+        if (!value) {
+          queryOptions.push(` subgroup.group_name IS NULL`);
+        } else {
+          queryOptions.push(
+            ` (alphanum(subgroup.group_name)) LIKE CONCAT("%",alphanum(${DB.connection.escape(
+              value
+            )}),"%")`
+          );
+        }
       } else if (["subgroup", "sg"].includes(prop)) {
         queryOptions.push(
           ` alphanum(subgroup.subgroup_name) LIKE CONCAT("%",alphanum(${DB.connection.escape(
