@@ -254,7 +254,7 @@ export default class Wishlist extends BaseCommand {
                   .toString()
                   .padStart(wishlist.length.toString().length)}\` ${
                   i.groupName ? `**${i.groupName}**` : `**Soloist**`
-                }${i.name}`;
+                } ${i.name}`;
               })
               .join("\n")}`
       )
