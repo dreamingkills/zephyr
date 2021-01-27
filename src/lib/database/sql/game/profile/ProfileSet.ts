@@ -42,34 +42,27 @@ export abstract class ProfileSet extends DBClass {
 
   public static async addToWishlist(
     discordId: string,
-    name: string,
-    group: string | null
-  ): Promise<void> {
-    if (!group) {
-      await DB.query(`INSERT INTO wishlist (discord_id, name) VALUES (?, ?);`, [
-        discordId,
-        name,
-      ]);
-    } else {
-      await DB.query(
-        `INSERT INTO wishlist (discord_id, name, group_name) VALUES (?, ?, ?);`,
-        [discordId, name, group]
-      );
-    }
-    return;
-  }
-  public static async removeFromWishlist(
-    discordId: string,
-    num: number
+    idolId: number
   ): Promise<void> {
     await DB.query(
-      `DELETE FROM wishlist WHERE id IN (SELECT id FROM (SELECT id FROM wishlist WHERE discord_id=? ORDER BY id ASC LIMIT 1 OFFSET ${
-        num - 1
-      }) x);`,
-      [discordId]
+      `INSERT INTO wishlist (discord_id, idol_id) VALUES (?, ?);`,
+      [discordId, idolId]
     );
+
     return;
   }
+
+  public static async removeFromWishlist(
+    discordId: string,
+    idolId: number
+  ): Promise<void> {
+    await DB.query(`DELETE FROM wishlist WHERE discord_id=? AND idol_id=?;`, [
+      discordId,
+      idolId,
+    ]);
+    return;
+  }
+
   public static async clearWishlist(discordId: string): Promise<void> {
     await DB.query(`DELETE FROM wishlist WHERE discord_id=?;`, [discordId]);
     return;

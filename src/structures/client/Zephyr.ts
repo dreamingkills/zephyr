@@ -21,6 +21,7 @@ import { GameSticker } from "../game/Sticker";
 import { createMessage } from "../../lib/discord/message/createMessage";
 import dayjs from "dayjs";
 import { ItemService } from "../../lib/ItemService";
+import { GameIdol } from "../game/Idol";
 
 export class Zephyr extends Client {
   version: string = "Camellia";
@@ -32,6 +33,8 @@ export class Zephyr extends Client {
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
   private stickers: { [stickerId: number]: GameSticker } = {};
+
+  private idols: { [id: number]: GameIdol } = {};
 
   webhookListener: WebhookListener | undefined;
   dbl: dblapi | undefined;
@@ -253,16 +256,30 @@ export class Zephyr extends Client {
     const cards = await CardService.getAllCards();
 
     const newCardObject: { [key: number]: GameBaseCard } = {};
+    const newIdolObject: { [id: number]: GameIdol } = {};
 
     for (let card of cards) {
       newCardObject[card.id] = card;
-      this.cards = newCardObject;
+
+      newIdolObject[card.idolId] = {
+        id: card.idolId,
+        name: card.name,
+        birthday: card.birthday,
+      };
     }
+
+    this.cards = newCardObject;
+    this.idols = newIdolObject;
+
     return;
   }
 
   public getCard(id: number): GameBaseCard | undefined {
     return this.cards[id];
+  }
+
+  public getIdol(id: number): GameIdol | undefined {
+    return this.idols[id];
   }
 
   public async refreshCard(id: number): Promise<GameBaseCard> {
@@ -283,7 +300,7 @@ export class Zephyr extends Client {
       if (bonus) {
         const random = this.chance.pickone(wishlist);
         const potential = eligibleCards.filter(
-          (c) => c.name === random.name && c.group === random.groupName
+          (c) => c.idolId === random.idolId
         );
         if (potential[0]) cards.push(potential[0]);
       }

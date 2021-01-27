@@ -52,17 +52,16 @@ export abstract class ProfileService {
 
   public static async addToWishlist(
     profile: GameProfile,
-    name: string,
-    group: string | null
+    idolId: number
   ): Promise<void> {
-    return await ProfileSet.addToWishlist(profile.discordId, name, group);
+    return await ProfileSet.addToWishlist(profile.discordId, idolId);
   }
 
   public static async removeFromWishlist(
     profile: GameProfile,
-    num: number
+    idolId: number
   ): Promise<void> {
-    return await ProfileSet.removeFromWishlist(profile.discordId, num);
+    return await ProfileSet.removeFromWishlist(profile.discordId, idolId);
   }
 
   public static async clearWishlist(profile: GameProfile): Promise<void> {

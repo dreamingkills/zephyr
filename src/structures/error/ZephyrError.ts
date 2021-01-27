@@ -1,5 +1,6 @@
 import { User } from "eris";
 import { GameDye } from "../game/Dye";
+import { GameIdol } from "../game/Idol";
 import { GameTag } from "../game/Tag";
 import { GameUserCard } from "../game/UserCard";
 import { PrefabItem } from "../item/PrefabItem";
@@ -237,11 +238,11 @@ export class InvalidWishlistNameError extends ZephyrError {
 }
 
 export class DuplicateWishlistEntryError extends ZephyrError {
-  constructor(name: string, groupName?: string) {
+  constructor(idol: GameIdol, groups: string[]) {
     super(
-      `${
-        groupName ? `**${groupName}** ` : ``
-      }${name} is already on your wishlist.`
+      `**${idol.name}**${
+        groups.length === 0 ? `` : ` (${groups.join(`, `)})`
+      } is already on your wishlist.`
     );
   }
 }

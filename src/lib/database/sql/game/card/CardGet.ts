@@ -34,6 +34,8 @@ export abstract class CardGet extends DBClass {
   public static async getAllCards(): Promise<GameBaseCard[]> {
     const query = (await DB.query(`SELECT
                                     card_base.id,
+                                    card_base.idol_id, 
+                                    card_base.subgroup_id,
                                     subgroup.group_name,
                                     idol.idol_name,
                                     idol.birthday,

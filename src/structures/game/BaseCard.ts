@@ -3,6 +3,8 @@ import dayjs from "dayjs";
 export interface BaseCard {
   id: number;
   group_name: string | null;
+  idol_id: number;
+  subgroup_id: number | null;
   idol_name: string;
   birthday: string;
   subgroup_name: string | null;
@@ -24,29 +26,33 @@ export interface Frame {
 
 export class GameBaseCard {
   id: number;
-  group: string | null;
-  subgroup: string | null;
+  group: string | undefined;
+  subgroup: string | undefined;
+  idolId: number;
+  subgroupId: number | undefined;
   name: string;
   image: string;
   rarity: number;
   serialTotal: number;
   serialLimit: number;
   totalGenerated: number;
-  emoji: string | null;
+  emoji: string | undefined;
   archived: boolean;
   birthday: string | undefined;
   constructor(card: BaseCard) {
     this.id = card.id;
-    this.group = card.group_name;
-    this.subgroup = card.subgroup_name;
+    this.group = card.group_name || undefined;
+    this.subgroup = card.subgroup_name || undefined;
     this.name = card.idol_name;
     this.image = card.image_url;
     this.rarity = card.rarity;
     this.serialLimit = card.serial_limit;
     this.serialTotal = card.serial_total;
     this.totalGenerated = card.num_generated;
-    this.emoji = card.emoji;
+    this.emoji = card.emoji || undefined;
     this.archived = card.archived;
+    this.idolId = card.idol_id;
+    this.subgroupId = card.subgroup_id || undefined;
     if (card.birthday)
       this.birthday = dayjs(card.birthday).format(`YYYY-MM-DD`);
   }

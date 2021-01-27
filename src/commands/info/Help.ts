@@ -103,7 +103,7 @@ export default class Help extends BaseCommand {
       })
       .addField({
         name: `Wishlist`,
-        value: `\`wishlist [add/remove/clear]\``,
+        value: `\`wishlist\`, \`wishadd\`, \`wishremove\`, \`wishclear\``,
         inline: true,
       })
       .addField({
