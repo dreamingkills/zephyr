@@ -361,7 +361,7 @@ export abstract class CardService {
 
   public static async getTopWishlisted(
     page: number = 1
-  ): Promise<{ group: string; name: string; count: number }[]> {
+  ): Promise<{ idol_id: number; count: number }[]> {
     return await CardGet.getTopWishlisted(page);
   }
 

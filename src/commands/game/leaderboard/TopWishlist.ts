@@ -12,17 +12,28 @@ export default class TopWishlist extends BaseCommand {
   allowDm = true;
 
   private async renderBody(
-    top: { group: string; name: string; count: number }[],
+    top: { idol_id: number; count: number }[],
     page: number
   ): Promise<string> {
     let description = "";
     const pad = `#${page * 10}`.length;
     for (let t of top) {
+      const idol = this.zephyr.getIdol(t.idol_id);
+
+      const groups: string[] = [];
+      this.zephyr
+        .getCards()
+        .filter((c) => c.idolId === idol?.id)
+        .map((c) => c.group)
+        .forEach((g) => {
+          if (!groups.includes(g || `Soloist`)) groups.push(g || `Soloist`);
+        });
+
       description += `\`${(
         `#` + (page * 10 - 10 + top.indexOf(t) + 1).toString()
-      ).padStart(pad, " ")}\` ${t.group ? `**${t.group}**` : `**Soloist**`} ${
-        t.name
-      } — **${t.count.toLocaleString()}** wishlists\n`;
+      ).padStart(pad, " ")}\` ${`**${idol?.name || `Unknown Idol`}**${
+        groups.length === 0 ? `` : ` (${groups.join(`, `)})`
+      }`} — **${t.count.toLocaleString()}** wishlists\n`;
     }
     return description;
   }

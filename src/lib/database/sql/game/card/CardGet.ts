@@ -192,20 +192,20 @@ export abstract class CardGet extends DBClass {
 
   public static async getNumberOfTopWishlisted(): Promise<number> {
     const query = (await DB.query(
-      `SELECT COUNT(*) as count FROM (SELECT COUNT(*) as count FROM wishlist GROUP BY name, group_name HAVING COUNT(*) ORDER BY count DESC) g;`
+      `SELECT COUNT(*) as count FROM (SELECT COUNT(*) as count FROM wishlist GROUP BY idol_id HAVING COUNT(*) ORDER BY count DESC) g;`
     )) as { count: number }[];
     return query[0].count;
   }
 
   public static async getTopWishlisted(
     page: number
-  ): Promise<{ group: string; name: string; count: number }[]> {
+  ): Promise<{ idol_id: number; count: number }[]> {
     const query = (await DB.query(
-      `SELECT COUNT(*) as count, name, group_name FROM wishlist GROUP BY name, group_name ORDER BY count DESC LIMIT 10 OFFSET ?;`,
+      `SELECT COUNT(*) as count, idol_id FROM wishlist GROUP BY idol_id ORDER BY count DESC LIMIT 10 OFFSET ?;`,
       [page * 10 - 10]
-    )) as { count: number; name: string; group_name: string }[];
+    )) as { count: number; idol_id: number }[];
     return query.map((q) => {
-      return { name: q.name, group: q.group_name, count: q.count };
+      return { idol_id: q.idol_id, count: q.count };
     });
   }
 
@@ -244,21 +244,12 @@ export abstract class CardGet extends DBClass {
   public static async getTimesCardWishlisted(
     baseCard: GameBaseCard
   ): Promise<number> {
-    let count: number;
-    if (baseCard.group) {
-      const query = (await DB.query(
-        `SELECT COUNT(*) AS count FROM wishlist WHERE group_name=? AND name=?;`,
-        [baseCard.group, baseCard.name]
-      )) as { count: number }[];
-      count = query[0].count;
-    } else {
-      const query = (await DB.query(
-        `SELECT COUNT(*) AS count FROM wishlist WHERE name=?;`,
-        [baseCard.name]
-      )) as { count: number }[];
-      count = query[0].count;
-    }
-    return count;
+    const query = (await DB.query(
+      `SELECT COUNT(*) AS count FROM wishlist WHERE idol_id=?;`,
+      [baseCard.idolId]
+    )) as { count: number }[];
+
+    return query[0].count;
   }
 
   public static async getAverageClaimTime(cardId: number): Promise<number> {
