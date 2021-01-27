@@ -12,6 +12,7 @@ export default class CardLookup extends BaseCommand {
   description = "Shows you information about a card.";
   usage = ["$CMD$ <name>"];
   allowDm = true;
+  developerOnly = true;
 
   async exec(
     msg: Message,
