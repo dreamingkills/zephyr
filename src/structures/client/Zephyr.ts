@@ -296,7 +296,7 @@ export class Zephyr extends Client {
     const cards: GameBaseCard[] = [];
     const eligibleCards = Object.values(this.cards).filter((c) => c.rarity > 0);
     if (wishlist.length > 0) {
-      const bonus = this.chance.bool({ likelihood: 1.25 });
+      const bonus = this.chance.bool({ likelihood: 5 });
       if (bonus) {
         const random = this.chance.pickone(wishlist);
         const potential = eligibleCards.filter(
