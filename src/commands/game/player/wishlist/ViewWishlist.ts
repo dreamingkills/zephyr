@@ -8,7 +8,7 @@ import * as ZephyrError from "../../../../structures/error/ZephyrError";
 export default class ViewWishlist extends BaseCommand {
   names = ["wishlist", "wish", "wl"];
   usage = [`$CMD$`, `$CMD$ <@mention>`, `$CMD$ <user id>`];
-  description = "Adds an idol to your wishlist.";
+  description = "Shows you someone's wishlist.";
   allowDm = true;
 
   async exec(

@@ -9,7 +9,7 @@ import { MessageCollector } from "eris-collector";
 
 export default class AddWishlist extends BaseCommand {
   names = ["wishadd", "wa"];
-  description = "Shows you your wishlist.";
+  description = "Adds an idol to your wishlist.";
   allowDm = true;
 
   async exec(
