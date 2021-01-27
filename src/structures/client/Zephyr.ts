@@ -24,7 +24,7 @@ import { ItemService } from "../../lib/ItemService";
 import { GameIdol } from "../game/Idol";
 
 export class Zephyr extends Client {
-  version: string = "Camellia";
+  version: string = "Nicotiana";
   commandLib = new CommandLib();
   dmHandler = new DMHandler();
   config: typeof config;
