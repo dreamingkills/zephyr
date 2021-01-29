@@ -4,6 +4,7 @@ import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 import { ReactionCollector } from "eris-collector";
+import { getGroupsByIdolId } from "../../../lib/utility/text/TextUtils";
 
 export default class TopWishlist extends BaseCommand {
   names = ["topwishlist", "twl"];
@@ -20,14 +21,7 @@ export default class TopWishlist extends BaseCommand {
     for (let t of top) {
       const idol = this.zephyr.getIdol(t.idol_id);
 
-      const groups: string[] = [];
-      this.zephyr
-        .getCards()
-        .filter((c) => c.idolId === idol?.id)
-        .map((c) => c.group)
-        .forEach((g) => {
-          if (!groups.includes(g || `Soloist`)) groups.push(g || `Soloist`);
-        });
+      const groups = getGroupsByIdolId(idol?.id || 0, this.zephyr.getCards());
 
       description += `\`${(
         `#` + (page * 10 - 10 + top.indexOf(t) + 1).toString()

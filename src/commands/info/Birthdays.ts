@@ -15,7 +15,7 @@ export default class Birthdays extends BaseCommand {
     const today = dayjs().format(`MM-DD`);
     const birthdays: GameBaseCard[] = [];
     this.zephyr.getCards().forEach((c) => {
-      if (!birthdays.find((b) => b.group === c.group && b.name === c.name)) {
+      if (!birthdays.find((b) => b.idolId === c.idolId)) {
         if (today === c.birthday?.slice(5)) birthdays.push(c);
       }
     });

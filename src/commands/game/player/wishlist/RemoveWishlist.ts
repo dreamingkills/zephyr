@@ -6,6 +6,7 @@ import { GameProfile } from "../../../../structures/game/Profile";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { MessageCollector } from "eris-collector";
 import { GameIdol } from "../../../../structures/game/Idol";
+import { getGroupsByIdolId } from "../../../../lib/utility/text/TextUtils";
 
 export default class RemoveWishlist extends BaseCommand {
   names = ["wishremove", "wr"];
@@ -55,15 +56,7 @@ export default class RemoveWishlist extends BaseCommand {
       ).setDescription(
         `I found multiple matches for \`${nameQuery}\`.\nPlease choose a number corresponding to the desired idol.\n${matches
           .map((u, index) => {
-            const groups: string[] = [];
-            this.zephyr
-              .getCards()
-              .filter((c) => c.idolId === u.id)
-              .map((c) => c.group)
-              .forEach((g) => {
-                if (!groups.includes(g || `Soloist`))
-                  groups.push(g || `Soloist`);
-              });
+            const groups = getGroupsByIdolId(u.id, this.zephyr.getCards());
 
             return `— \`${index + 1}\` **${u.name}**${
               groups.length === 0 ? `` : ` (${groups.join(`, `)})`
@@ -121,14 +114,7 @@ export default class RemoveWishlist extends BaseCommand {
 
     const exists = wishlist.find((wl) => wl.idolId === removalTarget.id);
 
-    const groups: string[] = [];
-    this.zephyr
-      .getCards()
-      .filter((c) => c.idolId === removalTarget.id)
-      .map((c) => c.group)
-      .forEach((g) => {
-        if (!groups.includes(g || `Soloist`)) groups.push(g || `Soloist`);
-      });
+    const groups = getGroupsByIdolId(removalTarget.id, this.zephyr.getCards());
 
     if (!exists) throw new ZephyrError.InvalidWishlistEntryError();
 

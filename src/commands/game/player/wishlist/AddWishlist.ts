@@ -6,6 +6,7 @@ import { GameProfile } from "../../../../structures/game/Profile";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { GameIdol } from "../../../../structures/game/Idol";
 import { MessageCollector } from "eris-collector";
+import { getGroupsByIdolId } from "../../../../lib/utility/text/TextUtils";
 
 export default class AddWishlist extends BaseCommand {
   names = ["wishadd", "wa"];
@@ -59,15 +60,7 @@ export default class AddWishlist extends BaseCommand {
       const embed = new MessageEmbed(`Wishlist Add`, msg.author).setDescription(
         `I found multiple matches for \`${nameQuery}\`.\nPlease choose a number corresponding to the desired idol.\n${matches
           .map((u, index) => {
-            const groups: string[] = [];
-            this.zephyr
-              .getCards()
-              .filter((c) => c.idolId === u.id)
-              .map((c) => c.group)
-              .forEach((g) => {
-                if (!groups.includes(g || `Soloist`))
-                  groups.push(g || `Soloist`);
-              });
+            const groups = getGroupsByIdolId(u.id, this.zephyr.getCards());
 
             return `— \`${index + 1}\` **${u.name}**${
               groups.length === 0 ? `` : ` (${groups.join(`, `)})`
