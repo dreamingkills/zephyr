@@ -1,12 +1,13 @@
 import dayjs from "dayjs";
 import { Message } from "eris";
+import { getGroupsByIdolId } from "../../lib/utility/text/TextUtils";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 import { GameBaseCard } from "../../structures/game/BaseCard";
 
 export default class Birthdays extends BaseCommand {
-  names = ["birthdays", "bd"];
-  description = "Shows a list of birthdays today.";
+  names = [`birthdays`, `bd`, `bday`];
+  description = `Shows a list of birthdays today.`;
   usage = ["$CMD$"];
   allowDm = true;
 
@@ -27,7 +28,12 @@ export default class Birthdays extends BaseCommand {
               birthdays
                 .map((c) => {
                   const age = dayjs().year() - dayjs(c.birthday).year();
-                  return `— **${c.group || `Soloist`}** ${c.name} (${age})`;
+                  const groups = getGroupsByIdolId(
+                    c.idolId,
+                    this.zephyr.getCards()
+                  );
+
+                  return `— ${age}: **${c.name}** (${groups.join(`, `)})`;
                 })
                 .join("\n")
       )

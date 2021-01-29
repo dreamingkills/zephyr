@@ -1,4 +1,5 @@
 import { Zephyr } from "../../../structures/client/Zephyr";
+import { GameBaseCard } from "../../../structures/game/BaseCard";
 import { GameDye } from "../../../structures/game/Dye";
 import { Recipe } from "../../../structures/game/Recipe";
 import { GameTag } from "../../../structures/game/Tag";
@@ -114,4 +115,19 @@ export function getDescriptions(
   }
 
   return descriptions;
+}
+
+export function getGroupsByIdolId(
+  idolId: number,
+  cards: GameBaseCard[]
+): string[] {
+  const groups: string[] = [];
+  cards
+    .filter((c) => c.idolId === idolId)
+    .forEach((c) => {
+      if (groups.includes(c.group || `Soloist`))
+        groups.push(c.group || `Soloist`);
+    });
+
+  return groups;
 }
