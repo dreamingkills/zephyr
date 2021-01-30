@@ -38,7 +38,12 @@ export function calculateTalent(
   };
 
   // Frame Talent
-  if (card.frameId != 1 && card.frameId !== null && card.wear === 5) {
+  if (
+    card.frameId &&
+    card.frameId != 1 &&
+    card.frameId !== null &&
+    card.wear === 5
+  ) {
     talents.frame += Math.floor(60 * wearMultiplier);
   }
 
