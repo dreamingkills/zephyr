@@ -6,7 +6,6 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { ReactionCollector } from "eris-collector";
 import { ItemService } from "../../../lib/ItemService";
-import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class UseItem extends BaseCommand {
   names = ["use"];
@@ -100,9 +99,6 @@ export default class UseItem extends BaseCommand {
 
       await this.react(confirmationMessage, "☑");
     });
-
-    if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
-      await confirmationMessage.removeReactions();
 
     if (!confirmed) {
       await this.edit(

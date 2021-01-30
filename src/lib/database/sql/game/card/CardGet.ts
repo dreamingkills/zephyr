@@ -48,27 +48,31 @@ export abstract class CardGet extends DBClass {
                                     num_generated,
                                     emoji
                                    FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE idol_id > 0;`)) as BaseCard[];
+
     return query.map((c) => new GameBaseCard(c));
   }
 
   public static async getCardById(id: number): Promise<GameBaseCard> {
     const query = (await DB.query(
       `SELECT
-    card_base.id,
-    subgroup.group_name,
-    idol.idol_name,
-    idol.birthday,
-    subgroup.subgroup_name,
-    subgroup.archived,
-    rarity,
-    image_url,
-    serial_total,
-    serial_limit,
-    num_generated,
-    emoji
+      card_base.id,
+      card_base.idol_id, 
+      card_base.subgroup_id,
+      subgroup.group_name,
+      idol.idol_name,
+      idol.birthday,
+      subgroup.subgroup_name,
+      subgroup.archived,
+      rarity,
+      image_url,
+      serial_total,
+      serial_limit,
+      num_generated,
+      emoji
    FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE card_base.id=? AND idol_id > 0;`,
       [id]
     )) as BaseCard[];
+
     return new GameBaseCard(query[0]);
   }
 

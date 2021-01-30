@@ -56,53 +56,58 @@ export default class CardLookup extends BaseCommand {
       return;
     }
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Lookup | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(
-        `I found multiple matches for **${nameQuery}**.\nPlease reply with a number to confirm which person you're talking about.\n` +
-          find
-            .map(
-              (u, index) =>
-                `— \`${index + 1}\` **${u.group || `Soloist`}** ${u.name}${
-                  u.subgroup ? ` (${u.subgroup})` : ``
-                }`
-            )
-            .join("\n")
-      );
+    const confirmationEmbed = new MessageEmbed(
+      `Lookup`,
+      msg.author
+    ).setDescription(
+      `I found multiple matches for **${nameQuery}**.\nPlease reply with a number to confirm which person you're talking about.\n` +
+        find
+          .map(
+            (u, index) =>
+              `— \`${index + 1}\` **${u.group || `Soloist`}** ${u.name}${
+                u.subgroup ? ` (${u.subgroup})` : ``
+              }`
+          )
+          .join("\n")
+    );
 
-    const conf = await this.send(msg.channel, embed);
+    const confirmation = await this.send(msg.channel, confirmationEmbed);
 
-    const filter = (m: Message) =>
-      find[parseInt(m.content) - 1] && m.author.id === msg.author.id;
-    const collector = new MessageCollector(this.zephyr, msg.channel, filter, {
-      time: 15000,
-      max: 1,
+    const selection: number | undefined = await new Promise((res, _req) => {
+      const filter = (m: Message) =>
+        find[parseInt(m.content) - 1] && m.author.id === msg.author.id;
+
+      const collector = new MessageCollector(this.zephyr, msg.channel, filter, {
+        time: 30000,
+        max: 1,
+      });
+
+      collector.on("error", async (e: Error) => {
+        await this.handleError(msg, e);
+      });
+
+      collector.on("collect", async (m: Message) => {
+        res(parseInt(m.content) - 1);
+      });
+
+      collector.on("end", async (_c: any, reason: string) => {
+        if (reason === "time") res(undefined);
+      });
     });
-    collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
-    });
 
-    collector.on("collect", async (m: Message) => {
-      const embed = await this.getCardStats(
-        find[parseInt(m.content) - 1],
-        msg.author
-      );
-
-      await this.send(msg.channel, embed, {
-        file: { file: find[parseInt(m.content) - 1].image, name: `card.png` },
+    if (!selection) {
+      await confirmation.edit({
+        embed: confirmationEmbed.setFooter(`🕒 This lookup has timed out.`),
       });
       return;
-    });
-    collector.on("end", async (_c: any, reason: string) => {
-      if (reason === "time") {
-        await conf.edit({
-          embed: embed.setFooter(`🕒 This lookup has timed out.`),
-        });
-      }
-    });
+    }
+
+    const targetCard = find[selection];
+
+    const embed = await this.getCardStats(targetCard, msg.author);
+
+    await this.send(msg.channel, embed);
+    return;
   }
 
   private async getCardStats(
@@ -110,6 +115,7 @@ export default class CardLookup extends BaseCommand {
     author: User
   ): Promise<MessageEmbed> {
     card = await this.zephyr.refreshCard(card.id);
+
     const timesDestroyed = await CardService.getTimesCardDestroyed(
       card,
       this.zephyr
@@ -118,41 +124,32 @@ export default class CardLookup extends BaseCommand {
     const avgClaimTime = await CardService.getAverageClaimTime(card);
     const wearSpread = await CardService.getCardWearSpread(card, this.zephyr);
 
-    const embed = new MessageEmbed().setAuthor(
-      `Lookup | ${author.tag}`,
-      author.dynamicAvatarURL("png")
+    const embed = new MessageEmbed(`Lookup`, author).setDescription(
+      `Name — **${card.name}**` +
+        (card.group ? `\nGroup — **${card.group}**` : ``) +
+        (card.subgroup ? `\nTheme — **${card.subgroup}**` : ``) +
+        (card.birthday ? `\nBirthday — **${card.birthday}**` : ``) +
+        `\n\n**${
+          card.name
+        }** is on **${timesWishlisted.toLocaleString()}** wishlists.` +
+        `\n\nTotal generated: **${card.totalGenerated.toLocaleString()}**` +
+        `\nTotal claimed: **${card.serialTotal.toLocaleString()}**` +
+        `\nTotal burned: **${timesDestroyed.toLocaleString()}**` +
+        `\n\nClaim rate: **${(
+          (card.serialTotal / Math.max(card.totalGenerated, 1)) *
+          100
+        ).toFixed(2)}%**` +
+        `\nAverage claim time: **${Math.max(avgClaimTime / 1000 - 5, 0).toFixed(
+          2
+        )}s**\n\n` +
+        `**Condition Spread**` +
+        `\n— \`☆☆☆☆☆\` **${wearSpread[0].toLocaleString()}**` +
+        `\n— \`★☆☆☆☆\` **${wearSpread[1].toLocaleString()}**` +
+        `\n— \`★★☆☆☆\` **${wearSpread[2].toLocaleString()}**` +
+        `\n— \`★★★☆☆\` **${wearSpread[3].toLocaleString()}**` +
+        `\n— \`★★★★☆\` **${wearSpread[4].toLocaleString()}**` +
+        `\n— \`★★★★★\` **${wearSpread[5].toLocaleString()}**`
     );
-
-    embed
-      //.setTitle(`Lookup - ${card.group ? `${card.group} ` : ``}${card.name}`)
-      .setDescription(
-        `Name — **${card.name}**` +
-          (card.group ? `\nGroup — **${card.group}**` : ``) +
-          (card.subgroup ? `\nTheme — **${card.subgroup}**` : ``) +
-          (card.birthday ? `\nBirthday — **${card.birthday}**` : ``) +
-          `\n\n**${
-            card.name
-          }** is on **${timesWishlisted.toLocaleString()}** wishlists.` +
-          `\n\nTotal generated: **${card.totalGenerated.toLocaleString()}**` +
-          `\nTotal claimed: **${card.serialTotal.toLocaleString()}**` +
-          `\nTotal burned: **${timesDestroyed.toLocaleString()}**` +
-          `\n\nClaim rate: **${(
-            (card.serialTotal / Math.max(card.totalGenerated, 1)) *
-            100
-          ).toFixed(2)}%**` +
-          `\nAverage claim time: **${Math.max(
-            avgClaimTime / 1000 - 5,
-            0
-          ).toFixed(2)}s**\n\n` +
-          `**Condition Spread**` +
-          `\n— \`☆☆☆☆☆\` **${wearSpread[0].toLocaleString()}**` +
-          `\n— \`★☆☆☆☆\` **${wearSpread[1].toLocaleString()}**` +
-          `\n— \`★★☆☆☆\` **${wearSpread[2].toLocaleString()}**` +
-          `\n— \`★★★☆☆\` **${wearSpread[3].toLocaleString()}**` +
-          `\n— \`★★★★☆\` **${wearSpread[4].toLocaleString()}**` +
-          `\n— \`★★★★★\` **${wearSpread[5].toLocaleString()}**`
-      )
-      .setThumbnail(`attachment://card.png`);
 
     return embed;
   }

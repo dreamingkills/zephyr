@@ -275,6 +275,7 @@ export class Zephyr extends Client {
   }
 
   public getCard(id: number): GameBaseCard | undefined {
+    console.log(this.cards[id]);
     return this.cards[id];
   }
 
@@ -284,7 +285,11 @@ export class Zephyr extends Client {
 
   public async refreshCard(id: number): Promise<GameBaseCard> {
     const recached = await CardService.getCardById(id);
-    this.cards[id] = recached;
+    console.log(this.cards[id]);
+
+    this.cards[recached.id] = recached;
+
+    console.log(recached);
     return recached;
   }
 

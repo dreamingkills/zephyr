@@ -117,14 +117,7 @@ export default class AddWishlist extends BaseCommand {
 
     const exists = wishlist.find((wl) => wl.idolId === additionTarget.id);
 
-    const groups: string[] = [];
-    this.zephyr
-      .getCards()
-      .filter((c) => c.idolId === additionTarget.id)
-      .map((c) => c.group)
-      .forEach((g) => {
-        if (!groups.includes(g || `Soloist`)) groups.push(g || `Soloist`);
-      });
+    const groups = getGroupsByIdolId(additionTarget.id, this.zephyr.getCards());
 
     if (exists)
       throw new ZephyrError.DuplicateWishlistEntryError(additionTarget, groups);
