@@ -36,9 +36,10 @@ export abstract class CardGet extends DBClass {
                                     card_base.id,
                                     card_base.idol_id, 
                                     card_base.subgroup_id,
-                                    subgroup.group_name,
+                                    base_group.group_name,
                                     idol.idol_name,
                                     idol.birthday,
+                                    subgroup.group_id,
                                     subgroup.subgroup_name,
                                     subgroup.archived,
                                     rarity,
@@ -47,7 +48,7 @@ export abstract class CardGet extends DBClass {
                                     serial_limit,
                                     num_generated,
                                     emoji
-                                   FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE idol_id > 0;`)) as BaseCard[];
+                                   FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id LEFT JOIN base_group ON base_group.id=subgroup.group_id WHERE idol_id > 0;`)) as BaseCard[];
 
     return query.map((c) => new GameBaseCard(c));
   }
@@ -58,9 +59,10 @@ export abstract class CardGet extends DBClass {
       card_base.id,
       card_base.idol_id, 
       card_base.subgroup_id,
-      subgroup.group_name,
+      base_group.group_name,
       idol.idol_name,
       idol.birthday,
+      subgroup.group_id,
       subgroup.subgroup_name,
       subgroup.archived,
       rarity,
@@ -69,7 +71,7 @@ export abstract class CardGet extends DBClass {
       serial_limit,
       num_generated,
       emoji
-   FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE card_base.id=? AND idol_id > 0;`,
+   FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id LEFT JOIN base_group ON base_group.id=subgroup.group_id WHERE card_base.id=? AND idol_id > 0;`,
       [id]
     )) as BaseCard[];
 

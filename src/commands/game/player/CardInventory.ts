@@ -104,6 +104,7 @@ export default class CardInventory extends BaseCommand {
       time: 2 * 60 * 1000,
     });
     collector.on("error", async (e: Error) => {
+      console.error(e);
       await this.handleError(msg, e);
     });
 

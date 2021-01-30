@@ -46,6 +46,7 @@ export function getDescriptions(
   tags: GameTag[] = []
 ): string[] {
   const descriptions = [];
+
   const onlyCards = targets.filter(
     (t) => t instanceof GameUserCard
   ) as GameUserCard[];
@@ -86,6 +87,7 @@ export function getDescriptions(
   for (let t of targets) {
     if (t instanceof GameUserCard) {
       const baseCard = zephyr.getCard(t.baseCardId)!;
+      console.log(baseCard);
       const hasTag = tags.filter(
         (tag) => tag.id === (<GameUserCard>t).tagId
       )[0];
