@@ -37,6 +37,12 @@ export interface Profile {
   vote_reminded: boolean;
 
   /*
+      Boosters
+  */
+  booster_group: number | null;
+  booster_expiry: string | null;
+
+  /*
       Other
   */
   daily_streak: number;
@@ -63,6 +69,10 @@ export class GameProfile {
   voteLast: string | null;
   voteReminder: boolean;
   voteReminded: boolean;
+
+  boosterGroup?: number;
+  boosterExpiry?: string;
+
   constructor(data: Profile) {
     this.discordId = data.discord_id;
     this.private = data.private;
@@ -85,6 +95,9 @@ export class GameProfile {
     this.voteReminder = data.vote_reminder;
     this.voteReminded = data.vote_reminded;
     this.blacklisted = data.blacklisted;
+
+    this.boosterGroup = data.booster_group || undefined;
+    this.boosterExpiry = data.booster_expiry || undefined;
   }
 
   public async fetch(): Promise<GameProfile> {

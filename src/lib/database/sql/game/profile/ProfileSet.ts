@@ -394,4 +394,26 @@ export abstract class ProfileSet extends DBClass {
 
     return;
   }
+
+  public static async setBooster(
+    profile: GameProfile,
+    groupId: number,
+    expiry: string
+  ): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET booster_group=?, booster_expiry=? WHERE discord_id=?;`,
+      [groupId, expiry, profile.discordId]
+    );
+
+    return;
+  }
+
+  public static async clearBooster(profile: GameProfile): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET booster_group=NULL, booster_expiry=NULL WHERE discord_id=?;`,
+      [profile.discordId]
+    );
+
+    return;
+  }
 }

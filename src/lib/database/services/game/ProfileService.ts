@@ -358,4 +358,20 @@ export abstract class ProfileService {
   public static getPrefabItemById(id: number): PrefabItem {
     return items.filter((i) => i.id === id)[0];
   }
+
+  public static async setBooster(
+    profile: GameProfile,
+    groupId: number,
+    expiry: string
+  ): Promise<GameProfile> {
+    await ProfileSet.setBooster(profile, groupId, expiry);
+
+    return await profile.fetch();
+  }
+
+  public static async clearBooster(profile: GameProfile): Promise<GameProfile> {
+    await ProfileSet.clearBooster(profile);
+
+    return await profile.fetch();
+  }
 }

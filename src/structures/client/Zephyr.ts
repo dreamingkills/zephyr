@@ -282,6 +282,16 @@ export class Zephyr extends Client {
     return this.idols[id];
   }
 
+  public getGroupById(id: number): string | undefined {
+    return Object.values(this.cards).find((c) => c.groupId === id)?.group;
+  }
+
+  public getGroupIdByName(name: string): number | undefined {
+    return Object.values(this.cards).find(
+      (c) => c.group?.toLowerCase() === name.toLowerCase()
+    )?.groupId;
+  }
+
   public async refreshCard(id: number): Promise<GameBaseCard> {
     const recached = await CardService.getCardById(id);
 
@@ -292,7 +302,8 @@ export class Zephyr extends Client {
 
   public getRandomCards(
     amount: number,
-    wishlist: GameWishlist[] = []
+    wishlist: GameWishlist[] = [],
+    booster?: number
   ): GameBaseCard[] {
     const today = dayjs().format(`MM-DD`);
     const cards: GameBaseCard[] = [];
@@ -309,7 +320,9 @@ export class Zephyr extends Client {
     }
 
     const weightings = eligibleCards.map(
-      (c) => c.rarity + (c.birthday?.slice(5) === today ? 150 : 0)
+      (c) =>
+        (c.rarity + (c.birthday?.slice(5) === today ? 150 : 0)) *
+        (c.groupId === booster ? 2.5 : 1)
     );
 
     while (cards.length < amount) {

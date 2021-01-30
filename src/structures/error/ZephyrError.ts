@@ -808,3 +808,14 @@ export class CannotReactError extends ZephyrError {
     );
   }
 }
+
+/*
+    Boosters
+              */
+export class BoosterActiveError extends ZephyrError {
+  constructor(expiry: string) {
+    super(
+      `You already have a booster active.\nIt expires at **${expiry} UTC**.`
+    );
+  }
+}
