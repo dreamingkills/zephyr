@@ -49,9 +49,7 @@ export default class CardLookup extends BaseCommand {
 
     if (find.length === 1) {
       const embed = await this.getCardStats(find[0], msg.author);
-      await this.send(msg.channel, embed, {
-        file: { file: find[0].image, name: `card.png` },
-      });
+      await this.send(msg.channel, embed);
       return;
     }
 
