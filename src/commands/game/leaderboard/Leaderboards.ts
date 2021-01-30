@@ -13,6 +13,7 @@ export default class Leaderboards extends BaseCommand {
   description = "Shows you top Zephyr players.";
   usage = ["$CMD$ <board name>"];
   allowDm = true;
+  developerOnly = true;
 
   private leaderboardTypes = ["bits", "daily", "cards", "cubits"];
 

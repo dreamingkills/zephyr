@@ -14,6 +14,7 @@ export default class TopGroup extends BaseCommand {
   description = "Shows you the top collectors of a certain group.";
   usage = ["$CMD$ <group name>"];
   allowDm = true;
+  developerOnly = true;
 
   async exec(
     msg: Message,
