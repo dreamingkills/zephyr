@@ -144,9 +144,10 @@ export abstract class CardSpawner {
           if (!warned.has(profile.discordId)) {
             await createMessage(
               channel,
-              `<@${userId}>, you must wait **${
-                getTimeUntil(now, until) || `<1s`
-              }** before claiming another card.`
+              `<@${userId}>, you must wait **${getTimeUntil(
+                now,
+                until
+              )}** before claiming another card.`
             );
             warned.add(profile.discordId);
           }

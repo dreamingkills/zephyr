@@ -325,16 +325,14 @@ export class ItemMissingError extends ZephyrError {
             */
 export class DropCooldownError extends ZephyrError {
   constructor(until: string) {
-    super(`You must wait **${until || `<1s`}** before dropping cards again.`);
+    super(`You must wait **${until}** before dropping cards again.`);
   }
 }
 
 export class ClaimCooldownError extends ZephyrError {
   constructor(until: string, userId: string) {
     super(
-      `<@${userId}>, you must wait **${
-        until || `<1s`
-      }** before claiming another card.`
+      `<@${userId}>, you must wait **${until}** before claiming another card.`
     );
   }
 }
