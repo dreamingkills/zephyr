@@ -103,10 +103,7 @@ export default class Leaderboards extends BaseCommand {
     let totalEntries: number;
     let title: string;
 
-    const embed = new MessageEmbed().setAuthor(
-      `Leaderboards | ${msg.author.tag}`,
-      msg.author.dynamicAvatarURL("png")
-    );
+    const embed = new MessageEmbed(`Leaderboards`, msg.author);
 
     if (["bit", "bits", "b"].includes(boardType)) {
       trueType = "bits";

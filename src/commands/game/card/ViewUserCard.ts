@@ -44,11 +44,7 @@ export default class ViewUserCard extends BaseCommand {
     const userTags = await ProfileService.getTags(targetProfile);
     const cardDescription = getDescriptions([card], this.zephyr, userTags)[0];
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Card View | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(`View Card`, msg.author)
       .setDescription(
         `${cardDescription} ${
           baseCard.subgroup ? `**(${baseCard.subgroup})**` : ``

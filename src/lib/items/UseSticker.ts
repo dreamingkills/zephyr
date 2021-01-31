@@ -35,11 +35,7 @@ export async function useSticker(
 
   const preview = await CardService.generateStickerPreview(card, zephyr);
 
-  const embed = new MessageEmbed()
-    .setAuthor(
-      `Add Sticker | ${msg.author.tag}`,
-      msg.author.dynamicAvatarURL("png")
-    )
+  const embed = new MessageEmbed(`Add Sticker`, msg.author)
     .setDescription(
       `Please enter the position (number) you'd like to place your sticker on.`
     )
@@ -100,11 +96,7 @@ export async function useSticker(
   );
   const newCard = await CardService.updateCardCache(addedSticker, zephyr);
 
-  const successEmbed = new MessageEmbed()
-    .setAuthor(
-      `Add Sticker | ${msg.author.tag}`,
-      msg.author.dynamicAvatarURL("png")
-    )
+  const successEmbed = new MessageEmbed(`Add Sticker`, msg.author)
     .setDescription(
       `You placed a **${item.names[0]}** at position **${position}**.`
     )

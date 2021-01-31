@@ -87,12 +87,9 @@ export default class BurnTag extends BaseCommand {
         )
         .join("\n");
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Bulk Burn | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(description);
+    const embed = new MessageEmbed(`Bulk Burn`, msg.author).setDescription(
+      description
+    );
 
     const confirmation = await this.send(msg.channel, embed);
 

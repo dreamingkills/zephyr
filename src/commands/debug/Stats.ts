@@ -22,12 +22,7 @@ export default class Stats extends BaseCommand {
     }
 
     const rtfl = await this.zephyr.fetchUser(`197186779843919877`);
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Stats | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png"),
-        `https://github.com/olivia-hye/zephyr`
-      )
+    const embed = new MessageEmbed(`Stats`, msg.author)
       .addField({
         name: `Memory Usage`,
         value: `— ${usedPct.toFixed(2)}% ${ramStatusEmoji}`,

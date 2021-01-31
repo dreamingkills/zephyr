@@ -26,10 +26,8 @@ export default class DailyReward extends BaseCommand {
       last.format(this.dayFormat);
 
     let _profile = profile;
-    let embed = new MessageEmbed().setAuthor(
-      `Daily | ${msg.author.tag}`,
-      msg.author.dynamicAvatarURL("png")
-    );
+
+    let embed = new MessageEmbed(`Daily Reward`, msg.author);
 
     if (last.format(`YYYY-MM-DD`) === todayFormat || last.isAfter(today)) {
       embed.setDescription(

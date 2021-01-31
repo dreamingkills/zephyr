@@ -54,20 +54,15 @@ export default class Trade extends BaseCommand {
 
     const traderTags = await ProfileService.getTags(profile);
     const tradeeTags = await ProfileService.getTags(target);
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Trade | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(
-        `Really trade \`${traderCard.id.toString(
-          36
-        )}\` for \`${tradeeCard.id.toString(36)}\`?` +
-          `\n\n__**${targetUser.username} receives:**__` +
-          `\n${getDescriptions([traderCard], this.zephyr, traderTags)}` +
-          `\n\n__**${msg.author.username} receives:**__` +
-          `\n${getDescriptions([tradeeCard], this.zephyr, tradeeTags)}`
-      );
+    const embed = new MessageEmbed(`Trade`, msg.author).setDescription(
+      `Really trade \`${traderCard.id.toString(
+        36
+      )}\` for \`${tradeeCard.id.toString(36)}\`?` +
+        `\n\n__**${targetUser.username} receives:**__` +
+        `\n${getDescriptions([traderCard], this.zephyr, traderTags)}` +
+        `\n\n__**${msg.author.username} receives:**__` +
+        `\n${getDescriptions([tradeeCard], this.zephyr, tradeeTags)}`
+    );
 
     const confirmation = await this.send(msg.channel, embed);
 

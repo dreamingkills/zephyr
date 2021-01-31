@@ -46,12 +46,9 @@ export default class CreateTag extends BaseCommand {
       throw new ZephyrError.DuplicateTagEmojiError(trueEmoji[0]);
 
     await ProfileService.createTag(profile, tag, trueEmoji[0]);
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Tag Creator | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(`Created tag ${trueEmoji[0]} \`${tag}\`!`);
+    const embed = new MessageEmbed(`Create Tag`, msg.author).setDescription(
+      `Created tag ${trueEmoji[0]} \`${tag}\`!`
+    );
 
     await this.send(msg.channel, embed);
     return;

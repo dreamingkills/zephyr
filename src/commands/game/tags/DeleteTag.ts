@@ -27,12 +27,9 @@ export default class DeleteTag extends BaseCommand {
 
     await ProfileService.deleteTag(hasTag);
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Delete Tag | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(`Deleted tag ${hasTag.emoji} \`${hasTag.name}\`.`);
+    const embed = new MessageEmbed(`Delete Tag`, msg.author).setDescription(
+      `Deleted tag ${hasTag.emoji} \`${hasTag.name}\`.`
+    );
 
     await this.send(msg.channel, embed);
     return;

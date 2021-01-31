@@ -58,8 +58,7 @@ export default class ViewDyes extends BaseCommand {
 
     const maxPage = Math.ceil(dyeCount / 10);
 
-    const embed = new MessageEmbed()
-      .setAuthor(`Dyes | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
+    const embed = new MessageEmbed(`Dyes`, msg.author)
       .setTitle(`${targetUser.tag}'s Dyes`)
       .setDescription(
         dyeCount > 0 ? this.renderDyes(dyes) : `${targetUser.tag} has no dyes!`

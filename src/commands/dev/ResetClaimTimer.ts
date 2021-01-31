@@ -15,9 +15,10 @@ export default class ResetClaimTimer extends BaseCommand {
     const target = await ProfileService.getProfile(msg.mentions[0].id);
     await ProfileService.setClaimTimestamp(target, "1970-01-01 00:00:00");
 
-    const embed = new MessageEmbed()
-      .setAuthor(`Reset Claim Timer | ${msg.author.tag}`, msg.author.avatarURL)
-      .setDescription(`Reset **${msg.mentions[0].tag}**'s claim timer.`);
+    const embed = new MessageEmbed(
+      `Reset Claim Timer`,
+      msg.author
+    ).setDescription(`Reset **${msg.mentions[0].tag}**'s claim timer.`);
 
     await this.send(msg.channel, embed);
     return;

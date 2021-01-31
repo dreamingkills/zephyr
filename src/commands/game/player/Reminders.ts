@@ -36,20 +36,13 @@ export default class Reminders extends BaseCommand {
         } else message = `You have enabled vote reminders.`;
       } else throw new ZephyrError.InvalidReminderTypeError();
 
-      const embed = new MessageEmbed()
-        .setAuthor(
-          `Reminders | ${msg.author.tag}`,
-          msg.author.dynamicAvatarURL("png")
-        )
-        .setDescription(message);
+      const embed = new MessageEmbed(`Reminders`, msg.author).setDescription(
+        message
+      );
       await this.send(msg.channel, embed);
       return;
     }
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Reminders | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(`Reminders`, msg.author)
       .setTitle(`${msg.author.tag}'s reminders`)
       .setDescription(
         `— Drops: **${profile.dropReminder ? `ON` : `OFF`}**` +

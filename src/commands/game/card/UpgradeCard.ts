@@ -63,11 +63,7 @@ export default class UpgradeCard extends BaseCommand {
       );
 
     const tags = await ProfileService.getTags(profile);
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Upgrade | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(`Upgrade`, msg.author)
       .setDescription(
         `Are you sure you want to upgrade this card?` +
           `\n${getDescriptions([card], this.zephyr, tags)}` +

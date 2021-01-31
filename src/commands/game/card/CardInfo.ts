@@ -60,11 +60,7 @@ export default class CardInfo extends BaseCommand {
 
     const cardImage = await CardService.checkCacheForCard(card, this.zephyr);
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Card Info | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(`Card Info`, msg.author)
       .setDescription(
         `Showing stats for \`${card.id.toString(36)}\`...` +
           `\n\n— Claimed at **${claimTime} UTC**` +

@@ -62,17 +62,17 @@ export default class Help extends BaseCommand {
               .join(", ")}` +
             `\n\`\`\``;
         }
-        const embed = new MessageEmbed()
-          .setAuthor(`Help | ${msg.author.tag}`, msg.author.avatarURL)
-          .setDescription(description);
+
+        const embed = new MessageEmbed(`Help`, msg.author).setDescription(
+          description
+        );
 
         await this.send(msg.channel, embed);
         return;
       } else throw new ZephyrError.InvalidHelpQueryError();
     }
 
-    const embed = new MessageEmbed()
-      .setAuthor(`Help | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
+    const embed = new MessageEmbed(`Help`, msg.author)
       .setDescription(
         `Type \`${prefix}help command\` to see more information about a command.`
       )

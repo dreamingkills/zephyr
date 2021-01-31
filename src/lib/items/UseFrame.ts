@@ -36,11 +36,7 @@ export async function useFrame(
 
   const preview = await CardService.generateCardImage(card, zephyr);
 
-  const embed = new MessageEmbed()
-    .setAuthor(
-      `Apply Frame | ${msg.author.tag}`,
-      msg.author.dynamicAvatarURL("png")
-    )
+  const embed = new MessageEmbed(`Apply Frame`, msg.author)
     .setDescription(
       `Really apply **${item.names[0]}** to \`${card.id.toString(36)}\`?`
     )

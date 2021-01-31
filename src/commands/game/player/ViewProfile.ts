@@ -48,25 +48,24 @@ export default class ViewProfile extends BaseCommand {
     const cardsAmount = await CardService.getUserInventorySize(target, [], {});
 
     const targetIsSender = target.discordId === msg.author.id;
-    const embed = new MessageEmbed()
-      .setAuthor(`Profile | ${targetUser.tag}`, msg.author.avatarURL)
-      .setDescription(
-        `**Blurb**` +
-          `\n${target.blurb || "*No blurb set*"}` +
-          `\n\n— ${targetIsSender ? `You have` : `${targetUser.tag} has`} ${
-            this.zephyr.config.discord.emoji.bits
-          } **${target.bits.toLocaleString()}**.` +
-          `\n— ${
-            targetIsSender ? `You have` : `${targetUser.tag} has`
-          } **${target.cubits.toLocaleString()}** cubit${
-            target.cubits === 1 ? `` : `s`
-          }.` +
-          `\n— ${
-            targetIsSender ? `You have` : `${targetUser.tag} has`
-          } **${cardsAmount.toLocaleString()}** card${
-            cardsAmount === 1 ? `` : `s`
-          }.`
-      );
+
+    const embed = new MessageEmbed(`Profile`, msg.author).setDescription(
+      `**Blurb**` +
+        `\n${target.blurb || "*No blurb set*"}` +
+        `\n\n— ${targetIsSender ? `You have` : `${targetUser.tag} has`} ${
+          this.zephyr.config.discord.emoji.bits
+        } **${target.bits.toLocaleString()}**.` +
+        `\n— ${
+          targetIsSender ? `You have` : `${targetUser.tag} has`
+        } **${target.cubits.toLocaleString()}** cubit${
+          target.cubits === 1 ? `` : `s`
+        }.` +
+        `\n— ${
+          targetIsSender ? `You have` : `${targetUser.tag} has`
+        } **${cardsAmount.toLocaleString()}** card${
+          cardsAmount === 1 ? `` : `s`
+        }.`
+    );
 
     if (target.discordId === msg.author.id && profile.private)
       embed.setFooter(`Your profile is currently private.`);

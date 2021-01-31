@@ -41,8 +41,7 @@ export default class UserInfo extends BaseCommand {
       target
     );
 
-    const embed = new MessageEmbed()
-      .setAuthor(`User Info | ${msg.author.tag}`, msg.author.avatarURL)
+    const embed = new MessageEmbed(`User Info`, msg.author)
       .setDescription(
         `Showing stats for **${targetUser.tag}**...` +
           `\n\n— Times voted: **${timesVoted.toLocaleString()}**` +

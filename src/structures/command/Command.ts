@@ -46,12 +46,9 @@ export abstract class BaseCommand implements Command {
   }
 
   public async handleError(msg: Message, error: Error): Promise<void> {
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Error | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(error.message);
+    const embed = new MessageEmbed(`Error`, msg.author).setDescription(
+      error.message
+    );
     await createMessage(msg.channel, embed);
     return;
   }

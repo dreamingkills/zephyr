@@ -20,10 +20,8 @@ export default class CheckCardImages extends BaseCommand {
       }
     }
 
-    const embed = new MessageEmbed().setAuthor(
-      `Check Card Images | ${msg.author.tag}`,
-      msg.author.dynamicAvatarURL("png")
-    );
+    const embed = new MessageEmbed(`Check Card Images`, msg.author);
+
     if (failed.length === 0) {
       embed.setDescription(`:ok_hand: All files were scanned successfully.`);
     } else {

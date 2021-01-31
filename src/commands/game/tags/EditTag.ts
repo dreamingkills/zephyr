@@ -55,14 +55,9 @@ export default class EditTag extends BaseCommand {
     }
     const newTag = await ProfileService.getTagById(hasTag.id);
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Edit Tag | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(
-        `Edited tag ${hasTag.emoji} **${hasTag.name}** to ${newTag.emoji} **${newTag.name}**.`
-      );
+    const embed = new MessageEmbed(`Edit Tag`, msg.author).setDescription(
+      `Edited tag ${hasTag.emoji} **${hasTag.name}** to ${newTag.emoji} **${newTag.name}**.`
+    );
 
     await this.send(msg.channel, embed);
     return;

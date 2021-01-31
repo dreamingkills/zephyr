@@ -170,9 +170,9 @@ export default class BurnCard extends BaseCommand {
       }\n\nYou will receive:\n` +
       (rewardsText.length === 0 ? `*... nothing ...*` : rewardsText.join("\n"));
 
-    const embed = new MessageEmbed()
-      .setAuthor(`Burn | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
-      .setDescription(embedDescription);
+    const embed = new MessageEmbed(`Burn`, msg.author).setDescription(
+      embedDescription
+    );
 
     const confirmation = await this.send(msg.channel, embed);
 

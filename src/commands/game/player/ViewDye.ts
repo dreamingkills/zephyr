@@ -39,11 +39,7 @@ export default class ViewDye extends BaseCommand {
     const buffer = canvas.toBuffer("image/jpeg");
     const buf = Buffer.alloc(buffer.length, buffer, "base64");
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `View Dye | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(`View Dye`, msg.author)
       .setDescription(
         `Viewing dye \`$${dyeTarget.id.toString(36)}\` **${
           dyeTarget.name

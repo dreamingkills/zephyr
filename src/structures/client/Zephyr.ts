@@ -216,14 +216,12 @@ export class Zephyr extends Client {
 
       // Get the prefix just in case it's already different (bot previously in guild)
       const prefix = this.getPrefix(guild.id);
-      const embed = new MessageEmbed()
-        .setAuthor(`Welcome | ${guild.name}`)
-        .setDescription(
-          `**Thanks for inviting Zephyr!**` +
-            `\nUse \`${prefix}setchannel\` in any channel to set that channel as the Zephyr channel.` +
-            `\n\n**Common configuration**` +
-            `\n— \`${prefix}prefix <prefix>\` - changes the bot's prefix`
-        );
+      const embed = new MessageEmbed(`Welcome | ${guild.name}`).setDescription(
+        `**Thanks for inviting Zephyr!**` +
+          `\nUse \`${prefix}setchannel\` in any channel to set that channel as the Zephyr channel.` +
+          `\n\n**Common configuration**` +
+          `\n— \`${prefix}prefix <prefix>\` - changes the bot's prefix`
+      );
       await createMessage(welcomeChannel, embed);
       return;
     });
@@ -441,13 +439,11 @@ export class Zephyr extends Client {
     try {
       const dmChannel = await voter.getDMChannel();
 
-      const embed = new MessageEmbed()
-        .setAuthor(`Vote | ${voter.tag}`, voter.dynamicAvatarURL("png"))
-        .setDescription(
-          `:sparkles: Thanks for voting, **${
-            voter.username
-          }**! You've been given **${isWeekend ? 4 : 2}** cubits!`
-        );
+      const embed = new MessageEmbed(`Vote`, voter).setDescription(
+        `:sparkles: Thanks for voting, **${
+          voter.username
+        }**! You've been given **${isWeekend ? 4 : 2}** cubits!`
+      );
       await createMessage(dmChannel, embed);
     } catch {}
   }

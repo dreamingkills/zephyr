@@ -60,12 +60,9 @@ export class CommandLib {
       command.developerOnly &&
       !zephyr.config.developers.includes(message.author.id)
     ) {
-      const embed = new MessageEmbed()
-        .setAuthor(
-          `Error | ${message.author.tag}`,
-          message.author.dynamicAvatarURL("png")
-        )
-        .setDescription(`This command is only usable by the developer.`);
+      const embed = new MessageEmbed(`Error`, message.author).setDescription(
+        `This command is only usable by the developer.`
+      );
       try {
         await createMessage(message.channel, embed);
       } catch {
@@ -84,24 +81,18 @@ export class CommandLib {
       await command.run(message, profile, zephyr);
     } catch (e) {
       if (e.isClientFacing) {
-        const embed = new MessageEmbed()
-          .setAuthor(
-            `Error | ${message.author.tag}`,
-            message.author.dynamicAvatarURL("png")
-          )
-          .setDescription(e.message);
+        const embed = new MessageEmbed(`Error`, message.author).setDescription(
+          e.message
+        );
         try {
           await createMessage(message.channel, embed);
         } catch {}
       } else {
         if (e.name === "Missing Access") return;
         console.log(`ERROR NAME: ${e}\n${e}`);
-        const embed = new MessageEmbed()
-          .setAuthor(
-            `Error | ${message.author.tag}`,
-            message.author.dynamicAvatarURL("png")
-          )
-          .setDescription(`An unexpected error occurred. Please try again.`);
+        const embed = new MessageEmbed(`Error`, message.author).setDescription(
+          `An unexpected error occurred. Please try again.`
+        );
         try {
           await createMessage(message.channel, embed);
         } catch {}

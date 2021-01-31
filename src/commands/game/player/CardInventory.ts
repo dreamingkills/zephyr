@@ -90,11 +90,7 @@ export default class CardInventory extends BaseCommand {
       filters
     );
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Inventory | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(`Inventory`, msg.author)
       .setTitle(`${targetUser.tag}'s cards`)
       .setDescription(this.renderInventory(inventory, userTags))
       .setFooter(

@@ -28,14 +28,9 @@ export default class DevUserCard extends BaseCommand {
       { item: targetItem, count: 1 },
     ]);
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Item Giver | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(
-        `Gave **1x** \`${targetItem.names[0]}\` to **${targetUser.tag}**`
-      );
+    const embed = new MessageEmbed(`Item Giver`, msg.author).setDescription(
+      `Gave **1x** \`${targetItem.names[0]}\` to **${targetUser.tag}**`
+    );
 
     await this.send(msg.channel, embed);
     return;

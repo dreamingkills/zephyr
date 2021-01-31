@@ -10,10 +10,7 @@ export default class ShowRecipes extends BaseCommand {
   allowDm = true;
 
   async exec(msg: Message): Promise<void> {
-    const embed = new MessageEmbed().setAuthor(
-      `Recipes | ${msg.author.tag}`,
-      msg.author.dynamicAvatarURL("png")
-    );
+    const embed = new MessageEmbed(`Recipes`, msg.author);
 
     const prefix = this.zephyr.getPrefix(msg.guildID!);
 

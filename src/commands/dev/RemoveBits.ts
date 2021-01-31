@@ -23,8 +23,7 @@ export default class RemoveBits extends BaseCommand {
     if (target.bits - amount < 0) amount = target.bits;
 
     const _target = await ProfileService.removeBitsFromProfile(target, amount);
-    const embed = new MessageEmbed()
-      .setAuthor(`Add Bits | ${msg.author.tag}`, msg.author.avatarURL)
+    const embed = new MessageEmbed(`Remove Bits`, msg.author)
       .setDescription(
         `Took ${this.zephyr.config.discord.emoji.bits}**${amount}** from **${targetUser.tag}**.`
       )

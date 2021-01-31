@@ -56,18 +56,14 @@ export default class TagCard extends BaseCommand {
     if (cards.length === 0) throw new ZephyrError.InvalidCardReferenceError();
 
     await CardService.setCardsTag(cards, tag.id);
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Tagging | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(
-        `Tagged ${
-          cards.length === 1
-            ? `\`${cards[0].id.toString(36)}\``
-            : `**${cards.length}** card${cards.length > 1 ? `s` : ``}`
-        } as ${tag.emoji} **${tag.name}**.`
-      );
+
+    const embed = new MessageEmbed(`Tag`, msg.author).setDescription(
+      `Tagged ${
+        cards.length === 1
+          ? `\`${cards[0].id.toString(36)}\``
+          : `**${cards.length}** card${cards.length > 1 ? `s` : ``}`
+      } as ${tag.emoji} **${tag.name}**.`
+    );
 
     await this.send(msg.channel, embed);
     return;

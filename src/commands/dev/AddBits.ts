@@ -21,8 +21,7 @@ export default class AddBits extends BaseCommand {
     const amount = parseInt(amountRaw[0], 10);
 
     const _target = await ProfileService.addBitsToProfile(target, amount);
-    const embed = new MessageEmbed()
-      .setAuthor(`Add Bits | ${msg.author.tag}`, msg.author.avatarURL)
+    const embed = new MessageEmbed(`Add Bits`, msg.author)
       .setDescription(
         `Gave ${this.zephyr.config.discord.emoji.bits}**${amount}** to **${targetUser.tag}**.`
       )
