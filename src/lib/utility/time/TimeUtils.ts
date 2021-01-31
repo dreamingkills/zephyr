@@ -21,9 +21,15 @@ export function getTimeUntil(from: Dayjs, to: Dayjs): string {
     seconds > 0 ? `${padIfNotLeading(seconds, minutes === 0)}s` : ``;
   const msText = ms > 0 ? `${padIfNotLeading(ms, seconds === 0)}ms` : ``;
 
-  if (ms === 0) {
+  if (ms === 0 && minutes === 0 && hours === 0 && days === 0) {
     return `Now`;
-  } else if (ms > 0 && seconds === 0) {
+  } else if (
+    ms > 0 &&
+    seconds === 0 &&
+    minutes === 0 &&
+    hours === 0 &&
+    days === 0
+  ) {
     return msText;
   } else {
     return (
