@@ -37,7 +37,12 @@ export default class ViewProfile extends BaseCommand {
 
     if (!target) target = await ProfileService.getProfile(targetUser.id);
 
-    if (target.private && target.discordId !== msg.author.id)
+    if (
+      target.private &&
+      target.discordId !== msg.author.id &&
+      !this.zephyr.config.moderators.includes(msg.author.id) &&
+      !this.zephyr.config.developers.includes(msg.author.id)
+    )
       throw new ZephyrError.PrivateProfileError(targetUser.tag);
 
     const cardsAmount = await CardService.getUserInventorySize(target, [], {});

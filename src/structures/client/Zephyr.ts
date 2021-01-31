@@ -130,7 +130,10 @@ export class Zephyr extends Client {
         return;
 
       // Prefix resetter
-      if (message.mentions[0]?.id === this.user.id) {
+      if (
+        message.mentions[0]?.id === this.user.id &&
+        message.content.includes(`<@`)
+      ) {
         const subcommand = message.content.split(" ")[1]?.toLowerCase();
 
         if (subcommand === "reset") {
