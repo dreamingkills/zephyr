@@ -9,7 +9,7 @@ export async function processItems(
   const tradeItems: TradeItemResolvable[] = [];
   let bits, cubits;
   for (let item of stringItems) {
-    const split = item.split(" ");
+    const split = item.split(" ").map((t) => t.toLowerCase());
     if (split.length === 1) {
       if (item.startsWith("$")) {
         try {
