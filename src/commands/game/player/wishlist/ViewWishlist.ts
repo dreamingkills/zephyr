@@ -4,6 +4,7 @@ import { MessageEmbed } from "../../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../../structures/command/Command";
 import { GameProfile } from "../../../../structures/game/Profile";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
+import { escapeMarkdown } from "../../../../lib/utility/text/TextUtils";
 
 export default class ViewWishlist extends BaseCommand {
   names = ["wishlist", "wish", "wl"];
@@ -57,7 +58,9 @@ export default class ViewWishlist extends BaseCommand {
           .toString()
           .padStart(leftPad, ` `)}\` **${
           this.zephyr.getIdol(idol.idolId)?.name || `Unknown Idol`
-        }** ${groups.length === 0 ? `` : `(${groups.join(", ")})`}`
+        }** ${
+          groups.length === 0 ? `` : `(${escapeMarkdown(groups.join(", "))})`
+        }`
       );
     }
 

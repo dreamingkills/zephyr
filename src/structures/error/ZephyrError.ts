@@ -126,6 +126,12 @@ export class InvalidHelpQueryError extends ZephyrError {
   }
 }
 
+export class UnknownIdolError extends ZephyrError {
+  constructor() {
+    super(`There are no idols by that name.`);
+  }
+}
+
 /*
     Lookup
             */
@@ -225,15 +231,15 @@ export class WishlistEmptyError extends ZephyrError {
   }
 }
 
-export class InvalidWishlistEntryError extends ZephyrError {
-  constructor() {
-    super(`Please enter a valid item from your wishlist.`);
-  }
-}
-
 export class InvalidWishlistNameError extends ZephyrError {
   constructor() {
     super(`Please enter a valid name to add to your wishlist.`);
+  }
+}
+
+export class InvalidWishlistNameRemoveError extends ZephyrError {
+  constructor() {
+    super(`Please enter an idol to remove from your wishlist.`);
   }
 }
 
@@ -243,6 +249,16 @@ export class DuplicateWishlistEntryError extends ZephyrError {
       `**${idol.name}**${
         groups.length === 0 ? `` : ` (${groups.join(`, `)})`
       } is already on your wishlist.`
+    );
+  }
+}
+
+export class IdolNotOnWishlistError extends ZephyrError {
+  constructor(idol: GameIdol, groups: string[]) {
+    super(
+      `**${idol.name}** (${
+        groups.join(`, `) || `Soloist`
+      }) is not on your wishlist.`
     );
   }
 }

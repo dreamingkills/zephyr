@@ -19,35 +19,28 @@ export default class RemoveWishlist extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (!options[0]) throw new ZephyrError.InvalidWishlistNameRemoveError();
+
     const wishlist = await ProfileService.getWishlist(profile);
 
     const nameQuery = options.join(" ").toLowerCase();
-    const matches: GameIdol[] = [];
 
+    const matches: GameIdol[] = [];
     this.zephyr
       .getCards()
       .filter((c) => `${c.group} ${c.name}`.toLowerCase().includes(nameQuery))
-      .forEach((m) => {
-        if (
-          !matches.find((match) => m.idolId === match.id) &&
-          wishlist.find((wl) => wl.idolId === m.idolId)
-        )
-          matches.push(
-            new GameIdol({
-              id: m.idolId,
-              idol_name: m.name,
-              birthday: m.birthday,
-            })
-          );
+      .map((c) => this.zephyr.getIdol(c.idolId))
+      .filter((c) => c)
+      .forEach((c) => {
+        if (!matches.find((m) => m.id === c!.id)) matches.push(c!);
       });
 
+    if (matches.length === 0) throw new ZephyrError.UnknownIdolError();
     if (matches.length > 25) throw new ZephyrError.LookupQueryTooBroadError();
 
     let removalTarget: GameIdol;
 
-    if (matches.length === 0) {
-      throw new ZephyrError.InvalidWishlistNameError();
-    } else if (matches.length === 1) {
+    if (matches.length === 1) {
       removalTarget = matches[0];
     } else {
       const embed = new MessageEmbed(
@@ -116,7 +109,8 @@ export default class RemoveWishlist extends BaseCommand {
 
     const groups = getGroupsByIdolId(removalTarget.id, this.zephyr.getCards());
 
-    if (!exists) throw new ZephyrError.InvalidWishlistEntryError();
+    if (!exists)
+      throw new ZephyrError.IdolNotOnWishlistError(removalTarget, groups);
 
     await ProfileService.removeFromWishlist(profile, removalTarget.id);
 
