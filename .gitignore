@@ -1,5 +1,9 @@
 # Orpheus
 src/orpheus/
+src/commands/orpheus
+src/lib/database/services/orpheus
+src/lib/database/sql/orpheus
+src/structures/orpheus
 
 # Discord
 config.json
