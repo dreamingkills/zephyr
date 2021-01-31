@@ -18,6 +18,7 @@ export default class AddWishlist extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (!options[0]) throw new ZephyrError.InvalidWishlistNameError();
     const wishlist = await ProfileService.getWishlist(profile);
 
     if (
