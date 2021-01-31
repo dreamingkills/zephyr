@@ -46,10 +46,10 @@ export class FilterService {
         );
       } else if (["group", "g"].includes(prop)) {
         if (!value) {
-          queryOptions.push(` subgroup.group_name IS NULL`);
+          queryOptions.push(` subgroup.group_id IS NULL`);
         } else {
           queryOptions.push(
-            ` (alphanum(subgroup.group_name)) LIKE CONCAT("%",alphanum(${DB.connection.escape(
+            ` (alphanum(base_group.group_name)) LIKE CONCAT("%",alphanum(${DB.connection.escape(
               value
             )}),"%")`
           );

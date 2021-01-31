@@ -103,7 +103,7 @@ export abstract class CardGet extends DBClass {
     tags: GameTag[]
   ): Promise<GameUserCard[]> {
     let query = `SELECT user_card.* FROM user_card 
-                  LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE discord_id=${DB.connection.escape(
+                  LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id LEFT JOIN base_group ON base_group.id=subgroup.group_id WHERE discord_id=${DB.connection.escape(
                     profile.discordId
                   )}`;
     const queryOptions = FilterService.parseOptions(options, tags);
@@ -125,7 +125,7 @@ export abstract class CardGet extends DBClass {
     } else if (["luck", "lc"].includes(order)) {
       query += ` ORDER BY luck_coeff ${reverse ? `ASC` : `DESC`}`;
     } else if (["group", "g"].includes(order)) {
-      query += ` ORDER BY subgroup.group_name ${reverse ? `DESC` : `ASC`}`;
+      query += ` ORDER BY base_group.group_name ${reverse ? `DESC` : `ASC`}`;
     } else if (["name", "n"].includes(order)) {
       query += ` ORDER BY idol.idol_name ${reverse ? `DESC` : `ASC`}`;
     } else if (["subgroup", "sg"].includes(order)) {
@@ -148,7 +148,7 @@ export abstract class CardGet extends DBClass {
     options: Filter,
     tags: GameTag[]
   ): Promise<number> {
-    let query = `SELECT COUNT(*) AS count FROM user_card LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE discord_id=${DB.connection.escape(
+    let query = `SELECT COUNT(*) AS count FROM user_card LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id LEFT JOIN base_group ON base_group.id=subgroup.group_id WHERE discord_id=${DB.connection.escape(
       profile.discordId
     )}`;
     const queryOptions = FilterService.parseOptions(options, tags);
