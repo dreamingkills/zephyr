@@ -31,7 +31,7 @@ export default class DropCards extends BaseCommand {
 
     if (
       msg.channel.id !== dropChannel &&
-      msg.channel.id !== this.zephyr.config.discord.secondaryChannel
+      !this.zephyr.config.discord.secondaryChannels.includes(msg.channel.id)
     )
       throw new ZephyrError.CannotDropInChannelError(dropChannel);
     const now = dayjs(Date.now());
