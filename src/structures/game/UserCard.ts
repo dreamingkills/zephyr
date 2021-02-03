@@ -11,9 +11,9 @@ export interface UserCard {
   frame_name: string;
   frame_url: string;
   dye_mask_url: string;
-  dye_r: number;
-  dye_g: number;
-  dye_b: number;
+  dye_r: number | null;
+  dye_g: number | null;
+  dye_b: number | null;
   claim_time: number;
   tag_id: number;
   original_wear: number;
@@ -33,9 +33,9 @@ export class GameUserCard {
   frameName: string;
   frameUrl: string;
   dyeMaskUrl: string;
-  dyeR: number;
-  dyeG: number;
-  dyeB: number;
+  dyeR: number | undefined;
+  dyeG: number | undefined;
+  dyeB: number | undefined;
   claimTime: number;
   originalWear: number;
   fightCount: number;
@@ -63,9 +63,9 @@ export class GameUserCard {
 
     this.tagId = data.tag_id;
 
-    this.dyeR = data.dye_r;
-    this.dyeG = data.dye_g;
-    this.dyeB = data.dye_b;
+    this.dyeR = data.dye_r || undefined;
+    this.dyeG = data.dye_g || undefined;
+    this.dyeB = data.dye_b || undefined;
   }
 
   public async fetch(): Promise<GameUserCard> {
