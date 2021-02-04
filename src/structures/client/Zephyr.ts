@@ -132,7 +132,7 @@ export class Zephyr extends Client {
       // Prefix resetter
       if (
         message.mentions[0]?.id === this.user.id &&
-        message.content.includes(`<@`)
+        message.content.includes(this.user.id)
       ) {
         const subcommand = message.content.split(" ")[1]?.toLowerCase();
 
