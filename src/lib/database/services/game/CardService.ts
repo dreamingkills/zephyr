@@ -121,15 +121,10 @@ export abstract class CardService {
     // Handle dye mask (this was so annoying to set up I hate Windows)
     // Default to the classic "Undyed Mask Gray" if the card is undyed.
     let [r, g, b] = [185, 185, 185];
-    if (card.dyeR || card.dyeR === 0) {
-      r = card.dyeR;
-    }
-    if (card.dyeG || card.dyeG === 0) {
-      g = card.dyeG;
-    }
-    if (card.dyeB || card.dyeB === 0) {
-      b = card.dyeB;
-    }
+
+    if (card.dyeR >= 0) r = card.dyeR;
+    if (card.dyeG >= 0) g = card.dyeR;
+    if (card.dyeB >= 0) b = card.dyeB;
 
     const { c, m, y } = rgbToCmy(r, g, b);
 

@@ -51,8 +51,16 @@ export default class ViewUserCard extends BaseCommand {
         }\n` +
           `\nOwner: ${targetUser ? `**${targetUser.tag}**` : `*Unknown User*`}`
       )
-      .setImage(`attachment://card.png`)
-      .setColor(rgbToHex(card.dyeR || 185, card.dyeG || 185, card.dyeB || 185));
+      .setImage(`attachment://card.png`);
+
+    const [r, g, b] = [
+      card.dyeR < 0 ? 185 : card.dyeR,
+      card.dyeG < 0 ? 185 : card.dyeG,
+      card.dyeB < 0 ? 185 : card.dyeB,
+    ];
+
+    embed.setColor(rgbToHex(r, g, b));
+
     // .setFooter(`Luck Coefficient: ${card.luckCoefficient}`);
     await this.send(msg.channel, embed, {
       file: {
