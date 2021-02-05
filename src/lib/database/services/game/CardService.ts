@@ -123,7 +123,7 @@ export abstract class CardService {
     let [r, g, b] = [185, 185, 185];
 
     if (card.dyeR >= 0) r = card.dyeR;
-    if (card.dyeG >= 0) g = card.dyeR;
+    if (card.dyeG >= 0) g = card.dyeG;
     if (card.dyeB >= 0) b = card.dyeB;
 
     const { c, m, y } = rgbToCmy(r, g, b);
