@@ -16,6 +16,7 @@ export interface BaseCard {
   num_generated: number;
   emoji: string | null;
   archived: boolean;
+  activated: boolean;
 }
 
 export interface Frame {
@@ -41,6 +42,7 @@ export class GameBaseCard {
   emoji?: string;
   archived: boolean;
   birthday?: string;
+  activated: boolean;
 
   constructor(card: BaseCard) {
     this.id = card.id;
@@ -61,6 +63,7 @@ export class GameBaseCard {
     this.totalGenerated = card.num_generated;
     this.emoji = card.emoji || undefined;
     this.archived = card.archived;
+    this.activated = card.activated;
     if (card.birthday)
       this.birthday = dayjs(card.birthday).format(`YYYY-MM-DD`);
   }

@@ -241,10 +241,12 @@ export class Zephyr extends Client {
     this.prefixes = prefixes;
     return;
   }
+
   public getPrefix(guildId?: string): string {
     if (!guildId) return config.discord.defaultPrefix;
     return this.prefixes[guildId] ?? config.discord.defaultPrefix;
   }
+
   public setPrefix(guildId: string, prefix: string): void {
     this.prefixes[guildId] = prefix;
     return;
@@ -254,7 +256,7 @@ export class Zephyr extends Client {
       Card Caching
   */
   public async cacheCards(): Promise<void> {
-    const cards = await CardService.getAllCards();
+    const cards = (await CardService.getAllCards()).filter((c) => c.activated);
 
     const newCardObject: { [key: number]: GameBaseCard } = {};
     const newIdolObject: { [id: number]: GameIdol } = {};
