@@ -48,12 +48,7 @@ export function calculateTalent(
   }
 
   // Dye Talent
-  if (
-    card.dyeR !== null &&
-    card.dyeG !== null &&
-    card.dyeB !== null &&
-    card.wear === 5
-  ) {
+  if (card.dyeR >= 0 && card.dyeG >= 0 && card.dyeB >= 0 && card.wear === 5) {
     talents.dye += Math.floor(15 * wearMultiplier);
   }
 
