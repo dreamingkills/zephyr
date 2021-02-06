@@ -322,11 +322,14 @@ export class Zephyr extends Client {
       }
     }
 
-    const weightings = eligibleCards.map(
-      (c) =>
-        (c.rarity + (c.birthday?.slice(5) === today ? 150 : 0)) *
-        (c.groupId === booster ? 2.5 : 1)
-    );
+    const weightings = eligibleCards.map((c) => {
+      let weight = 100;
+
+      if (c.birthday?.slice(5) === today) weight *= 1.5;
+      if (booster && c.groupId === booster) weight *= 2.5;
+
+      return weight;
+    });
 
     while (cards.length < amount) {
       const randomCard = this.chance.weighted(eligibleCards, weightings);
