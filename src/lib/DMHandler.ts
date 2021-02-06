@@ -62,9 +62,8 @@ export class DMHandler {
         message = types.slice(0, -1).join(`, `) + `, and ` + types.slice(-1);
       }
 
-      const dmChannel = await user.getDMChannel();
-
       try {
+        const dmChannel = await user.getDMChannel();
         await createMessage(
           dmChannel,
           `:bell: Hey, **${user.username}**! You can now ${message}!`
