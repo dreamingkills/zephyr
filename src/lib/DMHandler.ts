@@ -15,11 +15,13 @@ export class DMHandler {
       User[]
     ];
     const failed = [];
+
     for (let p of eligible) {
       if (p.blacklisted) {
         failed.push(p);
         continue;
       }
+
       const user = await zephyr.fetchUser(p.discordId);
       if (!user) {
         failed.push(p);
@@ -69,7 +71,8 @@ export class DMHandler {
           `:bell: Hey, **${user.username}**! You can now ${message}!`
         );
         continue;
-      } catch {
+      } catch (e) {
+        console.log(`Vote message failed - ${e}`);
         failed.push(p);
         continue;
       }
