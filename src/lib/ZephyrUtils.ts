@@ -7,7 +7,7 @@ function checkPermission(
   channel: Channel,
   zephyr: Zephyr
 ): boolean {
-  if (channel.type !== 0) return false;
+  if (!channel || channel.type !== 0) return false;
   return (<TextChannel>channel).permissionsOf(zephyr.user.id).json[permission];
 }
 

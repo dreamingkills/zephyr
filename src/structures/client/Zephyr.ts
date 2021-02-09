@@ -115,7 +115,7 @@ export class Zephyr extends Client {
     });
 
     this.on("messageCreate", async (message) => {
-      if (message.author.bot) return;
+      if (message.author.bot || !message.channel) return;
 
       await this.fetchUser(message.author.id);
 
