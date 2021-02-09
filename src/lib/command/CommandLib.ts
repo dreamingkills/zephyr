@@ -89,7 +89,7 @@ export class CommandLib {
         } catch {}
       } else {
         if (e.name === "Missing Access") return;
-        console.log(`ERROR NAME: ${e}\n${e}`);
+        console.log(`ERROR NAME: ${e}\n${e.stack}`);
         const embed = new MessageEmbed(`Error`, message.author).setDescription(
           `An unexpected error occurred. Please try again.`
         );
