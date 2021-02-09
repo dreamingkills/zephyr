@@ -338,13 +338,9 @@ export class Zephyr extends Client {
       wishlistProc = this.chance.bool({ likelihood: 15 });
     }
 
-    console.log(wishlistProc);
-
     while (groups.length < amount - (wishlistProc ? 1 : 0)) {
       groups.push(this.chance.weighted(groupIds, weightings));
     }
-
-    console.log(groups);
 
     if (wishlistProc) {
       const wishlistWeightings = wishlist.map((w) => {
