@@ -77,6 +77,7 @@ export class Zephyr extends Client {
     const fonts = await FontLoader.init();
 
     const startTime = Date.now();
+
     this.once("ready", async () => {
       if (this.config.topgg.enabled) await this.startTopGg();
       await this.commandLib.setup(this);
@@ -309,36 +310,92 @@ export class Zephyr extends Client {
     booster?: number
   ): GameBaseCard[] {
     const today = dayjs().format(`MM-DD`);
-    const cards: GameBaseCard[] = [];
-    const eligibleCards = Object.values(this.cards).filter((c) => c.rarity > 0);
-    if (wishlist.length > 0) {
-      const bonus = this.chance.bool({ likelihood: 5 });
-      if (bonus) {
-        const random = this.chance.pickone(wishlist);
-        const potential = eligibleCards.filter(
-          (c) => c.idolId === random.idolId
-        );
-        if (potential[0]) cards.push(potential[0]);
+    const chosenCards: GameBaseCard[] = [];
+
+    const eligibleCards = this.getCards().filter(
+      (c) => c.rarity > 0 && c.activated
+    );
+
+    const groupIds: (number | undefined)[] = [];
+    for (let card of eligibleCards) {
+      if (!groupIds.includes(card.groupId)) {
+        groupIds.push(card.groupId);
       }
     }
 
-    const weightings = eligibleCards.map((c) => {
+    const weightings = groupIds.map((g) => {
       let weight = 100;
 
-      if (c.birthday?.slice(5) === today) weight *= 1.5;
-      if (booster && c.groupId === booster) weight *= 2.5;
+      if (booster && booster === g) weight *= 2.5;
 
       return weight;
     });
 
-    while (cards.length < amount) {
-      const randomCard = this.chance.weighted(eligibleCards, weightings);
-      if (cards.includes(randomCard)) continue;
-      cards.push(randomCard);
+    const groups: (number | undefined)[] = [];
+
+    let wishlistProc = false;
+    if (wishlist.length > 0) {
+      wishlistProc = this.chance.bool({ likelihood: 15 });
     }
 
-    return cards.slice(0, amount);
+    console.log(wishlistProc);
+
+    while (groups.length < amount - (wishlistProc ? 1 : 0)) {
+      groups.push(this.chance.weighted(groupIds, weightings));
+    }
+
+    console.log(groups);
+
+    if (wishlistProc) {
+      const wishlistWeightings = wishlist.map((w) => {
+        let weight = 100;
+
+        const idol = this.getIdol(w.idolId);
+
+        if (idol && idol.birthday === today) weight *= 2.5;
+
+        return weight;
+      });
+
+      const randomWishlist = this.chance.weighted(wishlist, wishlistWeightings);
+
+      const idolCards = eligibleCards.filter(
+        (c) => c.idolId === randomWishlist.idolId
+      );
+
+      chosenCards.push(this.chance.pickone(idolCards));
+    }
+
+    for (let group of groups) {
+      const groupCards = eligibleCards.filter(
+        (c) => c.groupId === group && !chosenCards.includes(c)
+      );
+
+      if (groupCards.length > 0) {
+        const weightings = groupCards.map((c) => {
+          let weight = 100;
+
+          const idol = this.getIdol(c.idolId);
+          if (idol && idol.birthday === today) weight *= 2.5;
+
+          return weight;
+        });
+
+        const randomCard = this.chance.weighted(groupCards, weightings);
+        chosenCards.push(randomCard);
+      }
+    }
+
+    while (chosenCards.length < amount) {
+      const randomCard = this.chance.pickone(
+        eligibleCards.filter((c) => !chosenCards.includes(c))
+      );
+      chosenCards.push(randomCard);
+    }
+
+    return chosenCards;
   }
+
   public getCards(): GameBaseCard[] {
     return Object.values(this.cards);
   }
