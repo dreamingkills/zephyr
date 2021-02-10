@@ -12,7 +12,7 @@ export async function addReaction(
     3
   ).catch((e) => {
     console.log(
-      `Failed trying to add reaction ${reaction} to message ${message.id}. Full stack:\n${e}`
+      `Failed trying to add reaction ${reaction} to message ${message.id}. Full stack:\n${e.stack}`
     );
     throw new ZephyrError.FailedToAddReactionError();
   });

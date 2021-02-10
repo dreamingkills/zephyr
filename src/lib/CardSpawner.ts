@@ -260,7 +260,9 @@ export abstract class CardSpawner {
     });
 
     try {
-      this.emojis.forEach((e) => addReaction(drop, e));
+      for (let emoji of this.emojis) {
+        await addReaction(drop, emoji);
+      }
     } catch {}
 
     await CardService.incrementGenerated(cards);

@@ -316,6 +316,10 @@ export class Zephyr extends Client {
       (c) => c.rarity > 0 && c.activated
     );
 
+    const trueWishlist = wishlist.filter((wl) =>
+      eligibleCards.find((c) => c.idolId === wl.idolId)
+    );
+
     const groupIds: (number | undefined)[] = [];
     for (let card of eligibleCards) {
       if (!groupIds.includes(card.groupId)) {
@@ -334,7 +338,7 @@ export class Zephyr extends Client {
     const groups: (number | undefined)[] = [];
 
     let wishlistProc = false;
-    if (wishlist.length > 0) {
+    if (trueWishlist.length > 0) {
       wishlistProc = this.chance.bool({ likelihood: 15 });
     }
 
@@ -343,7 +347,7 @@ export class Zephyr extends Client {
     }
 
     if (wishlistProc) {
-      const wishlistWeightings = wishlist.map((w) => {
+      const wishlistWeightings = trueWishlist.map((w) => {
         let weight = 100;
 
         const idol = this.getIdol(w.idolId);
@@ -353,7 +357,10 @@ export class Zephyr extends Client {
         return weight;
       });
 
-      const randomWishlist = this.chance.weighted(wishlist, wishlistWeightings);
+      const randomWishlist = this.chance.weighted(
+        trueWishlist,
+        wishlistWeightings
+      );
 
       const idolCards = eligibleCards.filter(
         (c) => c.idolId === randomWishlist.idolId
@@ -394,6 +401,10 @@ export class Zephyr extends Client {
 
   public getCards(): GameBaseCard[] {
     return Object.values(this.cards);
+  }
+
+  public getCardsByGroup(id: number): GameBaseCard[] {
+    return this.getCards().filter((c) => c.groupId === id);
   }
 
   /*
