@@ -183,6 +183,15 @@ export class Zephyr extends Client {
       );
     });
 
+    this.on("guildDelete", async (guild) => {
+      if (this.logChannel) {
+        await createMessage(
+          this.logChannel,
+          `:outbox_tray: Zephyr left a server: **${guild.name}** (${guild.id}).`
+        );
+      }
+    });
+
     // Introduction when it joins a new guild
     this.on("guildCreate", async (guild) => {
       if (this.logChannel) {
