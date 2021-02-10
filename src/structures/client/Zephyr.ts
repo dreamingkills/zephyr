@@ -215,6 +215,9 @@ export class Zephyr extends Client {
       // Didn't find anything? Oh well...
       if (!welcomeChannel) return;
 
+      // No permission? Oh well...
+      if(!checkPermission(`sendMessages`, welcomeChannel, this)) return;
+
       // Get the prefix just in case it's already different (bot previously in guild)
       const prefix = this.getPrefix(guild.id);
       const embed = new MessageEmbed(`Welcome | ${guild.name}`).setDescription(
