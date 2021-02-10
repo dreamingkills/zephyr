@@ -36,6 +36,8 @@ export class Zephyr extends Client {
 
   private idols: { [id: number]: GameIdol } = {};
 
+  logChannel: TextChannel | undefined;
+
   webhookListener: WebhookListener | undefined;
   dbl: dblapi | undefined;
 
@@ -75,6 +77,12 @@ export class Zephyr extends Client {
     await this.cacheStickers();
     ItemService.refreshItems();
     const fonts = await FontLoader.init();
+
+    if (this.config.discord.logChannel) {
+      this.logChannel = (await this.getRESTChannel(
+        this.config.discord.logChannel
+      )) as TextChannel;
+    }
 
     const startTime = Date.now();
 
@@ -177,6 +185,13 @@ export class Zephyr extends Client {
 
     // Introduction when it joins a new guild
     this.on("guildCreate", async (guild) => {
+      if (this.logChannel) {
+        await createMessage(
+          this.logChannel,
+          `:inbox_tray: Zephyr joined a new server: **${guild.name}** (${guild.id}).`
+        );
+      }
+
       // Get ONLY TextChannels in the guild (type === 0)
       const channels = guild.channels.filter(
         (c) => c.type === 0
@@ -216,7 +231,7 @@ export class Zephyr extends Client {
       if (!welcomeChannel) return;
 
       // No permission? Oh well...
-      if(!checkPermission(`sendMessages`, welcomeChannel, this)) return;
+      if (!checkPermission(`sendMessages`, welcomeChannel, this)) return;
 
       // Get the prefix just in case it's already different (bot previously in guild)
       const prefix = this.getPrefix(guild.id);
