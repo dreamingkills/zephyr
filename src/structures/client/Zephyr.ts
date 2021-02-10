@@ -187,7 +187,7 @@ export class Zephyr extends Client {
       if (this.logChannel) {
         await createMessage(
           this.logChannel,
-          `:outbox_tray: Zephyr left a server: **${guild.name}** (${guild.id}).`
+          `:outbox_tray: Zephyr left a server: **${guild.name}** (${guild.id}).\nMember count: **${guild.memberCount}**`
         );
       }
     });
@@ -197,7 +197,7 @@ export class Zephyr extends Client {
       if (this.logChannel) {
         await createMessage(
           this.logChannel,
-          `:inbox_tray: Zephyr joined a new server: **${guild.name}** (${guild.id}).`
+          `:inbox_tray: Zephyr joined a new server: **${guild.name}** (${guild.id}).\nMember count: **${guild.memberCount}**`
         );
       }
 
