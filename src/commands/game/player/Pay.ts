@@ -24,6 +24,8 @@ export default class Pay extends BaseCommand {
     if (user.id === msg.author.id)
       throw new ZephyrError.CannotPayYourselfError();
 
+    if (!options[1]) throw new ZephyrError.InvalidAmountError(`bits`);
+
     const target = await ProfileService.getProfile(user.id);
 
     if (target.blacklisted)
