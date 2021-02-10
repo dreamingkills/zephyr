@@ -68,7 +68,10 @@ export class DMHandler {
         const dmChannel = await user.getDMChannel();
         await createMessage(
           dmChannel,
-          `:bell: Hey, **${user.username}**! You can now ${message}!`
+          `:bell: Hey, **${user.username}**! You can now ${message}!` +
+            (vote
+              ? `\nYou can vote by clicking this link! https://top.gg/bot/791100707629432863/vote`
+              : ``)
         );
         continue;
       } catch (e) {
