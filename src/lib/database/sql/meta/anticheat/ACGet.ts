@@ -35,7 +35,7 @@ export abstract class ACGet extends DBClass {
     profile: GameProfile
   ): Promise<number> {
     const query = (await DB.query(
-      `SELECT COUNT(*) AS count FROM gift WHERE recipient=?;`,
+      `SELECT SUM(1 * (weekend+1)) AS count FROM gift WHERE recipient=?;`,
       [profile.discordId]
     )) as { count: number }[];
     return query[0]?.count || 0;
