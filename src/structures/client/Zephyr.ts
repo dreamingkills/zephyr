@@ -78,12 +78,6 @@ export class Zephyr extends Client {
     ItemService.refreshItems();
     const fonts = await FontLoader.init();
 
-    if (this.config.discord.logChannel) {
-      this.logChannel = (await this.getRESTChannel(
-        this.config.discord.logChannel
-      )) as TextChannel;
-    }
-
     const startTime = Date.now();
 
     this.once("ready", async () => {
@@ -120,6 +114,19 @@ export class Zephyr extends Client {
         });
       }, 300000);
       await this.dmHandler.handle(this);
+
+      if (this.config.discord.logGuild) {
+        const channels = await this.getRESTGuildChannels(
+          this.config.discord.logGuild
+        );
+        const logChannel = channels.find(
+          (c) => c.name.toLowerCase() === "logs"
+        );
+
+        if (logChannel instanceof TextChannel) {
+          this.logChannel = logChannel;
+        }
+      }
     });
 
     this.on("messageCreate", async (message) => {
