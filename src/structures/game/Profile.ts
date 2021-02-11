@@ -46,6 +46,7 @@ export interface Profile {
       Other
   */
   daily_streak: number;
+  created_at: string;
 }
 
 export class GameProfile {
@@ -73,6 +74,8 @@ export class GameProfile {
   boosterGroup?: number;
   boosterExpiry?: string;
 
+  createdAt: string;
+
   constructor(data: Profile) {
     this.discordId = data.discord_id;
     this.private = data.private;
@@ -98,6 +101,8 @@ export class GameProfile {
 
     this.boosterGroup = data.booster_group || undefined;
     this.boosterExpiry = data.booster_expiry || undefined;
+
+    this.createdAt = data.created_at;
   }
 
   public async fetch(): Promise<GameProfile> {

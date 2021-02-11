@@ -5,6 +5,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
+import dayjs from "dayjs";
 
 export default class UserInfo extends BaseCommand {
   names = ["userinfo", "ui"];
@@ -41,13 +42,16 @@ export default class UserInfo extends BaseCommand {
       target
     );
 
+    const createdAt = dayjs(target.createdAt).format(`MMMM D, YYYY`);
+
     const embed = new MessageEmbed(`User Info`, msg.author)
       .setDescription(
         `Showing stats for **${targetUser.tag}**...` +
-          `\n\n— Times voted: **${timesVoted.toLocaleString()}**` +
+          `\n— Times voted: **${timesVoted.toLocaleString()}**` +
           `\n— Cards claimed: **${timesClaimed}**` +
           `\n— Cards gifted: **${timesGifted}**` +
-          `\n— Gifts received: **${timesReceivedGift}**`
+          `\n— Gifts received: **${timesReceivedGift}**` +
+          `\n\nAccount created **${createdAt}**`
       )
       .setThumbnail(targetUser.dynamicAvatarURL("png"));
 
