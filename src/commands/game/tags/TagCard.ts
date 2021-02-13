@@ -5,6 +5,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class TagCard extends BaseCommand {
   names = ["tag", "tc"];
@@ -27,7 +28,7 @@ export default class TagCard extends BaseCommand {
 
     const queryIsTag = tags.map((t) => t.name).includes(query);
     let tag;
-    let cards = [];
+    let cards: GameUserCard[] = [];
     if (queryIsTag && !options[1]) {
       tag = tags.filter((t) => t.name === query)[0];
       const card = await CardService.getLastCard(profile);
@@ -47,6 +48,8 @@ export default class TagCard extends BaseCommand {
       const identifiers = options.slice(1);
       for (let i of identifiers) {
         const card = await CardService.getUserCardByIdentifier(i);
+        if (cards.find((c) => c.id === card.id)) continue;
+
         if (card.discordId !== msg.author.id)
           throw new ZephyrError.NotOwnerOfCardError(card);
         cards.push(card);
