@@ -104,7 +104,7 @@ export abstract class CardGet extends DBClass {
     options: Filter,
     tags: GameTag[]
   ): Promise<GameUserCard[]> {
-    let query = `SELECT user_card.* FROM user_card 
+    let query = `SELECT user_card.* FROM user_card USE INDEX (CardOwner)
                   LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id LEFT JOIN base_group ON base_group.id=subgroup.group_id WHERE discord_id=${DB.connection.escape(
                     profile.discordId
                   )}`;
@@ -150,7 +150,7 @@ export abstract class CardGet extends DBClass {
     options: Filter,
     tags: GameTag[]
   ): Promise<number> {
-    let query = `SELECT COUNT(*) AS count FROM user_card LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id LEFT JOIN base_group ON base_group.id=subgroup.group_id WHERE discord_id=${DB.connection.escape(
+    let query = `SELECT COUNT(*) AS count FROM user_card USE INDEX (CardOwner) LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id LEFT JOIN base_group ON base_group.id=subgroup.group_id WHERE discord_id=${DB.connection.escape(
       profile.discordId
     )}`;
     const queryOptions = FilterService.parseOptions(options, tags);
@@ -163,7 +163,7 @@ export abstract class CardGet extends DBClass {
 
   public static async getUserCardById(id: number): Promise<GameUserCard> {
     const query = (await DB.query(
-      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.id=?;`,
+      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card USE INDEX (PRIMARY) LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.id=?;`,
       [id]
     )) as UserCard[];
     if (!query[0]) throw new ZephyrError.UnknownUserCardError(id.toString(36));
@@ -243,7 +243,7 @@ export abstract class CardGet extends DBClass {
     zephyrId: string
   ): Promise<number> {
     const query = (await DB.query(
-      `SELECT COUNT(*) AS count FROM user_card WHERE card_id=? AND discord_id=?;`,
+      `SELECT COUNT(*) AS count FROM user_card USE INDEX(PRIMARY) WHERE card_id=? AND discord_id=?;`,
       [id, zephyrId]
     )) as { count: number }[];
     return query[0].count;
