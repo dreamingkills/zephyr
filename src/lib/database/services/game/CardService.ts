@@ -417,6 +417,20 @@ export abstract class CardService {
     return image;
   }
 
+  public static async getPrefabFromCache(card: GameBaseCard): Promise<Buffer> {
+    let prefab: Buffer;
+    try {
+      prefab = await fs.readFile(`./cache/cards/prefab/${card.id}`);
+    } catch {
+      const image = await this.generateCardPrefab(card);
+      await fs.writeFile(`./cache/cards/prefab/${card.id}`, image);
+
+      prefab = image;
+    }
+
+    return prefab;
+  }
+
   public static async checkCacheForCard(
     card: GameUserCard,
     zephyr: Zephyr

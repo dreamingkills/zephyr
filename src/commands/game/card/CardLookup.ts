@@ -23,7 +23,11 @@ export default class CardLookup extends BaseCommand {
       const lastBase = this.zephyr.getCard(lastCard.baseCardId)!;
 
       const embed = await this.getCardStats(lastBase, msg.author);
-      await this.send(msg.channel, embed);
+      const prefabImage = await CardService.getPrefabFromCache(lastBase);
+
+      await this.send(msg.channel, embed, {
+        file: { file: prefabImage, name: `prefab.png` },
+      });
       return;
     }
 
@@ -49,7 +53,11 @@ export default class CardLookup extends BaseCommand {
 
     if (find.length === 1) {
       const embed = await this.getCardStats(find[0], msg.author);
-      await this.send(msg.channel, embed);
+      const prefabImage = await CardService.getPrefabFromCache(find[0]);
+
+      await this.send(msg.channel, embed, {
+        file: { file: prefabImage, name: `prefab.png` },
+      });
       return;
     }
 
@@ -102,8 +110,11 @@ export default class CardLookup extends BaseCommand {
     const targetCard = find[selection];
 
     const embed = await this.getCardStats(targetCard, msg.author);
+    const prefabImage = await CardService.getPrefabFromCache(targetCard);
 
-    await this.send(msg.channel, embed);
+    await this.send(msg.channel, embed, {
+      file: { file: prefabImage, name: `prefab.png` },
+    });
     return;
   }
 
@@ -121,32 +132,35 @@ export default class CardLookup extends BaseCommand {
     const avgClaimTime = await CardService.getAverageClaimTime(card);
     const wearSpread = await CardService.getCardWearSpread(card, this.zephyr);
 
-    const embed = new MessageEmbed(`Lookup`, author).setDescription(
-      `Name — **${card.name}**` +
-        (card.group ? `\nGroup — **${card.group}**` : ``) +
-        (card.subgroup ? `\nTheme — **${card.subgroup}**` : ``) +
-        (card.birthday ? `\nBirthday — **${card.birthday}**` : ``) +
-        `\n\n**${
-          card.name
-        }** is on **${timesWishlisted.toLocaleString()}** wishlists.` +
-        `\n\nTotal generated: **${card.totalGenerated.toLocaleString()}**` +
-        `\nTotal claimed: **${card.serialTotal.toLocaleString()}**` +
-        `\nTotal burned: **${timesDestroyed.toLocaleString()}**` +
-        `\n\nClaim rate: **${(
-          (card.serialTotal / Math.max(card.totalGenerated, 1)) *
-          100
-        ).toFixed(2)}%**` +
-        `\nAverage claim time: **${Math.max(avgClaimTime / 1000 - 5, 0).toFixed(
-          2
-        )}s**\n\n` +
-        `**Condition Spread**` +
-        `\n— \`☆☆☆☆☆\` **${wearSpread[0].toLocaleString()}**` +
-        `\n— \`★☆☆☆☆\` **${wearSpread[1].toLocaleString()}**` +
-        `\n— \`★★☆☆☆\` **${wearSpread[2].toLocaleString()}**` +
-        `\n— \`★★★☆☆\` **${wearSpread[3].toLocaleString()}**` +
-        `\n— \`★★★★☆\` **${wearSpread[4].toLocaleString()}**` +
-        `\n— \`★★★★★\` **${wearSpread[5].toLocaleString()}**`
-    );
+    const embed = new MessageEmbed(`Lookup`, author)
+      .setDescription(
+        `Name — **${card.name}**` +
+          (card.group ? `\nGroup — **${card.group}**` : ``) +
+          (card.subgroup ? `\nTheme — **${card.subgroup}**` : ``) +
+          (card.birthday ? `\nBirthday — **${card.birthday}**` : ``) +
+          `\n\n**${
+            card.name
+          }** is on **${timesWishlisted.toLocaleString()}** wishlists.` +
+          `\n\nTotal generated: **${card.totalGenerated.toLocaleString()}**` +
+          `\nTotal claimed: **${card.serialTotal.toLocaleString()}**` +
+          `\nTotal burned: **${timesDestroyed.toLocaleString()}**` +
+          `\n\nClaim rate: **${(
+            (card.serialTotal / Math.max(card.totalGenerated, 1)) *
+            100
+          ).toFixed(2)}%**` +
+          `\nAverage claim time: **${Math.max(
+            avgClaimTime / 1000 - 5,
+            0
+          ).toFixed(2)}s**\n\n` +
+          `**Condition Spread**` +
+          `\n— \`☆☆☆☆☆\` **${wearSpread[0].toLocaleString()}**` +
+          `\n— \`★☆☆☆☆\` **${wearSpread[1].toLocaleString()}**` +
+          `\n— \`★★☆☆☆\` **${wearSpread[2].toLocaleString()}**` +
+          `\n— \`★★★☆☆\` **${wearSpread[3].toLocaleString()}**` +
+          `\n— \`★★★★☆\` **${wearSpread[4].toLocaleString()}**` +
+          `\n— \`★★★★★\` **${wearSpread[5].toLocaleString()}**`
+      )
+      .setThumbnail(`attachment://prefab.png`);
 
     return embed;
   }
