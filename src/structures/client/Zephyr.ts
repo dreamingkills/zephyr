@@ -78,6 +78,8 @@ export class Zephyr extends Client {
     ItemService.refreshItems();
     const fonts = await FontLoader.init();
 
+    await this.generatePrefabs();
+
     const startTime = Date.now();
 
     this.once("ready", async () => {
@@ -310,6 +312,14 @@ export class Zephyr extends Client {
     this.idols = newIdolObject;
 
     return;
+  }
+
+  public async generatePrefabs(): Promise<void> {
+    const cards = this.getCards();
+    for (let card of cards) {
+      await CardService.generatePrefabCache(card);
+    }
+    console.log(`Generated ${cards.length} prefabs.`);
   }
 
   public getCard(id: number): GameBaseCard | undefined {
