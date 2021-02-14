@@ -18,9 +18,7 @@ export class ItemService {
 
   public static getItemByName(name: string): PrefabItem | undefined {
     return this.items.find((i) =>
-      i.names
-        .map((i) => i.toLowerCase())
-        .find((n) => name.toLowerCase().includes(n))
+      i.names.map((i) => i.toLowerCase()).find((n) => name.toLowerCase() === n)
     );
   }
 }
