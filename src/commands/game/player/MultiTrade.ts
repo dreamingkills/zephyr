@@ -202,7 +202,7 @@ export default class MultiTrade extends BaseCommand {
 
               break;
             }
-            case "☑": {
+            case "✅": {
               if (!(senderConfirmed && recipientConfirmed)) break;
 
               if (isSender && senderConfirmed) {
