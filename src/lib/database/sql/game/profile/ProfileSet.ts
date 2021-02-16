@@ -204,6 +204,7 @@ export abstract class ProfileSet extends DBClass {
     profile: GameProfile,
     items: { item: PrefabItem; count: number }[]
   ): Promise<void> {
+    const refetched = [];
     for (let item of items) {
       const refetchItem = await ProfileService.getItem(
         profile,
@@ -211,9 +212,12 @@ export abstract class ProfileSet extends DBClass {
         item.item.names[0]
       );
 
-      if (refetchItem.quantity - item.count)
+      if (refetchItem.quantity - item.count < 0)
         throw new ZephyrError.NotEnoughOfItemError(item.item.names[0]);
 
+      refetched.push(item);
+    }
+    for (let item of refetched) {
       await DB.query(
         `UPDATE user_item SET quantity=quantity-? WHERE item_id=? AND discord_id=?;`,
         [item.count, item.item.id, profile.discordId]
@@ -236,11 +240,13 @@ export abstract class ProfileSet extends DBClass {
     );
     return;
   }
+
   public static async deleteTag(tagId: number): Promise<void> {
     await DB.query(`DELETE FROM card_tag WHERE id=?;`, [tagId]);
     await DB.query(`UPDATE user_card SET tag_id=NULL WHERE tag_id=?;`, [tagId]);
     return;
   }
+
   public static async editTag(
     tagId: number,
     name?: string,
