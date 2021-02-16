@@ -238,7 +238,10 @@ export class Zephyr extends Client {
 
         // Check if we can send messages...
         for (let channel of top) {
-          if (checkPermission("sendMessages", <TextChannel>channel, this)) {
+          if (
+            checkPermission(`sendMessages`, channel, this) &&
+            checkPermission(`readMessages`, channel, this)
+          ) {
             welcomeChannel = channel as TextChannel;
             break;
           }
@@ -249,7 +252,11 @@ export class Zephyr extends Client {
       if (!welcomeChannel) return;
 
       // No permission? Oh well...
-      if (!checkPermission(`sendMessages`, welcomeChannel, this)) return;
+      if (
+        !checkPermission(`sendMessages`, welcomeChannel, this) ||
+        !checkPermission(`readMessages`, welcomeChannel, this)
+      )
+        return;
 
       // Get the prefix just in case it's already different (bot previously in guild)
       const prefix = this.getPrefix(guild.id);
@@ -259,7 +266,11 @@ export class Zephyr extends Client {
           `\n\n**Common configuration**` +
           `\n— \`${prefix}prefix <prefix>\` - changes the bot's prefix`
       );
-      await createMessage(welcomeChannel, embed);
+
+      try {
+        await createMessage(welcomeChannel, embed);
+      } catch {}
+
       return;
     });
 
