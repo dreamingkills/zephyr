@@ -823,6 +823,12 @@ export class CannotReactError extends ZephyrError {
   }
 }
 
+export class TooManyError extends ZephyrError {
+  constructor() {
+    super(`That would exceed the integer limit (4,294,967,295).`);
+  }
+}
+
 /*
     Boosters
               */
