@@ -151,7 +151,7 @@ export default class MultiTrade extends BaseCommand {
         userId: string
       ) =>
         [targetUser.id, msg.author.id].includes(userId) &&
-        ["❌", "🔒", "☑"].includes(emoji.name);
+        ["❌", "🔒", "✅"].includes(emoji.name);
       const reactionCollector = new ReactionCollector(
         this.zephyr,
         tradeMessage,
