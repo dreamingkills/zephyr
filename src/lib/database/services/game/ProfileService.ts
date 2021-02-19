@@ -374,4 +374,13 @@ export abstract class ProfileService {
 
     return await profile.fetch();
   }
+
+  public static async setProfileCreationDate(
+    profile: GameProfile,
+    date: string
+  ): Promise<GameProfile> {
+    await ProfileSet.setProfileCreationDate(profile, date);
+
+    return await profile.fetch();
+  }
 }
