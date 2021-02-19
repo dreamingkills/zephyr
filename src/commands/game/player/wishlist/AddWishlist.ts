@@ -18,15 +18,12 @@ export default class AddWishlist extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (!options[0]) throw new ZephyrError.InvalidWishlistNameError();
     const wishlist = await ProfileService.getWishlist(profile);
 
-    if (
-      (wishlist.length >= 5 && profile.patron === 0) ||
-      (wishlist.length >= 10 && profile.patron === 1) ||
-      (wishlist.length >= 15 && profile.patron === 2) ||
-      (wishlist.length >= 20 && profile.patron === 3) ||
-      (wishlist.length >= 25 && profile.patron === 4)
-    ) {
+    const max = 5 + profile.patron * 5;
+
+    if (wishlist.length > max) {
       const prefix = this.zephyr.getPrefix(msg.guildID!);
       throw new ZephyrError.WishlistFullError(profile.patron, prefix);
     }
@@ -115,16 +112,18 @@ export default class AddWishlist extends BaseCommand {
       await conf.delete();
     }
 
-    const exists = wishlist.find((wl) => wl.idolId === additionTarget.id);
+    const groups = getGroupsByIdolId(additionTarget.id, this.zephyr.getCards());
 
-    const groups: string[] = [];
-    this.zephyr
-      .getCards()
-      .filter((c) => c.idolId === additionTarget.id)
-      .map((c) => c.group)
-      .forEach((g) => {
-        if (!groups.includes(g || `Soloist`)) groups.push(g || `Soloist`);
-      });
+    const refetchWishlist = await ProfileService.getWishlist(profile);
+
+    if (refetchWishlist.length >= max) {
+      const prefix = this.zephyr.getPrefix(msg.guildID);
+      throw new ZephyrError.WishlistFullError(profile.patron, prefix);
+    }
+
+    const exists = refetchWishlist.find(
+      (wl) => wl.idolId === additionTarget.id
+    );
 
     if (exists)
       throw new ZephyrError.DuplicateWishlistEntryError(additionTarget, groups);

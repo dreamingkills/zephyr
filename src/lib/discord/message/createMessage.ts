@@ -62,7 +62,7 @@ export async function createMessage(
   ).catch((e) => {
     if (channel.type !== 1) {
       console.log(
-        `Failed trying to send message with content ${content} in channel ${channel.id}. Full stack:\n${e}`
+        `Failed trying to send message with content ${content} (embed content: ${embed.description}) in channel ${channel.id}. Full stack:\n${e.stack}`
       );
     }
 

@@ -20,7 +20,7 @@ export class ItemService {
     return this.items.find((i) =>
       i.names
         .map((i) => i.toLowerCase())
-        .find((n) => name.toLowerCase().includes(n))
+        .find((n) => name.startsWith(n.toLowerCase()))
     );
   }
 }

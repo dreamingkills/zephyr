@@ -32,17 +32,17 @@ export async function transferItems(
 
   if (cards.length > 0) await CardService.transferCardsToUser(cards, receiver);
   if (items.length > 0) {
-    await ProfileService.addItems(receiver, items);
     await ProfileService.removeItems(giver, items);
+    await ProfileService.addItems(receiver, items);
   }
   if (dyes.length > 0) await ProfileService.transferDyesToUser(dyes, receiver);
   if (bits > 0) {
-    await ProfileService.addBitsToProfile(receiver, bits);
     await ProfileService.removeBitsFromProfile(giver, bits);
+    await ProfileService.addBitsToProfile(receiver, bits);
   }
   if (cubits > 0) {
-    await ProfileService.addCubits(receiver, cubits);
     await ProfileService.removeCubits(giver, cubits);
+    await ProfileService.addCubits(receiver, cubits);
   }
 
   return;

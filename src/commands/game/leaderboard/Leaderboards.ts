@@ -13,6 +13,7 @@ export default class Leaderboards extends BaseCommand {
   description = "Shows you top Zephyr players.";
   usage = ["$CMD$ <board name>"];
   allowDm = true;
+  developerOnly = true;
 
   private leaderboardTypes = ["bits", "daily", "cards", "cubits"];
 
@@ -27,10 +28,7 @@ export default class Leaderboards extends BaseCommand {
     let totalEntries: number;
     let title: string;
 
-    const embed = new MessageEmbed().setAuthor(
-      `Leaderboards | ${msg.author.tag}`,
-      msg.author.dynamicAvatarURL("png")
-    );
+    const embed = new MessageEmbed(`Leaderboards`, msg.author);
 
     if (["bit", "bits", "b"].includes(boardType)) {
       trueType = "bits";

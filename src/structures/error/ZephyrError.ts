@@ -126,6 +126,12 @@ export class InvalidHelpQueryError extends ZephyrError {
   }
 }
 
+export class UnknownIdolError extends ZephyrError {
+  constructor() {
+    super(`There are no idols by that name.`);
+  }
+}
+
 /*
     Lookup
             */
@@ -225,15 +231,15 @@ export class WishlistEmptyError extends ZephyrError {
   }
 }
 
-export class InvalidWishlistEntryError extends ZephyrError {
-  constructor() {
-    super(`Please enter a valid item from your wishlist.`);
-  }
-}
-
 export class InvalidWishlistNameError extends ZephyrError {
   constructor() {
     super(`Please enter a valid name to add to your wishlist.`);
+  }
+}
+
+export class InvalidWishlistNameRemoveError extends ZephyrError {
+  constructor() {
+    super(`Please enter an idol to remove from your wishlist.`);
   }
 }
 
@@ -243,6 +249,16 @@ export class DuplicateWishlistEntryError extends ZephyrError {
       `**${idol.name}**${
         groups.length === 0 ? `` : ` (${groups.join(`, `)})`
       } is already on your wishlist.`
+    );
+  }
+}
+
+export class IdolNotOnWishlistError extends ZephyrError {
+  constructor(idol: GameIdol, groups: string[]) {
+    super(
+      `**${idol.name}** (${
+        groups.join(`, `) || `Soloist`
+      }) is not on your wishlist.`
     );
   }
 }
@@ -325,16 +341,14 @@ export class ItemMissingError extends ZephyrError {
             */
 export class DropCooldownError extends ZephyrError {
   constructor(until: string) {
-    super(`You must wait **${until || `<1s`}** before dropping cards again.`);
+    super(`You must wait **${until}** before dropping cards again.`);
   }
 }
 
 export class ClaimCooldownError extends ZephyrError {
   constructor(until: string, userId: string) {
     super(
-      `<@${userId}>, you must wait **${
-        until || `<1s`
-      }** before claiming another card.`
+      `<@${userId}>, you must wait **${until}** before claiming another card.`
     );
   }
 }
@@ -805,6 +819,23 @@ export class CannotReactError extends ZephyrError {
   constructor() {
     super(
       `I cannot react to messages here. Please make sure I have the \`Add Reactions\` permission.`
+    );
+  }
+}
+
+export class TooManyError extends ZephyrError {
+  constructor() {
+    super(`That would exceed the integer limit (4,294,967,295).`);
+  }
+}
+
+/*
+    Boosters
+              */
+export class BoosterActiveError extends ZephyrError {
+  constructor(expiry: string) {
+    super(
+      `You already have a booster active.\nIt expires at **${expiry} UTC**.`
     );
   }
 }

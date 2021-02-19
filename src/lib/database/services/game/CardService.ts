@@ -120,11 +120,11 @@ export abstract class CardService {
 
     // Handle dye mask (this was so annoying to set up I hate Windows)
     // Default to the classic "Undyed Mask Gray" if the card is undyed.
-    let [r, g, b] = [
-      isNaN(card.dyeR ?? NaN) ? 185 : card.dyeR,
-      isNaN(card.dyeG ?? NaN) ? 185 : card.dyeG,
-      isNaN(card.dyeB ?? NaN) ? 185 : card.dyeB,
-    ];
+    let [r, g, b] = [185, 185, 185];
+
+    if (card.dyeR >= 0) r = card.dyeR;
+    if (card.dyeG >= 0) g = card.dyeG;
+    if (card.dyeB >= 0) b = card.dyeB;
 
     const { c, m, y } = rgbToCmy(r, g, b);
 
@@ -185,6 +185,83 @@ export abstract class CardService {
     return Buffer.alloc(buf.length, buf, "base64");
   }
 
+  public static async generateCardPrefab(card: GameBaseCard): Promise<Buffer> {
+    // Create the card canvas
+    const canvas = createCanvas(350, 500);
+    const ctx = canvas.getContext("2d");
+
+    // Load the base card image (the subject of the card)
+    let img = await loadImage(card.image);
+
+    // Load the card's frame, default if the id column is null
+    let frame = await loadImage(
+      `./src/assets/frames/default/frame-default.png`
+    );
+
+    // Draw the base image, then the frame on top of that
+    ctx.drawImage(img, 0, 0, 350, 500);
+    ctx.drawImage(frame, 0, 0, 350, 500);
+
+    // Handle dye mask (this was so annoying to set up I hate Windows)
+    // Default to the classic "Undyed Mask Gray" if the card is undyed.
+    const { c, m, y } = rgbToCmy(185, 185, 185);
+
+    // We need to convert the GM State to a buffer, so that
+    // canvas knows what to do with it.
+    const dyeBuffer = await this.toBufferPromise(
+      gm(`./src/assets/frames/default/mask-default.png`).colorize(c, m, y)
+    );
+
+    // Load the buffer and draw the dye mask on top of the frame.
+    const dyeImage = await loadImage(dyeBuffer);
+    ctx.drawImage(dyeImage, 0, 0, 350, 500);
+
+    // Draw the group icon
+    const overlay = await loadImage(
+      `./src/assets/groups/${
+        card.group?.toLowerCase().replace("*", "") || "nogroup"
+      }.png`
+    );
+    ctx.drawImage(overlay, 0, 0, 350, 500);
+
+    // Draw the name of the subject
+    ctx.font = "30px AlteHaasGroteskBold";
+    ctx.fillText(`${card.name}`, 50, 445);
+
+    // Send it off!
+    const buf = canvas.toBuffer("image/png");
+    return Buffer.alloc(buf.length, buf, "base64");
+  }
+
+  public static async drawCardFromPrefab(
+    card: GameBaseCard,
+    serial: number
+  ): Promise<Buffer> {
+    let prefab: Buffer;
+    try {
+      prefab = await fs.readFile(`./cache/cards/prefab/${card.id}`);
+    } catch {
+      prefab = await this.generateCardPrefab(card);
+    }
+
+    // Create the card canvas
+    const canvas = createCanvas(350, 500);
+    const ctx = canvas.getContext(`2d`);
+
+    // Load the base card image
+    let img = await loadImage(prefab);
+
+    // Draw the base image
+    ctx.drawImage(img, 0, 0, 350, 500);
+
+    // Draw the serial number
+    ctx.font = "20px AlteHaasGroteskBold";
+    ctx.fillText(`#${serial}`, 50, 421);
+
+    const buf = canvas.toBuffer(`image/png`);
+    return Buffer.alloc(buf.length, buf, `base64`);
+  }
+
   public static async generateCardCollage(
     cards: GameUserCard[],
     zephyr: Zephyr
@@ -204,7 +281,9 @@ export abstract class CardService {
     // Generate each card image and draw it on the collage
     ctx.font = "14px AlteHaasGroteskBold";
     for (let [i, card] of cards.entries()) {
-      const cardBuffer = await this.generateCardImage(card, zephyr);
+      const base = zephyr.getCard(card.baseCardId)!;
+
+      const cardBuffer = await this.drawCardFromPrefab(base, card.serialNumber);
       const img = await loadImage(cardBuffer);
       ctx.drawImage(img, i * 350, 0, 350, 500);
     }
@@ -316,6 +395,40 @@ export abstract class CardService {
     );
 
     return await fs.readFile(`./cache/cards/${card.baseCardId}/${card.id}`);
+  }
+
+  public static async generatePrefabCache(card: GameBaseCard): Promise<Buffer> {
+    try {
+      await fs.readFile(`./cache/cards/prefab/${card.id}`);
+      console.log(`Skipping ${card.id}`);
+    } catch {
+      const image = await this.generateCardPrefab(card);
+      await fs.writeFile(`./cache/cards/prefab/${card.id}`, image);
+      console.log(`Generated ${card.id}`);
+    }
+
+    return await fs.readFile(`./cache/cards/prefab/${card.id}`);
+  }
+
+  public static async updatePrefabCache(card: GameBaseCard): Promise<Buffer> {
+    const image = await this.generateCardPrefab(card);
+    await fs.writeFile(`./cache/cards/prefab/${card.id}`, image);
+
+    return image;
+  }
+
+  public static async getPrefabFromCache(card: GameBaseCard): Promise<Buffer> {
+    let prefab: Buffer;
+    try {
+      prefab = await fs.readFile(`./cache/cards/prefab/${card.id}`);
+    } catch {
+      const image = await this.generateCardPrefab(card);
+      await fs.writeFile(`./cache/cards/prefab/${card.id}`, image);
+
+      prefab = image;
+    }
+
+    return prefab;
   }
 
   public static async checkCacheForCard(

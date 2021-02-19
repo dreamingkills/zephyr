@@ -50,15 +50,28 @@ export default class CardInventory extends BaseCommand {
 
     if (!target) target = await ProfileService.getProfile(targetUser.id);
 
-    if (target.private && target.discordId !== msg.author.id)
+    if (
+      target.private &&
+      target.discordId !== msg.author.id &&
+      !this.zephyr.config.moderators.includes(msg.author.id) &&
+      !this.zephyr.config.developers.includes(msg.author.id)
+    )
       throw new ZephyrError.PrivateProfileError(targetUser.tag);
 
-    const filtersRaw = options.filter((v) => v.includes("="));
     const filters: Filter = {};
-    for (let opt of filtersRaw) {
-      const key = opt.split("=")[0];
-      const value = opt.split("=")[1];
-      filters[key] = value;
+    let targetFilter;
+
+    for (const [index, opt] of options.map((o) => o.toLowerCase()).entries()) {
+      if (opt.includes(`=`)) {
+        targetFilter = opt.split(`=`)[0];
+        filters[targetFilter] = opt.split(`=`)[1];
+        continue;
+      }
+
+      const previousString = options[index - 1];
+      if (previousString && targetFilter) {
+        filters[targetFilter] += ` ${opt}`;
+      }
     }
 
     const userTags = await ProfileService.getTags(target);
@@ -69,14 +82,13 @@ export default class CardInventory extends BaseCommand {
       filters
     );
 
-    if (
-      !filters["page"] ||
-      isNaN(parseInt(<string>filters["page"], 10)) ||
-      filters["page"] < 1
-    )
-      filters["page"] = 1;
     const totalPages = Math.ceil(size / 10) || 1;
-    if (filters["page"] > totalPages) filters["page"] = totalPages;
+
+    filters[`page`] = isNaN(parseInt(<string>filters[`page`], 10))
+      ? 1
+      : filters[`page`] > totalPages
+      ? totalPages
+      : filters[`page`];
 
     let page = parseInt(filters["page"] as string, 10);
     const inventory = await CardService.getUserInventory(
@@ -85,11 +97,7 @@ export default class CardInventory extends BaseCommand {
       filters
     );
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Inventory | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(`Inventory`, msg.author)
       .setTitle(`${targetUser.tag}'s cards`)
       .setDescription(this.renderInventory(inventory, userTags))
       .setFooter(
@@ -104,6 +112,7 @@ export default class CardInventory extends BaseCommand {
       time: 2 * 60 * 1000,
     });
     collector.on("error", async (e: Error) => {
+      console.error(e);
       await this.handleError(msg, e);
     });
 
@@ -131,9 +140,11 @@ export default class CardInventory extends BaseCommand {
       }
     );
 
-    if (totalPages > 2) await this.react(sent, `⏮`);
-    if (totalPages > 1) await this.react(sent, `◀`);
-    if (totalPages > 1) await this.react(sent, `▶`);
-    if (totalPages > 2) await this.react(sent, `⏭`);
+    try {
+      if (totalPages > 2) await this.react(sent, `⏮`);
+      if (totalPages > 1) await this.react(sent, `◀`);
+      if (totalPages > 1) await this.react(sent, `▶`);
+      if (totalPages > 2) await this.react(sent, `⏭`);
+    } catch {}
   }
 }

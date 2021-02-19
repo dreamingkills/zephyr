@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
@@ -34,14 +34,18 @@ export default class ViewDyes extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    let target;
-    let targetUser;
+    let target: GameProfile | undefined = undefined;
+    let targetUser: User;
     if (msg.mentions[0]) {
       targetUser = msg.mentions[0];
     } else if (!isNaN(parseInt(options[0]))) {
       if (options[0].length < 17) throw new ZephyrError.InvalidSnowflakeError();
 
-      targetUser = await this.zephyr.fetchUser(options[0]);
+      const fetch = await this.zephyr.fetchUser(options[0]);
+
+      if (!fetch) throw new ZephyrError.UserNotFoundError();
+
+      targetUser = fetch;
     } else {
       targetUser = msg.author;
       target = profile;
@@ -58,8 +62,7 @@ export default class ViewDyes extends BaseCommand {
 
     const maxPage = Math.ceil(dyeCount / 10);
 
-    const embed = new MessageEmbed()
-      .setAuthor(`Dyes | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
+    const embed = new MessageEmbed(`Dyes`, msg.author)
       .setTitle(`${targetUser.tag}'s Dyes`)
       .setDescription(
         dyeCount > 0 ? this.renderDyes(dyes) : `${targetUser.tag} has no dyes!`
@@ -91,7 +94,7 @@ export default class ViewDyes extends BaseCommand {
           if (emoji.name === "▶" && page !== maxPage) page++;
           if (emoji.name === "⏭" && page !== maxPage) page = maxPage;
 
-          const newDyes = await ProfileService.getUserDyes(profile, page);
+          const newDyes = await ProfileService.getUserDyes(target!, page);
 
           embed.setDescription(this.renderDyes(newDyes));
           embed.setFooter(

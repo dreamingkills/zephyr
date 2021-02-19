@@ -19,20 +19,15 @@ export default class SetBlurb extends BaseCommand {
     const blurb = options.join(" ").slice(0, 500);
     await ProfileService.setProfileBlurb(profile, blurb);
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Blurb | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(
-        (blurbRaw.length > 500
-          ? `:warning: Your blurb has been shortened to 500 characters.\n`
-          : ``) +
-          `Updated your blurb to:` +
-          `\n\`\`\`` +
-          `\n${blurb || "empty blurb"}` +
-          `\n\`\`\``
-      );
+    const embed = new MessageEmbed(`Blurb`, msg.author).setDescription(
+      (blurbRaw.length > 500
+        ? `:warning: Your blurb has been shortened to 500 characters.\n`
+        : ``) +
+        `Updated your blurb to:` +
+        `\n\`\`\`` +
+        `\n${blurb || "empty blurb"}` +
+        `\n\`\`\``
+    );
 
     await this.send(msg.channel, embed);
     return;

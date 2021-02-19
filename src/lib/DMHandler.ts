@@ -15,11 +15,13 @@ export class DMHandler {
       User[]
     ];
     const failed = [];
+
     for (let p of eligible) {
       if (p.blacklisted) {
         failed.push(p);
         continue;
       }
+
       const user = await zephyr.fetchUser(p.discordId);
       if (!user) {
         failed.push(p);
@@ -62,15 +64,18 @@ export class DMHandler {
         message = types.slice(0, -1).join(`, `) + `, and ` + types.slice(-1);
       }
 
-      const dmChannel = await user.getDMChannel();
-
       try {
+        const dmChannel = await user.getDMChannel();
         await createMessage(
           dmChannel,
-          `:bell: Hey, **${user.username}**! You can now ${message}!`
+          `:bell: Hey, **${user.username}**! You can now ${message}!` +
+            (vote
+              ? `\nYou can vote by clicking this link! https://top.gg/bot/791100707629432863/vote`
+              : ``)
         );
         continue;
-      } catch {
+      } catch (e) {
+        console.log(`Vote message failed - ${e}`);
         failed.push(p);
         continue;
       }

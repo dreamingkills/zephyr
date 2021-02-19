@@ -16,41 +16,44 @@ export async function verifyMultitradeItems(
   handleError: (msg: Message<TextableChannel>, error: Error) => Promise<void>,
   items: TradeItemResolvable[],
   profile: GameProfile,
-  existingItems: TradeItemResolvable[]
+  existingItems: TradeItemResolvable[] = []
 ) {
+  const newProfile = await profile.fetch();
   for (let item of items) {
     if (item instanceof GameUserCard) {
-      if (item.discordId !== profile.discordId) continue;
+      const card = await item.fetch();
+      if (card.discordId !== profile.discordId) continue;
 
       const cardInTrade = existingItems.filter(
-        (t) => t instanceof GameUserCard && t.id === (<GameUserCard>item).id
+        (t) => t instanceof GameUserCard && t.id === card.id
       )[0] as GameUserCard | undefined;
 
       if (cardInTrade) continue;
 
-      const isInAlbum = await AlbumService.cardIsInAlbum(item);
+      const isInAlbum = await AlbumService.cardIsInAlbum(card);
       if (isInAlbum) {
-        await handleError(msg, new ZephyrError.CardInAlbumError(item));
+        await handleError(msg, new ZephyrError.CardInAlbumError(card));
         continue;
       }
 
-      existingItems.push(item);
+      existingItems.push(card);
       continue;
     } else if (item instanceof GameDye) {
-      if (item.discordId !== profile.discordId) continue;
+      const dye = await item.fetch();
+      if (dye.discordId !== profile.discordId) continue;
 
       const dyeInTrade = existingItems.filter(
-        (t) => t instanceof GameDye && t.id === (<GameDye>item).id
+        (t) => t instanceof GameDye && t.id === dye.id
       )[0] as GameDye | undefined;
 
       if (dyeInTrade) continue;
-      existingItems.push(item);
+      existingItems.push(dye);
       continue;
     } else if (isBitItem(item)) {
-      if (item.bits > profile.bits) {
+      if (item.bits > newProfile.bits) {
         await handleError(
           msg,
-          new ZephyrError.NotEnoughBitsError(profile.bits, item.bits)
+          new ZephyrError.NotEnoughBitsError(newProfile.bits, item.bits)
         );
         continue;
       }
@@ -59,10 +62,10 @@ export async function verifyMultitradeItems(
         | InteractableBits
         | undefined;
 
-      if ((bitsInTrade?.bits || 0) + item.bits > profile.bits) {
+      if ((bitsInTrade?.bits || 0) + item.bits > newProfile.bits) {
         await handleError(
           msg,
-          new ZephyrError.NotEnoughBitsError(profile.bits, item.bits)
+          new ZephyrError.NotEnoughBitsError(newProfile.bits, item.bits)
         );
         continue;
       }
@@ -76,10 +79,10 @@ export async function verifyMultitradeItems(
       }
       continue;
     } else if (isCubitItem(item)) {
-      if (item.cubits > profile.cubits) {
+      if (item.cubits > newProfile.cubits) {
         await handleError(
           msg,
-          new ZephyrError.NotEnoughCubitsError(profile.cubits, item.cubits)
+          new ZephyrError.NotEnoughCubitsError(newProfile.cubits, item.cubits)
         );
         continue;
       }
@@ -88,10 +91,10 @@ export async function verifyMultitradeItems(
         | InteractableCubits
         | undefined;
 
-      if ((cubitsInTrade?.cubits || 0) + item.cubits > profile.cubits) {
+      if ((cubitsInTrade?.cubits || 0) + item.cubits > newProfile.cubits) {
         await handleError(
           msg,
-          new ZephyrError.NotEnoughCubitsError(profile.cubits, item.cubits)
+          new ZephyrError.NotEnoughCubitsError(newProfile.cubits, item.cubits)
         );
         continue;
       }
@@ -113,7 +116,7 @@ export async function verifyMultitradeItems(
 
       try {
         const userItem = await ProfileService.getItem(
-          profile,
+          newProfile,
           item.item.id,
           item.item.names[0]
         );

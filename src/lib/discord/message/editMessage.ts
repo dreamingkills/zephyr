@@ -29,7 +29,7 @@ export async function editMessage(
     3
   ).catch((e) => {
     console.log(
-      `Failed trying to edit message ${msg.id} with content ${content} in channel ${msg.channel.id}. Full stack:\n${e}`
+      `Failed trying to edit message ${msg.id} with content ${content} in channel ${msg.channel.id}. Full stack:\n${e.stack}`
     );
     throw new ZephyrError.FailedToEditMessageError();
   });

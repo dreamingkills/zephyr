@@ -38,17 +38,17 @@ export function calculateTalent(
   };
 
   // Frame Talent
-  if (card.frameId != 1 && card.frameId !== null && card.wear === 5) {
+  if (
+    card.frameId &&
+    card.frameId != 1 &&
+    card.frameId !== null &&
+    card.wear === 5
+  ) {
     talents.frame += Math.floor(60 * wearMultiplier);
   }
 
   // Dye Talent
-  if (
-    card.dyeR !== null &&
-    card.dyeG !== null &&
-    card.dyeB !== null &&
-    card.wear === 5
-  ) {
+  if (card.dyeR >= 0 && card.dyeG >= 0 && card.dyeB >= 0 && card.wear === 5) {
     talents.dye += Math.floor(15 * wearMultiplier);
   }
 
@@ -65,7 +65,7 @@ export function calculateTalent(
   const wearDifference = Math.max(0, card.wear - card.originalWear);
 
   const purityTalent = Math.floor((10 / (1 + wearDifference)) * 2);
-  talents.purity += Math.floor(purityTalent);
+  talents.purity += Math.floor(purityTalent * wearMultiplier);
 
   /*
   // Print Talent

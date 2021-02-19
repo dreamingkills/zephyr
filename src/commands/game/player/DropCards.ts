@@ -31,7 +31,7 @@ export default class DropCards extends BaseCommand {
 
     if (
       msg.channel.id !== dropChannel &&
-      msg.channel.id !== this.zephyr.config.discord.secondaryChannel
+      !this.zephyr.config.discord.secondaryChannels.includes(msg.channel.id)
     )
       throw new ZephyrError.CannotDropInChannelError(dropChannel);
     const now = dayjs(Date.now());
@@ -40,7 +40,18 @@ export default class DropCards extends BaseCommand {
       throw new ZephyrError.DropCooldownError(getTimeUntil(now, until));
 
     const wishlist = await ProfileService.getWishlist(profile);
-    const cards = this.zephyr.getRandomCards(3, wishlist);
+    let boost;
+
+    if (profile.boosterGroup) {
+      const expiry = dayjs(profile.boosterExpiry);
+      const now = dayjs();
+      if (now > expiry) {
+        await ProfileService.clearBooster(profile);
+      } else {
+        boost = profile.boosterGroup;
+      }
+    }
+    const cards = this.zephyr.getRandomCards(3, wishlist, boost);
 
     await ProfileService.setDropTimestamp(
       profile,

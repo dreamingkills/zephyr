@@ -75,7 +75,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    await ProfileSet.addBits(profile.discordId, amount);
+    await ProfileSet.addBits(profile, amount);
     return await profile.fetch();
   }
 
@@ -83,7 +83,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    await ProfileSet.removeBits(profile.discordId, amount);
+    await ProfileSet.removeBits(profile, amount);
     return await profile.fetch();
   }
 
@@ -91,7 +91,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    await ProfileSet.addBitsToBank(profile.discordId, amount);
+    await ProfileSet.addBitsToBank(profile, amount);
     return await profile.fetch();
   }
 
@@ -99,7 +99,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    await ProfileSet.withdrawBitsFromBank(profile.discordId, amount);
+    await ProfileSet.withdrawBitsFromBank(profile, amount);
     return await profile.fetch();
   }
 
@@ -177,7 +177,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     items: { item: PrefabItem; count: number }[]
   ): Promise<void> {
-    return await ProfileSet.removeItems(profile.discordId, items);
+    return await ProfileSet.removeItems(profile, items);
   }
 
   /*
@@ -357,5 +357,21 @@ export abstract class ProfileService {
 
   public static getPrefabItemById(id: number): PrefabItem {
     return items.filter((i) => i.id === id)[0];
+  }
+
+  public static async setBooster(
+    profile: GameProfile,
+    groupId: number,
+    expiry: string
+  ): Promise<GameProfile> {
+    await ProfileSet.setBooster(profile, groupId, expiry);
+
+    return await profile.fetch();
+  }
+
+  public static async clearBooster(profile: GameProfile): Promise<GameProfile> {
+    await ProfileSet.clearBooster(profile);
+
+    return await profile.fetch();
   }
 }

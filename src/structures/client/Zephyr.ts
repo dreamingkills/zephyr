@@ -36,6 +36,8 @@ export class Zephyr extends Client {
 
   private idols: { [id: number]: GameIdol } = {};
 
+  logChannel: TextChannel | undefined;
+
   webhookListener: WebhookListener | undefined;
   dbl: dblapi | undefined;
 
@@ -49,7 +51,7 @@ export class Zephyr extends Client {
   ];
 
   constructor() {
-    super(config.discord.token, { restMode: true });
+    super(config.discord.token, { restMode: true, maxShards: `auto` });
     this.config = config;
     this.users.limit = 1000;
     this.setMaxListeners(250);
@@ -61,12 +63,14 @@ export class Zephyr extends Client {
 
     await this.webhookListener.init(this);
 
-    await this.dbl.postStats(this.guilds.size);
-    setInterval(async () => {
-      if (this.dbl) {
-        await this.dbl.postStats(this.guilds.size);
-      }
-    }, 1800000);
+    if (this.config.topgg.postEnabled) {
+      await this.dbl.postStats(this.guilds.size);
+      setInterval(async () => {
+        if (this.dbl) {
+          await this.dbl.postStats(this.guilds.size);
+        }
+      }, 1800000);
+    }
   }
 
   public async start() {
@@ -76,7 +80,10 @@ export class Zephyr extends Client {
     ItemService.refreshItems();
     const fonts = await FontLoader.init();
 
+    await this.generatePrefabs();
+
     const startTime = Date.now();
+
     this.once("ready", async () => {
       if (this.config.topgg.enabled) await this.startTopGg();
       await this.commandLib.setup(this);
@@ -111,10 +118,23 @@ export class Zephyr extends Client {
         });
       }, 300000);
       await this.dmHandler.handle(this);
+
+      if (this.config.discord.logGuild) {
+        const channels = await this.getRESTGuildChannels(
+          this.config.discord.logGuild
+        );
+        const logChannel = channels.find(
+          (c) => c.name.toLowerCase() === "logs"
+        );
+
+        if (logChannel instanceof TextChannel) {
+          this.logChannel = logChannel;
+        }
+      }
     });
 
     this.on("messageCreate", async (message) => {
-      if (message.author.bot) return;
+      if (message.author.bot || !message.channel) return;
 
       await this.fetchUser(message.author.id);
 
@@ -130,7 +150,10 @@ export class Zephyr extends Client {
         return;
 
       // Prefix resetter
-      if (message.mentions[0]?.id === this.user.id) {
+      if (
+        message.mentions[0]?.id === this.user.id &&
+        message.content.includes(this.user.id)
+      ) {
         const subcommand = message.content.split(" ")[1]?.toLowerCase();
 
         if (subcommand === "reset") {
@@ -171,8 +194,24 @@ export class Zephyr extends Client {
       );
     });
 
+    this.on("guildDelete", async (guild) => {
+      if (this.logChannel) {
+        await createMessage(
+          this.logChannel,
+          `:outbox_tray: Zephyr left a server: **${guild.name}** (${guild.id}).\nMember count: **${guild.memberCount}**`
+        );
+      }
+    });
+
     // Introduction when it joins a new guild
     this.on("guildCreate", async (guild) => {
+      if (this.logChannel) {
+        await createMessage(
+          this.logChannel,
+          `:inbox_tray: Zephyr joined a new server: **${guild.name}** (${guild.id}).\nMember count: **${guild.memberCount}**`
+        );
+      }
+
       // Get ONLY TextChannels in the guild (type === 0)
       const channels = guild.channels.filter(
         (c) => c.type === 0
@@ -201,7 +240,10 @@ export class Zephyr extends Client {
 
         // Check if we can send messages...
         for (let channel of top) {
-          if (checkPermission("sendMessages", <TextChannel>channel, this)) {
+          if (
+            checkPermission(`sendMessages`, channel, this) &&
+            checkPermission(`readMessages`, channel, this)
+          ) {
             welcomeChannel = channel as TextChannel;
             break;
           }
@@ -211,22 +253,42 @@ export class Zephyr extends Client {
       // Didn't find anything? Oh well...
       if (!welcomeChannel) return;
 
+      // No permission? Oh well...
+      if (
+        !checkPermission(`sendMessages`, welcomeChannel, this) ||
+        !checkPermission(`readMessages`, welcomeChannel, this)
+      )
+        return;
+
       // Get the prefix just in case it's already different (bot previously in guild)
       const prefix = this.getPrefix(guild.id);
-      const embed = new MessageEmbed()
-        .setAuthor(`Welcome | ${guild.name}`)
-        .setDescription(
-          `**Thanks for inviting Zephyr!**` +
-            `\nUse \`${prefix}setchannel\` in any channel to set that channel as the Zephyr channel.` +
-            `\n\n**Common configuration**` +
-            `\n— \`${prefix}prefix <prefix>\` - changes the bot's prefix`
-        );
-      await createMessage(welcomeChannel, embed);
+      const embed = new MessageEmbed(`Welcome | ${guild.name}`).setDescription(
+        `**Thanks for inviting Zephyr!**` +
+          `\nUse \`${prefix}setchannel\` in any channel to set that channel as the Zephyr channel.` +
+          `\n\n**Common configuration**` +
+          `\n— \`${prefix}prefix <prefix>\` - changes the bot's prefix`
+      );
+
+      try {
+        await createMessage(welcomeChannel, embed);
+      } catch {}
+
       return;
     });
 
     this.on("error", (error) => {
       console.log(error.message);
+    });
+
+    /*
+        Shards
+    */
+    this.on("shardReady", (id) => {
+      console.log(`Shard ${id} is ready!`);
+    });
+
+    this.on("shardDisconnect", (err, id) => {
+      console.log(`Shard ${id} disconnected with error: ${err}\n${err?.stack}`);
     });
 
     this.connect();
@@ -240,10 +302,12 @@ export class Zephyr extends Client {
     this.prefixes = prefixes;
     return;
   }
+
   public getPrefix(guildId?: string): string {
     if (!guildId) return config.discord.defaultPrefix;
     return this.prefixes[guildId] ?? config.discord.defaultPrefix;
   }
+
   public setPrefix(guildId: string, prefix: string): void {
     this.prefixes[guildId] = prefix;
     return;
@@ -253,7 +317,7 @@ export class Zephyr extends Client {
       Card Caching
   */
   public async cacheCards(): Promise<void> {
-    const cards = await CardService.getAllCards();
+    const cards = (await CardService.getAllCards()).filter((c) => c.activated);
 
     const newCardObject: { [key: number]: GameBaseCard } = {};
     const newIdolObject: { [id: number]: GameIdol } = {};
@@ -274,6 +338,14 @@ export class Zephyr extends Client {
     return;
   }
 
+  public async generatePrefabs(): Promise<void> {
+    const cards = this.getCards();
+    for (let card of cards) {
+      await CardService.generatePrefabCache(card);
+    }
+    console.log(`Generated ${cards.length} prefabs.`);
+  }
+
   public getCard(id: number): GameBaseCard | undefined {
     return this.cards[id];
   }
@@ -282,44 +354,125 @@ export class Zephyr extends Client {
     return this.idols[id];
   }
 
+  public getGroupById(id: number): string | undefined {
+    return Object.values(this.cards).find((c) => c.groupId === id)?.group;
+  }
+
+  public getGroupIdByName(name: string): number | undefined {
+    return Object.values(this.cards).find(
+      (c) => c.group?.toLowerCase() === name.toLowerCase()
+    )?.groupId;
+  }
+
   public async refreshCard(id: number): Promise<GameBaseCard> {
     const recached = await CardService.getCardById(id);
-    this.cards[id] = recached;
+
+    this.cards[recached.id] = recached;
+
     return recached;
   }
 
   public getRandomCards(
     amount: number,
-    wishlist: GameWishlist[] = []
+    wishlist: GameWishlist[] = [],
+    booster?: number
   ): GameBaseCard[] {
     const today = dayjs().format(`MM-DD`);
-    const cards: GameBaseCard[] = [];
-    const eligibleCards = Object.values(this.cards).filter((c) => c.rarity > 0);
-    if (wishlist.length > 0) {
-      const bonus = this.chance.bool({ likelihood: 5 });
-      if (bonus) {
-        const random = this.chance.pickone(wishlist);
-        const potential = eligibleCards.filter(
-          (c) => c.idolId === random.idolId
-        );
-        if (potential[0]) cards.push(potential[0]);
+    const chosenCards: GameBaseCard[] = [];
+
+    const eligibleCards = this.getCards().filter(
+      (c) => c.rarity > 0 && c.activated
+    );
+
+    const trueWishlist = wishlist.filter((wl) =>
+      eligibleCards.find((c) => c.idolId === wl.idolId)
+    );
+
+    const groupIds: (number | undefined)[] = [];
+    for (let card of eligibleCards) {
+      if (!groupIds.includes(card.groupId)) {
+        groupIds.push(card.groupId);
       }
     }
 
-    const weightings = eligibleCards.map(
-      (c) => c.rarity + (c.birthday?.slice(5) === today ? 150 : 0)
-    );
+    const weightings = groupIds.map((g) => {
+      let weight = 100;
 
-    while (cards.length < amount) {
-      const randomCard = this.chance.weighted(eligibleCards, weightings);
-      if (cards.includes(randomCard)) continue;
-      cards.push(randomCard);
+      if (booster && booster === g) weight *= 2.5;
+
+      return weight;
+    });
+
+    const groups: (number | undefined)[] = [];
+
+    let wishlistProc = false;
+    if (trueWishlist.length > 0) {
+      wishlistProc = this.chance.bool({ likelihood: 15 });
     }
 
-    return cards.slice(0, amount);
+    while (groups.length < amount - (wishlistProc ? 1 : 0)) {
+      groups.push(this.chance.weighted(groupIds, weightings));
+    }
+
+    if (wishlistProc) {
+      const wishlistWeightings = trueWishlist.map((w) => {
+        let weight = 100;
+
+        const idol = this.getIdol(w.idolId);
+
+        if (idol && idol.birthday === today) weight *= 2.5;
+
+        return weight;
+      });
+
+      const randomWishlist = this.chance.weighted(
+        trueWishlist,
+        wishlistWeightings
+      );
+
+      const idolCards = eligibleCards.filter(
+        (c) => c.idolId === randomWishlist.idolId
+      );
+
+      chosenCards.push(this.chance.pickone(idolCards));
+    }
+
+    for (let group of groups) {
+      const groupCards = eligibleCards.filter(
+        (c) => c.groupId === group && !chosenCards.includes(c)
+      );
+
+      if (groupCards.length > 0) {
+        const weightings = groupCards.map((c) => {
+          let weight = 100;
+
+          const idol = this.getIdol(c.idolId);
+          if (idol && idol.birthday === today) weight *= 2.5;
+
+          return weight;
+        });
+
+        const randomCard = this.chance.weighted(groupCards, weightings);
+        chosenCards.push(randomCard);
+      }
+    }
+
+    while (chosenCards.length < amount) {
+      const randomCard = this.chance.pickone(
+        eligibleCards.filter((c) => !chosenCards.includes(c))
+      );
+      chosenCards.push(randomCard);
+    }
+
+    return chosenCards;
   }
+
   public getCards(): GameBaseCard[] {
     return Object.values(this.cards);
+  }
+
+  public getCardsByGroup(id: number): GameBaseCard[] {
+    return this.getCards().filter((c) => c.groupId === id);
   }
 
   /*
@@ -423,13 +576,11 @@ export class Zephyr extends Client {
     try {
       const dmChannel = await voter.getDMChannel();
 
-      const embed = new MessageEmbed()
-        .setAuthor(`Vote | ${voter.tag}`, voter.dynamicAvatarURL("png"))
-        .setDescription(
-          `:sparkles: Thanks for voting, **${
-            voter.username
-          }**! You've been given **${isWeekend ? 4 : 2}** cubits!`
-        );
+      const embed = new MessageEmbed(`Vote`, voter).setDescription(
+        `:sparkles: Thanks for voting, **${
+          voter.username
+        }**! You've been given **${isWeekend ? 4 : 2}** cubits!`
+      );
       await createMessage(dmChannel, embed);
     } catch {}
   }

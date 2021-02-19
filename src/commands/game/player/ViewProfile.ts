@@ -37,14 +37,20 @@ export default class ViewProfile extends BaseCommand {
 
     if (!target) target = await ProfileService.getProfile(targetUser.id);
 
-    if (target.private && target.discordId !== msg.author.id)
+    if (
+      target.private &&
+      target.discordId !== msg.author.id &&
+      !this.zephyr.config.moderators.includes(msg.author.id) &&
+      !this.zephyr.config.developers.includes(msg.author.id)
+    )
       throw new ZephyrError.PrivateProfileError(targetUser.tag);
 
     const cardsAmount = await CardService.getUserInventorySize(target, [], {});
 
     const targetIsSender = target.discordId === msg.author.id;
-    const embed = new MessageEmbed()
-      .setAuthor(`Profile | ${targetUser.tag}`, msg.author.avatarURL)
+
+    const embed = new MessageEmbed(`Profile`, msg.author)
+      .setTitle(`${targetUser.tag}'s Profile`)
       .setDescription(
         `**Blurb**` +
           `\n${target.blurb || "*No blurb set*"}` +
@@ -63,8 +69,12 @@ export default class ViewProfile extends BaseCommand {
           }.`
       );
 
+    let footer = `User ID: ${targetUser.id}`;
+
     if (target.discordId === msg.author.id && profile.private)
-      embed.setFooter(`Your profile is currently private.`);
+      footer += `\nYour profile is currently private.`;
+
+    embed.setFooter(footer);
 
     await this.send(msg.channel, embed);
     return;

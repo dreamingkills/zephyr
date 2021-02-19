@@ -9,14 +9,10 @@ export default class ToggleDrops extends BaseCommand {
 
   async exec(msg: Message): Promise<void> {
     this.zephyr.dropsEnabled = !this.zephyr.dropsEnabled;
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Toggle Drops | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(
-        `Drops have been ${this.zephyr.dropsEnabled ? `enabled` : `disabled`}.`
-      );
+
+    const embed = new MessageEmbed(`Toggle Drops`, msg.author).setDescription(
+      `Drops have been ${this.zephyr.dropsEnabled ? `enabled` : `disabled`}.`
+    );
 
     await this.send(msg.channel, embed);
     return;

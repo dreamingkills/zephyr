@@ -12,7 +12,6 @@ export default class CardLookup extends BaseCommand {
   description = "Shows you information about a card.";
   usage = ["$CMD$ <name>"];
   allowDm = true;
-  developerOnly = true;
 
   async exec(
     msg: Message,
@@ -24,7 +23,11 @@ export default class CardLookup extends BaseCommand {
       const lastBase = this.zephyr.getCard(lastCard.baseCardId)!;
 
       const embed = await this.getCardStats(lastBase, msg.author);
-      await this.send(msg.channel, embed);
+      const prefabImage = await CardService.getPrefabFromCache(lastBase);
+
+      await this.send(msg.channel, embed, {
+        file: { file: prefabImage, name: `prefab.png` },
+      });
       return;
     }
 
@@ -50,59 +53,69 @@ export default class CardLookup extends BaseCommand {
 
     if (find.length === 1) {
       const embed = await this.getCardStats(find[0], msg.author);
+      const prefabImage = await CardService.getPrefabFromCache(find[0]);
+
       await this.send(msg.channel, embed, {
-        file: { file: find[0].image, name: `card.png` },
+        file: { file: prefabImage, name: `prefab.png` },
       });
       return;
     }
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Lookup | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(
-        `I found multiple matches for **${nameQuery}**.\nPlease reply with a number to confirm which person you're talking about.\n` +
-          find
-            .map(
-              (u, index) =>
-                `— \`${index + 1}\` **${u.group || `Soloist`}** ${u.name}${
-                  u.subgroup ? ` (${u.subgroup})` : ``
-                }`
-            )
-            .join("\n")
-      );
+    const confirmationEmbed = new MessageEmbed(
+      `Lookup`,
+      msg.author
+    ).setDescription(
+      `I found multiple matches for **${nameQuery}**.\nPlease reply with a number to confirm which person you're talking about.\n` +
+        find
+          .map(
+            (u, index) =>
+              `— \`${index + 1}\` **${u.group || `Soloist`}** ${u.name}${
+                u.subgroup ? ` (${u.subgroup})` : ``
+              }`
+          )
+          .join("\n")
+    );
 
-    const conf = await this.send(msg.channel, embed);
+    const confirmation = await this.send(msg.channel, confirmationEmbed);
 
-    const filter = (m: Message) =>
-      find[parseInt(m.content) - 1] && m.author.id === msg.author.id;
-    const collector = new MessageCollector(this.zephyr, msg.channel, filter, {
-      time: 15000,
-      max: 1,
+    const selection: number | undefined = await new Promise((res, _req) => {
+      const filter = (m: Message) =>
+        find[parseInt(m.content) - 1] && m.author.id === msg.author.id;
+
+      const collector = new MessageCollector(this.zephyr, msg.channel, filter, {
+        time: 30000,
+        max: 1,
+      });
+
+      collector.on("error", async (e: Error) => {
+        await this.handleError(msg, e);
+      });
+
+      collector.on("collect", async (m: Message) => {
+        res(parseInt(m.content) - 1);
+      });
+
+      collector.on("end", async (_c: any, reason: string) => {
+        if (reason === "time") res(undefined);
+      });
     });
-    collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
-    });
 
-    collector.on("collect", async (m: Message) => {
-      const embed = await this.getCardStats(
-        find[parseInt(m.content) - 1],
-        msg.author
-      );
-
-      await this.send(msg.channel, embed, {
-        file: { file: find[parseInt(m.content) - 1].image, name: `card.png` },
+    if (!selection && selection !== 0) {
+      await confirmation.edit({
+        embed: confirmationEmbed.setFooter(`🕒 This lookup has timed out.`),
       });
       return;
+    }
+
+    const targetCard = find[selection];
+
+    const embed = await this.getCardStats(targetCard, msg.author);
+    const prefabImage = await CardService.getPrefabFromCache(targetCard);
+
+    await this.send(msg.channel, embed, {
+      file: { file: prefabImage, name: `prefab.png` },
     });
-    collector.on("end", async (_c: any, reason: string) => {
-      if (reason === "time") {
-        await conf.edit({
-          embed: embed.setFooter(`🕒 This lookup has timed out.`),
-        });
-      }
-    });
+    return;
   }
 
   private async getCardStats(
@@ -110,6 +123,7 @@ export default class CardLookup extends BaseCommand {
     author: User
   ): Promise<MessageEmbed> {
     card = await this.zephyr.refreshCard(card.id);
+
     const timesDestroyed = await CardService.getTimesCardDestroyed(
       card,
       this.zephyr
@@ -118,13 +132,7 @@ export default class CardLookup extends BaseCommand {
     const avgClaimTime = await CardService.getAverageClaimTime(card);
     const wearSpread = await CardService.getCardWearSpread(card, this.zephyr);
 
-    const embed = new MessageEmbed().setAuthor(
-      `Lookup | ${author.tag}`,
-      author.dynamicAvatarURL("png")
-    );
-
-    embed
-      //.setTitle(`Lookup - ${card.group ? `${card.group} ` : ``}${card.name}`)
+    const embed = new MessageEmbed(`Lookup`, author)
       .setDescription(
         `Name — **${card.name}**` +
           (card.group ? `\nGroup — **${card.group}**` : ``) +
@@ -152,7 +160,7 @@ export default class CardLookup extends BaseCommand {
           `\n— \`★★★★☆\` **${wearSpread[4].toLocaleString()}**` +
           `\n— \`★★★★★\` **${wearSpread[5].toLocaleString()}**`
       )
-      .setThumbnail(`attachment://card.png`);
+      .setThumbnail(`attachment://prefab.png`);
 
     return embed;
   }

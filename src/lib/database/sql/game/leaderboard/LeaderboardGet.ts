@@ -83,6 +83,9 @@ export abstract class LeaderboardGet extends DBClass {
       vote_last: string | null;
       vote_reminder: boolean;
       vote_reminded: boolean;
+      booster_group: number | null;
+      booster_expiry: string | null;
+      created_at: string;
     }[];
     return query.map((p) => {
       return { profile: new GameProfile(p), count: p.count };

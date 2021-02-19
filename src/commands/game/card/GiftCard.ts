@@ -62,8 +62,7 @@ export default class GiftCard extends BaseCommand {
       tags
     );
 
-    const embed = new MessageEmbed()
-      .setAuthor(`Gift | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
+    const embed = new MessageEmbed(`Gift`, msg.author)
       .setTitle(
         `Really gift ${cards.length} card${cards.length === 1 ? `` : `s`} to ${
           giftee.tag

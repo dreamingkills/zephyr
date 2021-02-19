@@ -40,11 +40,7 @@ export default class TopWishlist extends BaseCommand {
     const totalPages = Math.ceil(topWishlistedCount / 10);
 
     const title = `Top wishlisted cards`;
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Top Collectors | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(`Top Wishlist`, msg.author)
       .setTitle(
         `${title} (${1 + 10 * page - 10}-${
           10 * page > topWishlistedCount ? topWishlistedCount : 10 * page

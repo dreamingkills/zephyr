@@ -54,17 +54,12 @@ export default class CraftItem extends BaseCommand {
       requiredUserItems.push(userItem);
     }
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Crafting | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(
-        `Please confirm that you would like to craft **${
-          recipeQuery.name
-        }**.\n${renderRecipe(recipeQuery)}` +
-          `**Notice**: Crafting is not reversible!`
-      );
+    const embed = new MessageEmbed(`Crafting`, msg.author).setDescription(
+      `Please confirm that you would like to craft **${
+        recipeQuery.name
+      }**.\n${renderRecipe(recipeQuery)}` +
+        `**Notice**: Crafting is not reversible!`
+    );
 
     const confirmation = await this.send(msg.channel, embed);
 

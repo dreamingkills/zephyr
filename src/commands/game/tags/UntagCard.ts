@@ -33,16 +33,12 @@ export default class UntagCard extends BaseCommand {
       throw new ZephyrError.CardsNotTaggedError(cardsRaw.length > 1);
 
     await CardService.unsetCardsTag(cards);
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Tagging | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
-      .setDescription(
-        `Removed tags from **${cards.length}** card${
-          cards.length > 1 ? `s` : ``
-        }.`
-      );
+
+    const embed = new MessageEmbed(`Untag`, msg.author).setDescription(
+      `Removed tags from **${cards.length}** card${
+        cards.length > 1 ? `s` : ``
+      }.`
+    );
 
     await this.send(msg.channel, embed);
     return;

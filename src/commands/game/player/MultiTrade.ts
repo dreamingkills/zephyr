@@ -127,7 +127,7 @@ export default class MultiTrade extends BaseCommand {
           msg,
           this.handleError,
           processed,
-          selectProfile,
+          await selectProfile.fetch(),
           selectItems
         );
 
@@ -151,7 +151,7 @@ export default class MultiTrade extends BaseCommand {
         userId: string
       ) =>
         [targetUser.id, msg.author.id].includes(userId) &&
-        ["❌", "🔒", "☑"].includes(emoji.name);
+        ["❌", "🔒", "✅"].includes(emoji.name);
       const reactionCollector = new ReactionCollector(
         this.zephyr,
         tradeMessage,
@@ -198,11 +198,11 @@ export default class MultiTrade extends BaseCommand {
               await this.edit(tradeMessage, tradeInterfaceEmbed);
 
               if (senderConfirmed && recipientConfirmed)
-                await this.react(tradeMessage, "☑");
+                await this.react(tradeMessage, "✅");
 
               break;
             }
-            case "☑": {
+            case "✅": {
               if (!(senderConfirmed && recipientConfirmed)) break;
 
               if (isSender && senderConfirmed) {
@@ -256,18 +256,28 @@ export default class MultiTrade extends BaseCommand {
       return;
     }
 
-    if (senderItems.length > 0 || recipientItems.length > 0) {
-      if (senderItems.length > 0)
-        await transferItems(senderItems, targetProfile, profile);
-      if (recipientItems.length > 0)
-        await transferItems(recipientItems, profile, targetProfile);
+    try {
+      if (senderItems.length > 0 || recipientItems.length > 0) {
+        if (senderItems.length > 0)
+          await transferItems(senderItems, targetProfile, profile);
+        if (recipientItems.length > 0)
+          await transferItems(recipientItems, profile, targetProfile);
 
-      await AnticheatService.logMultitrade(
-        senderItems,
-        recipientItems,
-        profile,
-        targetProfile
+        await AnticheatService.logMultitrade(
+          senderItems,
+          recipientItems,
+          profile,
+          targetProfile
+        );
+      }
+    } catch (e) {
+      await this.edit(
+        tradeMessage,
+        tradeInterfaceEmbed
+          .setDescription(`This trade has been cancelled.`)
+          .setColor(`C22727`)
       );
+      throw e;
     }
 
     await this.edit(

@@ -11,9 +11,9 @@ export interface UserCard {
   frame_name: string;
   frame_url: string;
   dye_mask_url: string;
-  dye_r: number;
-  dye_g: number;
-  dye_b: number;
+  dye_r: number | null;
+  dye_g: number | null;
+  dye_b: number | null;
   claim_time: number;
   tag_id: number;
   original_wear: number;
@@ -63,9 +63,15 @@ export class GameUserCard {
 
     this.tagId = data.tag_id;
 
-    this.dyeR = data.dye_r;
-    this.dyeG = data.dye_g;
-    this.dyeB = data.dye_b;
+    if (data.dye_r || data.dye_r === 0) {
+      this.dyeR = data.dye_r;
+    } else this.dyeR = -1;
+    if (data.dye_g || data.dye_g === 0) {
+      this.dyeG = data.dye_g;
+    } else this.dyeG = -1;
+    if (data.dye_b || data.dye_b === 0) {
+      this.dyeB = data.dye_b;
+    } else this.dyeB = -1;
   }
 
   public async fetch(): Promise<GameUserCard> {

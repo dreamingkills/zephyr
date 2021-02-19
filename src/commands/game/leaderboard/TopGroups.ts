@@ -14,6 +14,7 @@ export default class TopGroup extends BaseCommand {
   description = "Shows you the top collectors of a certain group.";
   usage = ["$CMD$ <group name>"];
   allowDm = true;
+  developerOnly = true;
 
   async exec(
     msg: Message,
@@ -48,11 +49,7 @@ export default class TopGroup extends BaseCommand {
     const totalPages = Math.ceil(topCollectorCount / 10);
 
     const title = `Top collectors of ${group} `;
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Top Collectors | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(`Top Collectors`, msg.author)
       .setTitle(
         `${title} (${1 + 10 * page - 10}-${
           10 * page > topCollectorCount ? topCollectorCount : 10 * page

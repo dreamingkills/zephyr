@@ -46,6 +46,7 @@ export function getDescriptions(
   tags: GameTag[] = []
 ): string[] {
   const descriptions = [];
+
   const onlyCards = targets.filter(
     (t) => t instanceof GameUserCard
   ) as GameUserCard[];
@@ -122,10 +123,11 @@ export function getGroupsByIdolId(
   cards: GameBaseCard[]
 ): string[] {
   const groups: string[] = [];
+
   cards
     .filter((c) => c.idolId === idolId)
     .forEach((c) => {
-      if (groups.includes(c.group || `Soloist`))
+      if (!groups.includes(c.group || `Soloist`))
         groups.push(c.group || `Soloist`);
     });
 

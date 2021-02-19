@@ -53,11 +53,10 @@ export default class ViewTalent extends BaseCommand {
 
     const cardImage = await CardService.checkCacheForCard(card, this.zephyr);
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Talent - ${card.id.toString(36)} | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(
+      `Talent - ${card.id.toString(36)}`,
+      msg.author
+    )
       .setDescription(
         `Card: ${base.group ? `**${base.group}**` : `**Soloist**`} ${
           base.name

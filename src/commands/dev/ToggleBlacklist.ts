@@ -7,19 +7,22 @@ import { MessageEmbed } from "../../structures/client/RichEmbed";
 export default class ToggleBlacklist extends BaseCommand {
   names = ["tbl"];
   description = `Toggles someone's blacklisted status.`;
-  developerOnly = true;
 
   async exec(msg: Message): Promise<void> {
+    if (
+      !this.zephyr.config.developers.includes(msg.author.id) &&
+      !this.zephyr.config.moderators.includes(msg.author.id)
+    )
+      return;
+
     const targetUser = msg.mentions[0];
     if (!targetUser) throw new ZephyrError.InvalidMentionError();
 
     const target = await ProfileService.getProfile(targetUser.id);
     const newProfile = await ProfileService.toggleBlacklisted(target);
 
-    const embed = new MessageEmbed().setAuthor(
-      `Toggle Blacklist | ${msg.author.tag}`,
-      msg.author.dynamicAvatarURL("png")
-    );
+    const embed = new MessageEmbed(`Toggle Blacklist`, msg.author);
+
     if (newProfile.blacklisted) {
       embed.setDescription(`Blacklisted **${targetUser.tag}**.`);
     } else

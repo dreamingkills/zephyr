@@ -28,12 +28,9 @@ export default class SetPatron extends BaseCommand {
       await ProfileService.setPatronTier(target, 0);
       await PatreonService.removePatron(target);
 
-      const embed = new MessageEmbed()
-        .setAuthor(
-          `Set Patron | ${msg.author.tag}`,
-          msg.author.dynamicAvatarURL("png")
-        )
-        .setDescription(`Unmarked **${targetUser.tag}** as patron.`);
+      const embed = new MessageEmbed(`Set Patron`, msg.author).setDescription(
+        `Unmarked **${targetUser.tag}** as patron.`
+      );
 
       await this.send(msg.channel, embed);
       return;
@@ -41,14 +38,9 @@ export default class SetPatron extends BaseCommand {
       await ProfileService.setPatronTier(target, tier);
       await PatreonService.addPatron(target);
 
-      const embed = new MessageEmbed()
-        .setAuthor(
-          `Set Patron | ${msg.author.tag}`,
-          msg.author.dynamicAvatarURL("png")
-        )
-        .setDescription(
-          `Marked **${targetUser.tag}** as a Tier **${tier}** patron.`
-        );
+      const embed = new MessageEmbed(`Set Patron`, msg.author).setDescription(
+        `Marked **${targetUser.tag}** as a Tier **${tier}** patron.`
+      );
 
       await this.send(msg.channel, embed);
       return;

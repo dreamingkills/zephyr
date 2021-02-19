@@ -38,7 +38,8 @@ export default class CardInfo extends BaseCommand {
       const claimerProfile = await ProfileService.getProfile(claimInfo.claimer);
       if (
         claimerProfile.private &&
-        claimerProfile.discordId !== msg.author.id
+        claimerProfile.discordId !== msg.author.id &&
+        !this.zephyr.config.moderators.includes(msg.author.id)
       ) {
         claimer = "Private User";
       } else claimer = claimerUser?.tag || "Unknown User";
@@ -51,7 +52,8 @@ export default class CardInfo extends BaseCommand {
         const dropperProfile = await ProfileService.getProfile(dropperUser.id);
         if (
           dropperProfile.private &&
-          dropperProfile.discordId !== msg.author.id
+          dropperProfile.discordId !== msg.author.id &&
+          !this.zephyr.config.moderators.includes(msg.author.id)
         ) {
           dropper = "Private User";
         } else dropper = dropperUser.tag;
@@ -60,11 +62,7 @@ export default class CardInfo extends BaseCommand {
 
     const cardImage = await CardService.checkCacheForCard(card, this.zephyr);
 
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Card Info | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(`Card Info`, msg.author)
       .setDescription(
         `Showing stats for \`${card.id.toString(36)}\`...` +
           `\n\n— Claimed at **${claimTime} UTC**` +

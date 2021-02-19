@@ -8,6 +8,9 @@ import { CardService } from "../../../services/game/CardService";
 import { Chance } from "chance";
 import { GameDye } from "../../../../../structures/game/Dye";
 import { GameSticker } from "../../../../../structures/game/Sticker";
+import * as ZephyrError from "../../../../../structures/error/ZephyrError";
+import { AlbumService } from "../../../services/game/AlbumService";
+
 export abstract class CardSet extends DBClass {
   public static async createNewUserCard(
     card: GameBaseCard,
@@ -69,6 +72,17 @@ export abstract class CardSet extends DBClass {
     cards: GameUserCard[],
     discordId: string
   ): Promise<void> {
+    for (let card of cards) {
+      const refetchCard = await card.fetch();
+
+      if (refetchCard.discordId !== card.discordId)
+        throw new ZephyrError.NotOwnerOfCardError(refetchCard);
+
+      const isInAlbum = await AlbumService.cardIsInAlbum(refetchCard);
+
+      if (isInAlbum) throw new ZephyrError.CardInAlbumError(refetchCard);
+    }
+
     await DB.query(
       `UPDATE user_card SET discord_id=?,tag_id=NULL WHERE id IN (?);`,
       [discordId, cards.map((c) => c.id)]
@@ -80,6 +94,17 @@ export abstract class CardSet extends DBClass {
     cards: GameUserCard[],
     zephyrId: string
   ): Promise<void> {
+    for (let card of cards) {
+      const refetchCard = await card.fetch();
+
+      if (refetchCard.discordId !== card.discordId)
+        throw new ZephyrError.NotOwnerOfCardError(refetchCard);
+
+      const isInAlbum = await AlbumService.cardIsInAlbum(refetchCard);
+
+      if (isInAlbum) throw new ZephyrError.CardInAlbumError(refetchCard);
+    }
+
     await DB.query(
       `UPDATE user_card SET discord_id=?,tag_id=NULL WHERE id IN (?);`,
       [zephyrId, cards.map((c) => c.id)]
@@ -91,6 +116,13 @@ export abstract class CardSet extends DBClass {
     cards: GameUserCard[],
     tagId: number
   ): Promise<void> {
+    for (let card of cards) {
+      const refetchCard = await card.fetch();
+
+      if (refetchCard.discordId !== card.discordId)
+        throw new ZephyrError.NotOwnerOfCardError(refetchCard);
+    }
+
     await DB.query(`UPDATE user_card SET tag_id=? WHERE id IN (?);`, [
       tagId,
       cards.map((c) => c.id),

@@ -45,8 +45,9 @@ export default class GroupList extends BaseCommand {
     if (totalPages > 1) await this.react(groupList, `▶`);
     if (totalPages > 2) await this.react(groupList, `⏭`);
 
-    const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
-      userId === msg.author.id;
+    const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
+      userId === msg.author.id && [`⏮`, `◀`, `▶`, `⏭`].includes(emoji.name);
+
     const collector = new ReactionCollector(this.zephyr, groupList, filter, {
       time: 2 * 60 * 1000,
     });

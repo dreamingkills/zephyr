@@ -36,9 +36,11 @@ export abstract class CardGet extends DBClass {
                                     card_base.id,
                                     card_base.idol_id, 
                                     card_base.subgroup_id,
-                                    subgroup.group_name,
+                                    card_base.activated,
+                                    base_group.group_name,
                                     idol.idol_name,
                                     idol.birthday,
+                                    subgroup.group_id,
                                     subgroup.subgroup_name,
                                     subgroup.archived,
                                     rarity,
@@ -47,28 +49,34 @@ export abstract class CardGet extends DBClass {
                                     serial_limit,
                                     num_generated,
                                     emoji
-                                   FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE idol_id > 0;`)) as BaseCard[];
+                                   FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id LEFT JOIN base_group ON base_group.id=subgroup.group_id WHERE idol_id > 0;`)) as BaseCard[];
+
     return query.map((c) => new GameBaseCard(c));
   }
 
   public static async getCardById(id: number): Promise<GameBaseCard> {
     const query = (await DB.query(
       `SELECT
-    card_base.id,
-    subgroup.group_name,
-    idol.idol_name,
-    idol.birthday,
-    subgroup.subgroup_name,
-    subgroup.archived,
-    rarity,
-    image_url,
-    serial_total,
-    serial_limit,
-    num_generated,
-    emoji
-   FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE card_base.id=? AND idol_id > 0;`,
+      card_base.id,
+      card_base.idol_id, 
+      card_base.subgroup_id,
+      card_base.activated,
+      base_group.group_name,
+      idol.idol_name,
+      idol.birthday,
+      subgroup.group_id,
+      subgroup.subgroup_name,
+      subgroup.archived,
+      rarity,
+      image_url,
+      serial_total,
+      serial_limit,
+      num_generated,
+      emoji
+   FROM card_base LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id LEFT JOIN base_group ON base_group.id=subgroup.group_id WHERE card_base.id=? AND idol_id > 0;`,
       [id]
     )) as BaseCard[];
+
     return new GameBaseCard(query[0]);
   }
 
@@ -96,10 +104,20 @@ export abstract class CardGet extends DBClass {
     options: Filter,
     tags: GameTag[]
   ): Promise<GameUserCard[]> {
-    let query = `SELECT user_card.* FROM user_card 
-                  LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE discord_id=${DB.connection.escape(
-                    profile.discordId
-                  )}`;
+    const indices = [`CardOwner`];
+
+    let query = `SELECT user_card.*
+                 FROM user_card USE INDEX (${indices.join(`, `)})
+                 LEFT JOIN card_base
+                   ON user_card.card_id=card_base.id
+                 LEFT JOIN idol
+                   ON idol.id=card_base.idol_id
+                 LEFT JOIN subgroup
+                   ON subgroup.id=card_base.subgroup_id
+                 LEFT JOIN base_group
+                   ON base_group.id=subgroup.group_id
+                 WHERE discord_id=${DB.connection.escape(profile.discordId)}`;
+
     const queryOptions = FilterService.parseOptions(options, tags);
     const page = <number>options["page"];
     query +=
@@ -119,7 +137,7 @@ export abstract class CardGet extends DBClass {
     } else if (["luck", "lc"].includes(order)) {
       query += ` ORDER BY luck_coeff ${reverse ? `ASC` : `DESC`}`;
     } else if (["group", "g"].includes(order)) {
-      query += ` ORDER BY subgroup.group_name ${reverse ? `DESC` : `ASC`}`;
+      query += ` ORDER BY base_group.group_name ${reverse ? `DESC` : `ASC`}`;
     } else if (["name", "n"].includes(order)) {
       query += ` ORDER BY idol.idol_name ${reverse ? `DESC` : `ASC`}`;
     } else if (["subgroup", "sg"].includes(order)) {
@@ -142,7 +160,7 @@ export abstract class CardGet extends DBClass {
     options: Filter,
     tags: GameTag[]
   ): Promise<number> {
-    let query = `SELECT COUNT(*) AS count FROM user_card LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id WHERE discord_id=${DB.connection.escape(
+    let query = `SELECT COUNT(*) AS count FROM user_card USE INDEX (CardOwner) LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id LEFT JOIN base_group ON base_group.id=subgroup.group_id WHERE discord_id=${DB.connection.escape(
       profile.discordId
     )}`;
     const queryOptions = FilterService.parseOptions(options, tags);
@@ -155,7 +173,7 @@ export abstract class CardGet extends DBClass {
 
   public static async getUserCardById(id: number): Promise<GameUserCard> {
     const query = (await DB.query(
-      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.id=?;`,
+      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card USE INDEX (PRIMARY) LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.id=?;`,
       [id]
     )) as UserCard[];
     if (!query[0]) throw new ZephyrError.UnknownUserCardError(id.toString(36));
@@ -235,7 +253,7 @@ export abstract class CardGet extends DBClass {
     zephyrId: string
   ): Promise<number> {
     const query = (await DB.query(
-      `SELECT COUNT(*) AS count FROM user_card WHERE card_id=? AND discord_id=?;`,
+      `SELECT COUNT(*) AS count FROM user_card USE INDEX(PRIMARY) WHERE card_id=? AND discord_id=?;`,
       [id, zephyrId]
     )) as { count: number }[];
     return query[0].count;

@@ -49,11 +49,7 @@ export default class DyeCard extends BaseCommand {
     ];
 
     const userTags = await ProfileService.getTags(profile);
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Dye Card | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(`Dye Card`, msg.author)
       .setDescription(
         `Really dye this card with \`$${targetDye.id.toString(36)}\` **${
           targetDye.name
@@ -112,11 +108,7 @@ export default class DyeCard extends BaseCommand {
         this.zephyr
       );
 
-      const successEmbed = new MessageEmbed()
-        .setAuthor(
-          `Dye Card | ${msg.author.tag}`,
-          msg.author.dynamicAvatarURL("png")
-        )
+      const successEmbed = new MessageEmbed(`Dye Card`, msg.author)
         .setDescription(
           `Successfully dyed \`${dyedCard.id.toString(
             36

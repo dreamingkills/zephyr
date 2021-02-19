@@ -72,42 +72,65 @@ export abstract class ProfileSet extends DBClass {
       Currency
   */
   public static async addBits(
-    discordId: string,
+    profile: GameProfile,
     amount: number
   ): Promise<void> {
+    const refetchProfile = await profile.fetch();
+
+    if (refetchProfile.bits + amount > 4294967295)
+      throw new ZephyrError.TooManyError();
+
     await DB.query(`UPDATE profile SET bits=bits+? WHERE discord_id=?;`, [
       amount,
-      discordId,
+      profile.discordId,
     ]);
     return;
   }
+
   public static async removeBits(
-    discordId: string,
+    profile: GameProfile,
     amount: number
   ): Promise<void> {
+    const refetchProfile = await profile.fetch();
+
+    if (refetchProfile.bits - amount < 0)
+      throw new ZephyrError.NotEnoughBitsError(refetchProfile.bits, 0);
+
     await DB.query(`UPDATE profile SET bits=bits-? WHERE discord_id=?;`, [
       amount,
-      discordId,
+      profile.discordId,
     ]);
     return;
   }
+
   public static async addBitsToBank(
-    discordId: string,
+    profile: GameProfile,
     amount: number
   ): Promise<void> {
+    const refetchProfile = await profile.fetch();
+
+    if (refetchProfile.bitsBank + amount > 4294967295)
+      throw new ZephyrError.TooManyError();
+
     await DB.query(
       `UPDATE profile SET bits_bank=bits_bank+? WHERE discord_id=?;`,
-      [amount, discordId]
+      [amount, profile.discordId]
     );
     return;
   }
+
   public static async withdrawBitsFromBank(
-    discordId: string,
+    profile: GameProfile,
     amount: number
   ): Promise<void> {
+    const refetchProfile = await profile.fetch();
+
+    if (refetchProfile.bitsBank - amount < 0)
+      throw new ZephyrError.NotEnoughBitsError(refetchProfile.bitsBank, 0);
+
     await DB.query(
       `UPDATE profile SET bits_bank=bits_bank-? WHERE discord_id=?;`,
-      [amount, discordId]
+      [amount, profile.discordId]
     );
     return;
   }
@@ -140,6 +163,7 @@ export abstract class ProfileSet extends DBClass {
     ]);
     return;
   }
+
   public static async setDropTimestamp(
     discordId: string,
     timestamp: string
@@ -149,6 +173,7 @@ export abstract class ProfileSet extends DBClass {
       [timestamp, discordId]
     );
   }
+
   public static async setClaimTimestamp(
     discordId: string,
     timestamp: string
@@ -176,13 +201,26 @@ export abstract class ProfileSet extends DBClass {
   }
 
   public static async removeItems(
-    discordId: string,
+    profile: GameProfile,
     items: { item: PrefabItem; count: number }[]
   ): Promise<void> {
+    const refetched = [];
     for (let item of items) {
+      const refetchItem = await ProfileService.getItem(
+        profile,
+        item.item.id,
+        item.item.names[0]
+      );
+
+      if (refetchItem.quantity - item.count < 0)
+        throw new ZephyrError.NotEnoughOfItemError(item.item.names[0]);
+
+      refetched.push(item);
+    }
+    for (let item of refetched) {
       await DB.query(
         `UPDATE user_item SET quantity=quantity-? WHERE item_id=? AND discord_id=?;`,
-        [item.count, item.item.id, discordId]
+        [item.count, item.item.id, profile.discordId]
       );
     }
     return;
@@ -202,11 +240,13 @@ export abstract class ProfileSet extends DBClass {
     );
     return;
   }
+
   public static async deleteTag(tagId: number): Promise<void> {
     await DB.query(`DELETE FROM card_tag WHERE id=?;`, [tagId]);
     await DB.query(`UPDATE user_card SET tag_id=NULL WHERE tag_id=?;`, [tagId]);
     return;
   }
+
   public static async editTag(
     tagId: number,
     name?: string,
@@ -376,6 +416,11 @@ export abstract class ProfileSet extends DBClass {
     profile: GameProfile,
     amount: number
   ): Promise<void> {
+    const refetchProfile = await profile.fetch();
+
+    if (refetchProfile.cubits + amount > 4294967295)
+      throw new ZephyrError.TooManyError();
+
     await DB.query(`UPDATE profile SET cubits=cubits+? WHERE discord_id=?;`, [
       amount,
       profile.discordId,
@@ -383,14 +428,42 @@ export abstract class ProfileSet extends DBClass {
 
     return;
   }
+
   public static async removeCubits(
     profile: GameProfile,
     amount: number
   ): Promise<void> {
+    const refetchProfile = await profile.fetch();
+
+    if (refetchProfile.cubits - amount < 0)
+      throw new ZephyrError.NotEnoughCubitsError(refetchProfile.cubits, 0);
+
     await DB.query(`UPDATE profile SET cubits=cubits-? WHERE discord_id=?;`, [
       amount,
       profile.discordId,
     ]);
+
+    return;
+  }
+
+  public static async setBooster(
+    profile: GameProfile,
+    groupId: number,
+    expiry: string
+  ): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET booster_group=?, booster_expiry=? WHERE discord_id=?;`,
+      [groupId, expiry, profile.discordId]
+    );
+
+    return;
+  }
+
+  public static async clearBooster(profile: GameProfile): Promise<void> {
+    await DB.query(
+      `UPDATE profile SET booster_group=NULL, booster_expiry=NULL WHERE discord_id=?;`,
+      [profile.discordId]
+    );
 
     return;
   }

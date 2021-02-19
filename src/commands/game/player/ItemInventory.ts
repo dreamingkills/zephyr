@@ -20,11 +20,7 @@ export default class ItemInventory extends BaseCommand {
     const maxPage = Math.ceil(totalItems / 10) || 1;
 
     const prefix = this.zephyr.getPrefix(msg.guildID!);
-    const embed = new MessageEmbed()
-      .setAuthor(
-        `Items | ${msg.author.tag}`,
-        msg.author.dynamicAvatarURL("png")
-      )
+    const embed = new MessageEmbed(`Items`, msg.author)
       .setTitle(`${msg.author.tag}'s items`)
       .setDescription(this.renderInventory(inventory, prefix))
       .setFooter(

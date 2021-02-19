@@ -30,12 +30,10 @@ export default class ClaimMonthlyPatronReward extends BaseCommand {
       ]);
       await PatreonService.setNextPatreonClaimTime(profile);
 
-      const embed = new MessageEmbed()
-        .setAuthor(
-          `Patron Reward | ${msg.author.tag}`,
-          msg.author.dynamicAvatarURL("png")
-        )
-        .setDescription(`You claimed **1x** \`${frameVoucherItem.names[0]}\`!`);
+      const embed = new MessageEmbed(
+        `Patron Reward`,
+        msg.author
+      ).setDescription(`You claimed **1x** \`${frameVoucherItem.names[0]}\`!`);
 
       await this.send(msg.channel, embed);
       return;
@@ -43,14 +41,12 @@ export default class ClaimMonthlyPatronReward extends BaseCommand {
       const nextFrameClaim = dayjs(information.nextFrameTime).startOf("month");
       if (nextFrameClaim.isAfter(dayjs())) {
         const timeUntil = getTimeUntil(dayjs(), nextFrameClaim);
-        const embed = new MessageEmbed()
-          .setAuthor(
-            `Patron Reward | ${msg.author.tag}`,
-            msg.author.dynamicAvatarURL("png")
-          )
-          .setDescription(
-            `You can claim your monthly reward again in **${timeUntil}**.`
-          );
+        const embed = new MessageEmbed(
+          `Patron Reward`,
+          msg.author
+        ).setDescription(
+          `You can claim your monthly reward again in **${timeUntil}**.`
+        );
 
         await this.send(msg.channel, embed);
         return;
@@ -65,14 +61,12 @@ export default class ClaimMonthlyPatronReward extends BaseCommand {
         ]);
         await PatreonService.setNextPatreonClaimTime(profile);
 
-        const embed = new MessageEmbed()
-          .setAuthor(
-            `Patron Reward | ${msg.author.tag}`,
-            msg.author.dynamicAvatarURL("png")
-          )
-          .setDescription(
-            `You claimed **1x** \`${frameVoucherItem.names[0]}\`!`
-          );
+        const embed = new MessageEmbed(
+          `Patron Reward`,
+          msg.author
+        ).setDescription(
+          `You claimed **1x** \`${frameVoucherItem.names[0]}\`!`
+        );
 
         await this.send(msg.channel, embed);
         return;

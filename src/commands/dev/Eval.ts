@@ -29,32 +29,22 @@ export default class DevEval extends BaseCommand {
         evaled = inspect(evaled);
       }
 
-      const embed = new MessageEmbed()
-        .setAuthor(
-          `Eval | ${msg.author.tag}`,
-          msg.author.dynamicAvatarURL("png")
-        )
-        .setDescription(
-          `Evaluation complete — ${Date.now() - msg.createdAt}ms` +
-            `\n\`\`\`xl` +
-            `\n${this.clean(evaled)
-              .slice(0, 1000)
-              .replace(this.zephyr.token!, `BOT_TOKEN`)}` +
-            `\n\`\`\``
-        );
+      const embed = new MessageEmbed(`Eval`, msg.author).setDescription(
+        `Evaluation complete — ${Date.now() - msg.createdAt}ms` +
+          `\n\`\`\`xl` +
+          `\n${this.clean(evaled)
+            .slice(0, 1000)
+            .replace(this.zephyr.token!, `BOT_TOKEN`)}` +
+          `\n\`\`\``
+      );
       await this.send(msg.channel, embed);
     } catch (e) {
-      const embed = new MessageEmbed()
-        .setAuthor(
-          `Eval | ${msg.author.tag}`,
-          msg.author.dynamicAvatarURL("png")
-        )
-        .setDescription(
-          `Error — ${Date.now() - msg.createdAt}ms` +
-            `\n\`\`\`xl` +
-            `\n${this.clean(e)}` +
-            `\n\`\`\``
-        );
+      const embed = new MessageEmbed(`Eval`, msg.author).setDescription(
+        `Error — ${Date.now() - msg.createdAt}ms` +
+          `\n\`\`\`xl` +
+          `\n${this.clean(e)}` +
+          `\n\`\`\``
+      );
       await this.send(msg.channel, embed);
     }
     return;

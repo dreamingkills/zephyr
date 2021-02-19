@@ -62,20 +62,21 @@ export default class Help extends BaseCommand {
               .join(", ")}` +
             `\n\`\`\``;
         }
-        const embed = new MessageEmbed()
-          .setAuthor(`Help | ${msg.author.tag}`, msg.author.avatarURL)
-          .setDescription(description);
+
+        const embed = new MessageEmbed(`Help`, msg.author).setDescription(
+          description
+        );
 
         await this.send(msg.channel, embed);
         return;
       } else throw new ZephyrError.InvalidHelpQueryError();
     }
 
-    const embed = new MessageEmbed()
-      .setAuthor(`Help | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
+    const embed = new MessageEmbed(`Help`, msg.author)
       .setDescription(
-        `Type \`${prefix}help command\` to see more information about a command.`
+        `Type \`${prefix}help command\` to see more information about a command.\n**Need more help or just want to chat?** Join __Zephyr Community__ by [clicking here](https://discord.gg/7PFyqUvKYs)!`
       )
+      .setFooter(`User ID: ${msg.author.id}`)
       .addField({
         name: "Basic",
         value: `\`daily\`, \`drop\`, \`burn\`, \`profile\`, \`balance\``,

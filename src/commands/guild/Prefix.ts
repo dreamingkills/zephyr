@@ -15,7 +15,7 @@ export default class Prefix extends BaseCommand {
     _profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    const prefix = options[0];
+    const prefix = options[0]?.toLowerCase();
     if (prefix?.length > 8) throw new ZephyrError.PrefixTooLongError();
 
     const guild = this.zephyr.guilds.get(msg.guildID!);

@@ -175,9 +175,7 @@ export default class Shop extends BaseCommand {
             });
           }
 
-          try {
-            await confirmation.removeReactions();
-          } catch {}
+          await confirmation.delete();
         });
 
         await this.react(confirmation, "☑️");

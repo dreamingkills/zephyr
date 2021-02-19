@@ -24,6 +24,8 @@ export default class Pay extends BaseCommand {
     if (user.id === msg.author.id)
       throw new ZephyrError.CannotPayYourselfError();
 
+    if (!options[1]) throw new ZephyrError.InvalidAmountError(`bits`);
+
     const target = await ProfileService.getProfile(user.id);
 
     if (target.blacklisted)
@@ -37,13 +39,11 @@ export default class Pay extends BaseCommand {
     if (profile.bits < amount)
       throw new ZephyrError.NotEnoughBitsError(profile.bits, amount);
 
-    const embed = new MessageEmbed()
-      .setAuthor(`Pay | ${msg.author.tag}`, msg.author.dynamicAvatarURL("png"))
-      .setDescription(
-        `Really give ${
-          this.zephyr.config.discord.emoji.bits
-        } **${amount.toLocaleString()}** to **${user.tag}**?`
-      );
+    const embed = new MessageEmbed(`Pay`, msg.author).setDescription(
+      `Really give ${
+        this.zephyr.config.discord.emoji.bits
+      } **${amount.toLocaleString()}** to **${user.tag}**?`
+    );
 
     const confirmation = await this.send(msg.channel, embed);
 

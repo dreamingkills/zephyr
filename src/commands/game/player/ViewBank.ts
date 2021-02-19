@@ -30,22 +30,17 @@ export default class ViewBank extends BaseCommand {
       await ProfileService.removeBitsFromProfile(profile, amount);
       const newProfile = await ProfileService.addBitsToBank(profile, amount);
 
-      const embed = new MessageEmbed()
-        .setAuthor(
-          `Bank | ${msg.author.tag}`,
-          msg.author.dynamicAvatarURL("png")
-        )
-        .setDescription(
-          `${this.zephyr.config.discord.emoji.bank} You deposited ${
+      const embed = new MessageEmbed(`Bank`, msg.author).setDescription(
+        `${this.zephyr.config.discord.emoji.bank} You deposited ${
+          this.zephyr.config.discord.emoji.bits
+        }**${amount.toLocaleString()}** to your bank.` +
+          `\n— New bank balance: ${
             this.zephyr.config.discord.emoji.bits
-          }**${amount.toLocaleString()}** to your bank.` +
-            `\n— New bank balance: ${
-              this.zephyr.config.discord.emoji.bits
-            }**${newProfile.bitsBank.toLocaleString()}**` +
-            `\n— New balance: ${
-              this.zephyr.config.discord.emoji.bits
-            }**${newProfile.bits.toLocaleString()}**`
-        );
+          }**${newProfile.bitsBank.toLocaleString()}**` +
+          `\n— New balance: ${
+            this.zephyr.config.discord.emoji.bits
+          }**${newProfile.bits.toLocaleString()}**`
+      );
 
       await this.send(msg.channel, embed);
       return;
@@ -65,34 +60,27 @@ export default class ViewBank extends BaseCommand {
         amount
       );
 
-      const embed = new MessageEmbed()
-        .setAuthor(
-          `Bank | ${msg.author.tag}`,
-          msg.author.dynamicAvatarURL("png")
-        )
-        .setDescription(
-          `${this.zephyr.config.discord.emoji.bank} You withdrew ${
+      const embed = new MessageEmbed(`Bank`, msg.author).setDescription(
+        `${this.zephyr.config.discord.emoji.bank} You withdrew ${
+          this.zephyr.config.discord.emoji.bits
+        }**${amount.toLocaleString()}** from your bank.` +
+          `\n— New bank balance: ${
             this.zephyr.config.discord.emoji.bits
-          }**${amount.toLocaleString()}** from your bank.` +
-            `\n— New bank balance: ${
-              this.zephyr.config.discord.emoji.bits
-            }**${newProfile.bitsBank.toLocaleString()}**` +
-            `\n— New balance: ${
-              this.zephyr.config.discord.emoji.bits
-            }**${newProfile.bits.toLocaleString()}**`
-        );
+          }**${newProfile.bitsBank.toLocaleString()}**` +
+          `\n— New balance: ${
+            this.zephyr.config.discord.emoji.bits
+          }**${newProfile.bits.toLocaleString()}**`
+      );
 
       await this.send(msg.channel, embed);
       return;
     }
-    const embed = new MessageEmbed()
-      .setAuthor(`Bank | ${msg.author.tag}`, msg.author.avatarURL)
-      .setDescription(
-        `${this.zephyr.config.discord.emoji.bank} Your bank contains...` +
-          `\n— ${
-            this.zephyr.config.discord.emoji.bits
-          }**${profile.bitsBank.toLocaleString()}**`
-      );
+    const embed = new MessageEmbed(`Bank`, msg.author).setDescription(
+      `${this.zephyr.config.discord.emoji.bank} Your bank contains...` +
+        `\n— ${
+          this.zephyr.config.discord.emoji.bits
+        }**${profile.bitsBank.toLocaleString()}**`
+    );
 
     await this.send(msg.channel, embed);
     return;
