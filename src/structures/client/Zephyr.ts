@@ -63,12 +63,14 @@ export class Zephyr extends Client {
 
     await this.webhookListener.init(this);
 
-    await this.dbl.postStats(this.guilds.size);
-    setInterval(async () => {
-      if (this.dbl) {
-        await this.dbl.postStats(this.guilds.size);
-      }
-    }, 1800000);
+    if (this.config.topgg.postEnabled) {
+      await this.dbl.postStats(this.guilds.size);
+      setInterval(async () => {
+        if (this.dbl) {
+          await this.dbl.postStats(this.guilds.size);
+        }
+      }, 1800000);
+    }
   }
 
   public async start() {
