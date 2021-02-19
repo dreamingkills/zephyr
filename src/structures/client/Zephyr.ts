@@ -288,7 +288,7 @@ export class Zephyr extends Client {
     });
 
     this.on("shardDisconnect", (err, id) => {
-      console.log(`Shard ${id} disconnected with error: ${err}\n${err.stack}`);
+      console.log(`Shard ${id} disconnected with error: ${err}\n${err?.stack}`);
     });
 
     this.connect();
