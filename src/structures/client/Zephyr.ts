@@ -51,7 +51,7 @@ export class Zephyr extends Client {
   ];
 
   constructor() {
-    super(config.discord.token, { restMode: true });
+    super(config.discord.token, { restMode: true, maxShards: `auto` });
     this.config = config;
     this.users.limit = 1000;
     this.setMaxListeners(250);
@@ -276,6 +276,17 @@ export class Zephyr extends Client {
 
     this.on("error", (error) => {
       console.log(error.message);
+    });
+
+    /*
+        Shards
+    */
+    this.on("shardReady", (id) => {
+      console.log(`Shard ${id} is ready!`);
+    });
+
+    this.on("shardDisconnect", (err, id) => {
+      console.log(`Shard ${id} disconnected with error: ${err}\n${err.stack}`);
     });
 
     this.connect();

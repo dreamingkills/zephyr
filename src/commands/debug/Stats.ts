@@ -21,8 +21,10 @@ export default class Stats extends BaseCommand {
       ramStatusEmoji = ":hot_face:";
     }
 
+    const shard = this.zephyr.guildShardMap[msg.guildID!] || 0;
     const rtfl = await this.zephyr.fetchUser(`197186779843919877`);
     const embed = new MessageEmbed(`Stats`, msg.author)
+      .setDescription(`Currently on **Shard ${shard}**.`)
       .addField({
         name: `Memory Usage`,
         value: `— ${usedPct.toFixed(2)}% ${ramStatusEmoji}`,

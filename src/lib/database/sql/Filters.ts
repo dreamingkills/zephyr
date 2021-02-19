@@ -10,94 +10,137 @@ export class FilterService {
     const queryOptions: string[] = [];
 
     for (let [prop, value] of Object.entries(options)) {
-      prop = prop.toLowerCase();
+      if (["issue", "i", "serial", "s", "print", "p"].includes(prop)) {
+        const targetIssues = [];
 
-      if (["issue", "i", "serial"].includes(prop)) {
-        let trueIssue = -1;
-        if (!isNaN(parseInt(value.toString(), 10))) {
-          trueIssue = parseInt(value.toString(), 10);
-        } else if (!isNaN(parseInt(value.toString().slice(1), 10))) {
-          trueIssue = parseInt(value.toString().slice(1), 10);
+        for (let issue of value.toString().split(`,`)) {
+          if ([`<`, `>`, `/`].includes(issue[0])) {
+            const trueIssue = parseInt(issue.slice(1), 10);
+
+            if (isNaN(trueIssue) || trueIssue < 1) continue;
+
+            switch (issue[0]) {
+              case `<`: {
+                queryOptions.push(
+                  ` user_card.serial_number < ${DB.connection.escape(
+                    trueIssue
+                  )}`
+                );
+                break;
+              }
+              case `>`: {
+                queryOptions.push(
+                  ` user_card.serial_number > ${DB.connection.escape(
+                    trueIssue
+                  )}`
+                );
+                break;
+              }
+              case `/`: {
+                queryOptions.push(
+                  ` user_card.serial_number % ${DB.connection.escape(
+                    trueIssue
+                  )} = 0`
+                );
+                break;
+              }
+            }
+          } else {
+            const issueNumber = parseInt(issue, 10);
+
+            if (isNaN(issueNumber) || issueNumber < 1) continue;
+
+            targetIssues.push(issueNumber);
+          }
         }
 
-        if (trueIssue < 0) continue;
+        if (targetIssues.length < 1) continue;
 
-        if (value.toString().startsWith(">")) {
-          queryOptions.push(
-            ` user_card.serial_number>${DB.connection.escape(trueIssue)}`
-          );
-        } else if (value.toString().startsWith("<")) {
-          queryOptions.push(
-            ` user_card.serial_number<${DB.connection.escape(trueIssue)}`
-          );
-        } else if (value.toString().startsWith("/")) {
-          queryOptions.push(
-            ` (user_card.serial_number%${DB.connection.escape(trueIssue)}=0)`
-          );
-        } else
-          queryOptions.push(
-            ` user_card.serial_number=${DB.connection.escape(trueIssue)}`
-          );
-      } else if (["name", "n", "member"].includes(prop)) {
         queryOptions.push(
-          ` (alphanum(idol.idol_name)) LIKE CONCAT("%",alphanum(${DB.connection.escape(
-            value
-          )}),"%")`
+          ` user_card.serial_number IN (${DB.connection.escape(targetIssues)})`
         );
+      } else if (["name", "n"].includes(prop)) {
+        const names = value
+          .toString()
+          .split(`,`)
+          .map(
+            (n) =>
+              `LOWER(idol.idol_name) LIKE CONCAT("%",${DB.connection.escape(
+                n
+              )},"%")`
+          );
+
+        queryOptions.push(` (${names.join(` OR `)})`);
       } else if (["group", "g"].includes(prop)) {
         if (!value) {
           queryOptions.push(` subgroup.group_id IS NULL`);
-        } else {
-          queryOptions.push(
-            ` (alphanum(base_group.group_name)) LIKE CONCAT("%",alphanum(${DB.connection.escape(
-              value
-            )}),"%")`
-          );
+          continue;
         }
+
+        const groups = value
+          .toString()
+          .split(`,`)
+          .map(
+            (n) =>
+              `LOWER(base_group.group_name) LIKE CONCAT("%",${DB.connection.escape(
+                n
+              )},"%")`
+          );
+
+        queryOptions.push(` (${groups.join(` OR `)})`);
       } else if (["subgroup", "sg"].includes(prop)) {
-        queryOptions.push(
-          ` alphanum(subgroup.subgroup_name) LIKE CONCAT("%",alphanum(${DB.connection.escape(
-            value
-          )}), "%")`
-        );
-      } else if (["wear", "w", "condition", "c"].includes(prop)) {
-        let trueWear = -1;
-        if (!isNaN(parseInt(value.toString(), 10))) {
-          trueWear = parseInt(value.toString(), 10);
-        } else if (!isNaN(parseInt(value.toString().slice(1), 10))) {
-          trueWear = parseInt(value.toString().slice(1), 10);
-        } else {
-          let stringValue = value.toString();
-          if (["<", ">"].includes(stringValue[0]))
-            stringValue = stringValue.slice(1);
-
-          if (["mint", "m"].includes(stringValue)) {
-            trueWear = 5;
-          } else if (["great", "gr"].includes(stringValue)) {
-            trueWear = 4;
-          } else if (["good", "g"].includes(stringValue)) {
-            trueWear = 3;
-          } else if (["average", "a"].includes(stringValue)) {
-            trueWear = 2;
-          } else if (["poor", "p"].includes(stringValue)) {
-            trueWear = 1;
-          } else if (["damaged", "d"].includes(stringValue)) trueWear = 0;
+        if (!value) {
+          queryOptions.push(` subgroup.subgroup_name IS NULL`);
         }
 
-        if (trueWear < 0) continue;
+        const subgroups = value
+          .toString()
+          .split(`,`)
+          .map(
+            (n) =>
+              `LOWER(subgroup.subgroup_name) LIKE CONCAT("%",${DB.connection.escape(
+                n
+              )},"%")`
+          );
 
-        if (value.toString().startsWith(">")) {
-          queryOptions.push(
-            ` user_card.wear>${DB.connection.escape(trueWear)}`
-          );
-        } else if (value.toString().startsWith("<")) {
-          queryOptions.push(
-            ` user_card.wear<${DB.connection.escape(trueWear)}`
-          );
-        } else
-          queryOptions.push(
-            ` user_card.wear=${DB.connection.escape(trueWear)}`
-          );
+        queryOptions.push(` (${subgroups.join(` OR `)})`);
+      } else if (["wear", "w", "condition", "c"].includes(prop)) {
+        const targetWears = [];
+
+        for (let wear of value.toString().split(`,`)) {
+          if ([`<`, `>`].includes(wear[0])) {
+            const trueWear = parseInt(wear.slice(1), 10);
+
+            if (isNaN(trueWear) || trueWear < 1) continue;
+
+            switch (wear[0]) {
+              case `<`: {
+                queryOptions.push(
+                  ` user_card.wear < ${DB.connection.escape(trueWear)}`
+                );
+                break;
+              }
+              case `>`: {
+                queryOptions.push(
+                  ` user_card.wear > ${DB.connection.escape(trueWear)}`
+                );
+                break;
+              }
+            }
+          } else {
+            const wearNumber = parseInt(wear, 10);
+
+            if (isNaN(wearNumber) || wearNumber < 0 || wearNumber > 5) continue;
+
+            targetWears.push(wearNumber);
+          }
+        }
+
+        if (targetWears.length < 1) continue;
+
+        queryOptions.push(
+          ` user_card.wear IN (${DB.connection.escape(targetWears)})`
+        );
       } else if (["tag", "t"].includes(prop)) {
         const tag = tags.filter(
           (t) => t.name === value.toString()?.toLowerCase()

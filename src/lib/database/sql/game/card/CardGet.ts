@@ -104,10 +104,20 @@ export abstract class CardGet extends DBClass {
     options: Filter,
     tags: GameTag[]
   ): Promise<GameUserCard[]> {
-    let query = `SELECT user_card.* FROM user_card USE INDEX (CardOwner)
-                  LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id LEFT JOIN base_group ON base_group.id=subgroup.group_id WHERE discord_id=${DB.connection.escape(
-                    profile.discordId
-                  )}`;
+    const indices = [`CardOwner`];
+
+    let query = `SELECT user_card.*
+                 FROM user_card USE INDEX (${indices.join(`, `)})
+                 LEFT JOIN card_base
+                   ON user_card.card_id=card_base.id
+                 LEFT JOIN idol
+                   ON idol.id=card_base.idol_id
+                 LEFT JOIN subgroup
+                   ON subgroup.id=card_base.subgroup_id
+                 LEFT JOIN base_group
+                   ON base_group.id=subgroup.group_id
+                 WHERE discord_id=${DB.connection.escape(profile.discordId)}`;
+
     const queryOptions = FilterService.parseOptions(options, tags);
     const page = <number>options["page"];
     query +=
