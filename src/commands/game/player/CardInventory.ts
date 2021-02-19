@@ -74,8 +74,6 @@ export default class CardInventory extends BaseCommand {
       }
     }
 
-    console.log(filters);
-
     const userTags = await ProfileService.getTags(target);
 
     const size = await CardService.getUserInventorySize(
