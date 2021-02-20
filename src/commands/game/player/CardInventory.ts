@@ -21,13 +21,6 @@ export default class CardInventory extends BaseCommand {
   ];
   allowDm = true;
 
-  private renderInventory(cards: GameUserCard[], tags: GameTag[]): string {
-    if (cards.length === 0) return "No cards here!";
-
-    const cardDescriptions = getDescriptions(cards, this.zephyr, tags);
-    return cardDescriptions.join("\n");
-  }
-
   async exec(
     msg: Message,
     profile: GameProfile,
@@ -62,15 +55,23 @@ export default class CardInventory extends BaseCommand {
     let targetFilter;
 
     for (const [index, opt] of options.map((o) => o.toLowerCase()).entries()) {
-      if (opt.includes(`=`)) {
-        targetFilter = opt.split(`=`)[0];
-        filters[targetFilter] = opt.split(`=`)[1];
+      const option = opt
+        .replace(target.discordId, ``)
+        .replace(`<@!`, ``)
+        .replace(`<@`, ``)
+        .replace(`>`, ``)
+        .trim();
+      if (option.length < 1) continue;
+
+      if (option.includes(`=`)) {
+        targetFilter = option.split(`=`)[0];
+        filters[targetFilter] = option.split(`=`)[1];
         continue;
       }
 
       const previousString = options[index - 1];
       if (previousString && targetFilter) {
-        filters[targetFilter] += ` ${opt}`;
+        filters[targetFilter] += ` ${option}`;
       }
     }
 
@@ -144,5 +145,12 @@ export default class CardInventory extends BaseCommand {
     if (totalPages > 1) await this.react(sent, `◀`);
     if (totalPages > 1) await this.react(sent, `▶`);
     if (totalPages > 2) await this.react(sent, `⏭`);
+  }
+
+  private renderInventory(cards: GameUserCard[], tags: GameTag[]): string {
+    if (cards.length === 0) return "No cards here!";
+
+    const cardDescriptions = getDescriptions(cards, this.zephyr, tags);
+    return cardDescriptions.join("\n");
   }
 }
