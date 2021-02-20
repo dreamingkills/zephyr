@@ -60,10 +60,12 @@ export async function createMessage(
     3000,
     3
   ).catch((e) => {
-    if (channel.type !== 1) {
-      console.log(
-        `Failed trying to send message with content ${content} (embed content: ${embed.description}) in channel ${channel.id}. Full stack:\n${e.stack}`
-      );
+    if (!e?.stack.includes(`[50013]:`)) {
+      if (channel.type !== 1) {
+        console.log(
+          `Failed trying to send message with content ${content} (embed content: ${embed.description}) in channel ${channel.id}. Full stack:\n${e.stack}`
+        );
+      }
     }
 
     throw new ZephyrError.MessageFailedToSendError();
