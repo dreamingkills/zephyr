@@ -107,9 +107,7 @@ export default class CraftItem extends BaseCommand {
         });
       }
 
-      try {
-        await confirmation.removeReactions();
-      } catch {}
+      await confirmation.removeReactions();
     });
 
     await this.react(

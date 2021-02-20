@@ -134,9 +134,7 @@ export default class Trade extends BaseCommand {
         });
       }
 
-      try {
-        await confirmation.removeReactions();
-      } catch {}
+      await confirmation.removeReactions();
     });
 
     await this.react(

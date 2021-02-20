@@ -118,9 +118,7 @@ export default class GiftCard extends BaseCommand {
         });
       }
 
-      try {
-        await confirmation.removeReactions();
-      } catch {}
+      await confirmation.removeReactions();
     });
 
     await this.react(

@@ -253,19 +253,17 @@ export abstract class CardSpawner {
     );
 
     collector.on("end", async () => {
-      try {
-        await drop.delete();
-      } catch {}
+      await drop.delete();
+
       return;
     });
 
-    try {
-      for (let emoji of this.emojis) {
-        await addReaction(drop, emoji);
-      }
-    } catch {}
-
     await CardService.incrementGenerated(cards);
+
+    for (let emoji of this.emojis) {
+      await addReaction(drop, emoji);
+    }
+
     return;
   }
 

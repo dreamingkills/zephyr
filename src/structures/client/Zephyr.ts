@@ -572,7 +572,8 @@ export class Zephyr extends Client {
     await ProfileService.addVote(profile, isWeekend);
     await AnticheatService.logVote(profile, isWeekend);
 
-    if (!voter) return;
+    if (!voter || profile.blacklisted) return;
+
     try {
       const dmChannel = await voter.getDMChannel();
 

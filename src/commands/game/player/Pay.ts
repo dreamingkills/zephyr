@@ -86,9 +86,7 @@ export default class Pay extends BaseCommand {
         });
       }
 
-      try {
-        await confirmation.removeReactions();
-      } catch {}
+      await confirmation.removeReactions();
     });
 
     await this.react(

@@ -101,9 +101,7 @@ export default class Shop extends BaseCommand {
           });
         }
 
-        try {
-          await facade.removeReactions();
-        } catch {}
+        await facade.removeReactions();
       });
 
       await this.react(facade, `1️⃣`);

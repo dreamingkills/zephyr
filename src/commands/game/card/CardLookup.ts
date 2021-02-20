@@ -104,6 +104,7 @@ export default class CardLookup extends BaseCommand {
       await confirmation.edit({
         embed: confirmationEmbed.setFooter(`🕒 This lookup has timed out.`),
       });
+
       return;
     }
 

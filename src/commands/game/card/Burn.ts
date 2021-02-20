@@ -245,9 +245,7 @@ export default class BurnCard extends BaseCommand {
           embed: embed.setFooter(`🕒 This confirmation has expired.`),
         });
       }
-      try {
-        await confirmation.removeReactions();
-      } catch {}
+      await confirmation.removeReactions();
     });
 
     await this.react(

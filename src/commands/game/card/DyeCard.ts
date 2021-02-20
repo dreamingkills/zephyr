@@ -132,9 +132,8 @@ export default class DyeCard extends BaseCommand {
           embed: embed.setFooter(`🕒 This dye confirmation has expired.`),
         });
       }
-      try {
-        await confirmation.removeReactions();
-      } catch {}
+
+      await confirmation.removeReactions();
     });
 
     await this.react(

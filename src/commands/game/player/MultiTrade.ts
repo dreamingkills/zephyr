@@ -62,9 +62,7 @@ export default class MultiTrade extends BaseCommand {
       return;
     }
 
-    try {
-      await tradeMessage.removeReactions();
-    } catch {}
+    await tradeMessage.removeReactions();
 
     const tradeInterfaceEmbed = new MessageEmbed(
       `Multi Trade`,

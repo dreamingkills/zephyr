@@ -140,11 +140,9 @@ export default class CardInventory extends BaseCommand {
       }
     );
 
-    try {
-      if (totalPages > 2) await this.react(sent, `⏮`);
-      if (totalPages > 1) await this.react(sent, `◀`);
-      if (totalPages > 1) await this.react(sent, `▶`);
-      if (totalPages > 2) await this.react(sent, `⏭`);
-    } catch {}
+    if (totalPages > 2) await this.react(sent, `⏮`);
+    if (totalPages > 1) await this.react(sent, `◀`);
+    if (totalPages > 1) await this.react(sent, `▶`);
+    if (totalPages > 2) await this.react(sent, `⏭`);
   }
 }

@@ -121,9 +121,8 @@ export default class UpgradeCard extends BaseCommand {
           embed: embed.setFooter(`🕒 This upgrade has expired.`),
         });
       }
-      try {
-        await confirmation.removeReactions();
-      } catch {}
+
+      await confirmation.removeReactions();
     });
 
     await this.react(
