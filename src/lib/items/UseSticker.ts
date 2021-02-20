@@ -9,6 +9,7 @@ import { GameProfile } from "../../structures/game/Profile";
 import { createMessage } from "../discord/message/createMessage";
 import { MessageCollector } from "eris-collector";
 import { editMessage } from "../discord/message/editMessage";
+import { AlbumService } from "../database/services/game/AlbumService";
 
 export async function useSticker(
   msg: Message,
@@ -28,6 +29,9 @@ export async function useSticker(
 
   if (card.wear !== 5)
     throw new ZephyrError.CardConditionTooLowError(card.wear, 5);
+
+  const isInAlbum = await AlbumService.cardIsInAlbum(card);
+  if (isInAlbum) throw new ZephyrError.CardInAlbumError(card);
 
   const cardStickers = await CardService.getCardStickers(card);
   if (cardStickers.length >= 3)
