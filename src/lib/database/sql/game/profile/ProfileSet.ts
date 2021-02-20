@@ -467,4 +467,16 @@ export abstract class ProfileSet extends DBClass {
 
     return;
   }
+
+  public static async setProfileCreationDate(
+    profile: GameProfile,
+    date: string
+  ): Promise<void> {
+    await DB.query(`UPDATE profile SET created_at=? WHERE discord_id=?;`, [
+      date,
+      profile.discordId,
+    ]);
+
+    return;
+  }
 }

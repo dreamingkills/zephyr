@@ -17,81 +17,6 @@ export default class Leaderboards extends BaseCommand {
 
   private leaderboardTypes = ["bits", "daily", "cards", "cubits"];
 
-  private async getLeaderboard(
-    type: string,
-    page: number,
-    authorId: string,
-    zephyr: Zephyr
-  ): Promise<string> {
-    let leaderboard = "";
-    switch (type) {
-      case "bits": {
-        const board = await LeaderboardService.getBitLeaderboard(page);
-        for (let profile of board) {
-          const user = await this.zephyr.fetchUser(profile.discordId);
-          leaderboard += `\`#${
-            board.indexOf(profile) + 1 + (page * 10 - 10)
-          }\` `;
-          if (profile.private && profile.discordId !== authorId) {
-            leaderboard += `*Private User*`;
-          } else
-            leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
-          leaderboard += ` — ${this.zephyr.config.discord.emoji.bits}**${(
-            profile.bits + profile.bitsBank
-          ).toLocaleString()}**\n`;
-        }
-        break;
-      }
-      case "daily": {
-        const board = await LeaderboardService.getDailyStreakLeaderboard(page);
-        for (let profile of board) {
-          const user = await this.zephyr.fetchUser(profile.discordId);
-          leaderboard += `\`#${
-            board.indexOf(profile) + 1 + (page * 10 - 10)
-          }\` `;
-          if (profile.private && profile.discordId !== authorId) {
-            leaderboard += `*Private User*`;
-          } else
-            leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
-          leaderboard += ` — **${profile.dailyStreak.toLocaleString()} days**\n`;
-        }
-        break;
-      }
-      case "cards": {
-        const board = await LeaderboardService.getCardLeaderboard(
-          page,
-          zephyr.user.id
-        );
-        for (let entry of board) {
-          const user = await this.zephyr.fetchUser(entry.profile.discordId);
-          leaderboard += `\`#${board.indexOf(entry) + 1 + (page * 10 - 10)}\` `;
-          if (entry.profile.private && entry.profile.discordId !== authorId) {
-            leaderboard += `*Private User*`;
-          } else
-            leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
-          leaderboard += ` — **${entry.count} cards**\n`;
-        }
-        break;
-      }
-      case "cubits": {
-        const board = await LeaderboardService.getCubitLeaderboard(page);
-        for (let profile of board) {
-          const user = await this.zephyr.fetchUser(profile.discordId);
-          leaderboard += `\`#${
-            board.indexOf(profile) + 1 + (page * 10 - 10)
-          }\` `;
-          if (profile.private && profile.discordId !== authorId) {
-            leaderboard += `*Private User*`;
-          } else
-            leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
-          leaderboard += ` — **${profile.cubits.toLocaleString()}** cubits\n`;
-        }
-        break;
-      }
-    }
-    return leaderboard;
-  }
-
   async exec(
     msg: Message,
     _profile: GameProfile,
@@ -195,5 +120,80 @@ export default class Leaderboards extends BaseCommand {
       }
     );
     return;
+  }
+
+  private async getLeaderboard(
+    type: string,
+    page: number,
+    authorId: string,
+    zephyr: Zephyr
+  ): Promise<string> {
+    let leaderboard = "";
+    switch (type) {
+      case "bits": {
+        const board = await LeaderboardService.getBitLeaderboard(page);
+        for (let profile of board) {
+          const user = await this.zephyr.fetchUser(profile.discordId);
+          leaderboard += `\`#${
+            board.indexOf(profile) + 1 + (page * 10 - 10)
+          }\` `;
+          if (profile.private && profile.discordId !== authorId) {
+            leaderboard += `*Private User*`;
+          } else
+            leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
+          leaderboard += ` — ${this.zephyr.config.discord.emoji.bits}**${(
+            profile.bits + profile.bitsBank
+          ).toLocaleString()}**\n`;
+        }
+        break;
+      }
+      case "daily": {
+        const board = await LeaderboardService.getDailyStreakLeaderboard(page);
+        for (let profile of board) {
+          const user = await this.zephyr.fetchUser(profile.discordId);
+          leaderboard += `\`#${
+            board.indexOf(profile) + 1 + (page * 10 - 10)
+          }\` `;
+          if (profile.private && profile.discordId !== authorId) {
+            leaderboard += `*Private User*`;
+          } else
+            leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
+          leaderboard += ` — **${profile.dailyStreak.toLocaleString()} days**\n`;
+        }
+        break;
+      }
+      case "cards": {
+        const board = await LeaderboardService.getCardLeaderboard(
+          page,
+          zephyr.user.id
+        );
+        for (let entry of board) {
+          const user = await this.zephyr.fetchUser(entry.profile.discordId);
+          leaderboard += `\`#${board.indexOf(entry) + 1 + (page * 10 - 10)}\` `;
+          if (entry.profile.private && entry.profile.discordId !== authorId) {
+            leaderboard += `*Private User*`;
+          } else
+            leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
+          leaderboard += ` — **${entry.count} cards**\n`;
+        }
+        break;
+      }
+      case "cubits": {
+        const board = await LeaderboardService.getCubitLeaderboard(page);
+        for (let profile of board) {
+          const user = await this.zephyr.fetchUser(profile.discordId);
+          leaderboard += `\`#${
+            board.indexOf(profile) + 1 + (page * 10 - 10)
+          }\` `;
+          if (profile.private && profile.discordId !== authorId) {
+            leaderboard += `*Private User*`;
+          } else
+            leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
+          leaderboard += ` — **${profile.cubits.toLocaleString()}** cubits\n`;
+        }
+        break;
+      }
+    }
+    return leaderboard;
   }
 }
