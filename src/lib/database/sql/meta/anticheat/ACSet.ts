@@ -203,7 +203,6 @@ export abstract class ACSet extends DBClass {
       );
     }
 
-    console.log(values);
     await DB.query(
       `INSERT INTO burn (discord_id, card_id, burn_time) VALUES ${values.join(
         `, `
