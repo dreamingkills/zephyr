@@ -24,6 +24,9 @@ export default class MultiTrade extends BaseCommand {
 
     const targetProfile = await ProfileService.getProfile(targetUser.id);
 
+    if (targetProfile.blacklisted)
+      throw new ZephyrError.AccountBlacklistedOtherError();
+
     const tradeMessage = await this.send(
       msg.channel,
       `<@${targetUser.id}>, would you like to trade with **${msg.author.tag}**? Click ☑ to confirm.`
