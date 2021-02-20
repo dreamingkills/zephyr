@@ -119,16 +119,13 @@ export class Zephyr extends Client {
       }, 300000);
       await this.dmHandler.handle(this);
 
-      if (this.config.discord.logGuild) {
-        const channels = await this.getRESTGuildChannels(
-          this.config.discord.logGuild
-        );
-        const logChannel = channels.find(
-          (c) => c.name.toLowerCase() === "logs"
+      if (this.config.discord.logChannel) {
+        const channel = await this.getRESTChannel(
+          this.config.discord.logChannel
         );
 
-        if (logChannel instanceof TextChannel) {
-          this.logChannel = logChannel;
+        if (channel instanceof TextChannel) {
+          this.logChannel = channel;
         }
       }
     });

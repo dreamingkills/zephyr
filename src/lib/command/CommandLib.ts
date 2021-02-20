@@ -7,6 +7,8 @@ import { Zephyr } from "../../structures/client/Zephyr";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import * as ZephyrError from "../../structures/error/ZephyrError";
 import { createMessage } from "../discord/message/createMessage";
+import { GameProfile } from "../../structures/game/Profile";
+import dayjs from "dayjs";
 
 export class CommandLib {
   commands: BaseCommand[] = [];
@@ -72,7 +74,46 @@ export class CommandLib {
     }
 
     try {
-      const profile = await ProfileService.getProfile(message.author.id, true);
+      let profile: GameProfile;
+      try {
+        profile = await ProfileService.getProfile(message.author.id);
+      } catch {
+        profile = await ProfileService.getProfile(message.author.id, true);
+
+        try {
+          const dmChannel = await message.author.getDMChannel();
+
+          const embed = new MessageEmbed(
+            `Welcome`,
+            message.author
+          ).setDescription(
+            `Hey **${message.author.username}**! Welcome to Zephyr!` +
+              `\n\nFirst and foremost, you should know the Zephyr Rules.` +
+              `\nThese rules apply across all servers, no matter where you play!` +
+              `\n\`\`\`md` +
+              `\n1. Alternate accounts are not permitted for any reason. Likewise, funnelling cards directly or indirectly into one account is not permitted.` +
+              `\n2. Automating bot functions (self-botting) is not permitted for any reason.` +
+              `\n3. Cross-bot trade is not allowed.` +
+              `\n4. Selling cards for real-world money or items is not allowed.` +
+              `\n\`\`\`` +
+              `\nDiscover communities, win giveaways, and get update alerts in **Zephyr Community**!` +
+              `\n:point_right: Just [click here](https://discord.gg/zephyr) to join us!`
+          );
+          await createMessage(dmChannel, embed);
+        } catch {
+          // their loss I guess lol
+        }
+
+        const creationDate = dayjs(message.author.createdAt);
+        const now = dayjs();
+        console.log(now > creationDate.add(14, `day`));
+        if (now < creationDate.add(14, `day`) && zephyr.logChannel) {
+          await createMessage(
+            zephyr.logChannel,
+            `:warning: New account (<2 weeks) created profile: **${message.author.tag}** (${message.author.id})`
+          );
+        }
+      }
 
       if (profile.blacklisted) throw new ZephyrError.AccountBlacklistedError();
       if (message.channel.type === 1 && !command.allowDm)
