@@ -17,6 +17,7 @@ export interface Profile {
   blurb: string;
   patron: number;
   blacklisted: boolean;
+  introduced: boolean;
 
   /*
       Timestamps
@@ -70,6 +71,7 @@ export class GameProfile {
   voteLast: string | null;
   voteReminder: boolean;
   voteReminded: boolean;
+  introduced: boolean;
 
   boosterGroup?: number;
   boosterExpiry?: string;
@@ -90,6 +92,7 @@ export class GameProfile {
     this.premiumCurrency = data.premium_currency;
     this.cubits = data.cubits;
     this.voteLast = data.vote_last;
+    this.introduced = data.introduced;
 
     this.dropReminder = data.drop_reminder;
     this.dropReminded = data.drop_reminded;

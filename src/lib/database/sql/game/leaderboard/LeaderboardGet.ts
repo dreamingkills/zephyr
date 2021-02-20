@@ -56,37 +56,7 @@ export abstract class LeaderboardGet extends DBClass {
     const query = (await DB.query(
       `SELECT profile.*, COUNT(*) as count FROM profile LEFT JOIN user_card ON user_card.discord_id=profile.discord_id WHERE blacklisted=0 AND user_card.discord_id!=? GROUP BY profile.discord_id ORDER BY count DESC, user_card.discord_id LIMIT ? OFFSET ?;`,
       [zephyrId, this.entries, offset]
-    )) as {
-      discord_id: string;
-      private: boolean;
-      blurb: string;
-      bits: number;
-      bits_bank: number;
-      daily_last: string;
-      daily_streak: number;
-      claim_next: string;
-      claim_reminder: boolean;
-      claim_reminded: boolean;
-      drop_next: string;
-      drop_reminder: boolean;
-      drop_reminded: boolean;
-      dust_1: number;
-      dust_2: number;
-      dust_3: number;
-      dust_4: number;
-      dust_5: number;
-      premium_currency: number;
-      patron: number;
-      count: number;
-      blacklisted: boolean;
-      cubits: number;
-      vote_last: string | null;
-      vote_reminder: boolean;
-      vote_reminded: boolean;
-      booster_group: number | null;
-      booster_expiry: string | null;
-      created_at: string;
-    }[];
+    )) as (Profile & { count: number })[];
     return query.map((p) => {
       return { profile: new GameProfile(p), count: p.count };
     });
