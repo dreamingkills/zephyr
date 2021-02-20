@@ -65,4 +65,15 @@ export abstract class ACGet extends DBClass {
     }[];
     return query[0];
   }
+
+  public static async getNumberOfCardsBurned(
+    profile: GameProfile
+  ): Promise<number> {
+    const query = (await DB.query(
+      `SELECT COUNT(*) AS count FROM burn WHERE discord_id=?;`,
+      [profile.discordId]
+    )) as { count?: number }[];
+
+    return query[0]?.count || 0;
+  }
 }

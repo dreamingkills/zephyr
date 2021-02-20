@@ -113,7 +113,7 @@ export default class BurnTag extends BaseCommand {
       }
 
       // Give the card to the bot
-      await CardService.burnCards(cards, this.zephyr);
+      await CardService.burnCards(profile, cards, this.zephyr);
 
       // Give the user their dust
       await ProfileService.addItems(profile, dustRewards);

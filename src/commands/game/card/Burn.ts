@@ -207,7 +207,7 @@ export default class BurnCard extends BaseCommand {
 
       // Give the cards to the bot
       if (cardTargets.length > 0)
-        await CardService.burnCards(cardTargets, this.zephyr);
+        await CardService.burnCards(profile, cardTargets, this.zephyr);
       // Delete the dyes
       if (dyeTargets.length > 0) await ProfileService.burnDyes(dyeTargets);
 

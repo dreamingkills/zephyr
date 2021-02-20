@@ -125,4 +125,17 @@ export abstract class AnticheatService {
       receiver
     );
   }
+
+  public static async logBurn(
+    profile: GameProfile,
+    cards: GameUserCard[]
+  ): Promise<void> {
+    return await ACSet.logBurn(profile, cards);
+  }
+
+  public static async getNumberOfCardsBurned(
+    profile: GameProfile
+  ): Promise<number> {
+    return await ACGet.getNumberOfCardsBurned(profile);
+  }
 }

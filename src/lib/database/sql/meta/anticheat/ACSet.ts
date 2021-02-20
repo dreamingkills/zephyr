@@ -186,4 +186,30 @@ export abstract class ACSet extends DBClass {
     );
     return;
   }
+
+  public static async logBurn(
+    profile: GameProfile,
+    cards: GameUserCard[]
+  ): Promise<void> {
+    const formattedTimestamp = getCurrentTimestamp();
+
+    const values = [];
+
+    for (let card of cards) {
+      values.push(
+        `(${DB.connection.escape(profile.discordId)}, ${DB.connection.escape(
+          card.id
+        )}, ${DB.connection.escape(formattedTimestamp)})`
+      );
+    }
+
+    console.log(values);
+    await DB.query(
+      `INSERT INTO burn (discord_id, card_id, burn_time) VALUES ${values.join(
+        `, `
+      )}`
+    );
+
+    return;
+  }
 }

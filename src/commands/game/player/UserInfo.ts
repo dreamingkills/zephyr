@@ -41,6 +41,9 @@ export default class UserInfo extends BaseCommand {
     const timesReceivedGift = await AnticheatService.getNumberOfCardsReceivedByGift(
       target
     );
+    const timesCardBurned = await AnticheatService.getNumberOfCardsBurned(
+      target
+    );
 
     const createdAt = dayjs(target.createdAt).format(`MMMM D, YYYY`);
 
@@ -51,6 +54,7 @@ export default class UserInfo extends BaseCommand {
           `\n— Cards claimed: **${timesClaimed}**` +
           `\n— Cards gifted: **${timesGifted}**` +
           `\n— Gifts received: **${timesReceivedGift}**` +
+          `\n— Cards burned: **${timesCardBurned}**` +
           `\n\nAccount created **${createdAt}**`
       )
       .setThumbnail(targetUser.dynamicAvatarURL("png"));

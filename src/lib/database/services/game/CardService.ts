@@ -16,6 +16,7 @@ import {
   GameCardSticker,
   GameSticker,
 } from "../../../../structures/game/Sticker";
+import { AnticheatService } from "../meta/AnticheatService";
 
 export abstract class CardService {
   // Used for card image generation
@@ -363,9 +364,11 @@ export abstract class CardService {
   }
 
   public static async burnCards(
+    profile: GameProfile,
     cards: GameUserCard[],
     zephyr: Zephyr
   ): Promise<void> {
+    await AnticheatService.logBurn(profile, cards);
     return await CardSet.burnCards(cards, zephyr.user.id);
   }
 
