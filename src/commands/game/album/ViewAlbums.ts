@@ -63,7 +63,11 @@ export default class ViewAlbums extends BaseCommand {
           targetUser.id === msg.author.id
             ? `You have`
             : `**${targetUser.tag}** has`
-        } no albums.`
+        } no albums.${
+          targetUser.id === msg.author.id
+            ? `\nPurchase a \`Sealed Book\` from the shop, then use it to get an album!`
+            : ``
+        }`
       );
 
       await this.send(msg.channel, embed);
