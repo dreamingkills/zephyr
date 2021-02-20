@@ -52,9 +52,9 @@ export default class UserInfo extends BaseCommand {
         `Showing stats for **${targetUser.tag}**...` +
           `\n— Times voted: **${timesVoted.toLocaleString()}**` +
           `\n— Cards claimed: **${timesClaimed}**` +
+          `\n— Cards burned: **${timesCardBurned}**` +
           `\n— Cards gifted: **${timesGifted}**` +
           `\n— Gifts received: **${timesReceivedGift}**` +
-          `\n— Cards burned: **${timesCardBurned}**` +
           `\n\nAccount created **${createdAt}**`
       )
       .setThumbnail(targetUser.dynamicAvatarURL("png"));
