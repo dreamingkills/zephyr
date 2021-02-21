@@ -103,11 +103,17 @@ export abstract class CardSpawner {
       },
     });
 
+    for (let emoji of this.emojis) {
+      await addReaction(drop, emoji);
+    }
+
     const filter = (_m: Message, emoji: PartialEmoji, userID: string) =>
       this.emojis.includes(emoji.name) && userID !== channel.client.user.id;
+
     const collector = new ReactionCollector(channel.client, drop, filter, {
       time: 30000,
     });
+
     collector.on("error", async (e: Error) => {
       // we should do something here but idk what yet lol
       console.log(e);
@@ -259,10 +265,6 @@ export abstract class CardSpawner {
     });
 
     await CardService.incrementGenerated(cards);
-
-    for (let emoji of this.emojis) {
-      await addReaction(drop, emoji);
-    }
 
     return;
   }
