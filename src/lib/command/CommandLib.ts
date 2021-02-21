@@ -106,11 +106,15 @@ export class CommandLib {
 
         const creationDate = dayjs(message.author.createdAt);
         const now = dayjs();
-        console.log(now > creationDate.add(14, `day`));
+
         if (now < creationDate.add(14, `day`) && zephyr.logChannel) {
           await createMessage(
             zephyr.logChannel,
-            `:warning: New account (<2 weeks) created profile: **${message.author.tag}** (${message.author.id})`
+            `:warning: New account (<2 weeks) joined: **${
+              message.author.tag
+            }** (${message.author.id})\nCreation date: ${creationDate.format(
+              `YYYY-MM-DD HH:mm:ss`
+            )}`
           );
         }
       }
