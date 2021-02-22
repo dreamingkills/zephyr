@@ -59,7 +59,7 @@ export default class CardInventory extends BaseCommand {
         .replace(target.discordId, ``)
         .replace(`<@!`, ``)
         .replace(`<@`, ``)
-        .replace(`>`, ``)
+        .replace(` >`, ``)
         .trim();
       if (option.length < 1) continue;
 
