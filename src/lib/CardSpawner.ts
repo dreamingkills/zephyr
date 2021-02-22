@@ -68,6 +68,7 @@ export abstract class CardSpawner {
   ): Promise<void> {
     const start = Date.now();
     const droppedCards: GameUserCard[] = [];
+    let deleted = false;
 
     for (let card of cards) {
       droppedCards.push(
@@ -253,7 +254,10 @@ export abstract class CardSpawner {
     );
 
     collector.on("end", async () => {
-      await drop.delete();
+      if (!deleted) {
+        deleted = true;
+        await drop.delete();
+      }
 
       return;
     });
@@ -264,9 +268,7 @@ export abstract class CardSpawner {
     await addReaction(drop, this.emojis[1]);
     await addReaction(drop, this.emojis[2]);
 
-    setTimeout(() => {
-      collector.stop();
-    }, 30000);
+    setTimeout(() => collector.stop(), 30000);
 
     return;
   }
