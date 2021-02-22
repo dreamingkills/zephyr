@@ -114,7 +114,7 @@ export class CommandLib {
               message.author.tag
             }** (${message.author.id})\nCreation date: ${creationDate.format(
               `YYYY-MM-DD HH:mm:ss`
-            )}`
+            )}\nGuild created in: **${message.guildID || `DMs`}**`
           );
         }
       }
