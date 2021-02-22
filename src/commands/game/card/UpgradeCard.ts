@@ -11,6 +11,7 @@ import { GameUserCard } from "../../../structures/game/UserCard";
 import { Dust } from "../../../structures/game/Dust";
 import { items } from "../../../assets/Items";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class UpgradeCard extends BaseCommand {
   names = ["upgrade", "u"];
@@ -84,6 +85,7 @@ export default class UpgradeCard extends BaseCommand {
       time: 15000,
       max: 1,
     });
+
     collector.on("error", async (e: Error) => {
       await this.handleError(msg, e);
     });
@@ -118,11 +120,12 @@ export default class UpgradeCard extends BaseCommand {
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
         await confirmation.edit({
-          embed: embed.setFooter(`🕒 This upgrade has expired.`),
+          embed: embed.setFooter(`🕒 This confirmation has expired.`),
         });
       }
 
-      await confirmation.removeReactions();
+      if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+        await confirmation.removeReactions();
     });
 
     await this.react(
