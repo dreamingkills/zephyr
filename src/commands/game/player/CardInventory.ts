@@ -11,6 +11,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { GameTag } from "../../../structures/game/Tag";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
+import { editMessage } from "../../../lib/discord/message/editMessage";
 
 export default class CardInventory extends BaseCommand {
   names = ["inventory", "inv", "i"];
@@ -134,7 +135,7 @@ export default class CardInventory extends BaseCommand {
         );
         embed.setDescription(this.renderInventory(newCards, userTags));
         embed.setFooter(`Page ${page} of ${totalPages} • ${size} entries`);
-        await sent.edit({ embed });
+        await editMessage(sent, embed);
 
         if (checkPermission("manageMessages", msg.textChannel, this.zephyr))
           await sent.removeReaction(emoji.name, userId);
