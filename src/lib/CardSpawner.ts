@@ -15,6 +15,7 @@ import { AnticheatService } from "./database/services/meta/AnticheatService";
 import { createMessage } from "./discord/message/createMessage";
 import { addReaction } from "./discord/message/addReaction";
 import { checkPermission } from "./ZephyrUtils";
+import { AutotagService } from "./database/services/game/AutotagService";
 
 export abstract class CardSpawner {
   private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
@@ -245,6 +246,31 @@ export abstract class CardSpawner {
             fight.winner,
             now.add(10, "minute").format(`YYYY/MM/DD HH:mm:ss`)
           );
+
+          /*
+              Autotag
+          */
+          const tags = await ProfileService.getTags(fight.winner);
+          if (tags.length > 0) {
+            const autotag = await AutotagService.autotag(
+              fight.winner,
+              tags,
+              fight.card,
+              zephyr
+            );
+
+            if (autotag.tag) {
+              const targetTag = tags.find((t) => t.id === autotag.tag);
+
+              if (!targetTag) {
+                console.log(
+                  `Unexpected autotag behavior: targetTag undefined where Tag ${autotag.tag}`
+                );
+              } else {
+                message += ` It was automatically tagged ${targetTag.emoji} **${targetTag.name}**.`;
+              }
+            }
+          }
 
           await createMessage(channel, message);
 
