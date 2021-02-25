@@ -16,7 +16,7 @@ export abstract class IssueHandler {
         await pending;
       } finally {
         if (profile.bits < price)
-          throw new ZephyrError.NotEnoughBitsError(profile.bits, price);
+          throw new ZephyrError.NotEnoughBitsError(price);
 
         if (price > 0)
           await ProfileService.removeBitsFromProfile(profile, price);

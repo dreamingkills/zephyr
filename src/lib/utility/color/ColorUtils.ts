@@ -17,16 +17,6 @@ export function rgbToHex(r: number, g: number, b: number): string {
   return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
-export function hexToRgb(hex: string): { r: number; g: number; b: number } {
-  if (hex.startsWith("#")) hex = hex.slice(1);
-  const big = parseInt(hex, 16);
-  return {
-    r: (big >> 16) & 255,
-    g: (big >> 8) & 255,
-    b: big & 255,
-  };
-}
-
 export function getNearestColor(
   hex: string
 ): {

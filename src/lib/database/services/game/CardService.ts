@@ -97,7 +97,8 @@ export abstract class CardService {
 
   public static async generateCardImage(
     card: GameUserCard,
-    zephyr: Zephyr
+    zephyr: Zephyr,
+    noText: boolean = false
   ): Promise<Buffer> {
     // Need information off the base card to do anything.
     const baseCard = zephyr.getCard(card.baseCardId)!;
@@ -165,21 +166,23 @@ export abstract class CardService {
       }
     }
 
-    // Draw the group icon
-    const overlay = await loadImage(
-      `./src/assets/groups/${
-        baseCard.group?.toLowerCase().replace("*", "") || "nogroup"
-      }.png`
-    );
-    ctx.drawImage(overlay, 0, 0, 350, 500);
+    if (!noText) {
+      // Draw the group icon
+      const overlay = await loadImage(
+        `./src/assets/groups/${
+          baseCard.group?.toLowerCase().replace("*", "") || "nogroup"
+        }.png`
+      );
+      ctx.drawImage(overlay, 0, 0, 350, 500);
 
-    // Draw the serial number
-    ctx.font = "20px AlteHaasGroteskBold";
-    ctx.fillText(`#${card.serialNumber}`, 50, 421);
+      // Draw the serial number
+      ctx.font = "20px AlteHaasGroteskBold";
+      ctx.fillText(`#${card.serialNumber}`, 50, 421);
 
-    // Draw the name of the subject
-    ctx.font = "30px AlteHaasGroteskBold";
-    ctx.fillText(`${baseCard.name}`, 50, 445);
+      // Draw the name of the subject
+      ctx.font = "30px AlteHaasGroteskBold";
+      ctx.fillText(`${baseCard.name}`, 50, 445);
+    }
 
     // Send it off!
     const buf = canvas.toBuffer("image/png");

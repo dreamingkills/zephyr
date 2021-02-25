@@ -1,6 +1,8 @@
+import { User } from "eris";
 import { Zephyr } from "../../../structures/client/Zephyr";
 import { GameBaseCard } from "../../../structures/game/BaseCard";
 import { GameDye } from "../../../structures/game/Dye";
+import { GameProfile } from "../../../structures/game/Profile";
 import { Recipe } from "../../../structures/game/Recipe";
 import { GameTag } from "../../../structures/game/Tag";
 import { GameUserCard } from "../../../structures/game/UserCard";
@@ -132,4 +134,21 @@ export function getGroupsByIdolId(
     });
 
   return groups;
+}
+
+export function generateUserTag(
+  sender: User,
+  user: User | undefined,
+  profile: GameProfile,
+  zephyr: Zephyr
+): string {
+  if (!user) return `Unknown User`;
+
+  const isMod = zephyr.config.moderators.includes(sender.id);
+
+  if (isMod || user.id === sender.id) return user.tag;
+
+  if (profile.private) return `Private Profile`;
+
+  return user.tag;
 }

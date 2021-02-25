@@ -14,7 +14,7 @@ export default class RemoveBits extends BaseCommand {
     const amountRaw = msg.content
       .split(" ")
       .filter((c) => !isNaN(parseInt(c, 10)));
-    if (!amountRaw[0]) throw new ZephyrError.InvalidAmountError(`bits`);
+    if (!amountRaw[0]) throw new ZephyrError.InvalidAmountOfBitsError();
 
     let targetUser = msg.mentions[0];
     let target = await ProfileService.getProfile(targetUser.id);

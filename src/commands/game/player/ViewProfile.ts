@@ -27,7 +27,7 @@ export default class ViewProfile extends BaseCommand {
         targetUser = await this.zephyr.fetchUser(userId);
       } else if (msg.mentions[0]) {
         targetUser = msg.mentions[0];
-      } else throw new ZephyrError.InvalidUserArgumentError();
+      } else throw new ZephyrError.InvalidMentionError();
     } else {
       targetUser = msg.author;
       target = profile;

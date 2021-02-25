@@ -24,7 +24,7 @@ export default class Pay extends BaseCommand {
     if (user.id === msg.author.id)
       throw new ZephyrError.CannotPayYourselfError();
 
-    if (!options[1]) throw new ZephyrError.InvalidAmountError(`bits`);
+    if (!options[1]) throw new ZephyrError.InvalidAmountOfBitsError();
 
     const target = await ProfileService.getProfile(user.id);
 
@@ -34,10 +34,9 @@ export default class Pay extends BaseCommand {
     const amount = strToInt(options.filter((p) => !isNaN(parseInt(p, 10)))[0]);
 
     if (isNaN(amount) || amount < 1)
-      throw new ZephyrError.InvalidAmountError("bits");
+      throw new ZephyrError.InvalidAmountOfBitsError();
 
-    if (profile.bits < amount)
-      throw new ZephyrError.NotEnoughBitsError(profile.bits, amount);
+    if (profile.bits < amount) throw new ZephyrError.NotEnoughBitsError(amount);
 
     const embed = new MessageEmbed(`Pay`, msg.author).setDescription(
       `Really give ${

@@ -20,7 +20,8 @@ export class CommandLib {
     for (let f of files) {
       try {
         const cmdExport = require(f);
-        if (!cmdExport.default) return;
+        if (!cmdExport.default) continue;
+
         const cmd = new cmdExport.default(zephyr) as BaseCommand;
         this.commands.push(cmd);
       } catch {

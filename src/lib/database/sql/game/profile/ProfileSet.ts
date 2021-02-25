@@ -94,7 +94,7 @@ export abstract class ProfileSet extends DBClass {
     const refetchProfile = await profile.fetch();
 
     if (refetchProfile.bits - amount < 0)
-      throw new ZephyrError.NotEnoughBitsError(refetchProfile.bits, 0);
+      throw new ZephyrError.NotEnoughBitsError(amount);
 
     await DB.query(`UPDATE profile SET bits=bits-? WHERE discord_id=?;`, [
       amount,
@@ -126,7 +126,10 @@ export abstract class ProfileSet extends DBClass {
     const refetchProfile = await profile.fetch();
 
     if (refetchProfile.bitsBank - amount < 0)
-      throw new ZephyrError.NotEnoughBitsError(refetchProfile.bitsBank, 0);
+      throw new ZephyrError.NotEnoughBitsInBankError(
+        refetchProfile.bitsBank,
+        amount
+      );
 
     await DB.query(
       `UPDATE profile SET bits_bank=bits_bank-? WHERE discord_id=?;`,

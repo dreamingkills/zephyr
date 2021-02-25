@@ -22,10 +22,10 @@ export default class ViewBank extends BaseCommand {
       if (options[1]?.toLowerCase() === "all") amount = profile.bits;
 
       if (isNaN(amount) || amount < 1) {
-        throw new ZephyrError.InvalidAmountError("bits");
+        throw new ZephyrError.InvalidAmountOfBitsError();
       }
       if (amount > profile.bits)
-        throw new ZephyrError.NotEnoughBitsError(profile.bits, amount);
+        throw new ZephyrError.NotEnoughBitsError(amount);
 
       await ProfileService.removeBitsFromProfile(profile, amount);
       const newProfile = await ProfileService.addBitsToBank(profile, amount);
@@ -49,7 +49,7 @@ export default class ViewBank extends BaseCommand {
       if (options[1]?.toLowerCase() === "all") amount = profile.bitsBank;
 
       if (isNaN(amount) || amount < 1) {
-        throw new ZephyrError.InvalidAmountError("bits");
+        throw new ZephyrError.InvalidAmountOfBitsError();
       }
       if (amount > profile.bitsBank)
         throw new ZephyrError.NotEnoughBitsInBankError(profile.bits, amount);

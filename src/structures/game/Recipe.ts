@@ -1,4 +1,4 @@
-export type RecipeItem = {
+type RecipeItem = {
   itemId: number;
   count: number;
 };

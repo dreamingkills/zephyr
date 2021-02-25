@@ -20,7 +20,7 @@ export default class SetPatron extends BaseCommand {
     if (!targetUser) throw new ZephyrError.InvalidMentionError();
 
     const tier = parseInt(options[1], 10);
-    if (isNaN(tier)) throw new ZephyrError.InvalidAmountError("tier");
+    if (isNaN(tier)) throw new ZephyrError.InvalidPatronTierError();
 
     const target = await ProfileService.getProfile(targetUser.id);
 

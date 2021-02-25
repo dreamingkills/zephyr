@@ -5,7 +5,10 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
-import { getDescriptions } from "../../../lib/utility/text/TextUtils";
+import {
+  generateUserTag,
+  getDescriptions,
+} from "../../../lib/utility/text/TextUtils";
 import { rgbToHex } from "../../../lib/utility/color/ColorUtils";
 
 export default class ViewUserCard extends BaseCommand {
@@ -20,6 +23,8 @@ export default class ViewUserCard extends BaseCommand {
     options: string[]
   ): Promise<void> {
     const rawIdentifier = options[0];
+    let noText = options[1]?.toLowerCase() === "--notext";
+
     let card;
     if (!rawIdentifier) {
       card = await CardService.getLastCard(profile);
@@ -33,13 +38,14 @@ export default class ViewUserCard extends BaseCommand {
       targetProfile = await ProfileService.getProfile(card.discordId);
     } else targetProfile = profile;
 
-    if (targetProfile.private && targetProfile.discordId !== msg.author.id)
-      throw new ZephyrError.PrivateProfileError();
-
     const targetUser = await this.zephyr.fetchUser(targetProfile.discordId);
 
     const baseCard = this.zephyr.getCard(card.baseCardId)!;
-    const image = await CardService.checkCacheForCard(card, this.zephyr);
+    let image: Buffer;
+
+    if (noText) {
+      image = await CardService.generateCardImage(card, this.zephyr, noText);
+    } else image = await CardService.checkCacheForCard(card, this.zephyr);
 
     const userTags = await ProfileService.getTags(targetProfile);
     const cardDescription = getDescriptions([card], this.zephyr, userTags)[0];
@@ -49,7 +55,12 @@ export default class ViewUserCard extends BaseCommand {
         `${cardDescription} ${
           baseCard.subgroup ? `**(${baseCard.subgroup})**` : ``
         }\n` +
-          `\nOwner: ${targetUser ? `**${targetUser.tag}**` : `*Unknown User*`}`
+          `\nOwner: ${generateUserTag(
+            msg.author,
+            targetUser,
+            targetProfile,
+            this.zephyr
+          )}`
       )
       .setImage(`attachment://card.png`);
 

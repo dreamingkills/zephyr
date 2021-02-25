@@ -112,10 +112,16 @@ export class Zephyr extends Client {
       );
 
       setInterval(() => {
-        this.editStatus(`online`, {
-          name: `with cards | ${this.guilds.size} servers`,
-          type: 0,
-        });
+        try {
+          this.editStatus(`online`, {
+            name: `with cards | ${this.guilds.size} servers`,
+            type: 0,
+          });
+        } catch (e) {
+          console.log(
+            `Failed to update status with error ${e}.\nStack trace: ${e?.stack}`
+          );
+        }
       }, 300000);
       await this.dmHandler.handle(this);
 

@@ -51,10 +51,7 @@ export async function verifyMultitradeItems(
       continue;
     } else if (isBitItem(item)) {
       if (item.bits > newProfile.bits) {
-        await handleError(
-          msg,
-          new ZephyrError.NotEnoughBitsError(newProfile.bits, item.bits)
-        );
+        await handleError(msg, new ZephyrError.NotEnoughBitsError(item.bits));
         continue;
       }
 
@@ -63,10 +60,7 @@ export async function verifyMultitradeItems(
         | undefined;
 
       if ((bitsInTrade?.bits || 0) + item.bits > newProfile.bits) {
-        await handleError(
-          msg,
-          new ZephyrError.NotEnoughBitsError(newProfile.bits, item.bits)
-        );
+        await handleError(msg, new ZephyrError.NotEnoughBitsError(item.bits));
         continue;
       }
 

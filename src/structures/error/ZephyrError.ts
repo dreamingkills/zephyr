@@ -16,14 +16,21 @@ abstract class ZephyrError extends Error {
   }
 }
 
-export class UnexpectedError extends ZephyrError {
-  constructor(e: any) {
-    super(
-      `An unexpected error occurred. This has been reported to the developer.`
-    );
-    console.log(e);
+/*
+    Invalid Numerics
+*/
+export class InvalidAmountOfBitsError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid number of bits.`);
   }
 }
+
+export class InvalidPatronTierError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid tier.`);
+  }
+}
+
 export class PrefixTooLongError extends ZephyrError {
   constructor() {
     super(`That prefix is too long. It must be 8 characters at most.`);
@@ -32,7 +39,7 @@ export class PrefixTooLongError extends ZephyrError {
 
 export class NotAllowedInDMError extends ZephyrError {
   constructor() {
-    super(`You cannot do that here.`);
+    super(`You cannot use that command in DM channels.`);
   }
 }
 
@@ -64,32 +71,6 @@ export class InvalidMentionError extends ZephyrError {
   }
 }
 
-export class InvalidUserArgumentError extends ZephyrError {
-  constructor() {
-    super(`Please mention someone or provide their User ID.`);
-  }
-}
-
-export class InvalidMentionGiftError extends ZephyrError {
-  constructor(plural: boolean) {
-    super(
-      `Please mention someone to gift your ${plural ? `cards` : `card`} to.`
-    );
-  }
-}
-
-export class InvalidMentionItemError extends ZephyrError {
-  constructor(plural: boolean) {
-    super(`Please mention someone to gift your item${plural ? `s` : ``} to.`);
-  }
-}
-
-export class NoItemsSpecifiedError extends ZephyrError {
-  constructor() {
-    super(`Please specify some items.`);
-  }
-}
-
 export class UnspecifiedItemError extends ZephyrError {
   constructor() {
     super(`Please specify an item.`);
@@ -99,12 +80,6 @@ export class UnspecifiedItemError extends ZephyrError {
 export class CannotGiftAuthorError extends ZephyrError {
   constructor() {
     super(`You can't gift cards to yourself.`);
-  }
-}
-
-export class InvalidAmountError extends ZephyrError {
-  constructor(type: string) {
-    super(`Please enter a valid number of **${type}**.`);
   }
 }
 
@@ -168,19 +143,13 @@ export class PrivateProfileError extends ZephyrError {
   }
 }
 
-export class NotEnoughBitsError extends ZephyrError {
-  constructor(_has: number, _needs: number) {
-    super(`You don't have enough bits to do that.`);
-  }
-}
-
 export class NotEnoughBitsInBankError extends ZephyrError {
   constructor(_has: number, _needs: number) {
     super(`You don't have enough bits in your bank to do that.`);
   }
 }
 
-export class NotEnoughBitsToUpgradeError extends ZephyrError {
+export class NotEnoughBitsError extends ZephyrError {
   constructor(needs: number) {
     super(`You need **${needs.toLocaleString()}** bits to do that.`);
   }
@@ -216,12 +185,6 @@ export class WishlistFullError extends ZephyrError {
           ? ``
           : `\nYou can get more slots by becoming a patron! Use \`${prefix}patreon\` to find out more!`)
     );
-  }
-}
-
-export class WishlistEntryTooLongError extends ZephyrError {
-  constructor() {
-    super(`Wishlist entries must be 12 characters or less.`);
   }
 }
 
@@ -269,14 +232,6 @@ export class InvalidReminderTypeError extends ZephyrError {
   }
 }
 
-export class ReminderSpamError extends ZephyrError {
-  constructor() {
-    super(
-      `Please wait at least 10 seconds before switching your reminder status again.`
-    );
-  }
-}
-
 /*
     Items
            */
@@ -289,20 +244,6 @@ export class InvalidItemError extends ZephyrError {
 export class NoItemInInventoryError extends ZephyrError {
   constructor(item: string) {
     super(`You don't have any \`${item}\`.`);
-  }
-}
-
-export class InvalidFrameError extends ZephyrError {
-  constructor() {
-    super(
-      `I couldn't find that frame.\nPlease ensure your spelling is correct.`
-    );
-  }
-}
-
-export class NoFrameSpecifiedError extends ZephyrError {
-  constructor() {
-    super(`Please specify a frame to preview.`);
   }
 }
 
@@ -508,12 +449,6 @@ export class CannotDropInChannelError extends ZephyrError {
   }
 }
 
-export class InvalidDustTypeError extends ZephyrError {
-  constructor() {
-    super(`That is not a valid type of dust.`);
-  }
-}
-
 /*
     Dyes
           */
@@ -615,11 +550,13 @@ export class InvalidCardIdentifierTradeError extends ZephyrError {
     super(`Please specify two valid cards in your trade.`);
   }
 }
+
 export class TradeeNotOwnerOfCardError extends ZephyrError {
   constructor(card: GameUserCard) {
     super(`The person you mentioned does not own \`${card.id.toString(36)}\`.`);
   }
 }
+
 export class UnacceptableTradeTargetError extends ZephyrError {
   constructor() {
     super(`You cannot trade with yourself or Zephyr.`);
@@ -673,15 +610,6 @@ export class NoStickerBoundToItemError extends ZephyrError {
 export class InvalidStickerError extends ZephyrError {
   constructor() {
     super(`Please enter a valid sticker name.`);
-  }
-}
-
-/*
-    Shop v2
-*/
-export class ItemNotForSaleError extends ZephyrError {
-  constructor(item: PrefabItem) {
-    super(`\`${item.names[0]}\` is not currently available for purchase.`);
   }
 }
 

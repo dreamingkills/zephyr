@@ -1,4 +1,4 @@
-export interface Idol {
+interface Idol {
   id: number;
   idol_name: string;
   birthday: string | null | undefined;

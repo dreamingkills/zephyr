@@ -43,8 +43,7 @@ export default class GiftCard extends BaseCommand {
     }
 
     const giftee = msg.mentions[0];
-    if (!giftee)
-      throw new ZephyrError.InvalidMentionGiftError(cards.length > 1);
+    if (!giftee) throw new ZephyrError.InvalidMentionError();
 
     if (giftee.id === msg.author.id)
       throw new ZephyrError.CannotGiftAuthorError();
