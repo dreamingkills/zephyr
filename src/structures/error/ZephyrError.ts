@@ -767,3 +767,12 @@ export class BoosterActiveError extends ZephyrError {
     );
   }
 }
+
+/*
+    Autotag
+             */
+export class AutotagIdNotFoundError extends ZephyrError {
+  constructor(id: number) {
+    super(`I couldn't find an autotag with id \`${id}\`.`);
+  }
+}
