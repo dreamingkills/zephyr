@@ -1,3 +1,5 @@
+import { AutotagService } from "../../lib/database/services/game/AutotagService";
+
 export interface Autotag {
   id: number;
   discord_id: string;
@@ -21,5 +23,9 @@ export class GameAutotag {
     this.value = autotag.autotag_value;
     this.priority = autotag.priority;
     this.tagId = autotag.tag_id;
+  }
+
+  public async fetch(): Promise<GameAutotag> {
+    return await AutotagService.getAutotagById(this.id);
   }
 }

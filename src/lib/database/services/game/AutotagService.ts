@@ -4,6 +4,7 @@ import { GameProfile } from "../../../../structures/game/Profile";
 import { GameTag } from "../../../../structures/game/Tag";
 import { GameUserCard } from "../../../../structures/game/UserCard";
 import { AutotagGet } from "../../sql/game/autotag/AutotagGet";
+import { AutotagSet } from "../../sql/game/autotag/AutotagSet";
 import { CardService } from "./CardService";
 
 export abstract class AutotagService {
@@ -66,6 +67,47 @@ export abstract class AutotagService {
     profile: GameProfile
   ): Promise<GameAutotag[]> {
     return await AutotagGet.getAutotags(profile);
+  }
+
+  public static async getAutotagById(id: number): Promise<GameAutotag> {
+    return await AutotagGet.getAutotagById(id);
+  }
+
+  /*
+        Set
+  */
+  public static async createAutotag(
+    profile: GameProfile,
+    key: AutotagKey,
+    value: number,
+    priority: number
+  ): Promise<GameAutotag> {
+    return await AutotagSet.createAutotag(profile, key, value, priority);
+  }
+
+  public static async deleteAutotag(autotag: GameAutotag): Promise<void> {
+    return await AutotagSet.deleteAutotag(autotag);
+  }
+
+  public static async setAutotagKey(
+    autotag: GameAutotag,
+    key: AutotagKey
+  ): Promise<GameAutotag> {
+    return await AutotagSet.setAutotagKey(autotag, key);
+  }
+
+  public static async setAutotagValue(
+    autotag: GameAutotag,
+    value: number
+  ): Promise<GameAutotag> {
+    return await AutotagSet.setAutotagValue(autotag, value);
+  }
+
+  public static async setAutotagPriority(
+    autotag: GameAutotag,
+    priority: number
+  ): Promise<GameAutotag> {
+    return await AutotagSet.setAutotagPriority(autotag, priority);
   }
 }
 

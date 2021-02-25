@@ -30,4 +30,5 @@ declare global {
     card: GameUserCard;
     slot: number;
   }
+  type AutotagKey = `idol` | `group` | `wear` | `issue`;
 }
