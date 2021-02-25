@@ -110,16 +110,3 @@ export abstract class AutotagService {
     return await AutotagSet.setAutotagPriority(autotag, priority);
   }
 }
-
-/*
-
-CREATE TABLE autotag
-(
-    id            INT(11) AUTO_INCREMENT,
-    discord_id    VARCHAR(32) NOT NULL,
-    autotag_key   ENUM("idol", "group", "wear", "issue"),
-    autotag_value SMALLINT NOT NULL,
-    PRIMARY KEY(id)
-)
-
-*/

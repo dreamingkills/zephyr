@@ -84,6 +84,8 @@ export class FilterService {
             (n) =>
               `LOWER(base_group.group_name) LIKE CONCAT("%",${DB.connection.escape(
                 n
+              )},"%") OR LOWER(base_group.alias) LIKE CONCAT("%",${DB.connection.escape(
+                n
               )},"%")`
           );
 

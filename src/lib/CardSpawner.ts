@@ -267,7 +267,7 @@ export abstract class CardSpawner {
                   `Unexpected autotag behavior: targetTag undefined where Tag ${autotag.tag}`
                 );
               } else {
-                message += ` It was automatically tagged ${targetTag.emoji} **${targetTag.name}**.`;
+                message += ` It was autotagged ${targetTag.emoji} **${targetTag.name}**.`;
               }
             }
           }
