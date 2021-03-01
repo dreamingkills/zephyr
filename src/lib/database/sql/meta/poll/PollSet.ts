@@ -17,7 +17,7 @@ export abstract class PollSet extends DBClass {
         [title, body, endsAt]
       )) as { insertId: number };
     } else
-      query = (await DB.query(`INSERT INTO POLL (title, body) VALUES (?, ?);`, [
+      query = (await DB.query(`INSERT INTO poll (title, body) VALUES (?, ?);`, [
         title,
         body,
       ])) as { insertId: number };
