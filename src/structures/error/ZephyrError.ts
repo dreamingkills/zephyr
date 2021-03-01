@@ -4,6 +4,7 @@ import { GameIdol } from "../game/Idol";
 import { GameTag } from "../game/Tag";
 import { GameUserCard } from "../game/UserCard";
 import { PrefabItem } from "../item/PrefabItem";
+import { GamePoll } from "../poll/Poll";
 
 abstract class ZephyrError extends Error {
   name = "ZephyrError";
@@ -774,5 +775,126 @@ export class BoosterActiveError extends ZephyrError {
 export class AutotagIdNotFoundError extends ZephyrError {
   constructor(id: number) {
     super(`I couldn't find an autotag with id \`${id}\`.`);
+  }
+}
+
+export class InvalidAutotagTypeError extends ZephyrError {
+  constructor() {
+    super(
+      `Please enter a valid autotag type (group, idol, condition, or issue).`
+    );
+  }
+}
+
+export class InvalidConditionError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid condition, represented by a number 0 to 5.`);
+  }
+}
+
+export class InvalidIssueError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid issue, greater than 0 and less than 65,535.`);
+  }
+}
+
+export class DuplicateAutotagGroupError extends ZephyrError {
+  constructor() {
+    super(
+      `That group is already bound to one of your autotags.\nPlease delete the existing autotag before creating another.`
+    );
+  }
+}
+
+export class DuplicateAutotagIdolError extends ZephyrError {
+  constructor() {
+    super(
+      `That idol is already bound to one of your autotags.\nPlease delete the existing autotag before creating another.`
+    );
+  }
+}
+
+export class DuplicateAutotagWearError extends ZephyrError {
+  constructor() {
+    super(
+      `That condition is already bound to one of your autotags.\nPlease delete the existing autotag before creating another.`
+    );
+  }
+}
+
+export class DuplicateAutotagIssueError extends ZephyrError {
+  constructor() {
+    super(
+      `That issue is already bound to one of your autotags.\nPlease delete the existing autotag before creating another.`
+    );
+  }
+}
+
+/*
+    Polls
+*/
+export class InvalidPollIdError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid Poll ID.`);
+  }
+}
+
+export class PollDoesNotExistError extends ZephyrError {
+  constructor(id: number) {
+    super(`There is no poll with ID \`${id}\`.`);
+  }
+}
+
+export class PollAlreadyActivatedError extends ZephyrError {
+  constructor(poll: GamePoll) {
+    super(`**Poll #${poll.id}: ${poll.title}** is already activated.`);
+  }
+}
+
+export class PollAlreadyDeactivatedError extends ZephyrError {
+  constructor(poll: GamePoll) {
+    super(`**Poll #${poll.id}: ${poll.title}** is already deactivated.`);
+  }
+}
+
+export class InvalidPollTitleError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid poll title.`);
+  }
+}
+
+export class InvalidPollDescriptionError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid poll description.`);
+  }
+}
+
+export class InvalidPollEndTimeError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid poll end time.`);
+  }
+}
+
+export class PollInactiveError extends ZephyrError {
+  constructor(poll: GamePoll) {
+    super(`**Poll #${poll.id}: ${poll.title}** is not currently active.`);
+  }
+}
+
+export class PollAnsweredError extends ZephyrError {
+  constructor(poll: GamePoll) {
+    super(`You have already answered **Poll #${poll.id}: ${poll.title}**.`);
+  }
+}
+
+export class PollAnswerDoesNotExistError extends ZephyrError {
+  constructor() {
+    super(`There is no answer by that ID.`);
+  }
+}
+
+export class InvalidPollAnswerError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid poll answer (yes/no).`);
   }
 }
