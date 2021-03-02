@@ -22,6 +22,7 @@ export abstract class BaseCommand implements Command {
   subcommands: string[] = [];
   allowDm: boolean = false;
   developerOnly: boolean = false;
+  moderatorOnly: boolean = false;
 
   zephyr!: Zephyr;
 

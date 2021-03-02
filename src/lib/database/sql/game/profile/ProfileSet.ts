@@ -394,12 +394,24 @@ export abstract class ProfileSet extends DBClass {
     return;
   }
 
-  public static async toggleBlacklisted(profile: GameProfile): Promise<void> {
-    await DB.query(
-      `UPDATE profile SET blacklisted=1-blacklisted WHERE discord_id=?;`,
-      [profile.discordId]
-    );
-    return;
+  public static async blacklistUser(
+    profile: GameProfile
+  ): Promise<GameProfile> {
+    await DB.query(`UPDATE profile SET blacklisted=1 WHERE discord_id=?;`, [
+      profile.discordId,
+    ]);
+
+    return await profile.fetch();
+  }
+
+  public static async unblacklistUser(
+    profile: GameProfile
+  ): Promise<GameProfile> {
+    await DB.query(`UPDATE profile SET blacklisted=0 WHERE discord_id=?;`, [
+      profile.discordId,
+    ]);
+
+    return await profile.fetch();
   }
 
   public static async addVote(

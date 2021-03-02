@@ -323,11 +323,16 @@ export abstract class ProfileService {
     return await ProfileSet.setPatronTier(profile, tier);
   }
 
-  public static async toggleBlacklisted(
+  public static async blacklistUser(
     profile: GameProfile
   ): Promise<GameProfile> {
-    await ProfileSet.toggleBlacklisted(profile);
-    return await profile.fetch();
+    return await ProfileSet.blacklistUser(profile);
+  }
+
+  public static async unblacklistUser(
+    profile: GameProfile
+  ): Promise<GameProfile> {
+    return await ProfileSet.unblacklistUser(profile);
   }
 
   public static async addVote(

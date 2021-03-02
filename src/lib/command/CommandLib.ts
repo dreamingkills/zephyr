@@ -9,6 +9,7 @@ import * as ZephyrError from "../../structures/error/ZephyrError";
 import { createMessage } from "../discord/message/createMessage";
 import { GameProfile } from "../../structures/game/Profile";
 import dayjs from "dayjs";
+import { BlacklistService } from "../database/services/meta/BlacklistService";
 
 export class CommandLib {
   commands: BaseCommand[] = [];
@@ -66,6 +67,22 @@ export class CommandLib {
       const embed = new MessageEmbed(`Error`, message.author).setDescription(
         `This command is only usable by the developer.`
       );
+
+      try {
+        await createMessage(message.channel, embed);
+      } catch {
+      } finally {
+        return;
+      }
+    } else if (
+      command.moderatorOnly &&
+      !zephyr.config.moderators.includes(message.author.id) &&
+      !zephyr.config.developers.includes(message.author.id)
+    ) {
+      const embed = new MessageEmbed(`Error`, message.author).setDescription(
+        `This command is only usable by Zephyr staff.`
+      );
+
       try {
         await createMessage(message.channel, embed);
       } catch {
@@ -120,7 +137,14 @@ export class CommandLib {
         }
       }
 
-      if (profile.blacklisted) throw new ZephyrError.AccountBlacklistedError();
+      if (profile.blacklisted) {
+        const blacklist = await BlacklistService.findBlacklist(profile);
+
+        if (!blacklist) throw new ZephyrError.AccountBlacklistedNoCaseError();
+
+        throw new ZephyrError.AccountBlacklistedError(blacklist);
+      }
+
       if (message.channel.type === 1 && !command.allowDm)
         throw new ZephyrError.NotAllowedInDMError();
 

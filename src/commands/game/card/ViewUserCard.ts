@@ -23,7 +23,7 @@ export default class ViewUserCard extends BaseCommand {
     options: string[]
   ): Promise<void> {
     const rawIdentifier = options[0];
-    let noText = options[1]?.toLowerCase() === "--notext";
+    let noText = options[1]?.toLowerCase().replace(`—`, `--`) === "--notext";
 
     let card;
     if (!rawIdentifier) {

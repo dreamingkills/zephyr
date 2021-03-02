@@ -1,4 +1,5 @@
 import { User } from "eris";
+import { GameBlacklist } from "../game/blacklist/Blacklist";
 import { GameDye } from "../game/Dye";
 import { GameIdol } from "../game/Idol";
 import { GameTag } from "../game/Tag";
@@ -52,10 +53,19 @@ export class DropsDisabledError extends ZephyrError {
   }
 }
 
-export class AccountBlacklistedError extends ZephyrError {
+export class AccountBlacklistedNoCaseError extends ZephyrError {
   constructor() {
     super(
-      `You have been blacklisted. If you think this is in error, please join the support server by clicking [here](https://discord.gg/7PFyqUvKYs).`
+      `You have been blacklisted. You must join [Zephyr Community](https://discord.gg/zephyr) to appeal.\nYou do not have a case open because you were blacklisted before the new system. Please appeal regardless.`
+    );
+  }
+}
+export class AccountBlacklistedError extends ZephyrError {
+  constructor(blacklist: GameBlacklist) {
+    super(
+      `You have been blacklisted. You must join [Zephyr Community](https://discord.gg/zephyr) to appeal. Your Case ID is \`#${blacklist.id}\`.` /*\nModerator: **${
+        blacklister?.tag || `Unknown User`
+      }**`*/ // Removed due to popular demand
     );
   }
 }
@@ -896,5 +906,44 @@ export class PollAnswerDoesNotExistError extends ZephyrError {
 export class InvalidPollAnswerError extends ZephyrError {
   constructor() {
     super(`Please enter a valid poll answer (yes/no).`);
+  }
+}
+
+/*
+    Blacklist
+*/
+export class InvalidBlacklistIdError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid Case ID.`);
+  }
+}
+
+export class BlacklistDoesNotExistError extends ZephyrError {
+  constructor() {
+    super(`There is no case with that ID.`);
+  }
+}
+
+export class InvalidBlacklistReasonError extends ZephyrError {
+  constructor() {
+    super(`You must specify a reason to blacklist.`);
+  }
+}
+
+export class UserAlreadyBlacklistedError extends ZephyrError {
+  constructor(user: User) {
+    super(`**${user.tag}** is already blacklisted.`);
+  }
+}
+
+export class CaseAlreadyQuashedError extends ZephyrError {
+  constructor(blacklist: GameBlacklist) {
+    super(`\`Case #${blacklist.id}\` has already been quashed.`);
+  }
+}
+
+export class InvalidQuashNoteError extends ZephyrError {
+  constructor() {
+    super(`You must write a quash note in order to quash a blacklist.`);
   }
 }
