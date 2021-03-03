@@ -58,7 +58,7 @@ export default class RemoveWishlist extends BaseCommand {
           .join("\n")}`
       );
 
-      const conf = await this.send(msg.channel, embed);
+      const confirmation = await this.send(msg.channel, embed);
 
       const choice: GameIdol | undefined = await new Promise(
         async (res, _req) => {
@@ -95,14 +95,14 @@ export default class RemoveWishlist extends BaseCommand {
       );
 
       if (!choice) {
-        await conf.edit({
+        await confirmation.edit({
           embed: embed.setFooter(`🕒 This search has timed out.`),
         });
         return;
       }
 
       removalTarget = choice;
-      await this.delete(conf);
+      await this.delete(confirmation);
     }
 
     const exists = wishlist.find((wl) => wl.idolId === removalTarget.id);

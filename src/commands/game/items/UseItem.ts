@@ -72,14 +72,14 @@ export default class UseItem extends BaseCommand {
       )
       .setFooter(`This action is irreversible.`);
 
-    const confirmationMessage = await this.send(msg.channel, embed);
+    const confirmation = await this.send(msg.channel, embed);
 
     const confirmed = await new Promise(async (res, _req) => {
       const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
         userId === msg.author.id && emoji.name === "☑";
       const collector = new ReactionCollector(
         this.zephyr,
-        confirmationMessage,
+        confirmation,
         filter,
         { time: 15000, max: 1 }
       );
@@ -97,18 +97,18 @@ export default class UseItem extends BaseCommand {
         if (reason === "time") res(false);
       });
 
-      await this.react(confirmationMessage, "☑");
+      await this.react(confirmation, "☑");
     });
 
     if (!confirmed) {
       await this.edit(
-        confirmationMessage,
+        confirmation,
         embed.setFooter(`🕒 This confirmation has timed out.`)
       );
       return;
     }
 
-    await this.delete(confirmationMessage);
+    await this.delete(confirmation);
 
     await targetItem.use(msg, profile, parameters, this.zephyr);
     return;
