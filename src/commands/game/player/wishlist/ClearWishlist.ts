@@ -60,7 +60,7 @@ export default class ClearWishlist extends BaseCommand {
       return;
     }
 
-    await confirmation.delete();
+    await this.delete(confirmation);
     await ProfileService.clearWishlist(profile);
 
     const embed = new MessageEmbed(`Clear Wishlist`, msg.author).setDescription(

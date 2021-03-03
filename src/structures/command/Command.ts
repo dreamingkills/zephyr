@@ -1,6 +1,7 @@
 import { Message } from "eris";
 import { addReaction } from "../../lib/discord/message/addReaction";
 import { createMessage } from "../../lib/discord/message/createMessage";
+import { deleteMessage } from "../../lib/discord/message/deleteMessage";
 import { editMessage } from "../../lib/discord/message/editMessage";
 import { MessageEmbed } from "../client/RichEmbed";
 import { Zephyr } from "../client/Zephyr";
@@ -57,4 +58,5 @@ export abstract class BaseCommand implements Command {
   public send = createMessage;
   public react = addReaction;
   public edit = editMessage;
+  public delete = deleteMessage;
 }

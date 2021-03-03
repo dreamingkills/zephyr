@@ -16,7 +16,7 @@ export async function createMessage(
   body: string | MessageEmbed | ErisFile,
   options?: { embed?: MessageEmbed; file?: ErisFile }
 ): Promise<Message<TextableChannel>> {
-  let embed: MessageEmbed;
+  let embed: MessageEmbed | undefined;
   let content: string;
   let file: { file: string | Buffer; name: string } | undefined;
 
@@ -63,7 +63,7 @@ export async function createMessage(
     if (!e?.stack.includes(`[50013]:`)) {
       if (channel.type !== 1) {
         console.log(
-          `Failed trying to send message with content ${content} (embed content: ${embed.description}) in channel ${channel.id}. Full stack:\n${e.stack}`
+          `Failed trying to send message with content ${content} (embed content: ${embed?.description}) in channel ${channel.id}. Full stack:\n${e.stack}`
         );
       }
     }

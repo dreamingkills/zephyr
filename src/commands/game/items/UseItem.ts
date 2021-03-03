@@ -108,7 +108,7 @@ export default class UseItem extends BaseCommand {
       return;
     }
 
-    await confirmationMessage.delete();
+    await this.delete(confirmationMessage);
 
     await targetItem.use(msg, profile, parameters, this.zephyr);
     return;

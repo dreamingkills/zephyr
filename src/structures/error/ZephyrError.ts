@@ -630,7 +630,7 @@ export class InvalidStickerError extends ZephyrError {
 export class MessageFailedToSendError extends ZephyrError {
   constructor() {
     super(
-      `There was a problem connecting to Discord, and a message could not be sent. Please try again in a few minutes.\nThis has been reported to the developer.`
+      `There was a problem connecting to Discord, and a message could not be sent. Please try again in a few minutes.`
     );
   }
 }
@@ -638,7 +638,7 @@ export class MessageFailedToSendError extends ZephyrError {
 export class FailedToAddReactionError extends ZephyrError {
   constructor() {
     super(
-      `There was a problem connecting to Discord, and a reaction could not be added. Please try again in a few minutes.\nThis has been reported to the developer.`
+      `There was a problem connecting to Discord, and a reaction could not be added. Please try again in a few minutes.`
     );
   }
 }
@@ -646,7 +646,15 @@ export class FailedToAddReactionError extends ZephyrError {
 export class FailedToEditMessageError extends ZephyrError {
   constructor() {
     super(
-      `There was a problem connecting to Discord, and a message could not be edited. Please try again in a few minutes.\nThis has been reported to the developer.`
+      `There was a problem connecting to Discord, and a message could not be edited. Please try again in a few minutes.`
+    );
+  }
+}
+
+export class FailedToDeleteMessageError extends ZephyrError {
+  constructor() {
+    super(
+      `There was a problem connecting to Discord, and a message could not be deleted. Please try again in a few minutes.`
     );
   }
 }

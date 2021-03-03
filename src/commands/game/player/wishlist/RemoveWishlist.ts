@@ -102,7 +102,7 @@ export default class RemoveWishlist extends BaseCommand {
       }
 
       removalTarget = choice;
-      await conf.delete();
+      await this.delete(conf);
     }
 
     const exists = wishlist.find((wl) => wl.idolId === removalTarget.id);

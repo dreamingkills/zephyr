@@ -109,7 +109,7 @@ export default class AddWishlist extends BaseCommand {
       }
 
       additionTarget = choice;
-      await conf.delete();
+      await this.delete(conf);
     }
 
     const groups = getGroupsByIdolId(additionTarget.id, this.zephyr.getCards());

@@ -98,7 +98,7 @@ export default class DyeCard extends BaseCommand {
       if (refetchDye.charges < 1)
         throw new ZephyrError.UnchargedDyeError(refetchDye);
 
-      await confirmation.delete();
+      await this.delete(confirmation);
 
       const dyedCard = await CardService.setCardDye(targetCard, targetDye);
       await ProfileService.removeChargesFromDye(targetDye);

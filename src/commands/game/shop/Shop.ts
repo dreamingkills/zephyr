@@ -173,7 +173,7 @@ export default class Shop extends BaseCommand {
             });
           }
 
-          await confirmation.delete();
+          await this.delete(confirmation);
         });
 
         await this.react(confirmation, "☑️");

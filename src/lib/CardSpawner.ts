@@ -16,6 +16,7 @@ import { createMessage } from "./discord/message/createMessage";
 import { addReaction } from "./discord/message/addReaction";
 import { checkPermission } from "./ZephyrUtils";
 import { AutotagService } from "./database/services/game/AutotagService";
+import { deleteMessage } from "./discord/message/deleteMessage";
 
 export abstract class CardSpawner {
   private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
@@ -282,7 +283,7 @@ export abstract class CardSpawner {
     collector.on("end", async () => {
       if (!deleted) {
         deleted = true;
-        await drop.delete();
+        await deleteMessage(drop);
       }
 
       return;

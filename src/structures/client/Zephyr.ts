@@ -172,17 +172,23 @@ export class Zephyr extends Client {
             this.config.discord.defaultPrefix
           );
 
-          await createMessage(
-            message.channel,
-            `Reset your prefix to \`${this.config.discord.defaultPrefix}\``
-          );
+          try {
+            await createMessage(
+              message.channel,
+              `Reset your prefix to \`${this.config.discord.defaultPrefix}\``
+            );
+          } catch {}
+
           return;
         }
 
-        await createMessage(
-          message.channel,
-          `My prefix here is \`${this.getPrefix(message.guildID!)}\`!`
-        );
+        try {
+          await createMessage(
+            message.channel,
+            `My prefix here is \`${this.getPrefix(message.guildID!)}\`!`
+          );
+        } catch {}
+
         return;
       }
 
@@ -199,20 +205,32 @@ export class Zephyr extends Client {
 
     this.on("guildDelete", async (guild) => {
       if (this.logChannel) {
-        await createMessage(
-          this.logChannel,
-          `:outbox_tray: Zephyr left a server: **${guild.name}** (${guild.id}).\nMember count: **${guild.memberCount}**`
-        );
+        try {
+          await createMessage(
+            this.logChannel,
+            `:outbox_tray: Zephyr left a server: **${guild.name}** (${guild.id}).\nMember count: **${guild.memberCount}**`
+          );
+        } catch (e) {
+          console.log(
+            `Failed to send guild delete log (${guild.id}) - ${e.stack}`
+          );
+        }
       }
     });
 
     // Introduction when it joins a new guild
     this.on("guildCreate", async (guild) => {
       if (this.logChannel) {
-        await createMessage(
-          this.logChannel,
-          `:inbox_tray: Zephyr joined a new server: **${guild.name}** (${guild.id}).\nMember count: **${guild.memberCount}**`
-        );
+        try {
+          await createMessage(
+            this.logChannel,
+            `:inbox_tray: Zephyr joined a new server: **${guild.name}** (${guild.id}).\nMember count: **${guild.memberCount}**`
+          );
+        } catch (e) {
+          console.log(
+            `Failed to send guild create log (${guild.id}) - ${e.stack}`
+          );
+        }
       }
 
       // Get ONLY TextChannels in the guild (type === 0)

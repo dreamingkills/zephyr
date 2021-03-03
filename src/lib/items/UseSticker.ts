@@ -10,6 +10,7 @@ import { createMessage } from "../discord/message/createMessage";
 import { MessageCollector } from "eris-collector";
 import { editMessage } from "../discord/message/editMessage";
 import { AlbumService } from "../database/services/game/AlbumService";
+import { deleteMessage } from "../discord/message/deleteMessage";
 
 export async function useSticker(
   msg: Message,
@@ -86,7 +87,7 @@ export async function useSticker(
     return;
   }
 
-  await previewMessage.delete();
+  await deleteMessage(previewMessage);
 
   if (cardStickers.filter((s) => s.position === position)[0])
     throw new ZephyrError.StickerSlotTakenError(card, position);
