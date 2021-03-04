@@ -35,10 +35,20 @@ export abstract class BaseCommand implements Command {
 
   public async run(msg: Message, profile: GameProfile, zephyr: Zephyr) {
     this.zephyr = zephyr;
-    const options = msg.content
-      .split(" ")
-      .slice(1)
-      .filter((v) => v);
+
+    const options = [];
+
+    for (const [index, option] of msg.content.split(` `).entries()) {
+      if (index === 0 && option.includes(`\n`)) {
+        const splitOptions = option.split(`\n`).slice(1);
+
+        for (let splitOption of splitOptions) {
+          options.push(splitOption);
+        }
+        continue;
+      }
+      options.push(option);
+    }
 
     await this.exec(msg, profile, options);
   }

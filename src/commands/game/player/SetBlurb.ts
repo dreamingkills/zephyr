@@ -15,12 +15,12 @@ export default class SetBlurb extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    const blurbRaw = options.join(" ");
+    const originalLength = options.join(` `).length;
     const blurb = options.join(" ").slice(0, 500);
     await ProfileService.setProfileBlurb(profile, blurb);
 
     const embed = new MessageEmbed(`Blurb`, msg.author).setDescription(
-      (blurbRaw.length > 500
+      (originalLength > 500
         ? `:warning: Your blurb has been shortened to 500 characters.\n`
         : ``) +
         `Updated your blurb to:` +
