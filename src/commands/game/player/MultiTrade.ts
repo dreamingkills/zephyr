@@ -118,7 +118,7 @@ export default class MultiTrade extends BaseCommand {
         const selectProfile = isSender ? profile : targetProfile;
         const selectItems = isSender ? senderItems : recipientItems;
 
-        if (selectItems.length > 30) return;
+        if (selectItems.length > 50) return;
 
         const processed = await processItems(
           m.content.split(",").map((i) => i.trim())
