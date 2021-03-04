@@ -4,7 +4,10 @@ import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 import { ReactionCollector } from "eris-collector";
-import { getGroupsByIdolId } from "../../../lib/utility/text/TextUtils";
+import {
+  escapeMarkdown,
+  getGroupsByIdolId,
+} from "../../../lib/utility/text/TextUtils";
 
 export default class TopWishlist extends BaseCommand {
   names = ["topwishlist", "twl"];
@@ -26,7 +29,7 @@ export default class TopWishlist extends BaseCommand {
       description += `\`${(
         `#` + (page * 10 - 10 + top.indexOf(t) + 1).toString()
       ).padStart(pad, " ")}\` ${`**${idol?.name || `Unknown Idol`}**${
-        groups.length === 0 ? `` : ` (${groups.join(`, `)})`
+        groups.length === 0 ? `` : ` (${escapeMarkdown(groups.join(`, `))})`
       }`} — **${t.count.toLocaleString()}** wishlists\n`;
     }
     return description;
