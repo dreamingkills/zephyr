@@ -29,6 +29,15 @@ export default class CardInfo extends BaseCommand {
 
     const claimInfo = await AnticheatService.getClaimInformation(card);
 
+    if (!claimInfo) {
+      const embed = new MessageEmbed(`Card Info`, msg.author).setDescription(
+        `:thinking: This card has no history... perhaps it will have a future.`
+      );
+
+      await this.send(msg.channel, embed);
+      return;
+    }
+
     const claimTime = dayjs(claimInfo.claim_time).format(`YYYY/MM/DD HH:mm:ss`);
     let claimer;
     let dropper;
@@ -44,6 +53,7 @@ export default class CardInfo extends BaseCommand {
         claimer = "Private User";
       } else claimer = claimerUser?.tag || "Unknown User";
     }
+
     if (claimInfo.dropper) {
       const dropperUser = await this.zephyr.fetchUser(claimInfo.dropper);
       if (!dropperUser) {
