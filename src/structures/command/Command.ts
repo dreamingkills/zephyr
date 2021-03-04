@@ -36,7 +36,7 @@ export abstract class BaseCommand implements Command {
   public async run(msg: Message, profile: GameProfile, zephyr: Zephyr) {
     this.zephyr = zephyr;
 
-    const options = [];
+    let options = [];
 
     for (const [index, option] of msg.content.split(` `).entries()) {
       if (index === 0 && option.includes(`\n`)) {
@@ -49,6 +49,9 @@ export abstract class BaseCommand implements Command {
       }
       options.push(option);
     }
+
+    // Parses out the command itself
+    options = options.slice(1);
 
     await this.exec(msg, profile, options);
   }
