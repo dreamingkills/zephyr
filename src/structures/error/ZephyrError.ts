@@ -955,3 +955,9 @@ export class InvalidQuashNoteError extends ZephyrError {
     super(`You must write a quash note in order to quash a blacklist.`);
   }
 }
+
+export class TooManyItemsInMultitradeError extends ZephyrError {
+  constructor() {
+    super(`You have reached the multitrade limit. Please split up your trade.`);
+  }
+}
