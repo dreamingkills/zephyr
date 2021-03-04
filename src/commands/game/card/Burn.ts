@@ -12,6 +12,7 @@ import { GameDye } from "../../../structures/game/Dye";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class BurnCard extends BaseCommand {
   names = ["burn", "b"];
@@ -245,7 +246,9 @@ export default class BurnCard extends BaseCommand {
           embed: embed.setFooter(`🕒 This confirmation has expired.`),
         });
       }
-      await confirmation.removeReactions();
+
+      if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+        await confirmation.removeReactions();
     });
 
     await this.react(

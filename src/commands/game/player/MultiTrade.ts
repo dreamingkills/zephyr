@@ -10,6 +10,7 @@ import { verifyMultitradeItems } from "../../../lib/command/multitrade/VerifyIte
 import { renderMultitradeInventory } from "../../../lib/command/multitrade/RenderInventory";
 import { transferItems } from "../../../lib/command/multitrade/TransferItems";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class MultiTrade extends BaseCommand {
   names = ["multitrade", "mt"];
@@ -62,7 +63,8 @@ export default class MultiTrade extends BaseCommand {
       return;
     }
 
-    await tradeMessage.removeReactions();
+    if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+      await tradeMessage.removeReactions();
 
     const tradeInterfaceEmbed = new MessageEmbed(
       `Multi Trade`,

@@ -10,6 +10,7 @@ import { Recipe } from "../../../structures/game/Recipe";
 import { ReactionCollector } from "eris-collector";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
 import { ItemService } from "../../../lib/ItemService";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class CraftItem extends BaseCommand {
   names = ["craft"];
@@ -107,7 +108,8 @@ export default class CraftItem extends BaseCommand {
         });
       }
 
-      await confirmation.removeReactions();
+      if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+        await confirmation.removeReactions();
     });
 
     await this.react(

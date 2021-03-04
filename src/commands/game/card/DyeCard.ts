@@ -8,6 +8,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ReactionCollector } from "eris-collector";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class DyeCard extends BaseCommand {
   names = ["dye"];
@@ -133,7 +134,8 @@ export default class DyeCard extends BaseCommand {
         });
       }
 
-      await confirmation.removeReactions();
+      if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+        await confirmation.removeReactions();
     });
 
     await this.react(

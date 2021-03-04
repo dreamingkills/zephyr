@@ -10,6 +10,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class GiftCard extends BaseCommand {
   names = ["gift", "give"];
@@ -117,7 +118,8 @@ export default class GiftCard extends BaseCommand {
         });
       }
 
-      await confirmation.removeReactions();
+      if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+        await confirmation.removeReactions();
     });
 
     await this.react(

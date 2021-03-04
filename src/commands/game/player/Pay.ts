@@ -7,6 +7,7 @@ import { ReactionCollector } from "eris-collector";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { strToInt } from "../../../lib/utility/text/TextUtils";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class Pay extends BaseCommand {
   names = ["pay", "venmo", "paypal", "cashapp"];
@@ -85,7 +86,8 @@ export default class Pay extends BaseCommand {
         });
       }
 
-      await confirmation.removeReactions();
+      if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+        await confirmation.removeReactions();
     });
 
     await this.react(

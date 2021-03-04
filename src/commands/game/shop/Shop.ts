@@ -7,6 +7,7 @@ import { ReactionCollector } from "eris-collector";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { ItemService } from "../../../lib/ItemService";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class Shop extends BaseCommand {
   names = [`shop`];
@@ -101,7 +102,8 @@ export default class Shop extends BaseCommand {
           });
         }
 
-        await facade.removeReactions();
+        if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+          await facade.removeReactions();
       });
 
       await this.react(facade, `1️⃣`);
