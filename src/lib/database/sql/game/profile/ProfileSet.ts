@@ -8,7 +8,6 @@ import {
   rgbToHex,
 } from "../../../../utility/color/ColorUtils";
 import dayjs from "dayjs";
-import { User } from "eris";
 import { PrefabItem } from "../../../../../structures/item/PrefabItem";
 
 export abstract class ProfileSet extends DBClass {
@@ -304,26 +303,32 @@ export abstract class ProfileSet extends DBClass {
     return;
   }
 
-  public static async setUserClaimReminded(users: User[]): Promise<void> {
+  public static async setUserClaimReminded(
+    profiles: GameProfile[]
+  ): Promise<void> {
     await DB.query(
       `UPDATE profile SET claim_reminded=1 WHERE discord_id IN (?);`,
-      [users.map((u) => u.id)]
+      [profiles.map((p) => p.discordId)]
     );
     return;
   }
 
-  public static async setUserDropReminded(users: User[]): Promise<void> {
+  public static async setUserDropReminded(
+    profiles: GameProfile[]
+  ): Promise<void> {
     await DB.query(
       `UPDATE profile SET drop_reminded=1 WHERE discord_id IN (?);`,
-      [users.map((u) => u.id)]
+      [profiles.map((p) => p.discordId)]
     );
     return;
   }
 
-  public static async setUserVoteReminded(users: User[]): Promise<void> {
+  public static async setUserVoteReminded(
+    profiles: GameProfile[]
+  ): Promise<void> {
     await DB.query(
       `UPDATE profile SET vote_reminded=1 WHERE discord_id IN (?);`,
-      [users.map((u) => u.id)]
+      [profiles.map((p) => p.discordId)]
     );
     return;
   }

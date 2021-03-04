@@ -2,7 +2,7 @@ import { Zephyr } from "../structures/client/Zephyr";
 import { ProfileService } from "./database/services/game/ProfileService";
 import dayjs from "dayjs";
 import { createMessage } from "./discord/message/createMessage";
-import { User } from "eris";
+import { GameProfile } from "../structures/game/Profile";
 
 export class DMHandler {
   public remindersEnabled = true;
@@ -12,20 +12,14 @@ export class DMHandler {
     console.log(`Grabbed ${eligible.length} users to DM...`);
     const start = Date.now();
     const [claimSuccess, dropSuccess, voteSuccess] = [[], [], []] as [
-      User[],
-      User[],
-      User[]
+      GameProfile[],
+      GameProfile[],
+      GameProfile[]
     ];
     const failed = [];
 
     for (let p of eligible) {
       if (p.blacklisted) {
-        failed.push(p);
-        continue;
-      }
-
-      const user = await zephyr.fetchUser(p.discordId);
-      if (!user) {
         failed.push(p);
         continue;
       }
@@ -46,15 +40,12 @@ export class DMHandler {
       let message = "";
       const types = [];
       if (claim) {
-        claimSuccess.push(user);
         types.push("**claim**");
       }
       if (drop) {
-        dropSuccess.push(user);
         types.push("**drop**");
       }
       if (vote) {
-        voteSuccess.push(user);
         types.push("**vote**");
       }
 
@@ -67,7 +58,7 @@ export class DMHandler {
       }
 
       console.log(
-        `Attempting to DM ${user.id} (${types.join(
+        `Attempting to DM ${p.discordId} (${types.join(
           `, `
         )}).\n- Now: ${now.format(
           `YYYY-MM-DD HH:mm:ss`
@@ -79,14 +70,18 @@ export class DMHandler {
       );
 
       try {
-        const dmChannel = await user.getDMChannel();
+        const dmChannel = await zephyr.getDMChannel(p.discordId);
         await createMessage(
           dmChannel,
-          `:bell: Hey, **${user.username}**! You can now ${message}!` +
+          `:bell: Hey, **${dmChannel.recipient.tag}**! You can now ${message}!` +
             (vote
               ? `\nYou can vote by clicking this link! https://top.gg/bot/791100707629432863/vote`
               : ``)
         );
+
+        if (claim) claimSuccess.push(p);
+        if (drop) dropSuccess.push(p);
+        if (vote) voteSuccess.push(p);
         continue;
       } catch (e) {
         console.log(`Vote message failed - ${e}`);

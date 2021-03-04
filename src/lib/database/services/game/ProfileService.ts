@@ -5,7 +5,6 @@ import { GameTag } from "../../../../structures/game/Tag";
 import { GameWishlist } from "../../../../structures/game/Wishlist";
 import { ProfileGet } from "../../sql/game/profile/ProfileGet";
 import { ProfileSet } from "../../sql/game/profile/ProfileSet";
-import { User } from "eris";
 import { PrefabItem } from "../../../../structures/item/PrefabItem";
 import { items } from "../../../../assets/Items";
 
@@ -219,16 +218,22 @@ export abstract class ProfileService {
     return await ProfileGet.getAvailableReminderRecipients();
   }
 
-  public static async setUserClaimReminded(users: User[]): Promise<void> {
-    return await ProfileSet.setUserClaimReminded(users);
+  public static async setUserClaimReminded(
+    profiles: GameProfile[]
+  ): Promise<void> {
+    return await ProfileSet.setUserClaimReminded(profiles);
   }
 
-  public static async setUserDropReminded(users: User[]): Promise<void> {
-    return await ProfileSet.setUserDropReminded(users);
+  public static async setUserDropReminded(
+    profiles: GameProfile[]
+  ): Promise<void> {
+    return await ProfileSet.setUserDropReminded(profiles);
   }
 
-  public static async setUserVoteReminded(users: User[]): Promise<void> {
-    return await ProfileSet.setUserVoteReminded(users);
+  public static async setUserVoteReminded(
+    profiles: GameProfile[]
+  ): Promise<void> {
+    return await ProfileSet.setUserVoteReminded(profiles);
   }
 
   public static async toggleDropReminders(
