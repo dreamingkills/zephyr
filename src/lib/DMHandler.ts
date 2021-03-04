@@ -9,6 +9,8 @@ export class DMHandler {
 
   public async handle(zephyr: Zephyr): Promise<void> {
     const eligible = await ProfileService.getAvailableReminderRecipients();
+    console.log(`Grabbed ${eligible.length} users to DM...`);
+    const start = Date.now();
     const [claimSuccess, dropSuccess, voteSuccess] = [[], [], []] as [
       User[],
       User[],
@@ -64,6 +66,18 @@ export class DMHandler {
         message = types.slice(0, -1).join(`, `) + `, and ` + types.slice(-1);
       }
 
+      console.log(
+        `Attempting to DM ${user.id} (${types.join(
+          `, `
+        )}).\n- Now: ${now.format(
+          `YYYY-MM-DD HH:mm:ss`
+        )}\n- Next Claim: ${nextClaim.format(
+          `YYYY-MM-DD HH:mm:ss`
+        )}\n- Next Drop: ${nextDrop.format(
+          `YYYY-MM-DD HH:mm:ss`
+        )}\n- Next Vote: ${nextVote.format(`YYYY-MM-DD HH:mm:ss`)}`
+      );
+
       try {
         const dmChannel = await user.getDMChannel();
         await createMessage(
@@ -89,6 +103,13 @@ export class DMHandler {
       await ProfileService.setUserVoteReminded(voteSuccess);
 
     if (failed.length > 0) await ProfileService.disableReminders(failed);
+
+    const end = Date.now();
+    console.log(
+      `Finished DMing ${
+        claimSuccess.length + dropSuccess.length + voteSuccess.length
+      } users (${failed.length} failed). ${end - start}ms elapsed.`
+    );
 
     if (this.remindersEnabled) setTimeout(() => this.handle(zephyr), 30000);
   }
