@@ -51,7 +51,7 @@ export abstract class BaseCommand implements Command {
     }
 
     // Parses out the command itself
-    options = options.slice(1);
+    options = options.slice(1).map((o) => o);
 
     await this.exec(msg, profile, options);
   }
