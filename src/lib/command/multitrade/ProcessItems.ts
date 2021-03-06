@@ -51,7 +51,7 @@ export async function processItems(
     if (!baseItem) {
       const noNumber = item.split(" ").slice(1).join(" ").toLowerCase();
       const derivedAmount = parseInt(item.split(" ")[0]);
-      if (isNaN(derivedAmount)) continue;
+      if (isNaN(derivedAmount) || derivedAmount < 0) continue;
 
       amount = derivedAmount;
 
