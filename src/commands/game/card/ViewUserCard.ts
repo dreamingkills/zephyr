@@ -44,8 +44,18 @@ export default class ViewUserCard extends BaseCommand {
     let image: Buffer;
 
     if (noText) {
-      image = await CardService.generateCardImage(card, this.zephyr, noText);
-    } else image = await CardService.checkCacheForCard(card, this.zephyr);
+      image = await CardService.generateCardImage(
+        card,
+        this.zephyr,
+        noText,
+        profile.patron > 1
+      );
+    } else
+      image = await CardService.checkCacheForCard(
+        card,
+        this.zephyr,
+        profile.patron > 1
+      );
 
     const userTags = await ProfileService.getTags(targetProfile);
     const cardDescription = getDescriptions([card], this.zephyr, userTags)[0];

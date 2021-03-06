@@ -98,13 +98,16 @@ export abstract class CardService {
   public static async generateCardImage(
     card: GameUserCard,
     zephyr: Zephyr,
-    noText: boolean = false
+    noText: boolean = false,
+    large: boolean = false
   ): Promise<Buffer> {
     // Need information off the base card to do anything.
     const baseCard = zephyr.getCard(card.baseCardId)!;
 
+    const [sizeX, sizeY] = large ? [770, 1100] : [350, 500];
+
     // Create the card canvas
-    const canvas = createCanvas(350, 500);
+    const canvas = createCanvas(sizeX, sizeY);
     const ctx = canvas.getContext("2d");
 
     // Load the base card image (the subject of the card)
@@ -117,8 +120,8 @@ export abstract class CardService {
     } else frame = await loadImage(card.frameUrl);
 
     // Draw the base image, then the frame on top of that
-    ctx.drawImage(img, 0, 0, 350, 500);
-    ctx.drawImage(frame, 0, 0, 350, 500);
+    ctx.drawImage(img, 0, 0, sizeX, sizeY);
+    ctx.drawImage(frame, 0, 0, sizeX, sizeY);
 
     // Handle dye mask (this was so annoying to set up I hate Windows)
     // Default to the classic "Undyed Mask Gray" if the card is undyed.
@@ -140,7 +143,7 @@ export abstract class CardService {
 
     // Load the buffer and draw the dye mask on top of the frame.
     const dyeImage = await loadImage(dyeBuffer);
-    ctx.drawImage(dyeImage, 0, 0, 350, 500);
+    ctx.drawImage(dyeImage, 0, 0, sizeX, sizeY);
 
     // Draw the stickers, if any
     const stickers = await this.getCardStickers(card);
@@ -166,6 +169,12 @@ export abstract class CardService {
       }
     }
 
+    const textX = large ? 108 : 50;
+    const serialFontSize = large ? 45 : 20;
+    const serialY = large ? 922 : 421;
+    const nameFontSize = large ? 70 : 30;
+    const nameY = large ? 980 : 445;
+
     if (!noText) {
       // Draw the group icon
       const overlay = await loadImage(
@@ -173,15 +182,15 @@ export abstract class CardService {
           baseCard.group?.toLowerCase().replace("*", "") || "nogroup"
         }.png`
       );
-      ctx.drawImage(overlay, 0, 0, 350, 500);
+      ctx.drawImage(overlay, 0, 0, sizeX, sizeY);
 
       // Draw the serial number
-      ctx.font = "20px AlteHaasGroteskBold";
-      ctx.fillText(`#${card.serialNumber}`, 50, 421);
+      ctx.font = `${serialFontSize}px AlteHaasGroteskBold`;
+      ctx.fillText(`#${card.serialNumber}`, textX, serialY);
 
       // Draw the name of the subject
-      ctx.font = "30px AlteHaasGroteskBold";
-      ctx.fillText(`${baseCard.name}`, 50, 445);
+      ctx.font = `${nameFontSize}px AlteHaasGroteskBold`;
+      ctx.fillText(`${baseCard.name}`, textX, nameY);
     }
 
     // Send it off!
@@ -380,9 +389,14 @@ export abstract class CardService {
   */
   public static async updateCardCache(
     card: GameUserCard,
-    zephyr: Zephyr
+    zephyr: Zephyr,
+    large: boolean = false
   ): Promise<Buffer> {
-    const image = await this.generateCardImage(card, zephyr);
+    const image = await this.generateCardImage(card, zephyr, false, large);
+
+    const fileName = `${card.id}${large ? `_large` : ``}`;
+    const tempFile = `./cache/cards/temp/${fileName}`;
+    const finalFile = `./cache/cards/${card.baseCardId}/${fileName}`;
 
     // fs will throw an error if the directory already exists.
     // TODO - Change this do detect directory, removing need for error handling.
@@ -394,13 +408,10 @@ export abstract class CardService {
     // The card image file stays in the temp folder while it's building.
     // Once it's finished, it's moved to the cache folder to avoid
     // showing users incomplete card images.
-    await fs.writeFile(`./cache/cards/temp/${card.id}`, image);
-    await fs.rename(
-      `./cache/cards/temp/${card.id}`,
-      `./cache/cards/${card.baseCardId}/${card.id}`
-    );
+    await fs.writeFile(tempFile, image);
+    await fs.rename(tempFile, finalFile);
 
-    return await fs.readFile(`./cache/cards/${card.baseCardId}/${card.id}`);
+    return await fs.readFile(finalFile);
   }
 
   public static async generatePrefabCache(card: GameBaseCard): Promise<Buffer> {
@@ -439,12 +450,15 @@ export abstract class CardService {
 
   public static async checkCacheForCard(
     card: GameUserCard,
-    zephyr: Zephyr
+    zephyr: Zephyr,
+    large: boolean = false
   ): Promise<Buffer> {
     try {
-      return await fs.readFile(`./cache/cards/${card.baseCardId}/${card.id}`);
+      return await fs.readFile(
+        `./cache/cards/${card.baseCardId}/${card.id}${large ? `_large` : ``}`
+      );
     } catch (e) {
-      return await this.updateCardCache(card, zephyr);
+      return await this.updateCardCache(card, zephyr, large);
     }
   }
 
