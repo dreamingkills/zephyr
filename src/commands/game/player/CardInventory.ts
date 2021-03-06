@@ -76,6 +76,8 @@ export default class CardInventory extends BaseCommand {
       }
     }
 
+    const verbose = filters[`verbose`] === `true`;
+
     const userTags = await ProfileService.getTags(target);
 
     const size = await CardService.getUserInventorySize(
@@ -101,7 +103,7 @@ export default class CardInventory extends BaseCommand {
 
     const embed = new MessageEmbed(`Inventory`, msg.author)
       .setTitle(`${targetUser.tag}'s cards`)
-      .setDescription(this.renderInventory(inventory, userTags))
+      .setDescription(this.renderInventory(inventory, userTags, verbose))
       .setFooter(
         `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${size} cards`
       );
@@ -113,6 +115,7 @@ export default class CardInventory extends BaseCommand {
     const collector = new ReactionCollector(this.zephyr, sent, filter, {
       time: 2 * 60 * 1000,
     });
+
     collector.on("error", async (e: Error) => {
       console.error(e);
       await this.handleError(msg, e);
@@ -133,7 +136,8 @@ export default class CardInventory extends BaseCommand {
           userTags,
           filters
         );
-        embed.setDescription(this.renderInventory(newCards, userTags));
+
+        embed.setDescription(this.renderInventory(newCards, userTags, verbose));
         embed.setFooter(`Page ${page} of ${totalPages} • ${size} entries`);
         await editMessage(sent, embed);
 
@@ -148,10 +152,19 @@ export default class CardInventory extends BaseCommand {
     if (totalPages > 2) await this.react(sent, `⏭`);
   }
 
-  private renderInventory(cards: GameUserCard[], tags: GameTag[]): string {
+  private renderInventory(
+    cards: GameUserCard[],
+    tags: GameTag[],
+    showSubgroup: boolean = false
+  ): string {
     if (cards.length === 0) return "No cards here!";
 
-    const cardDescriptions = getDescriptions(cards, this.zephyr, tags);
+    const cardDescriptions = getDescriptions(
+      cards,
+      this.zephyr,
+      tags,
+      showSubgroup
+    );
     return cardDescriptions.join("\n");
   }
 }

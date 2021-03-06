@@ -45,7 +45,8 @@ export function renderRecipe(recipe: Recipe): string {
 export function getDescriptions(
   targets: (GameUserCard | GameDye)[],
   zephyr: Zephyr,
-  tags: GameTag[] = []
+  tags: GameTag[] = [],
+  showSubgroup: boolean = false
 ): string[] {
   const descriptions = [];
 
@@ -103,7 +104,10 @@ export function getDescriptions(
           " "
         )}\`` +
           ` **${baseCard.group || `Soloist`}** ${baseCard.name}` +
-          (baseCard.emoji ? ` ${baseCard.emoji}` : ``)
+          (baseCard.emoji ? ` ${baseCard.emoji}` : ``) +
+          (showSubgroup && baseCard.subgroup
+            ? ` **(${baseCard.subgroup})**`
+            : ``)
       );
     } else if (t instanceof GameDye) {
       descriptions.push(
