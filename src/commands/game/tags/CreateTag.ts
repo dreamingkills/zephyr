@@ -40,7 +40,8 @@ export default class CreateTag extends BaseCommand {
 
     const emojiRaw = options[1];
     const trueEmoji = emojiregex().exec(emojiRaw);
-    if (!trueEmoji) throw new ZephyrError.InvalidEmojiTagError();
+    if (!trueEmoji || emojiRaw.length > 1)
+      throw new ZephyrError.InvalidEmojiTagError();
 
     if (userTags.filter((t) => t.emoji === trueEmoji[0])[0])
       throw new ZephyrError.DuplicateTagEmojiError(trueEmoji[0]);

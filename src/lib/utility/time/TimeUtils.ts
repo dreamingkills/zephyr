@@ -5,6 +5,10 @@ export function getCurrentTimestamp(): string {
   return dayjs().format(`YYYY/MM/DD HH:mm:ss`);
 }
 
+export function dateTimeDisplay(date: Dayjs): string {
+  return date.format(`MMMM D, YYYY`);
+}
+
 export function getTimeUntil(from: Dayjs, to: Dayjs): string {
   const days = to.diff(from, "d");
   const hours = to.diff(from, "h");

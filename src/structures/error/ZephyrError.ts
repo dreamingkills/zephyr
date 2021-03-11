@@ -961,3 +961,54 @@ export class TooManyItemsInMultitradeError extends ZephyrError {
     super(`You have reached the multitrade limit. Please split up your trade.`);
   }
 }
+
+/*
+    Badges
+*/
+export class BadgeNotFoundError extends ZephyrError {
+  constructor(id: number) {
+    super(`There is no badge with ID \`${id}\`.`);
+  }
+}
+
+export class UserBadgeNotFoundError extends ZephyrError {
+  constructor(id: number) {
+    super(`There is no user badge with ID \`${id}\`.`);
+  }
+}
+
+export class BadgeNameNotFoundError extends ZephyrError {
+  constructor(name: string) {
+    super(`There is no badge named \`${name}\`.`);
+  }
+}
+
+export class BadgeEmojiNotFoundError extends ZephyrError {
+  constructor(emoji: string) {
+    super(`There is no badge with emoji ${emoji}.`);
+  }
+}
+
+export class InvalidBadgeNameError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid badge name.`);
+  }
+}
+
+export class InvalidBadgeEmojiError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid badge emoji.`);
+  }
+}
+
+export class DuplicateBadgeNameError extends ZephyrError {
+  constructor() {
+    super(`There is already a badge with that name.`);
+  }
+}
+
+export class DuplicateBadgeEmojiError extends ZephyrError {
+  constructor() {
+    super(`There is already a badge with that emoji.`);
+  }
+}
