@@ -76,7 +76,7 @@ export default class CardInventory extends BaseCommand {
       }
     }
 
-    const verbose = filters[`verbose`] === `true`;
+    const verbose = filters[`verbose`] === `true` || filters[`v`] === `true`;
 
     const userTags = await ProfileService.getTags(target);
 
