@@ -525,7 +525,11 @@ export class NotEnoughOfItemError extends ZephyrError {
              */
 export class CardBurnedError extends ZephyrError {
   constructor(card: GameUserCard) {
-    super(`:fire: \`${card.id.toString(36)}\` was burned.`);
+    super(
+      `:fire: You cannot view \`${card.id.toString(
+        36
+      )}\` because it has been burned.`
+    );
   }
 }
 
