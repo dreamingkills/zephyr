@@ -13,7 +13,7 @@ export default class DropCards extends BaseCommand {
   names = ["drop"];
   description = "Drops three random cards in the channel.";
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!this.zephyr.dropsEnabled) throw new ZephyrError.DropsDisabledError();
+    if (!this.zephyr.flags.drops) throw new ZephyrError.DropFlagDisabledError();
 
     const reactPermission = checkPermission(
       `addReactions`,

@@ -16,6 +16,9 @@ export default class ViewBank extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (!this.zephyr.flags.transactions)
+      throw new ZephyrError.TransactionFlagDisabledError();
+
     const subcommand = options[0]?.toLowerCase();
     if (subcommand === "deposit") {
       let amount = parseInt(options[1], 10);

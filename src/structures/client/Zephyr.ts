@@ -24,12 +24,10 @@ import { ItemService } from "../../lib/ItemService";
 import { GameIdol } from "../game/Idol";
 
 export class Zephyr extends Client {
-  version: string = "Nicotiana";
   commandLib = new CommandLib();
   dmHandler = new DMHandler();
   config: typeof config;
   chance = new Chance();
-  dropsEnabled = true;
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
   private stickers: { [stickerId: number]: GameSticker } = {};
@@ -40,6 +38,22 @@ export class Zephyr extends Client {
 
   webhookListener: WebhookListener | undefined;
   dbl: dblapi | undefined;
+
+  // These are toggles that control what bot functions are enabled or disabled.
+  public flags: { [key: string]: boolean } = {
+    processMessages: true /* this.on("message", ()=>{}) listener */,
+    commands: true /* General commands */,
+    drops: true /* Card drops (user+activity) */,
+    trades: true /* Multitrade, normal trade, gift */,
+    reminders: true /* DM reminders */,
+    transactions: true /* Paying bits, withdrawing from bank, shop */,
+    dyes: true /* Dyeing cards */,
+    upgrades: true /* Upgrading cards */,
+    burns: true /* Burning cards */,
+    crafting: true /* Crafting recipes and recipe viewer */,
+    dmCommands: true /* Use of commands in DM channels */,
+    postServerCount: true /* Post server count to Top.gg */,
+  };
 
   private generalChannelNames = [
     "welcome",
@@ -63,10 +77,10 @@ export class Zephyr extends Client {
 
     await this.webhookListener.init(this);
 
-    if (this.config.topgg.postEnabled) {
+    if (this.config.topgg.postEnabled && this.flags.postServerCount) {
       await this.dbl.postStats(this.guilds.size);
       setInterval(async () => {
-        if (this.dbl) {
+        if (this.dbl && this.flags.postServerCount) {
           await this.dbl.postStats(this.guilds.size);
         }
       }, 1800000);
@@ -88,9 +102,7 @@ export class Zephyr extends Client {
       if (this.config.topgg.enabled) await this.startTopGg();
       await this.commandLib.setup(this);
 
-      const header = `===== ${chalk.hex(
-        `#1fb7cf`
-      )`PROJECT: ZEPHYR`} (${chalk.hex(`#1fb7cf`)`${this.version}`}) =====`;
+      const header = `===== ${chalk.hex(`#1fb7cf`)`PROJECT: ZEPHYR`} =====`;
       console.log(
         header +
           `\n\n- Took ${chalk.hex("1794E6")`${
@@ -137,11 +149,13 @@ export class Zephyr extends Client {
     });
 
     this.on("messageCreate", async (message) => {
+      if (!this.flags.processMessages) return;
+
       if (message.author.bot || !message.channel) return;
 
       await this.fetchUser(message.author.id);
 
-      if (message.channel instanceof PrivateChannel) {
+      if (message.channel instanceof PrivateChannel && this.flags.dmCommands) {
         await this.commandLib.process(message, this);
         return;
       }
@@ -193,7 +207,7 @@ export class Zephyr extends Client {
       }
 
       // go ahead if we're allowed to speak
-      await this.commandLib.process(message, this);
+      if (this.flags.commands) await this.commandLib.process(message, this);
 
       // message counter
       await CardSpawner.processMessage(

@@ -20,6 +20,9 @@ export default class Shop extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (!this.zephyr.flags.transactions)
+      throw new ZephyrError.TransactionFlagDisabledError();
+
     const subcommand = options[0];
 
     if (!subcommand) {

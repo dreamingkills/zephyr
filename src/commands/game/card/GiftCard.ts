@@ -21,6 +21,9 @@ export default class GiftCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (!this.zephyr.flags.trades)
+      throw new ZephyrError.TradeFlagDisabledError();
+
     const identifiers = options.filter((o) => !o.includes("<@"));
     const cards: GameUserCard[] = [];
     if (identifiers.length === 0) {

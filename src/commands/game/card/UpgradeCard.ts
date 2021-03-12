@@ -24,6 +24,9 @@ export default class UpgradeCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (!this.zephyr.flags.upgrades)
+      throw new ZephyrError.UpgradeFlagDisabledError();
+
     const reference = options[0];
     let card: GameUserCard;
     if (!reference) {

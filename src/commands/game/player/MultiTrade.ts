@@ -17,6 +17,9 @@ export default class MultiTrade extends BaseCommand {
   description = "Initiates a multitrade.";
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
+    if (!this.zephyr.flags.trades)
+      throw new ZephyrError.TradeFlagDisabledError();
+
     const targetUser = msg.mentions[0];
     if (!targetUser) throw new ZephyrError.InvalidMentionError();
 

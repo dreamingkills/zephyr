@@ -13,27 +13,13 @@ export default class ViewDyes extends BaseCommand {
   description = "Shows you the dyes you own.";
   allowDm = true;
 
-  private renderDyes(dyes: GameDye[]): string {
-    const longestIdentifier = dyes
-      .map((d) => `$${d.id.toString(36)}`)
-      .reduce((a, b) => {
-        return a.length > b.length ? a : b;
-      }).length;
-    return dyes
-      .map(
-        (d) =>
-          `\`${`$${d.id.toString(36)}`.padStart(longestIdentifier, " ")}\` ${
-            d.name
-          } [**${d.charges}**]`
-      )
-      .join("\n");
-  }
-
   async exec(
     msg: Message,
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (!this.zephyr.flags.dyes) throw new ZephyrError.DyeFlagDisabledError();
+
     let target: GameProfile | undefined = undefined;
     let targetUser: User;
     if (msg.mentions[0]) {
@@ -117,5 +103,21 @@ export default class ViewDyes extends BaseCommand {
         if (maxPage > 2) this.react(sent, `⏭`);
       } catch (e) {}
     }
+  }
+
+  private renderDyes(dyes: GameDye[]): string {
+    const longestIdentifier = dyes
+      .map((d) => `$${d.id.toString(36)}`)
+      .reduce((a, b) => {
+        return a.length > b.length ? a : b;
+      }).length;
+    return dyes
+      .map(
+        (d) =>
+          `\`${`$${d.id.toString(36)}`.padStart(longestIdentifier, " ")}\` ${
+            d.name
+          } [**${d.charges}**]`
+      )
+      .join("\n");
   }
 }

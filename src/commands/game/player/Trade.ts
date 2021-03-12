@@ -21,6 +21,9 @@ export default class Trade extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (!this.zephyr.flags.trades)
+      throw new ZephyrError.TradeFlagDisabledError();
+
     const targetUser = msg.mentions[0];
     if (!targetUser) throw new ZephyrError.InvalidMentionError();
 

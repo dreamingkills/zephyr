@@ -23,6 +23,8 @@ export default class BurnTag extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (!this.zephyr.flags.burns) throw new ZephyrError.BurnFlagDisabledError();
+
     if (!options[0]) throw new ZephyrError.UnspecifiedBurnTagsError();
 
     const tags = await ProfileService.getTags(profile);

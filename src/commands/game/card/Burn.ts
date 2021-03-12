@@ -25,6 +25,8 @@ export default class BurnCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (!this.zephyr.flags.burns) throw new ZephyrError.BurnFlagDisabledError();
+
     const burnTargets: (GameUserCard | GameDye)[] = [];
 
     if (options.length === 0) {

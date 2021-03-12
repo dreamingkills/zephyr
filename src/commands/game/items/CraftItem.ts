@@ -24,6 +24,9 @@ export default class CraftItem extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (!this.zephyr.flags.crafting)
+      throw new ZephyrError.CraftingFlagDisabledError();
+
     if (!options[0]) throw new ZephyrError.UnspecifiedRecipeError();
 
     const recipeQuery = recipes.filter(

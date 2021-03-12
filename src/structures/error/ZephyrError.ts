@@ -46,14 +46,6 @@ export class NotAllowedInDMError extends ZephyrError {
   }
 }
 
-export class DropsDisabledError extends ZephyrError {
-  constructor() {
-    super(
-      `Drops are currently disabled, likely because the bot will restart soon. Please try again in a couple minutes.`
-    );
-  }
-}
-
 export class AccountBlacklistedNoCaseError extends ZephyrError {
   constructor() {
     super(
@@ -1031,5 +1023,90 @@ export class UserLacksBadgeError extends ZephyrError {
     super(
       `**${user.tag}** does not have ${badge.badgeEmoji} **${badge.badgeName}**.`
     );
+  }
+}
+
+/*
+    Flags
+*/
+export class DropFlagDisabledError extends ZephyrError {
+  constructor() {
+    super(
+      `Sorry, but dropping is temporarily disabled.\nPlease join [Zephyr Community](https://discord.gg/zephyr) to stay up to date.`
+    );
+  }
+}
+
+export class TradeFlagDisabledError extends ZephyrError {
+  constructor() {
+    super(
+      `Sorry, but trades, multitrades, and gifts are temporarily disabled.\nPlease join [Zephyr Community](https://discord.gg/zephyr) to stay up to date.`
+    );
+  }
+}
+
+export class ReminderFlagDisabledError extends ZephyrError {
+  constructor() {
+    super(
+      `Sorry, but reminders are temporarily disabled.\nPlease join [Zephyr Community](https://discord.gg/zephyr) to stay up to date.`
+    );
+  }
+}
+
+export class TransactionFlagDisabledError extends ZephyrError {
+  constructor() {
+    super(
+      `Sorry, but paying, the bank, and the shop are temporarily disabled.\nPlease join [Zephyr Community](https://discord.gg/zephyr) to stay up to date.`
+    );
+  }
+}
+
+export class DyeFlagDisabledError extends ZephyrError {
+  constructor() {
+    super(
+      `Sorry, but dyes are temporarily disabled.\nPlease join [Zephyr Community](https://discord.gg/zephyr) to stay up to date.`
+    );
+  }
+}
+
+export class UpgradeFlagDisabledError extends ZephyrError {
+  constructor() {
+    super(
+      `Sorry, but upgrades are temporarily disabled.\nPlease join [Zephyr Community](https://discord.gg/zephyr) to stay up to date.`
+    );
+  }
+}
+
+export class BurnFlagDisabledError extends ZephyrError {
+  constructor() {
+    super(
+      `Sorry, but burning is temporarily disabled.\nPlease join [Zephyr Community](https://discord.gg/zephyr) to stay up to date.`
+    );
+  }
+}
+
+export class CraftingFlagDisabledError extends ZephyrError {
+  constructor() {
+    super(
+      `Sorry, but crafting is temporarily disabled.\nPlease join [Zephyr Community](https://discord.gg/zephyr) to stay up to date.`
+    );
+  }
+}
+
+export class InvalidFlagNameError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid flag name.`);
+  }
+}
+
+export class FlagNotFoundError extends ZephyrError {
+  constructor() {
+    super(`There is no flag by that name.`);
+  }
+}
+
+export class InvalidFlagValueError extends ZephyrError {
+  constructor() {
+    super(`Please enter a valid flag value (true/false).`);
   }
 }

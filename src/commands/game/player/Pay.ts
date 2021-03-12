@@ -19,6 +19,9 @@ export default class Pay extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (!this.zephyr.flags.transactions)
+      throw new ZephyrError.TransactionFlagDisabledError();
+
     if (!msg.mentions[0]) throw new ZephyrError.InvalidMentionError();
 
     const user = msg.mentions[0];
