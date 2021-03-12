@@ -19,7 +19,6 @@ import {
   GameSticker,
   Sticker,
 } from "../../../../../structures/game/Sticker";
-import { ProfileService } from "../../../services/game/ProfileService";
 
 export type WearSpread = {
   0: number;
@@ -316,10 +315,27 @@ export abstract class CardGet extends DBClass {
   }
 
   public static async getLastCard(profile: GameProfile): Promise<GameUserCard> {
-    const tags = await ProfileService.getTags(profile);
-    const inventory = await this.getUserInventory(profile, { page: 1 }, tags);
+    const query = (await DB.query(
+      `SELECT
+        user_card.*,
+        card_frame.id AS frame_id,
+        card_frame.frame_name,
+        card_frame.frame_url,
+        card_frame.dye_mask_url
+      FROM
+        user_card 
+      LEFT JOIN
+        card_frame
+      ON
+        user_card.frame=card_frame.id
+      WHERE
+        user_card.discord_id=?
+      ORDER BY updated_at DESC;`,
+      [profile.discordId]
+    )) as UserCard[];
 
-    if (!inventory[0]) throw new ZephyrError.InvalidCardReferenceError();
-    return inventory[0];
+    if (!query[0]) throw new ZephyrError.InvalidCardReferenceError();
+
+    return new GameUserCard(query[0]);
   }
 }
