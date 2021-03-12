@@ -1,4 +1,5 @@
 import { User } from "eris";
+import { GameAlbum } from "../game/Album";
 import { GameBadge } from "../game/Badge";
 import { GameBlacklist } from "../game/blacklist/Blacklist";
 import { GameDye } from "../game/Dye";
@@ -665,7 +666,7 @@ export class NonexistentAlbumIdError extends ZephyrError {
   }
 }
 
-export class NonexistentAlbumNameError extends ZephyrError {
+export class AlbumNotFoundError extends ZephyrError {
   constructor(target?: User) {
     super(
       (target ? `${target.tag} has` : `You have`) + ` no albums by that name.`
@@ -750,6 +751,12 @@ export class CardAlreadyInAlbumError extends ZephyrError {
 export class CardNotInAlbumError extends ZephyrError {
   constructor(card: GameUserCard) {
     super(`\`${card.id.toString(36)}\` is not in an album.`);
+  }
+}
+
+export class AlbumEmptyError extends ZephyrError {
+  constructor(album: GameAlbum) {
+    super(`\`${album.name}\` is already empty.`);
   }
 }
 
