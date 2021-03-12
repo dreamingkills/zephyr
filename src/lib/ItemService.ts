@@ -17,10 +17,13 @@ export class ItemService {
   }
 
   public static getItemByName(name: string): PrefabItem | undefined {
-    return this.items.find((i) =>
-      i.names
-        .map((i) => i.toLowerCase())
-        .find((n) => name.startsWith(n.toLowerCase()))
-    );
+    for (let item of this.items) {
+      if (
+        item.names
+          .map((n) => n.toLowerCase())
+          .find((n) => name.toLowerCase().startsWith(n.toLowerCase()))
+      )
+        return item;
+    }
   }
 }

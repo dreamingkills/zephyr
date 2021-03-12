@@ -23,6 +23,7 @@ export default class ClaimMonthlyPatronReward extends BaseCommand {
       const frameVoucherItem = ItemService.getItemByName(
         `Patron Frame Voucher`
       );
+
       if (!frameVoucherItem) throw new ZephyrError.InvalidItemError();
 
       await ProfileService.addItems(profile, [

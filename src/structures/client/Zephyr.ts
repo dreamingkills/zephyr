@@ -41,7 +41,7 @@ export class Zephyr extends Client {
 
   // These are toggles that control what bot functions are enabled or disabled.
   public flags: { [key: string]: boolean } = {
-    processMessages: true /* this.on("message", ()=>{}) listener */,
+    processMessages: true /* this.on("message", ()=>{}) listener - DANGEROUS */,
     commands: true /* General commands */,
     drops: true /* Card drops (user+activity) */,
     trades: true /* Multitrade, normal trade, gift */,
@@ -409,6 +409,71 @@ export class Zephyr extends Client {
     this.cards[recached.id] = recached;
 
     return recached;
+  }
+
+  // BETA FUNCTION
+  public __getRandomCards(
+    amount: number,
+    wishlist: GameWishlist[] = [],
+    _booster?: number
+  ): GameBaseCard[] {
+    // TODO
+    //  - card-based rng (instead of group-based)
+    //  - less weight for high-issue cards to balance them out
+    //  - somehow improve boosters
+    //  - weird ass wishlist + birthday logic
+    //  - apply weightings to droppableCards before anything else
+    //  - not suck at math...
+
+    // mathematical conundrums
+    //  - how to effectively/fairly change card weighting? (birthday, booster)
+    //  - how to lower weighting based on total # of card generated? (relative to the lowest print card)
+    //  --> how to "average out" high-issue cards with midrange cards while ignoring low prints?
+
+    const droppableCards = this.getCards()
+      .filter((c) => c.rarity > 0 && c.activated)
+      .map((c) => {
+        return { card: c, weight: 100 };
+      });
+
+    const pickedCards: GameBaseCard[] = [];
+
+    if (wishlist.length > 0) {
+      const receiveWishlistBonus = this.chance.bool({ likelihood: 15 });
+
+      if (receiveWishlistBonus) {
+        const validWishlists = wishlist.filter((w) =>
+          droppableCards.find((c) => c.card.idolId === w.idolId)
+        );
+        const wishlistCards: { card: GameBaseCard; weight: number }[] = [];
+
+        for (let wish of validWishlists) {
+          const cards = droppableCards.filter(
+            (c) => c.card.idolId === wish.idolId
+          );
+
+          wishlistCards.push(...cards);
+        }
+
+        const pickedWishlistCard = this.chance.weighted(
+          wishlistCards.map((c) => c.card),
+          wishlistCards.map((c) => c.weight)
+        );
+
+        pickedCards.push(pickedWishlistCard);
+      }
+    }
+
+    while (pickedCards.length < amount) {
+      const newDroppableCards = droppableCards.filter((c) => {
+        if (pickedCards.find((p) => p.idolId === c.card.idolId)) return false;
+        if (pickedCards.find((p) => p.groupId === c.card.groupId)) return false;
+      });
+
+      newDroppableCards;
+    }
+
+    return pickedCards;
   }
 
   public getRandomCards(
