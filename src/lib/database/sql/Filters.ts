@@ -144,16 +144,23 @@ export class FilterService {
           ` user_card.wear IN (${DB.connection.escape(targetWears)})`
         );
       } else if (["tag", "t"].includes(prop)) {
-        const tag = tags.filter(
-          (t) => t.name === value.toString()?.toLowerCase()
-        )[0];
         if (!value.toString()) {
           queryOptions.push(` user_card.tag_id IS NULL`);
           continue;
         }
-        if (tag && value) {
+
+        const tagNames = value
+          .toString()
+          ?.split(`,`)
+          .map((t) => t?.trim());
+
+        const targetTags = tags.filter((t) => tagNames.includes(t.name));
+
+        if (targetTags[0]) {
           queryOptions.push(
-            ` user_card.tag_id=${DB.connection.escape(tag.id)}`
+            ` user_card.tag_id IN (${DB.connection.escape(
+              targetTags.map((t) => t.id)
+            )})`
           );
           continue;
         }
