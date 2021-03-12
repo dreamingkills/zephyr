@@ -53,7 +53,7 @@ export abstract class AlbumGet extends DBClass {
     )) as Album[];
 
     if (!query[0])
-      throw new ZephyrError.NonexistentAlbumNameError(
+      throw new ZephyrError.AlbumNotFoundError(
         owner.id === sender.id ? undefined : owner
       );
 

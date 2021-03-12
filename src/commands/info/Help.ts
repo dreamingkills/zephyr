@@ -94,12 +94,12 @@ export default class Help extends BaseCommand {
       })
       .addField({
         name: `Information`,
-        value: `\`timers\`, \`reminders\`, \`lookup\`, \`recipes\`, \`previewframe\`, \`previewsticker\`, \`top\`, \`topgroup\`, \`topwishlist\`, \`grouplist\`, \`birthdays\``,
+        value: `\`timers\`, \`reminders\`, \`lookup\`, \`recipes\`, \`iteminfo\`, \`previewframe\`, \`previewsticker\`, \`top\`, \`topgroup\`, \`topwishlist\`, \`grouplist\`, \`birthdays\``,
         inline: true,
       })
       .addField({
         name: `Profile`,
-        value: `\`blurb\`, \`private\`, \`bank\`, \`userinfo\``,
+        value: `\`blurb\`, \`private\`, \`bank\`, \`userinfo\`, \`badges\`, \`badge\``,
         inline: true,
       })
       .addField({
@@ -114,7 +114,7 @@ export default class Help extends BaseCommand {
       })
       .addField({
         name: `Album`,
-        value: `\`album\`, \`albums\`, \`renamealbum\`, \`addcardtoalbum\`, \`removecardfromalbum\``,
+        value: `\`album\`, \`albums\`, \`renamealbum\`, \`addcardtoalbum\`, \`removecardfromalbum\`, \`clearalbum\``,
         inline: true,
       })
       .addField({
