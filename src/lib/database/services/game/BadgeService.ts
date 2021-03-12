@@ -46,4 +46,10 @@ export abstract class BadgeService {
   ): Promise<GameBadge | undefined> {
     return await BadgeGet.getBadgeByEmoji(emoji);
   }
+
+  public static async getNumberOfBadgeGranted(
+    badge: GameBadge
+  ): Promise<number> {
+    return await BadgeGet.getNumberOfBadgeGranted(badge);
+  }
 }

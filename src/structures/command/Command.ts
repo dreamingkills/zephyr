@@ -47,11 +47,11 @@ export abstract class BaseCommand implements Command {
         }
         continue;
       }
-      options.push(option);
+      options.push(option.trim());
     }
 
-    // Parses out the command itself
-    options = options.slice(1).map((o) => o);
+    // Parses out the command itself and removes empty elements
+    options = options.slice(1).filter((o) => o);
 
     await this.exec(msg, profile, options);
   }

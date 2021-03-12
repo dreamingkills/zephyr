@@ -60,7 +60,11 @@ export default class ShowBadges extends BaseCommand {
       const awardedDate = dateTimeDisplay(dayjs(badge.createdAt));
 
       badgeDescriptions.push(
-        `${badge.badgeEmoji} **${badge.badgeName}** — awarded **${awardedDate}**`
+        `${badge.badgeEmoji} **${
+          badge.badgeName
+        }** — awarded **${awardedDate}**${
+          badge.badgeDescription ? `\n*"${badge.badgeDescription}"*` : ``
+        }`
       );
     }
 

@@ -1,4 +1,5 @@
 import { User } from "eris";
+import { GameBadge } from "../game/Badge";
 import { GameBlacklist } from "../game/blacklist/Blacklist";
 import { GameDye } from "../game/Dye";
 import { GameIdol } from "../game/Idol";
@@ -1014,5 +1015,11 @@ export class DuplicateBadgeNameError extends ZephyrError {
 export class DuplicateBadgeEmojiError extends ZephyrError {
   constructor() {
     super(`There is already a badge with that emoji.`);
+  }
+}
+
+export class DuplicateUserBadgeError extends ZephyrError {
+  constructor(badge: GameBadge) {
+    super(`That user already has ${badge.badgeEmoji} **${badge.badgeName}**.`);
   }
 }

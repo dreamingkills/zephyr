@@ -39,7 +39,8 @@ export abstract class BadgeGet extends DBClass {
         user_badge.badge_id,
         user_badge.created_at,
         badge.badge_name,
-        badge.badge_emoji
+        badge.badge_emoji,
+        badge.badge_description
       FROM
         user_badge
       LEFT JOIN
@@ -77,6 +78,27 @@ export abstract class BadgeGet extends DBClass {
     if (!query[0]) return;
 
     return new GameBadge(query[0]);
+  }
+
+  public static async getNumberOfBadgeGranted(
+    badge: GameBadge
+  ): Promise<number> {
+    const query = (await DB.query(
+      `SELECT
+         COUNT(*) AS count
+       FROM
+         user_badge
+       LEFT JOIN
+         profile
+       ON
+         user_badge.discord_id=profile.discord_id
+       WHERE
+         user_badge.badge_id=?
+         AND profile.blacklisted=0;`,
+      [badge.id]
+    )) as { count: number }[];
+
+    return query[0].count;
   }
 }
 

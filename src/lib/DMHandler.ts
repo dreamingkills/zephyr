@@ -57,7 +57,7 @@ export class DMHandler {
         message = types.slice(0, -1).join(`, `) + `, and ` + types.slice(-1);
       }
 
-      console.log(
+      /*console.log(
         `Attempting to DM ${p.discordId} (${types.join(
           `, `
         )}).\n- Now: ${now.format(
@@ -67,7 +67,7 @@ export class DMHandler {
         )}\n- Next Drop: ${nextDrop.format(
           `YYYY-MM-DD HH:mm:ss`
         )}\n- Next Vote: ${nextVote.format(`YYYY-MM-DD HH:mm:ss`)}`
-      );
+      );*/
 
       try {
         const dmChannel = await zephyr.getDMChannel(p.discordId);
@@ -103,7 +103,11 @@ export class DMHandler {
     console.log(
       `Finished DMing ${
         claimSuccess.length + dropSuccess.length + voteSuccess.length
-      } users (${failed.length} failed). ${end - start}ms elapsed.`
+      } users (${failed.length} failed). ${end - start}ms elapsed.${
+        failed.length > 0
+          ? `\n${failed.map((p) => p.discordId).join(`, `)}`
+          : ``
+      }`
     );
 
     if (this.remindersEnabled) setTimeout(() => this.handle(zephyr), 30000);
