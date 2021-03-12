@@ -1019,7 +1019,17 @@ export class DuplicateBadgeEmojiError extends ZephyrError {
 }
 
 export class DuplicateUserBadgeError extends ZephyrError {
-  constructor(badge: GameBadge) {
-    super(`That user already has ${badge.badgeEmoji} **${badge.badgeName}**.`);
+  constructor(user: User, badge: GameBadge) {
+    super(
+      `**${user.tag}** already has ${badge.badgeEmoji} **${badge.badgeName}**.`
+    );
+  }
+}
+
+export class UserLacksBadgeError extends ZephyrError {
+  constructor(user: User, badge: GameBadge) {
+    super(
+      `**${user.tag}** does not have ${badge.badgeEmoji} **${badge.badgeName}**.`
+    );
   }
 }

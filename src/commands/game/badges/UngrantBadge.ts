@@ -6,9 +6,9 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BadgeService } from "../../../lib/database/services/game/BadgeService";
 
-export default class GrantBadge extends BaseCommand {
-  names = [`grant`];
-  description = `Gives somebody a badge.`;
+export default class UngrantBadge extends BaseCommand {
+  names = [`ungrant`];
+  description = `Takes a badge away.`;
   usage = [`$CMD$ <@mention/user id> <badge name>`];
   allowDm = true;
   developerOnly = true;
@@ -51,13 +51,16 @@ export default class GrantBadge extends BaseCommand {
 
     const profileBadges = await BadgeService.getProfileBadges(targetProfile);
 
-    if (profileBadges.find((b) => b.badgeId === targetBadge.id))
-      throw new ZephyrError.DuplicateUserBadgeError(targetUser, targetBadge);
+    const targetUserBadge = profileBadges.find(
+      (b) => b.badgeId === targetBadge.id
+    );
+    if (!targetUserBadge)
+      throw new ZephyrError.UserLacksBadgeError(targetUser, targetBadge);
 
-    await BadgeService.createUserBadge(targetProfile, targetBadge);
+    await BadgeService.deleteUserBadge(targetProfile, targetUserBadge);
 
-    const embed = new MessageEmbed(`Grant Badge`, msg.author).setDescription(
-      `**${targetUser.tag}** was given ${targetBadge.badgeEmoji} **${targetBadge.badgeName}**.`
+    const embed = new MessageEmbed(`Ungrant Badge`, msg.author).setDescription(
+      `${targetBadge.badgeEmoji} **${targetBadge.badgeName}** was removed from **${targetUser.tag}**.`
     );
 
     await this.send(msg.channel, embed);

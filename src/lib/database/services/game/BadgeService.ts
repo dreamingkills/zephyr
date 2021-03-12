@@ -14,11 +14,22 @@ export abstract class BadgeService {
     return await BadgeSet.createBadge(name, emoji);
   }
 
+  public static async deleteBadge(badge: GameBadge): Promise<void> {
+    return await BadgeSet.deleteBadge(badge);
+  }
+
   public static async createUserBadge(
     profile: GameProfile,
     badge: GameBadge
   ): Promise<GameUserBadge> {
     return await BadgeSet.createUserBadge(profile, badge);
+  }
+
+  public static async deleteUserBadge(
+    profile: GameProfile,
+    badge: GameUserBadge
+  ): Promise<void> {
+    return await BadgeSet.deleteUserBadge(profile, badge);
   }
 
   public static async getBadgeById(id: number): Promise<GameBadge> {

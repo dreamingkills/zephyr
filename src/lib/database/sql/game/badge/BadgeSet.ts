@@ -16,6 +16,21 @@ export abstract class BadgeSet extends DBClass {
     return await BadgeService.getBadgeById(query.insertId);
   }
 
+  public static async deleteBadge(badge: GameBadge): Promise<void> {
+    await DB.query(
+      `DELETE badge.*, user_badge.* FROM 
+         badge
+       LEFT JOIN
+         user_badge
+       ON
+         user_badge.badge_id=badge.id
+       WHERE badge.id=? OR user_badge.badge_id=?;`,
+      [badge.id, badge.id]
+    );
+
+    return;
+  }
+
   public static async createUserBadge(
     profile: GameProfile,
     badge: GameBadge
@@ -26,6 +41,18 @@ export abstract class BadgeSet extends DBClass {
     )) as { insertId: number };
 
     return await BadgeService.getUserBadgeById(query.insertId);
+  }
+
+  public static async deleteUserBadge(
+    profile: GameProfile,
+    badge: GameUserBadge
+  ): Promise<void> {
+    await DB.query(`DELETE FROM user_badge WHERE id=? AND discord_id=?;`, [
+      badge.id,
+      profile.discordId,
+    ]);
+
+    return;
   }
 }
 
