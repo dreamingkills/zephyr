@@ -24,7 +24,7 @@ export default class SetFlag extends BaseCommand {
 
     const targetFlag: boolean | undefined = this.zephyr.flags[flagName];
 
-    if (!targetFlag) throw new ZephyrError.FlagNotFoundError();
+    if (targetFlag === undefined) throw new ZephyrError.FlagNotFoundError();
 
     const value = flagValue === `true`;
     this.zephyr.flags[flagName] = value;
