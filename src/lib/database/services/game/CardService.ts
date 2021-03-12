@@ -103,6 +103,7 @@ export abstract class CardService {
   ): Promise<Buffer> {
     // Need information off the base card to do anything.
     const baseCard = zephyr.getCard(card.baseCardId)!;
+    const sizeCoefficient = large ? 2.2 : 1;
 
     const [sizeX, sizeY] = large ? [770, 1100] : [350, 500];
 
@@ -148,6 +149,7 @@ export abstract class CardService {
     // Draw the stickers, if any
     const stickers = await this.getCardStickers(card);
     if (stickers.length > 0) {
+      const size = 64 * sizeCoefficient;
       for (let sticker of stickers) {
         const gameSticker = zephyr.getSticker(sticker.stickerId);
         if (!gameSticker) continue;
@@ -155,25 +157,27 @@ export abstract class CardService {
         const stickerImage = await loadImage(gameSticker.imageUrl);
 
         const posX =
-          82 +
+          82 * sizeCoefficient +
           (sticker.position - 1 - Math.floor((sticker.position - 1) / 4) * 4) *
-            62;
-        const posY = 90 + Math.floor((sticker.position - 1) / 4) * 68;
+            (62 * sizeCoefficient);
+        const posY =
+          90 * sizeCoefficient +
+          Math.floor((sticker.position - 1) / 4) * (68 * sizeCoefficient);
 
         ctx.save();
 
         ctx.translate(posX, posY);
-        ctx.drawImage(stickerImage, -64 / 2, -64 / 2, 64, 64);
+        ctx.drawImage(stickerImage, -size / 2, -size / 2, size, size);
 
         ctx.restore();
       }
     }
 
-    const textX = large ? 108 : 50;
-    const serialFontSize = large ? 45 : 20;
-    const serialY = large ? 922 : 421;
-    const nameFontSize = large ? 70 : 30;
-    const nameY = large ? 980 : 445;
+    const textX = 50 * sizeCoefficient;
+    const serialFontSize = 20 * sizeCoefficient;
+    const serialY = 421 * sizeCoefficient;
+    const nameFontSize = 30 * sizeCoefficient;
+    const nameY = 445 * sizeCoefficient;
 
     if (!noText) {
       // Draw the group icon

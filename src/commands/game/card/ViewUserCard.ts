@@ -51,7 +51,7 @@ export default class ViewUserCard extends BaseCommand {
         profile.patron > 1
       );
     } else
-      image = await CardService.checkCacheForCard(
+      image = await CardService.updateCardCache(
         card,
         this.zephyr,
         profile.patron > 1
