@@ -502,14 +502,16 @@ export class Zephyr extends Client {
           wishlistCards.push(...cards);
         }
 
-        // Choose a random wishlist card
-        const pickedWishlistCard = this.chance.weighted(
-          wishlistCards.map((c) => c.card),
-          wishlistCards.map((c) => c.weight)
-        );
+        if (wishlistCards.length > 0) {
+          // Choose a random wishlist card
+          const pickedWishlistCard = this.chance.weighted(
+            wishlistCards.map((c) => c.card),
+            wishlistCards.map((c) => c.weight)
+          );
 
-        // Add it to the final cards array
-        pickedCards.push(pickedWishlistCard);
+          // Add it to the final cards array
+          pickedCards.push(pickedWishlistCard);
+        }
       }
     }
 
