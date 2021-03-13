@@ -22,6 +22,12 @@ export default class ViewUserCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
+    if (
+      msg.channel.id === this.zephyr.config.discord.main &&
+      !this.zephyr.flags.mainViewing
+    )
+      throw new ZephyrError.MainViewingFlagDisabledError();
+
     const rawIdentifier = options[0];
     let noText = options[1]?.toLowerCase().replace(`—`, `--`) === "--notext";
 

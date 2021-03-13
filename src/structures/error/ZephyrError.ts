@@ -1117,3 +1117,9 @@ export class InvalidFlagValueError extends ZephyrError {
     super(`Please enter a valid flag value (true/false).`);
   }
 }
+
+export class MainViewingFlagDisabledError extends ZephyrError {
+  constructor() {
+    super(`Sorry, but viewing cards is currently disabled in this channel.`);
+  }
+}

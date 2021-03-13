@@ -53,6 +53,7 @@ export class Zephyr extends Client {
     crafting: true /* Crafting recipes and recipe viewer */,
     dmCommands: true /* Use of commands in DM channels */,
     postServerCount: true /* Post server count to Top.gg */,
+    mainViewing: true /* Viewing cards in #zephyr-main */,
   };
 
   /* These are some numbers that affect various things around Zephyr. */
@@ -458,11 +459,11 @@ export class Zephyr extends Client {
         (median / Math.max(1, c.serialTotal)) * 1.025
       );
 
-      console.log(
+      /*console.log(
         `Relative: ${relativeMultiplier} - Total: ${
           c.serialTotal
         } - Average: ${median} - Final: ${relativeMultiplier * weight}`
-      );
+      );*/
       weight *= relativeMultiplier;
 
       // The base weighting is multiplied by the boost modifier if the boosted group matches the card's group
