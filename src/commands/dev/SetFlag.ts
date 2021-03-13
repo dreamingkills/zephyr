@@ -21,12 +21,10 @@ export default class SetFlag extends BaseCommand {
 
     const flags = this.zephyr.flags;
 
-    const flagName = options[0].toLowerCase();
+    const flagName = options[0];
     const flagValue = options[1].toLowerCase();
 
-    const flagExists = Object.keys(flags).find(
-      (k) => k.toLowerCase() === flagName
-    );
+    const flagExists = Object.keys(flags).find((k) => k === flagName);
 
     if (!flagExists) throw new ZephyrError.FlagNotFoundError();
 
