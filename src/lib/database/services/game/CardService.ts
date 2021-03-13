@@ -394,7 +394,8 @@ export abstract class CardService {
   public static async updateCardCache(
     card: GameUserCard,
     zephyr: Zephyr,
-    large: boolean = false
+    large: boolean = false,
+    invalidate: boolean = false
   ): Promise<Buffer> {
     const image = await this.generateCardImage(card, zephyr, false, large);
 
@@ -414,6 +415,16 @@ export abstract class CardService {
     // showing users incomplete card images.
     await fs.writeFile(tempFile, image);
     await fs.rename(tempFile, finalFile);
+
+    // Cache invalidator
+    if (invalidate) {
+      try {
+        if (large) {
+          await fs.unlink(`./cache/cards/${card.baseCardId}/${card.id}`);
+        } else
+          await fs.unlink(`./cache/cards/${card.baseCardId}/${card.id}_large`);
+      } catch {}
+    }
 
     return await fs.readFile(finalFile);
   }
@@ -455,14 +466,15 @@ export abstract class CardService {
   public static async checkCacheForCard(
     card: GameUserCard,
     zephyr: Zephyr,
-    large: boolean = false
+    large: boolean = false,
+    invalidate: boolean = false
   ): Promise<Buffer> {
     try {
       return await fs.readFile(
         `./cache/cards/${card.baseCardId}/${card.id}${large ? `_large` : ``}`
       );
     } catch (e) {
-      return await this.updateCardCache(card, zephyr, large);
+      return await this.updateCardCache(card, zephyr, large, invalidate);
     }
   }
 

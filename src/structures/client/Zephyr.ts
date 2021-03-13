@@ -40,7 +40,7 @@ export class Zephyr extends Client {
   dbl: dblapi | undefined;
 
   // These are toggles that control what bot functions are enabled or disabled.
-  public flags: { [key: string]: boolean } = {
+  public flags = {
     processMessages: true /* this.on("message", ()=>{}) listener - DANGEROUS */,
     commands: true /* General commands */,
     drops: true /* Card drops (user+activity) */,
@@ -53,6 +53,12 @@ export class Zephyr extends Client {
     crafting: true /* Crafting recipes and recipe viewer */,
     dmCommands: true /* Use of commands in DM channels */,
     postServerCount: true /* Post server count to Top.gg */,
+  };
+
+  /* These are some numbers that affect various things around Zephyr. */
+  public modifiers = {
+    boosterModifier: 2.5 /* Drops: card weight modifier for boosters */,
+    birthdayModifier: 2.5 /* Drops: card weight modifier for idols whose birthday is "today" */,
   };
 
   private generalChannelNames = [
@@ -412,71 +418,120 @@ export class Zephyr extends Client {
   }
 
   // BETA FUNCTION
-  public __getRandomCards(
+  public getRandomCards(
     amount: number,
     wishlist: GameWishlist[] = [],
-    _booster?: number
+    booster?: number
   ): GameBaseCard[] {
     // TODO
-    //  - card-based rng (instead of group-based)
     //  - less weight for high-issue cards to balance them out
     //  - somehow improve boosters
-    //  - weird ass wishlist + birthday logic
     //  - apply weightings to droppableCards before anything else
-    //  - not suck at math...
 
     // mathematical conundrums
-    //  - how to effectively/fairly change card weighting? (birthday, booster)
     //  - how to lower weighting based on total # of card generated? (relative to the lowest print card)
     //  --> how to "average out" high-issue cards with midrange cards while ignoring low prints?
 
-    const droppableCards = this.getCards()
-      .filter((c) => c.rarity > 0 && c.activated)
-      .map((c) => {
-        return { card: c, weight: 100 };
-      });
+    // Get today's date so we can weigh birthday idols appropriately
+    const today = dayjs().format(`MM-DD`);
 
+    // Get median serial number for use in averaging out drops
+    const droppableCards = this.getCards().filter(
+      (c) =>
+        c.rarity > 0 &&
+        c.activated &&
+        (c.serialLimit > 0 ? c.serialTotal < c.serialLimit : true)
+    );
+
+    const median = droppableCards.map((c) => c.serialTotal)[
+      Math.ceil(droppableCards.length / 2)
+    ];
+
+    // Get all activated cards with a rarity > 0 not at serial limit, and map them with their weights
+    const weightedCards = droppableCards.map((c) => {
+      // Each card receives a base weighting of 100
+      let weight = 100;
+
+      // Calculate relative weighting based on serial number
+      const relativeMultiplier = Math.min(
+        1,
+        (median / Math.max(1, c.serialTotal)) * 1.025
+      );
+
+      console.log(
+        `Relative: ${relativeMultiplier} - Total: ${
+          c.serialTotal
+        } - Average: ${median} - Final: ${relativeMultiplier * weight}`
+      );
+      weight *= relativeMultiplier;
+
+      // The base weighting is multiplied by the boost modifier if the boosted group matches the card's group
+      if (c.groupId && c.groupId === booster)
+        weight *= this.modifiers.boosterModifier;
+
+      // The base weighting is multiplied by the birthday modifier if the idol's birthday is today
+      if (c.birthday) {
+        const birthday = c.birthday.split(`-`).slice(1).join(`-`);
+
+        if (today === birthday) weight *= this.modifiers.birthdayModifier;
+      }
+
+      return { card: c, weight: weight };
+    });
+
+    // Random cards chosen, up to `amount`
     const pickedCards: GameBaseCard[] = [];
 
     if (wishlist.length > 0) {
       const receiveWishlistBonus = this.chance.bool({ likelihood: 15 });
 
       if (receiveWishlistBonus) {
+        // Finds only wishlisted idols who have droppable cards
         const validWishlists = wishlist.filter((w) =>
-          droppableCards.find((c) => c.card.idolId === w.idolId)
+          weightedCards.find((c) => c.card.idolId === w.idolId)
         );
         const wishlistCards: { card: GameBaseCard; weight: number }[] = [];
 
+        // Add card candidates to their own array
         for (let wish of validWishlists) {
-          const cards = droppableCards.filter(
+          const cards = weightedCards.filter(
             (c) => c.card.idolId === wish.idolId
           );
 
           wishlistCards.push(...cards);
         }
 
+        // Choose a random wishlist card
         const pickedWishlistCard = this.chance.weighted(
           wishlistCards.map((c) => c.card),
           wishlistCards.map((c) => c.weight)
         );
 
+        // Add it to the final cards array
         pickedCards.push(pickedWishlistCard);
       }
     }
 
     while (pickedCards.length < amount) {
-      const newDroppableCards = droppableCards.filter((c) => {
+      // Removes duplicate groups and idols from the pool
+      const newDroppableCards = weightedCards.filter((c) => {
         if (pickedCards.find((p) => p.idolId === c.card.idolId)) return false;
         if (pickedCards.find((p) => p.groupId === c.card.groupId)) return false;
+
+        return true;
       });
 
-      newDroppableCards;
+      const randomCard = this.chance.weighted(
+        newDroppableCards.map((c) => c.card),
+        newDroppableCards.map((c) => c.weight)
+      );
+      pickedCards.push(randomCard);
     }
 
     return pickedCards;
   }
 
-  public getRandomCards(
+  public __getRandomCards(
     amount: number,
     wishlist: GameWishlist[] = [],
     booster?: number

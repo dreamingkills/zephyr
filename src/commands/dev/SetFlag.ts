@@ -19,15 +19,20 @@ export default class SetFlag extends BaseCommand {
     if (!options[1] || ![`true`, `false`].includes(options[1].toLowerCase()))
       throw new ZephyrError.InvalidFlagValueError();
 
+    const flags = this.zephyr.flags;
+
     const flagName = options[0].toLowerCase();
     const flagValue = options[1].toLowerCase();
 
-    const targetFlag: boolean | undefined = this.zephyr.flags[flagName];
+    const flagExists = Object.keys(flags).find(
+      (k) => k.toLowerCase() === flagName
+    );
 
-    if (targetFlag === undefined) throw new ZephyrError.FlagNotFoundError();
+    if (!flagExists) throw new ZephyrError.FlagNotFoundError();
 
     const value = flagValue === `true`;
-    this.zephyr.flags[flagName] = value;
+
+    flags[flagName as keyof typeof flags] = value;
 
     const embed = new MessageEmbed(`Set Flag`, msg.author).setDescription(
       `The flag \`${flagName}\` is now \`${value}\`.`

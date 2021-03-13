@@ -108,7 +108,9 @@ export default class DyeCard extends BaseCommand {
 
       const dyedCardImage = await CardService.updateCardCache(
         dyedCard,
-        this.zephyr
+        this.zephyr,
+        false,
+        true
       );
 
       const successEmbed = new MessageEmbed(`Dye Card`, msg.author)

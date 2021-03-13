@@ -172,6 +172,12 @@ export class FilterService {
         } else if (value === "false") {
           queryOptions.push(` user_card.frame=1`);
         }
+      } else if ([`dyed`].includes(prop)) {
+        if (value === `true`) {
+          queryOptions.push(` user_card.dye_r IS NOT NULL`);
+        } else if (value === "false") {
+          queryOptions.push(` user_card.dye_r IS NULL`);
+        }
       }
     }
     return queryOptions;
