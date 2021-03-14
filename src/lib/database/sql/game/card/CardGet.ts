@@ -362,7 +362,7 @@ export abstract class CardGet extends DBClass {
       [confiscatedTag.id]
     )) as UserCard[];
 
-    if (!query[0]) throw new ZephyrError.InvalidCardReferenceError();
+    if (!query[0]) throw new ZephyrError.NoAvailableConfiscatedCardsError();
 
     return new GameUserCard(query[0]);
   }

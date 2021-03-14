@@ -1152,6 +1152,14 @@ export class ConfiscatedTokenFlagDisabledError extends ZephyrError {
   }
 }
 
+export class NoAvailableConfiscatedCardsError extends ZephyrError {
+  constructor() {
+    super(
+      `Sorry, but there are no available confiscated cards. Please try again later.`
+    );
+  }
+}
+
 export class ItemSoulboundError extends ZephyrError {
   constructor(item: PrefabItem) {
     super(`\`${item.names[0]}\` is a soulbound item and cannot be traded.`);
