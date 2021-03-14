@@ -2,9 +2,9 @@ import { Message } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import emojiregex from "emoji-regex";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import emoji from "node-emoji";
 
 export default class CreateTag extends BaseCommand {
   names = ["createtag", "ct"];
@@ -39,16 +39,17 @@ export default class CreateTag extends BaseCommand {
       throw new ZephyrError.DuplicateTagError(tag);
 
     const emojiRaw = options[1];
-    const trueEmoji = emojiregex().exec(emojiRaw);
+    const trueEmoji = emoji.find(emojiRaw);
+
     if (!trueEmoji || emojiRaw.length > 2)
       throw new ZephyrError.InvalidEmojiTagError();
 
-    if (userTags.filter((t) => t.emoji === trueEmoji[0])[0])
-      throw new ZephyrError.DuplicateTagEmojiError(trueEmoji[0]);
+    if (userTags.find((t) => t.emoji.includes(trueEmoji.emoji)))
+      throw new ZephyrError.DuplicateTagEmojiError(trueEmoji.emoji);
 
-    await ProfileService.createTag(profile, tag, trueEmoji[0]);
+    await ProfileService.createTag(profile, tag, trueEmoji.emoji);
     const embed = new MessageEmbed(`Create Tag`, msg.author).setDescription(
-      `Created tag ${trueEmoji[0]} \`${tag}\`!`
+      `Created tag ${trueEmoji.emoji} \`${tag}\`!`
     );
 
     await this.send(msg.channel, embed);

@@ -11,6 +11,7 @@ export interface PrefabItem {
   description?: string;
   usage?: string;
   emoji: string;
+  soulbound?: boolean;
   use?: (
     msg: Message,
     profile: GameProfile,
