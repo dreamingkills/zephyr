@@ -186,7 +186,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     name: string,
     emoji: string
-  ): Promise<void> {
+  ): Promise<GameTag> {
     return await ProfileSet.createTag(profile.discordId, name, emoji);
   }
 
@@ -202,8 +202,8 @@ export abstract class ProfileService {
     tag: GameTag,
     name?: string,
     emoji?: string
-  ): Promise<void> {
-    return await ProfileSet.editTag(tag.id, name, emoji);
+  ): Promise<GameTag> {
+    return await ProfileSet.editTag(tag, name, emoji);
   }
 
   public static async getTagById(tagId: number): Promise<GameTag> {

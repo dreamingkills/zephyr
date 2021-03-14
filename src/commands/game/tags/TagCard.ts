@@ -8,9 +8,9 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class TagCard extends BaseCommand {
-  names = ["tag", "tc"];
-  description = "Sets the tag of a card.";
-  usage = ["$CMD$ <tag> [cards]"];
+  names = [`tag`, `tc`];
+  description = `Adds a tag to a card. If a card is already tagged, it will be replaced with the tag you specify.`;
+  usage = [`$CMD$ <tag> [cards]`];
   allowDm = true;
 
   async exec(
@@ -21,42 +21,49 @@ export default class TagCard extends BaseCommand {
     if (!options[0]) throw new ZephyrError.UnspecifiedTagError();
 
     const tags = await ProfileService.getTags(profile);
-    if (tags.length === 0) throw new ZephyrError.NoTagsError();
 
-    const query = options[0]?.toLowerCase();
-    if (!query) throw new ZephyrError.UnspecifiedTagError();
+    if (tags.length === 0) {
+      const prefix = this.zephyr.getPrefix(msg.guildID);
+      throw new ZephyrError.NoTagsError(prefix);
+    }
 
-    const queryIsTag = tags.map((t) => t.name).includes(query);
-    let tag;
+    const tagName = options[0].toLowerCase();
+
+    const tag = tags.find((t) => t.name === tagName);
+
+    if (!tag) throw new ZephyrError.TagNotFoundError(tagName);
+
     let cards: GameUserCard[] = [];
-    if (queryIsTag && !options[1]) {
-      tag = tags.filter((t) => t.name === query)[0];
+    if (!options[1]) {
       const card = await CardService.getLastCard(profile);
+
+      if (card.tagId === tag.id)
+        throw new ZephyrError.CardAlreadyTaggedError(tag, card);
+
       cards.push(card);
     } else {
-      const trueQuery = options[0]?.toLowerCase();
-
-      const findTag = tags.filter(
-        (t) =>
-          t.name.toLowerCase() === trueQuery ||
-          t.emoji.toLowerCase() === trueQuery
-      )[0];
-      if (!findTag) throw new ZephyrError.InvalidTagError(trueQuery);
-
-      tag = findTag;
-
       const identifiers = options.slice(1);
       for (let i of identifiers) {
         const card = await CardService.getUserCardByIdentifier(i);
-        if (cards.find((c) => c.id === card.id)) continue;
+
+        if (cards.find((c) => c.id === card.id)) continue; // No duplicates
 
         if (card.discordId !== msg.author.id)
           throw new ZephyrError.NotOwnerOfCardError(card);
+
+        if (card.tagId === tag.id) continue; // Don't bother tagging it if it's already tagged
+
         cards.push(card);
       }
     }
 
-    if (cards.length === 0) throw new ZephyrError.InvalidCardReferenceError();
+    if (cards.length === 0) {
+      // If the user specified cards that are all already tagged with the specified tag, throw this error
+      if (options[1]) throw new ZephyrError.CardsAlreadyTaggedError(tag);
+
+      // Otherwise, none of their card references were valid and they don't have a last card, so throw this error
+      throw new ZephyrError.InvalidCardReferenceError();
+    }
 
     await CardService.setCardsTag(cards, tag.id);
 

@@ -6,9 +6,9 @@ import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class UntagCard extends BaseCommand {
-  names = ["untag", "ut"];
-  description = "Removes the tag of a card.";
-  usage = ["$CMD$ [cards]"];
+  names = [`untag`, `ut`];
+  description = `Removes the tag from a card, if it has one.`;
+  usage = [`$CMD$ <cards>`];
   allowDm = true;
 
   async exec(
@@ -17,12 +17,17 @@ export default class UntagCard extends BaseCommand {
     options: string[]
   ): Promise<void> {
     if (!options[0]) throw new ZephyrError.InvalidCardReferenceError();
+
     const cardsRaw = [];
     const identifiers = options;
+
     for (let i of identifiers) {
       const card = await CardService.getUserCardByIdentifier(i);
+
       if (card.discordId !== msg.author.id)
         throw new ZephyrError.NotOwnerOfCardError(card);
+
+      if (!card.tagId) continue;
 
       cardsRaw.push(card);
     }

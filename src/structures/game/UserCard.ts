@@ -15,7 +15,7 @@ export interface UserCard {
   dye_g: number | null;
   dye_b: number | null;
   claim_time: number;
-  tag_id: number;
+  tag_id: number | null;
   original_wear: number;
   fight_count: number;
   luck_coeff: number;
@@ -42,7 +42,7 @@ export class GameUserCard {
   luckCoefficient: number;
   dropper: string;
 
-  tagId: number;
+  tagId: number | undefined;
 
   constructor(data: UserCard) {
     this.id = data.id;
@@ -61,7 +61,7 @@ export class GameUserCard {
     this.luckCoefficient = data.luck_coeff;
     this.dropper = data.dropper;
 
-    this.tagId = data.tag_id;
+    this.tagId = data.tag_id || undefined;
 
     if (data.dye_r || data.dye_r === 0) {
       this.dyeR = data.dye_r;

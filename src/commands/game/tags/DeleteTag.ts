@@ -6,9 +6,9 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class DeleteTag extends BaseCommand {
-  names = ["deletetag", "dt"];
-  description = "Deletes a tag.";
-  usage = ["$CMD$ <tag name>"];
+  names = [`deletetag`, `dt`];
+  description = `Deletes a tag and removes it from all of your cards.`;
+  usage = [`$CMD$ <tag name>`];
   allowDm = true;
 
   async exec(
@@ -17,18 +17,18 @@ export default class DeleteTag extends BaseCommand {
     options: string[]
   ): Promise<void> {
     if (!options[0]) throw new ZephyrError.UnspecifiedTagError();
+
     const userTags = await ProfileService.getTags(profile);
 
-    const tagQuery = options[0]?.toLowerCase();
-    const hasTag = userTags.filter((t) => t.name === tagQuery)[0];
+    const tagName = options[0].toLowerCase();
+    const tag = userTags.find((t) => t.name === tagName);
 
-    if (!hasTag)
-      throw new ZephyrError.InvalidTagError(options[0]?.toLowerCase());
+    if (!tag) throw new ZephyrError.TagNotFoundError(tagName);
 
-    await ProfileService.deleteTag(hasTag);
+    await ProfileService.deleteTag(tag);
 
     const embed = new MessageEmbed(`Delete Tag`, msg.author).setDescription(
-      `Deleted tag ${hasTag.emoji} \`${hasTag.name}\`.`
+      `The tag ${tag.emoji} **${tag.name}** was deleted.`
     );
 
     await this.send(msg.channel, embed);

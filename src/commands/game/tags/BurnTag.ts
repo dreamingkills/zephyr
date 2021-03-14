@@ -13,9 +13,9 @@ import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class BurnTag extends BaseCommand {
-  names = ["burntag", "bt"];
-  description = "Burns all the cards in a tag.";
-  usage = ["$CMD$ <tag>"];
+  names = [`burntag`, `bt`];
+  description = `Burns all the cards in a specific tag.`;
+  usage = [`$CMD$ <tag>`];
   allowDm = true;
 
   async exec(
@@ -32,7 +32,7 @@ export default class BurnTag extends BaseCommand {
       (t) => t.name.toLowerCase() === options.join(" ").toLowerCase()
     )[0];
 
-    if (!query) throw new ZephyrError.InvalidTagError(options[0]);
+    if (!query) throw new ZephyrError.TagNotFoundError(options[0]);
 
     const cardsRaw = await CardService.getCardsByTag(query, profile);
 

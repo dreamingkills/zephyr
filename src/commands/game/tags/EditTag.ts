@@ -4,15 +4,16 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
-import emojiregex from "emoji-regex";
+import emoji from "node-emoji";
+import { GameTag } from "../../../structures/game/Tag";
 
 export default class EditTag extends BaseCommand {
-  names = ["edittag", "et"];
-  description = "Edits a tag.";
+  names = [`edittag`, `et`];
+  description = `Changes the name or emoji of an existing tag.`;
   usage = [
-    "$CMD$ <tag name> <new name>",
-    "$CMD$ <tag name> <new emoji>",
-    "$CMD$ <tag name> <new name> <new emoji>",
+    `$CMD$ <tag name> <new name>`,
+    `$CMD$ <tag name> <new emoji>`,
+    `$CMD$ <tag name> <new name> <new emoji>`,
   ];
   allowDm = true;
 
@@ -21,39 +22,57 @@ export default class EditTag extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    const userTags = await ProfileService.getTags(profile);
+    if (!options[0]) throw new ZephyrError.UnspecifiedTagError();
 
-    const tagQuery = options[0]?.toLowerCase();
-    const hasTag = userTags.filter((t) => t.name === tagQuery)[0];
+    const tags = await ProfileService.getTags(profile);
 
-    if (!hasTag) throw new ZephyrError.InvalidTagError(options[0]);
+    if (tags.length === 0) {
+      const prefix = this.zephyr.getPrefix(msg.guildID);
+      throw new ZephyrError.NoTagsError(prefix);
+    }
 
-    const firstParam = options[1]?.toLowerCase();
-    const secondParam = options[2]?.toLowerCase();
-    if (secondParam) {
-      if (firstParam.length > 12)
+    const tagName = options[0]?.toLowerCase();
+    const hasTag = tags.filter((t) => t.name === tagName)[0];
+
+    if (!hasTag) throw new ZephyrError.TagNotFoundError(options[0]);
+
+    const newParameter = options[1]?.toLowerCase();
+    const newEmoji = options[2]?.toLowerCase();
+
+    let newTag: GameTag;
+
+    if (newEmoji) {
+      if (newParameter.length > 12)
         throw new ZephyrError.UnspecifiedTagInCreationError();
-      const isEmoji = emojiregex().exec(secondParam);
+
+      const isEmoji = emoji.find(newEmoji);
       if (!isEmoji) throw new ZephyrError.InvalidEmojiTagError();
 
-      if (userTags.filter((t) => t.name === firstParam)[0])
-        throw new ZephyrError.DuplicateTagError(firstParam);
+      if (tags.find((t) => t.name === newParameter))
+        throw new ZephyrError.DuplicateTagError(newParameter);
 
-      await ProfileService.editTag(hasTag, firstParam, secondParam);
+      if (tags.find((t) => t.emoji === isEmoji.emoji))
+        throw new ZephyrError.DuplicateTagEmojiError(isEmoji.emoji);
+
+      newTag = await ProfileService.editTag(hasTag, newParameter, newEmoji);
     } else {
-      if (!firstParam || firstParam.length > 12)
+      if (!newParameter || newParameter.length > 12)
         throw new ZephyrError.UnspecifiedTagInCreationError();
-      const isEmoji = emojiregex().exec(firstParam);
-      if (isEmoji) {
-        await ProfileService.editTag(hasTag, undefined, isEmoji[0]);
-      } else {
-        if (userTags.filter((t) => t.name === firstParam)[0])
-          throw new ZephyrError.DuplicateTagEmojiError(secondParam);
 
-        await ProfileService.editTag(hasTag, firstParam);
+      const isEmoji = emoji.find(newParameter);
+
+      if (isEmoji) {
+        if (tags.find((t) => t.emoji === isEmoji.emoji))
+          throw new ZephyrError.DuplicateTagEmojiError(isEmoji.emoji);
+
+        newTag = await ProfileService.editTag(hasTag, undefined, isEmoji.emoji);
+      } else {
+        if (tags.find((t) => t.name === newParameter))
+          throw new ZephyrError.DuplicateTagError(newParameter);
+
+        newTag = await ProfileService.editTag(hasTag, newParameter);
       }
     }
-    const newTag = await ProfileService.getTagById(hasTag.id);
 
     const embed = new MessageEmbed(`Edit Tag`, msg.author).setDescription(
       `Edited tag ${hasTag.emoji} **${hasTag.name}** to ${newTag.emoji} **${newTag.name}**.`

@@ -6,9 +6,9 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 
 export default class ViewTags extends BaseCommand {
-  names = ["viewtags", "tags", "vt"];
-  description = "Shows you a list of your tags.";
-  usage = ["$CMD$", "$CMD$ <@mention>", "$CMD$ <id>"];
+  names = [`viewtags`, `tags`, `vt`];
+  description = `Shows you a list of a user's tags.`;
+  usage = [`$CMD$ [@mention/user id]`];
   allowDm = true;
 
   async exec(
@@ -22,36 +22,44 @@ export default class ViewTags extends BaseCommand {
     if (msg.mentions[0]) {
       targetUser = msg.mentions[0];
     } else if (!isNaN(parseInt(options[0]))) {
-      if (options[0].length < 17) throw new ZephyrError.InvalidSnowflakeError();
+      if (options[0].length < 17 || options[0].length > 18)
+        throw new ZephyrError.InvalidSnowflakeError();
 
-      targetUser = await this.zephyr.fetchUser(options[0]);
+      const fetchUser = await this.zephyr.fetchUser(options[0]);
+      if (!fetchUser) throw new ZephyrError.UserNotFoundError();
+
+      targetUser = fetchUser;
     } else {
       targetUser = msg.author;
       target = profile;
     }
 
-    if (!targetUser) throw new ZephyrError.UserNotFoundError();
-
     if (!target) target = await ProfileService.getProfile(targetUser.id);
+
     if (target.private && target.discordId !== msg.author.id)
       throw new ZephyrError.PrivateProfileError(targetUser.tag);
 
     const userTags = await ProfileService.getTags(target);
-    userTags.sort((a, b) => (a.name[0] > b.name[0] ? 1 : -1));
+    userTags.sort((a, b) => (a.name > b.name ? 1 : -1));
 
-    const embed = new MessageEmbed(`Tag List`, msg.author)
-      .setTitle(`${targetUser.tag}'s tags`)
-      .setDescription(
-        userTags.length === 0
-          ? targetUser.id === msg.author.id
-            ? `You have no tags.`
-            : `**${targetUser.tag}** has no tags.`
-          : `${userTags
-              .map((t) => {
-                return `${t.emoji} — \`${t.name}\``;
-              })
-              .join("\n")}`
+    const embed = new MessageEmbed(`Tags`, msg.author).setTitle(
+      `${targetUser.tag}'s tags`
+    );
+
+    if (userTags.length === 0) {
+      if (targetUser.id === msg.author.id) {
+        const prefix = this.zephyr.getPrefix(msg.guildID);
+        embed.setDescription(
+          `You have no tags!\nUse \`${prefix}createtag <tag name> <emoji>\` to make one.`
+        );
+      } else {
+        embed.setDescription(`**${targetUser.tag}** has no tags.`);
+      }
+    } else {
+      embed.setDescription(
+        userTags.map((t) => `${t.emoji} — \`${t.name}\``).join(`\n`)
       );
+    }
 
     await this.send(msg.channel, embed);
     return;

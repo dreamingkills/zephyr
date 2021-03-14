@@ -9,6 +9,7 @@ import {
 } from "../../../../utility/color/ColorUtils";
 import dayjs from "dayjs";
 import { PrefabItem } from "../../../../../structures/item/PrefabItem";
+import { GameTag } from "../../../../../structures/game/Tag";
 
 export abstract class ProfileSet extends DBClass {
   /*
@@ -235,40 +236,46 @@ export abstract class ProfileSet extends DBClass {
     discordId: string,
     name: string,
     emoji: string
-  ): Promise<void> {
-    await DB.query(
+  ): Promise<GameTag> {
+    const query = (await DB.query(
       `INSERT INTO card_tag (discord_id, tag_name, emoji) VALUES (?, ?, ?);`,
       [discordId, name, emoji]
-    );
-    return;
+    )) as { insertId: number };
+
+    return await ProfileService.getTagById(query.insertId);
   }
 
   public static async deleteTag(tagId: number): Promise<void> {
     await DB.query(`DELETE FROM card_tag WHERE id=?;`, [tagId]);
     await DB.query(`UPDATE user_card SET tag_id=NULL WHERE tag_id=?;`, [tagId]);
+
     return;
   }
 
   public static async editTag(
-    tagId: number,
+    tag: GameTag,
     name?: string,
     emoji?: string
-  ): Promise<void> {
+  ): Promise<GameTag> {
     if (!name && emoji) {
-      await DB.query(`UPDATE card_tag SET emoji=? WHERE id=?;`, [emoji, tagId]);
+      await DB.query(`UPDATE card_tag SET emoji=? WHERE id=?;`, [
+        emoji,
+        tag.id,
+      ]);
     } else if (!emoji && name) {
       await DB.query(`UPDATE card_tag SET tag_name=? WHERE id=?;`, [
         name,
-        tagId,
+        tag.id,
       ]);
     } else if (emoji && name) {
       await DB.query(`UPDATE card_tag SET tag_name=?, emoji=? WHERE id=?;`, [
         name,
         emoji,
-        tagId,
+        tag.id,
       ]);
     } else throw new ZephyrError.NoParametersInTagEditError();
-    return;
+
+    return await tag.fetch();
   }
 
   public static async toggleDropReminders(discordId: string[]): Promise<void> {

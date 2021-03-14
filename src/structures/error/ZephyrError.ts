@@ -350,7 +350,7 @@ export class UnspecifiedTagError extends ZephyrError {
   }
 }
 
-export class InvalidTagError extends ZephyrError {
+export class TagNotFoundError extends ZephyrError {
   constructor(name: string) {
     super(`You don't have a tag named \`${name}\`.`);
   }
@@ -369,8 +369,10 @@ export class TagContainsSpacesError extends ZephyrError {
 }
 
 export class NoTagsError extends ZephyrError {
-  constructor() {
-    super(`You have no tags.`);
+  constructor(prefix: string) {
+    super(
+      `:warning: You have no tags!\nUse \`${prefix}createtag <tag name> <emoji>\` to make one.`
+    );
   }
 }
 
@@ -420,6 +422,24 @@ export class NoCardsTaggedError extends ZephyrError {
 export class NoUntaggedCardsError extends ZephyrError {
   constructor() {
     super(`You have no untagged cards.`);
+  }
+}
+
+export class CardAlreadyTaggedError extends ZephyrError {
+  constructor(tag: GameTag, card: GameUserCard) {
+    super(
+      `\`${card.id.toString(36)}\` is already tagged as ${tag.emoji} **${
+        tag.name
+      }**.`
+    );
+  }
+}
+
+export class CardsAlreadyTaggedError extends ZephyrError {
+  constructor(tag: GameTag) {
+    super(
+      `All cards you tagged are already tagged as ${tag.emoji} **${tag.name}**.`
+    );
   }
 }
 

@@ -13,9 +13,9 @@ import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class BurnUntagged extends BaseCommand {
-  names = ["burnuntagged", "bu"];
-  description = "Burns all cards that are untagged.";
-  usage = ["$CMD$"];
+  names = [`burnuntagged`, `bu`];
+  description = `Burns all untagged cards in your inventory.`;
+  usage = [`$CMD$`];
   allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
