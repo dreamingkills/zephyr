@@ -109,6 +109,9 @@ export async function verifyMultitradeItems(
       )[0] as InteractableItem | undefined;
 
       try {
+        if (item.item.soulbound)
+          throw new ZephyrError.ItemSoulboundError(item.item);
+
         const userItem = await ProfileService.getItem(
           newProfile,
           item.item.id,

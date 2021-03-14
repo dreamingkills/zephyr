@@ -591,4 +591,10 @@ export abstract class CardService {
   public static async getLastCard(profile: GameProfile): Promise<GameUserCard> {
     return await CardGet.getLastCard(profile);
   }
+
+  public static async getRandomConfiscatedCard(
+    confiscatedTag: GameTag
+  ): Promise<GameUserCard> {
+    return await CardGet.getRandomConfiscatedCard(confiscatedTag);
+  }
 }

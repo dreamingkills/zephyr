@@ -338,4 +338,32 @@ export abstract class CardGet extends DBClass {
 
     return new GameUserCard(query[0]);
   }
+
+  public static async getRandomConfiscatedCard(
+    confiscatedTag: GameTag
+  ): Promise<GameUserCard> {
+    const query = (await DB.query(
+      `SELECT
+        user_card.*,
+        card_frame.id AS frame_id,
+        card_frame.frame_name,
+        card_frame.frame_url,
+        card_frame.dye_mask_url
+      FROM
+        user_card 
+      LEFT JOIN
+        card_frame
+      ON
+        user_card.frame=card_frame.id
+      WHERE
+        user_card.tag_id=?
+      ORDER BY RAND()
+      LIMIT 1;`,
+      [confiscatedTag.id]
+    )) as UserCard[];
+
+    if (!query[0]) throw new ZephyrError.InvalidCardReferenceError();
+
+    return new GameUserCard(query[0]);
+  }
 }

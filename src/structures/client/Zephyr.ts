@@ -52,6 +52,7 @@ export class Zephyr extends Client {
     burns: false /* Burning cards */,
     crafting: false /* Crafting recipes and recipe viewer */,
     dmCommands: false /* Use of commands in DM channels */,
+    useConfiscatedToken: false /* Use of the confiscated card token */,
     postServerCount: true /* Post server count to Top.gg */,
     mainViewing: true /* Viewing cards in #zephyr-main */,
   };
@@ -61,6 +62,8 @@ export class Zephyr extends Client {
     boosterModifier: 2.5 /* Drops: card weight modifier for boosters */,
     birthdayModifier: 2.5 /* Drops: card weight modifier for idols whose birthday is "today" */,
   };
+
+  public confiscatedTagId = 561;
 
   private generalChannelNames = [
     "welcome",

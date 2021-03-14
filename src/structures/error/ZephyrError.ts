@@ -1143,3 +1143,17 @@ export class MainViewingFlagDisabledError extends ZephyrError {
     super(`Sorry, but viewing cards is currently disabled in this channel.`);
   }
 }
+
+export class ConfiscatedTokenFlagDisabledError extends ZephyrError {
+  constructor(item: PrefabItem) {
+    super(
+      `Sorry, but use of the **${item.names[0]}** is temporarily disabled.\nPlease join [Zephyr Community](https://discord.gg/zephyr) to stay up to date.`
+    );
+  }
+}
+
+export class ItemSoulboundError extends ZephyrError {
+  constructor(item: PrefabItem) {
+    super(`\`${item.names[0]}\` is a soulbound item and cannot be traded.`);
+  }
+}
