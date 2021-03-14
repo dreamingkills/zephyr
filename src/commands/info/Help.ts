@@ -5,6 +5,7 @@ import { GameProfile } from "../../structures/game/Profile";
 import * as ZephyrError from "../../structures/error/ZephyrError";
 
 export default class Help extends BaseCommand {
+  id = `orion`;
   names = ["help"];
   description = "Shows you the help center.";
   usage = ["$CMD$", "$CMD$ [command/topic]"];
