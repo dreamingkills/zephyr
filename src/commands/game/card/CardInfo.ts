@@ -10,7 +10,7 @@ import dayjs from "dayjs";
 
 export default class CardInfo extends BaseCommand {
   names = ["cardinfo", "ci"];
-  description = "Shows you information a card.";
+  description = "Shows you a card's statistics.";
   usage = ["$CMD$ [card]"];
 
   async exec(
