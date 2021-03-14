@@ -6,6 +6,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 export default class Cooldowns extends BaseCommand {
+  id = `absolution`;
   names = ["cooldowns", "cd", "timer", "timers", "t"];
   description = "Shows the status of various timers.";
   allowDm = true;

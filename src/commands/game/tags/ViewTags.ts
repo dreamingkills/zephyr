@@ -6,6 +6,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 
 export default class ViewTags extends BaseCommand {
+  id = `campfire`;
   names = [`viewtags`, `tags`, `vt`];
   description = `Shows you a list of a user's tags.`;
   usage = [`$CMD$ [@mention/user id]`];

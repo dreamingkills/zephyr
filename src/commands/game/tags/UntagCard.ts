@@ -6,6 +6,7 @@ import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class UntagCard extends BaseCommand {
+  id = `mango`;
   names = [`untag`, `ut`];
   description = `Removes the tag from a card, if it has one.`;
   usage = [`$CMD$ <cards>`];

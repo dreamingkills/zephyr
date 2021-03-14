@@ -13,6 +13,7 @@ import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class BurnUntagged extends BaseCommand {
+  id = `firefox`;
   names = [`burnuntagged`, `bu`];
   description = `Burns all untagged cards in your inventory.`;
   usage = [`$CMD$`];

@@ -7,6 +7,7 @@ import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { escapeMarkdown } from "../../../../lib/utility/text/TextUtils";
 
 export default class ViewWishlist extends BaseCommand {
+  id = `rise`;
   names = ["wishlist", "wish", "wl"];
   usage = [`$CMD$`, `$CMD$ <@mention>`, `$CMD$ <user id>`];
   description = "Shows you someone's wishlist.";

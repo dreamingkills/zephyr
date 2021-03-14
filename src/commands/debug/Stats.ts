@@ -4,8 +4,9 @@ import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 
 export default class Stats extends BaseCommand {
-  names = ["stats"];
-  description = "Shows the bot's memory usage.";
+  id = `necklace`;
+  names = [`stats`];
+  description = `Shows the bot's memory usage.`;
   allowDm = true;
 
   async exec(msg: Message): Promise<void> {

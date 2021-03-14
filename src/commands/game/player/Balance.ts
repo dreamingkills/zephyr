@@ -6,6 +6,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 
 export default class Balance extends BaseCommand {
+  id = `spirit`;
   names = ["balance", "bits", "$", "bal", "cubits"];
   description = "Shows you your balance.";
   allowDm = true;

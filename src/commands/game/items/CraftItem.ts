@@ -13,6 +13,7 @@ import { ItemService } from "../../../lib/ItemService";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class CraftItem extends BaseCommand {
+  id = `crescendolls`;
   names = ["craft"];
   description =
     "Crafts ingredients into a result according to a specified recipe.";

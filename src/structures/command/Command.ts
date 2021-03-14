@@ -8,6 +8,7 @@ import { Zephyr } from "../client/Zephyr";
 import { GameProfile } from "../game/Profile";
 
 export interface Command {
+  id?: string;
   names: string[];
   description: string;
   usage: string[];
@@ -17,6 +18,7 @@ export interface Command {
 }
 
 export abstract class BaseCommand implements Command {
+  id?: string;
   names: string[] = [];
   description: string = "This command has no description!";
   usage: string[] = [];

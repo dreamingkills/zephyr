@@ -6,6 +6,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 
 export default class Reminders extends BaseCommand {
+  id = `elizabeth`;
   names = ["reminders", "rm"];
   description = "Shows your active reminders.";
   usage = ["$CMD$ [type]"];

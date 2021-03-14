@@ -9,6 +9,7 @@ import { checkPermission } from "../../../lib/ZephyrUtils";
 import { ItemService } from "../../../lib/ItemService";
 
 export default class ItemInventory extends BaseCommand {
+  id = `ritual`;
   names = ["items"];
   description = "Shows items that belong to you.";
   allowDm = true;

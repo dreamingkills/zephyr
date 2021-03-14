@@ -6,6 +6,7 @@ import { BaseCommand } from "../../structures/command/Command";
 import { GameBaseCard } from "../../structures/game/BaseCard";
 
 export default class Birthdays extends BaseCommand {
+  id = `ice`;
   names = [`birthdays`, `bd`, `bday`];
   description = `Shows a list of birthdays today.`;
   usage = ["$CMD$"];

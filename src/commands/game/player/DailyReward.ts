@@ -8,8 +8,9 @@ import { Chance } from "chance";
 import { getTimeUntil } from "../../../lib/utility/time/TimeUtils";
 
 export default class DailyReward extends BaseCommand {
-  names = ["daily"];
-  description = "Shows you the status of your daily reward.";
+  id = `uta`;
+  names = [`daily`];
+  description = `Shows you the status of your daily reward.`;
   allowDm = true;
 
   private dayFormat = `YYYY-MM-DD`;

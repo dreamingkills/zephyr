@@ -8,6 +8,7 @@ import { AnticheatService } from "../../../lib/database/services/meta/AnticheatS
 import dayjs from "dayjs";
 
 export default class UserInfo extends BaseCommand {
+  id = `ashes`;
   names = ["userinfo", "ui"];
   description = "Shows you information about a user.";
   allowDm = true;

@@ -13,6 +13,7 @@ import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class BurnTag extends BaseCommand {
+  id = `refuse`;
   names = [`burntag`, `bt`];
   description = `Burns all the cards in a specific tag.`;
   usage = [`$CMD$ <tag>`];

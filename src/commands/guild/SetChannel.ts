@@ -3,6 +3,7 @@ import { GuildService } from "../../lib/database/services/guild/GuildService";
 import { BaseCommand } from "../../structures/command/Command";
 
 export default class SetChannel extends BaseCommand {
+  id = `ashley`;
   names = ["setchannel", "sch"];
   description =
     `Sets the dedicated Zephyr channel, for drops and other things.` +

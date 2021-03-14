@@ -12,9 +12,10 @@ import {
 import { rgbToHex } from "../../../lib/utility/color/ColorUtils";
 
 export default class ViewUserCard extends BaseCommand {
-  names = ["card", "show", "view", "v"];
-  description = "Inspects one of your cards.";
-  usage = ["$CMD$ <card>"];
+  id = `confusion`;
+  names = [`card`, `show`, `view`, `v`];
+  description = `Inspects one of your cards.`;
+  usage = [`$CMD$ <card>`];
   allowDm = true;
 
   async exec(

@@ -3,6 +3,7 @@ import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 
 export default class Patreon extends BaseCommand {
+  id = `crawling`;
   names = ["patreon", "donate", "kofi", "ko-fi"];
   description = "Sends a link to Zephyr's Patreon page.";
   usage = ["$CMD$"];

@@ -7,6 +7,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { GameProfile } from "../../../structures/game/Profile";
 
 export default class AnswerPoll extends BaseCommand {
+  id = `butane`;
   names = [`answer`];
   description = `Answers a poll if it's active.`;
   usage = [`$CMD$ <poll number> <yes/no>`];

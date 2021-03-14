@@ -6,6 +6,7 @@ import { renderRecipe } from "../../../lib/utility/text/TextUtils";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 
 export default class ShowRecipes extends BaseCommand {
+  id = `voyager`;
   names = ["recipes"];
   description = "Shows recipes available to craft.";
   allowDm = true;

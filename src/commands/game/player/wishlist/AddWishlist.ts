@@ -9,6 +9,7 @@ import { MessageCollector } from "eris-collector";
 import { getGroupsByIdolId } from "../../../../lib/utility/text/TextUtils";
 
 export default class AddWishlist extends BaseCommand {
+  id = `permatrip`;
   names = ["wishadd", "wa"];
   description = "Adds an idol to your wishlist.";
   allowDm = true;

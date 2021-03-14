@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import { dateTimeDisplay } from "../../../lib/utility/time/TimeUtils";
 
 export default class ShowBadges extends BaseCommand {
+  id = `drone`;
   names = [`badge`];
   description = `Shows you information about a badge.`;
   usage = [`$CMD$ <name>`];

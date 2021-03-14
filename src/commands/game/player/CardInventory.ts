@@ -14,6 +14,7 @@ import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { editMessage } from "../../../lib/discord/message/editMessage";
 
 export default class CardInventory extends BaseCommand {
+  id = `cirice`;
   names = ["inventory", "inv", "i"];
   description = "Shows cards that belong to you.";
   usage = [

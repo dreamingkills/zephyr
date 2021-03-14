@@ -6,6 +6,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 
 export default class ViewPoll extends BaseCommand {
+  id = `xxok`;
   names = [`poll`];
   description = `Shows you the current active poll if there is one.`;
   usage = [`$CMD$`];

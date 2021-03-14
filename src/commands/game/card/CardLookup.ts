@@ -8,9 +8,10 @@ import { GameBaseCard } from "../../../structures/game/BaseCard";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 
 export default class CardLookup extends BaseCommand {
-  names = ["lookup", "lu"];
-  description = "Shows you information about a card.";
-  usage = ["$CMD$ <name>"];
+  id = `rooster`;
+  names = [`lookup`, `lu`];
+  description = `Shows you information about a card.`;
+  usage = [`$CMD$ <name>`];
   allowDm = true;
 
   async exec(

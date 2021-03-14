@@ -6,9 +6,10 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 
 export default class RenameAlbum extends BaseCommand {
-  names = ["renamealbum", "ra"];
-  usage = ["$CMD$ <album name> <new name>"];
-  description = "Changes the name of an album.";
+  id = `nightwalk`;
+  names = [`renamealbum`, `ra`];
+  usage = [`$CMD$ <album name> <new name>`];
+  description = `Changes the name of an album.`;
   allowDm = true;
 
   async exec(

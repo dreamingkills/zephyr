@@ -7,6 +7,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import emoji from "node-emoji";
 
 export default class CreateTag extends BaseCommand {
+  id = `tori`;
   names = [`createtag`, `ct`];
   description = `Creates a tag which you can add to your cards.`;
   usage = [`$CMD$ <tag name> <emoji>`];

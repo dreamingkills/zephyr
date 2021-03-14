@@ -7,6 +7,7 @@ import { BlacklistService } from "../../../lib/database/services/meta/BlacklistS
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class BlacklistUser extends BaseCommand {
+  id = `forgotten`;
   names = ["blacklist"];
   description =
     "Blacklists a user. Be **extremely careful** when using this command!";

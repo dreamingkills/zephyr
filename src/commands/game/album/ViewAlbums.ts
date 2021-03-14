@@ -10,6 +10,7 @@ import { checkPermission } from "../../../lib/ZephyrUtils";
 import { ReactionCollector } from "eris-collector";
 
 export default class ViewAlbums extends BaseCommand {
+  id = `aerodynamic`;
   names = ["albums", "albumlist", "al"];
   description = "Shows the albums owned by a user.";
   usage = ["$CMD$", "$CMD$ <@user>", "$CMD$ [user id]"];

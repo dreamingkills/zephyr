@@ -12,9 +12,10 @@ import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class Trade extends BaseCommand {
-  names = ["trade"];
-  description = "Trades one of your cards for someone else's card.";
-  usage = ["$CMD$ <@mention> <your card> <their card>"];
+  id = `rhinestone`;
+  names = [`trade`];
+  description = `Trades one of your cards for someone else's card.`;
+  usage = [`$CMD$ <@mention> <your card> <their card>`];
 
   async exec(
     msg: Message,

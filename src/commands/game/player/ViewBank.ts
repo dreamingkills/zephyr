@@ -6,6 +6,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 
 export default class ViewBank extends BaseCommand {
+  id = `rats`;
   names = ["bank"];
   description = "Shows you the contents of your bit bank.";
   subcommands = ["deposit <amount>", "withdraw <amount>"];

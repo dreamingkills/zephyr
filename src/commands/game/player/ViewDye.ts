@@ -8,6 +8,7 @@ import { rgbToHex } from "../../../lib/utility/color/ColorUtils";
 import { createCanvas } from "canvas";
 
 export default class ViewDye extends BaseCommand {
+  id = `faith`;
   names = ["viewdye", "vd"];
   description = "Shows you a dye you own.";
   allowDm = true;

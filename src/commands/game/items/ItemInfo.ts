@@ -6,6 +6,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ItemService } from "../../../lib/ItemService";
 
 export default class ItemInfo extends BaseCommand {
+  id = `nightvision`;
   names = ["iteminfo", "ii"];
   usage = ["$CMD$ <item>"];
   description =

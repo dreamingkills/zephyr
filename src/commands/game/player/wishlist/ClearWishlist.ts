@@ -7,6 +7,7 @@ import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { ReactionCollector } from "eris-collector";
 
 export default class ClearWishlist extends BaseCommand {
+  id = `handlebars`;
   names = ["wishclear", "wc"];
   usage = [`$CMD$`];
   description = "Clears your wishlist.";

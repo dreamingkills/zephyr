@@ -9,9 +9,10 @@ import { AnticheatService } from "../../../lib/database/services/meta/AnticheatS
 import dayjs from "dayjs";
 
 export default class CardInfo extends BaseCommand {
-  names = ["cardinfo", "ci"];
-  description = "Shows you a card's statistics.";
-  usage = ["$CMD$ [card]"];
+  id = `sickman`;
+  names = [`cardinfo`, `ci`];
+  description = `Shows you a card's statistics.`;
+  usage = [`$CMD$ [card]`];
 
   async exec(
     msg: Message,

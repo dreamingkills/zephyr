@@ -7,9 +7,10 @@ import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class ResetFrame extends BaseCommand {
-  names = ["resetframe", "rf"];
-  description = "Resets the frame of a card to default.";
-  usage = ["$CMD$ <card>"];
+  id = `would`;
+  names = [`resetframe`, `rf`];
+  description = `Resets the frame of a card to default.`;
+  usage = [`$CMD$ <card>`];
   allowDm = true;
 
   async exec(

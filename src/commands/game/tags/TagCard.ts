@@ -8,6 +8,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { GameUserCard } from "../../../structures/game/UserCard";
 
 export default class TagCard extends BaseCommand {
+  id = `zeitgeist`;
   names = [`tag`, `tc`];
   description = `Adds a tag to a card. If a card is already tagged, it will be replaced with the tag you specify.`;
   usage = [`$CMD$ <tag> [cards]`];

@@ -3,6 +3,7 @@ import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 
 export default class Invite extends BaseCommand {
+  id = `papercut`;
   names = ["invite", "support"];
   description =
     "Sends a link to the Zephyr Community server, and a link to add the bot.";

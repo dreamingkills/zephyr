@@ -8,6 +8,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import dayjs from "dayjs";
 
 export default class ViewCase extends BaseCommand {
+  id = `escape`;
   names = [`case`];
   description = `Shows a blacklist case.`;
   usage = ["$CMD$ <case id>"];

@@ -67,6 +67,10 @@ export default class Help extends BaseCommand {
           description
         );
 
+        if (this.zephyr.config.developers.includes(msg.author.id)) {
+          embed.setFooter(`Command ID: ${findCommand.id || `none`}`);
+        }
+
         await this.send(msg.channel, embed);
         return;
       } else throw new ZephyrError.InvalidHelpQueryError();

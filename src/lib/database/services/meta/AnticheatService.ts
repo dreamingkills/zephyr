@@ -1,3 +1,4 @@
+import { Message } from "eris";
 import { GameItem } from "../../../../structures/game/Item";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameUserCard } from "../../../../structures/game/UserCard";
@@ -137,5 +138,14 @@ export abstract class AnticheatService {
     profile: GameProfile
   ): Promise<number> {
     return await ACGet.getNumberOfCardsBurned(profile);
+  }
+
+  public static async logCommand(
+    commandId: string,
+    message: Message,
+    parameters: string,
+    error: boolean
+  ): Promise<void> {
+    return await ACSet.logCommand(commandId, message, parameters, error);
   }
 }

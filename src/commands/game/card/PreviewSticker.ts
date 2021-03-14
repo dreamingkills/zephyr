@@ -5,9 +5,10 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { createCanvas, loadImage } from "canvas";
 
 export default class PreviewSticker extends BaseCommand {
-  names = ["previewsticker", "ps"];
-  description = "Shows you what a sticker looks like before you buy it.";
-  usage = ["$CMD$ <sticker>"];
+  id = `dirt`;
+  names = [`previewsticker`, `ps`];
+  description = `Shows you what a sticker looks like before you buy it.`;
+  usage = [`$CMD$ <sticker>`];
   allowDm = true;
 
   async exec(

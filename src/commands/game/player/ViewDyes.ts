@@ -9,6 +9,7 @@ import { checkPermission } from "../../../lib/ZephyrUtils";
 import { ReactionCollector } from "eris-collector";
 
 export default class ViewDyes extends BaseCommand {
+  id = `untitled`;
   names = ["dyes"];
   description = "Shows you the dyes you own.";
   allowDm = true;

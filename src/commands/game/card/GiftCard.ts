@@ -13,9 +13,10 @@ import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class GiftCard extends BaseCommand {
-  names = ["gift", "give"];
-  description = "Gives your card(s) to someone else.";
-  usage = ["$CMD$ <card> <mention>"];
+  id = `stunna`;
+  names = [`gift`, `give`];
+  description = `Gives your card(s) to someone else.`;
+  usage = [`$CMD$ <card> <mention>`];
   async exec(
     msg: Message,
     profile: GameProfile,
@@ -24,7 +25,7 @@ export default class GiftCard extends BaseCommand {
     if (!this.zephyr.flags.trades)
       throw new ZephyrError.TradeFlagDisabledError();
 
-    const identifiers = options.filter((o) => !o.includes("<@"));
+    const identifiers = options.filter((o) => !o.includes(`<@`));
     const cards: GameUserCard[] = [];
     if (identifiers.length === 0) {
       const lastCard = await CardService.getLastCard(profile);

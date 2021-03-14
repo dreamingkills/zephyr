@@ -9,6 +9,7 @@ import { GameIdol } from "../../../../structures/game/Idol";
 import { getGroupsByIdolId } from "../../../../lib/utility/text/TextUtils";
 
 export default class RemoveWishlist extends BaseCommand {
+  id = `combat`;
   names = ["wishremove", "wr"];
   usage = [`$CMD$ <idol>`];
   description = "Removes an idol from your wishlist.";

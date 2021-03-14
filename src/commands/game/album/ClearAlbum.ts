@@ -8,6 +8,7 @@ import { ReactionCollector } from "eris-collector";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class ClearAlbum extends BaseCommand {
+  id = `arabella`;
   names = [`clearalbum`, `ca`];
   usage = ["$CMD$ <album name>"];
   description = "Clears all cards from an album.";

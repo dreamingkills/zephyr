@@ -11,9 +11,10 @@ import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class DyeCard extends BaseCommand {
-  names = ["dye"];
-  description = "Dyes a card.";
-  usage = ["$CMD$ <$dye> <card>"];
+  id = `junkhead`;
+  names = [`dye`];
+  description = `Dyes a card.`;
+  usage = [`$CMD$ <$dye> <card>`];
   allowDm = true;
 
   async exec(

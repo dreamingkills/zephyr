@@ -5,6 +5,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 
 export default class SetBlurb extends BaseCommand {
+  id = `genesis`;
   names = ["blurb", "setblurb", "desc", "setdesc"];
   description = "Changes the blurb on your profile.";
   usage = ["$CMD$ <up to 500 characters>"];

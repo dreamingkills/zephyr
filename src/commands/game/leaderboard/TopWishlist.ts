@@ -10,6 +10,7 @@ import {
 } from "../../../lib/utility/text/TextUtils";
 
 export default class TopWishlist extends BaseCommand {
+  id = `within`;
   names = ["topwishlist", "twl"];
   description = "Shows you the top cards by number of wishlists.";
   usage = ["$CMD$"];

@@ -7,6 +7,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
 
 export default class ViewProfile extends BaseCommand {
+  id = `reagan`;
   names = ["profile", "p"];
   usage = ["$CMD$", "$CMD$ <@mention>", "$CMD$ <id>"];
   description = "Displays your profile.";

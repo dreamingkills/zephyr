@@ -5,6 +5,7 @@ import { BaseCommand } from "../../structures/command/Command";
 import { ReactionCollector } from "eris-collector";
 
 export default class GroupList extends BaseCommand {
+  id = `blister`;
   names = ["grouplist", "gl"];
   description = "Shows a list of all groups currently in the game.";
   usage = ["$CMD$"];

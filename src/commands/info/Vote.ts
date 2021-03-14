@@ -4,6 +4,7 @@ import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 
 export default class Vote extends BaseCommand {
+  id = `runaway`;
   names = ["vote"];
   description = "Sends a link to Zephyr's voting page.";
   usage = ["$CMD$"];

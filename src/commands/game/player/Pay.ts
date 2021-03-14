@@ -10,9 +10,10 @@ import { strToInt } from "../../../lib/utility/text/TextUtils";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class Pay extends BaseCommand {
-  names = ["pay", "venmo", "paypal", "cashapp"];
-  description = "Gives someone some money.";
-  usage = ["$CMD$ <@user> <amount>"];
+  id = `silvera`;
+  names = [`pay`, `venmo`, `paypal`, `cashapp`];
+  description = `Gives someone some money.`;
+  usage = [`$CMD$ <@user> <amount>`];
 
   async exec(
     msg: Message,

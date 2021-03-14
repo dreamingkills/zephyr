@@ -5,6 +5,7 @@ import { GameProfile } from "../../structures/game/Profile";
 import * as ZephyrError from "../../structures/error/ZephyrError";
 
 export default class Prefix extends BaseCommand {
+  id = `echo`;
   names = ["prefix"];
   description =
     `Changes the prefix of the bot.` +

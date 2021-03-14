@@ -14,9 +14,10 @@ import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class UpgradeCard extends BaseCommand {
-  names = ["upgrade", "u"];
-  description = "Use dust to have a chance to increase your card's condition.";
-  usage = ["$CMD$ <card>"];
+  id = `sunshine`;
+  names = [`upgrade`, `u`];
+  description = `Use dust to have a chance to increase your card's condition.`;
+  usage = [`$CMD$ <card>`];
   allowDm = true;
 
   async exec(

@@ -7,6 +7,7 @@ import { CardService } from "../../../lib/database/services/game/CardService";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 
 export default class RemoveCardFromAlbum extends BaseCommand {
+  id = `fireside`;
   names = [`removecardfromalbum`, `rc`];
   usage = [`$CMD$ <card>`];
   description = `Removes a card from an album.`;

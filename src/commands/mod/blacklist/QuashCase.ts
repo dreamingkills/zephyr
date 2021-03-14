@@ -7,6 +7,7 @@ import { BlacklistService } from "../../../lib/database/services/meta/BlacklistS
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class QuashCase extends BaseCommand {
+  id = `one`;
   names = ["quash"];
   description =
     "Quashes a blacklist case. In other words, it gets nullified and the user is unblacklisted.";

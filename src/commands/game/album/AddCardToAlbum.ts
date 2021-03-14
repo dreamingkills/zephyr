@@ -8,9 +8,10 @@ import { CardService } from "../../../lib/database/services/game/CardService";
 import { GameAlbum } from "../../../structures/game/Album";
 
 export default class AddCardToAlbum extends BaseCommand {
-  names = ["addcardtoalbum", "aa"];
-  description = "Adds a card to an album.";
-  usage = ["$CMD$ <album> <card> [page] [slot]"];
+  id = `maybe`;
+  names = [`addcardtoalbum`, `aa`];
+  description = `Adds a card to an album.`;
+  usage = [`$CMD$ <album> <card> [page] [slot]`];
   allowDm = true;
 
   async exec(

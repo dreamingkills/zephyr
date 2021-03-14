@@ -10,6 +10,7 @@ import { createMessage } from "../discord/message/createMessage";
 import { GameProfile } from "../../structures/game/Profile";
 import dayjs from "dayjs";
 import { BlacklistService } from "../database/services/meta/BlacklistService";
+import { AnticheatService } from "../database/services/meta/AnticheatService";
 
 export class CommandLib {
   commands: BaseCommand[] = [];
@@ -149,6 +150,15 @@ export class CommandLib {
         throw new ZephyrError.NotAllowedInDMError();
 
       await command.run(message, profile, zephyr);
+
+      if (command.id) {
+        await AnticheatService.logCommand(
+          command.id,
+          message,
+          message.content,
+          false
+        );
+      }
     } catch (e) {
       if (e.isClientFacing) {
         const embed = new MessageEmbed(`Error`, message.author).setDescription(
@@ -166,6 +176,15 @@ export class CommandLib {
         try {
           await createMessage(message.channel, embed);
         } catch {}
+      }
+
+      if (command.id) {
+        await AnticheatService.logCommand(
+          command.id,
+          message,
+          message.content,
+          true
+        );
       }
     }
   }

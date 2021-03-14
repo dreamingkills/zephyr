@@ -8,6 +8,7 @@ import { ReactionCollector } from "eris-collector";
 import { ItemService } from "../../../lib/ItemService";
 
 export default class UseItem extends BaseCommand {
+  id = `superheroes`;
   names = ["use"];
   description = "Uses an item from your items inventory.";
   usage = ["$CMD$ <item>"];

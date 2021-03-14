@@ -10,6 +10,7 @@ import { ItemService } from "../../../lib/ItemService";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class Shop extends BaseCommand {
+  id = `dreamer`;
   names = [`shop`];
   description = `Shows you the available shops.`;
   subcommands = [`buy <item>`];

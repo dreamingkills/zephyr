@@ -6,6 +6,7 @@ import { GameUserCard } from "../../../../../structures/game/UserCard";
 import { Chance } from "chance";
 import { getCurrentTimestamp } from "../../../../utility/time/TimeUtils";
 import { processMultitradeLogs } from "../../../../command/multitrade/ProcessLogs";
+import { Message } from "eris";
 
 export abstract class ACSet extends DBClass {
   public static async logGift(
@@ -207,6 +208,27 @@ export abstract class ACSet extends DBClass {
       `INSERT INTO burn (discord_id, card_id, burn_time) VALUES ${values.join(
         `, `
       )}`
+    );
+
+    return;
+  }
+
+  public static async logCommand(
+    commandId: string,
+    message: Message,
+    parameters: string,
+    error: boolean
+  ): Promise<void> {
+    await DB.query(
+      `INSERT INTO command_use (command_id, discord_id, parameters, guild_id, channel_id, error) VALUES (?, ?, ?, ?, ?, ?);`,
+      [
+        commandId,
+        message.author.id,
+        parameters,
+        message.guildID || null!,
+        message.channel.id,
+        error,
+      ]
     );
 
     return;

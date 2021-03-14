@@ -9,6 +9,7 @@ import { Zephyr } from "../../../structures/client/Zephyr";
 import { escapeMarkdown } from "../../../lib/utility/text/TextUtils";
 
 export default class Leaderboards extends BaseCommand {
+  id = `technologic`;
   names = ["leaderboards", "leaderboard", "top"];
   description = "Shows you top Zephyr players.";
   usage = ["$CMD$ <board name>"];

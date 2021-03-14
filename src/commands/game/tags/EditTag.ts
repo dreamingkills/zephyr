@@ -8,6 +8,7 @@ import emoji from "node-emoji";
 import { GameTag } from "../../../structures/game/Tag";
 
 export default class EditTag extends BaseCommand {
+  id = `freeze`;
   names = [`edittag`, `et`];
   description = `Changes the name or emoji of an existing tag.`;
   usage = [

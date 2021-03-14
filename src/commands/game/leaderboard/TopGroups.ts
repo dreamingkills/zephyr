@@ -10,6 +10,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { escapeMarkdown } from "../../../lib/utility/text/TextUtils";
 
 export default class TopGroup extends BaseCommand {
+  id = `emotion`;
   names = ["topgroup", "tg"];
   description = "Shows you the top collectors of a certain group.";
   usage = ["$CMD$ <group name>"];

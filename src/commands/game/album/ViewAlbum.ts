@@ -7,9 +7,10 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class ViewAlbums extends BaseCommand {
-  names = ["album", "a"];
-  description = "Shows you an album.";
-  usage = ["$CMD$ <album>", "$CMD$ <@user> <album>", "$CMD$ <user id> <album>"];
+  id = `crystallized`;
+  names = [`album`, `a`];
+  description = `Shows you an album.`;
+  usage = [`$CMD$ <album>`, `$CMD$ <@user> <album>`, `$CMD$ <user id> <album>`];
 
   allowDm = true;
 

@@ -10,6 +10,7 @@ import { PatreonService } from "../../../lib/database/services/meta/PatreonServi
 import { ItemService } from "../../../lib/ItemService";
 
 export default class ClaimMonthlyPatronReward extends BaseCommand {
+  id = `majesty`;
   names = ["monthly"];
   description = "Claims your monthly Patreon reward.";
   allowDm = true;

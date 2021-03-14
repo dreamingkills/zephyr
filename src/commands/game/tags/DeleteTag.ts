@@ -6,6 +6,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 
 export default class DeleteTag extends BaseCommand {
+  id = `acdc`;
   names = [`deletetag`, `dt`];
   description = `Deletes a tag and removes it from all of your cards.`;
   usage = [`$CMD$ <tag name>`];

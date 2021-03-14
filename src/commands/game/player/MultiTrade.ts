@@ -13,8 +13,9 @@ import { AnticheatService } from "../../../lib/database/services/meta/AnticheatS
 import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class MultiTrade extends BaseCommand {
-  names = ["multitrade", "mt"];
-  description = "Initiates a multitrade.";
+  id = `inhuman`;
+  names = [`multitrade`, `mt`];
+  description = `Initiates a multitrade.`;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     if (!this.zephyr.flags.trades)
