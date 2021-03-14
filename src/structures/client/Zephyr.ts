@@ -63,7 +63,7 @@ export class Zephyr extends Client {
     birthdayModifier: 2.5 /* Drops: card weight modifier for idols whose birthday is "today" */,
   };
 
-  public confiscatedTagId = 561;
+  public confiscatedTagId = 1345;
 
   private generalChannelNames = [
     "welcome",
