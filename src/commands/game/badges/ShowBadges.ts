@@ -68,7 +68,7 @@ export default class ShowBadges extends BaseCommand {
       );
     }
 
-    embed.setDescription(`${badgeDescriptions.join(`\n`)}`);
+    embed.setDescription(`${badgeDescriptions.join(`\n\n`)}`);
 
     await this.send(msg.channel, embed);
   }

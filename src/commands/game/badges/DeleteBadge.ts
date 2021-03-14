@@ -9,6 +9,7 @@ export default class DeleteBadge extends BaseCommand {
   names = ["deletebadge"];
   description = `Deletes a badge.`;
   usage = [`$CMD$ <badge name>`];
+  allowDm = true;
   developerOnly = true;
 
   async exec(
