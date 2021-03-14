@@ -132,11 +132,8 @@ export async function verifyMultitradeItems(
           itemInTrade.count += item.count;
         }
         continue;
-      } catch {
-        await handleError(
-          msg,
-          new ZephyrError.NoItemInInventoryError(item.item.names[0])
-        );
+      } catch (e) {
+        await handleError(msg, e);
         continue;
       }
     }

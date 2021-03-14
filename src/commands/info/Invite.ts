@@ -12,7 +12,7 @@ export default class Invite extends BaseCommand {
   async exec(msg: Message): Promise<void> {
     const embed = new MessageEmbed(`Invite`, msg.author).setDescription(
       `You can add the bot to your server by [clicking here](https://discord.com/api/oauth2/authorize?client_id=791100707629432863&permissions=388160&scope=bot)!` +
-        `\nYou can also join the Zephyr Community server at https://discord.gg/7PFyqUvKYs.`
+        `\nYou can also join the Zephyr Community server at https://discord.gg/zephyr.`
     );
 
     await this.send(msg.channel, embed);

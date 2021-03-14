@@ -265,6 +265,21 @@ export default class MultiTrade extends BaseCommand {
     }
 
     try {
+      await verifyMultitradeItems(
+        msg,
+        this.handleError,
+        senderItems,
+        await profile.fetch(),
+        []
+      );
+      await verifyMultitradeItems(
+        msg,
+        this.handleError,
+        recipientItems,
+        await targetProfile.fetch(),
+        []
+      );
+
       if (senderItems.length > 0 || recipientItems.length > 0) {
         if (senderItems.length > 0)
           await transferItems(senderItems, targetProfile, profile);
@@ -277,6 +292,13 @@ export default class MultiTrade extends BaseCommand {
           profile,
           targetProfile
         );
+
+        await this.edit(
+          tradeMessage,
+          tradeInterfaceEmbed
+            .setFooter(`This trade has been completed.`)
+            .setColor(`26BF30`)
+        );
       }
     } catch (e) {
       await this.edit(
@@ -285,15 +307,7 @@ export default class MultiTrade extends BaseCommand {
           .setDescription(`This trade has been cancelled.`)
           .setColor(`C22727`)
       );
-      throw e;
     }
-
-    await this.edit(
-      tradeMessage,
-      tradeInterfaceEmbed
-        .setFooter(`This trade has been completed.`)
-        .setColor(`26BF30`)
-    );
 
     return;
   }
