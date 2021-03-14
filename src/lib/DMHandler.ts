@@ -5,9 +5,12 @@ import { createMessage } from "./discord/message/createMessage";
 import { GameProfile } from "../structures/game/Profile";
 
 export class DMHandler {
-  public remindersEnabled = true;
-
   public async handle(zephyr: Zephyr): Promise<void> {
+    if (!zephyr.flags.reminders) {
+      setTimeout(() => this.handle(zephyr), 30000);
+      return;
+    }
+
     const eligible = await ProfileService.getAvailableReminderRecipients();
     console.log(`Grabbed ${eligible.length} users to DM...`);
     const start = Date.now();
@@ -110,6 +113,6 @@ export class DMHandler {
       }`
     );
 
-    if (this.remindersEnabled) setTimeout(() => this.handle(zephyr), 30000);
+    setTimeout(() => this.handle(zephyr), 30000);
   }
 }
