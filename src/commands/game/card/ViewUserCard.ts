@@ -10,6 +10,7 @@ import {
   getDescriptions,
 } from "../../../lib/utility/text/TextUtils";
 import { rgbToHex } from "../../../lib/utility/color/ColorUtils";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 
 export default class ViewUserCard extends BaseCommand {
   id = `confusion`;
@@ -28,6 +29,14 @@ export default class ViewUserCard extends BaseCommand {
       !this.zephyr.flags.mainViewing
     )
       throw new ZephyrError.MainViewingFlagDisabledError();
+
+    const attachPermission = checkPermission(
+      `attachFiles`,
+      msg.channel,
+      this.zephyr
+    );
+
+    if (!attachPermission) throw new ZephyrError.CannotAttachFilesError();
 
     const rawIdentifier = options[0];
     let noText = options[1]?.toLowerCase().replace(`—`, `--`) === "--notext";
