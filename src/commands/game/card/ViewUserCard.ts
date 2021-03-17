@@ -72,12 +72,12 @@ export default class ViewUserCard extends BaseCommand {
         `${cardDescription} ${
           baseCard.subgroup ? `**(${baseCard.subgroup})**` : ``
         }\n` +
-          `\nOwner: ${generateUserTag(
+          `\nOwner: **${generateUserTag(
             msg.author,
             targetUser,
             targetProfile,
             this.zephyr
-          )}`
+          )}**`
       )
       .setImage(`attachment://card.png`);
 

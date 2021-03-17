@@ -29,4 +29,15 @@ export abstract class BlacklistGet extends DBClass {
       return new GameBlacklist(query[0]);
     } else return;
   }
+
+  public static async getProfileBlacklists(
+    profile: GameProfile
+  ): Promise<GameBlacklist[]> {
+    const query = (await DB.query(
+      `SELECT * FROM blacklist WHERE discord_id=?;`,
+      [profile.discordId]
+    )) as Blacklist[];
+
+    return query.map((b) => new GameBlacklist(b));
+  }
 }

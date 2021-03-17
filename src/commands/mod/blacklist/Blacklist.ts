@@ -40,6 +40,10 @@ export default class BlacklistUser extends BaseCommand {
     if (reason.length < 1 || reason.length > 1500)
       throw new ZephyrError.InvalidBlacklistReasonError();
 
+    const blacklists = await BlacklistService.getProfileBlacklists(
+      targetProfile
+    );
+
     await ProfileService.blacklistUser(targetProfile);
     const blacklist = await BlacklistService.blacklist(
       targetProfile,
@@ -48,7 +52,15 @@ export default class BlacklistUser extends BaseCommand {
     );
 
     const embed = new MessageEmbed(`Blacklist`, msg.author).setDescription(
-      `:lock: Blacklisted **${target.tag}**. Case ID: \`${blacklist.id}\``
+      `:lock: Blacklisted **${target.tag}** (${target.id}). Case ID: \`${
+        blacklist.id
+      }\`\n**${target.tag}** has ${
+        blacklists.length === 0
+          ? `never been blacklisted.`
+          : `been blacklisted **${blacklists.length}** time${
+              blacklists.length === 1 ? `` : `s`
+            }.`
+      }`
     );
 
     await this.send(msg.channel, embed);

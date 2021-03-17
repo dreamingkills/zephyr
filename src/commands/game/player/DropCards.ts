@@ -8,12 +8,18 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { getTimeUntil } from "../../../lib/utility/time/TimeUtils";
 import { GuildService } from "../../../lib/database/services/guild/GuildService";
 import { checkPermission } from "../../../lib/ZephyrUtils";
+// import childProcess from "child_process";
 
 export default class DropCards extends BaseCommand {
   id = `stylo`;
   names = [`drop`];
   description = `Drops three random cards in the channel.`;
+
   async exec(msg: Message, profile: GameProfile): Promise<void> {
+    /*this.runScript(`./dist/src/lib/arcanum/index.js`, (err: Error) => {
+      if (err) throw err;
+      console.log(`Done`);
+    });*/
     if (!this.zephyr.flags.drops) throw new ZephyrError.DropFlagDisabledError();
 
     const reactPermission = checkPermission(
@@ -21,6 +27,7 @@ export default class DropCards extends BaseCommand {
       msg.channel,
       this.zephyr
     );
+
     if (!reactPermission) throw new ZephyrError.CannotReactError();
 
     const dropChannel = await GuildService.getDropChannel(msg.guildID!);
@@ -35,6 +42,7 @@ export default class DropCards extends BaseCommand {
       !this.zephyr.config.discord.secondaryChannels.includes(msg.channel.id)
     )
       throw new ZephyrError.CannotDropInChannelError(dropChannel);
+
     const now = dayjs(Date.now());
     const until = dayjs(profile.dropNext);
     if (now < until)
@@ -67,4 +75,22 @@ export default class DropCards extends BaseCommand {
     );
     return;
   }
+
+  /*private runScript(scriptPath: string, callback: any) {
+    let invoked = false;
+    let process = childProcess.fork(scriptPath);
+
+    process.on("error", function (err) {
+      if (invoked) return;
+      invoked = true;
+      callback(err);
+    });
+
+    process.on("exit", function (code) {
+      if (invoked) return;
+      invoked = true;
+      var err = code === 0 ? null : new Error(" exit code: " + code);
+      callback(err);
+    });
+  }*/
 }

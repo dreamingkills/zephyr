@@ -29,4 +29,10 @@ export abstract class BlacklistService {
   ): Promise<GameBlacklist | undefined> {
     return await BlacklistGet.findBlacklist(profile);
   }
+
+  public static async getProfileBlacklists(
+    profile: GameProfile
+  ): Promise<GameBlacklist[]> {
+    return await BlacklistGet.getProfileBlacklists(profile);
+  }
 }

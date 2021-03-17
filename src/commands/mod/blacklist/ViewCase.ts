@@ -57,7 +57,11 @@ export default class ViewCase extends BaseCommand {
         blacklistee?.dynamicAvatarURL(`png`) ||
           msg.author.dynamicAvatarURL(`png`)
       )
-      .setTitle(`Case #${caseId} - ${blacklistee?.tag || blacklist.discordId}`)
+      .setTitle(
+        `Case #${caseId} - ${blacklistee?.tag || blacklist.discordId} (${
+          blacklist.discordId
+        })`
+      )
       .setDescription(
         `**Moderator**: ${
           moderator?.tag || blacklist.moderator

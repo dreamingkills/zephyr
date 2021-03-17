@@ -220,13 +220,14 @@ export abstract class ACSet extends DBClass {
     error: boolean
   ): Promise<void> {
     await DB.query(
-      `INSERT INTO command_use (command_id, discord_id, parameters, guild_id, channel_id, error) VALUES (?, ?, ?, ?, ?, ?);`,
+      `INSERT INTO command_use (command_id, discord_id, parameters, guild_id, channel_id, message_id, error) VALUES (?, ?, ?, ?, ?, ?, ?);`,
       [
         commandId,
         message.author.id,
         parameters,
         message.guildID || null!,
         message.channel.id,
+        message.id,
         error,
       ]
     );
