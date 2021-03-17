@@ -41,11 +41,20 @@ export default class CreateTag extends BaseCommand {
     if (tagName.length > 12)
       throw new ZephyrError.UnspecifiedTagInCreationError();
 
+    // @ts-ignore - this function is actually in node-emoji but it isn't in the typings.
+    //              it allows us to search the emoji index by **ONLY** emoji, and it
+    //              will NOT coerce strings such as "bank" into emojis.
+    if (emoji.findByCode(tagName))
+      throw new ZephyrError.UnspecifiedTagInCreationError();
+
     if (userTags.find((t) => t.name === tagName))
       throw new ZephyrError.DuplicateTagError(tagName);
 
     const emojiRaw = options[1];
-    const trueEmoji = emoji.find(emojiRaw);
+    // @ts-ignore - this function is actually in node-emoji but it isn't in the typings.
+    //              it allows us to search the emoji index by **ONLY** emoji, and it
+    //              will NOT coerce strings such as "bank" into emojis.
+    const trueEmoji = emoji.findByCode(emojiRaw);
 
     if (!trueEmoji) throw new ZephyrError.InvalidEmojiTagError();
 

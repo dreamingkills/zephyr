@@ -46,7 +46,16 @@ export default class EditTag extends BaseCommand {
       if (newParameter.length > 12)
         throw new ZephyrError.UnspecifiedTagInCreationError();
 
-      const isEmoji = emoji.find(newEmoji);
+      // @ts-ignore - this function is actually in node-emoji but it isn't in the typings.
+      //              it allows us to search the emoji index by **ONLY** emoji, and it
+      //              will NOT coerce strings such as "bank" into emojis.
+      if (emoji.findByCode(newParameter))
+        throw new ZephyrError.UnspecifiedTagInCreationError();
+
+      // @ts-ignore - this function is actually in node-emoji but it isn't in the typings.
+      //              it allows us to search the emoji index by **ONLY** emoji, and it
+      //              will NOT coerce strings such as "bank" into emojis.
+      const isEmoji = emoji.findByCode(newEmoji);
       if (!isEmoji) throw new ZephyrError.InvalidEmojiTagError();
 
       if (tags.find((t) => t.name === newParameter))
@@ -60,7 +69,10 @@ export default class EditTag extends BaseCommand {
       if (!newParameter || newParameter.length > 12)
         throw new ZephyrError.UnspecifiedTagInCreationError();
 
-      const isEmoji = emoji.find(newParameter);
+      // @ts-ignore - this function is actually in node-emoji but it isn't in the typings.
+      //              it allows us to search the emoji index by **ONLY** emoji, and it
+      //              will NOT coerce strings such as "bank" into emojis.
+      const isEmoji = emoji.findByCode(newParameter);
 
       if (isEmoji) {
         if (tags.find((t) => t.emoji === isEmoji.emoji))
