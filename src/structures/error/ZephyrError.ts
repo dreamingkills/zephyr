@@ -794,6 +794,14 @@ export class CannotReactError extends ZephyrError {
   }
 }
 
+export class CannotAttachFilesError extends ZephyrError {
+  constructor() {
+    super(
+      `I cannot attach files here. Please make sure I have the \`Attach Files\` permission.`
+    );
+  }
+}
+
 export class TooManyError extends ZephyrError {
   constructor() {
     super(`That would exceed the integer limit (4,294,967,295).`);

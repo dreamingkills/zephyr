@@ -30,6 +30,14 @@ export default class DropCards extends BaseCommand {
 
     if (!reactPermission) throw new ZephyrError.CannotReactError();
 
+    const attachPermission = checkPermission(
+      `attachFiles`,
+      msg.channel,
+      this.zephyr
+    );
+
+    if (!attachPermission) throw new ZephyrError.CannotAttachFilesError();
+
     const dropChannel = await GuildService.getDropChannel(msg.guildID!);
 
     if (!dropChannel) {
