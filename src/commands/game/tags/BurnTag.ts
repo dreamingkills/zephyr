@@ -38,12 +38,20 @@ export default class BurnTag extends BaseCommand {
     const cardsRaw = await CardService.getCardsByTag(query, profile);
 
     const cards: GameUserCard[] = [];
+    const inAlbum: GameUserCard[] = [];
     for (let card of cardsRaw) {
       const isInAlbum = await AlbumService.cardIsInAlbum(card);
-      if (!isInAlbum) cards.push(card);
+
+      if (isInAlbum) {
+        inAlbum.push(card);
+      } else cards.push(card);
     }
 
-    if (cards.length < 1) throw new ZephyrError.NoCardsTaggedError(query);
+    if (cards.length < 1 && inAlbum.length === 0) {
+      throw new ZephyrError.NoCardsTaggedError(query);
+    } else if (cards.length < 1 && inAlbum.length > 0) {
+      throw new ZephyrError.NoAvailableCardsTaggedError(query, inAlbum.length);
+    }
 
     const individualRewards = cards.map((c) => {
       return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
@@ -88,7 +96,12 @@ export default class BurnTag extends BaseCommand {
           (r) =>
             `:white_medium_small_square: **${r.count}x** \`${r.item.names[0]}\``
         )
-        .join("\n");
+        .join("\n") +
+      (inAlbum.length > 0
+        ? `\n\n*${inAlbum.length} card${
+            inAlbum.length === 1 ? ` is in an album` : `s are in albums`
+          } and cannot be burned.*`
+        : ``);
 
     const embed = new MessageEmbed(`Bulk Burn`, msg.author).setDescription(
       description

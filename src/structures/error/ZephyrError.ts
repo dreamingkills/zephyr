@@ -415,7 +415,21 @@ export class CardsNotTaggedError extends ZephyrError {
 
 export class NoCardsTaggedError extends ZephyrError {
   constructor(tag: GameTag) {
-    super(`You have no cards tagged ${tag.emoji} \`${tag.name}\`.`);
+    super(`You have no cards tagged ${tag.emoji} **${tag.name}**.`);
+  }
+}
+
+export class NoAvailableCardsTaggedError extends ZephyrError {
+  constructor(tag: GameTag, count: number) {
+    super(
+      `You have **${count.toLocaleString()}** card${
+        count === 1 ? `` : `s`
+      } tagged ${tag.emoji} **${tag.name}**, but ${
+        count === 1 ? `it` : `they`
+      } cannot be burned because ${
+        count === 1 ? `it is in an album.` : `they are in albums.`
+      }`
+    );
   }
 }
 
