@@ -272,6 +272,8 @@ export abstract class CardService {
     ctx.fillStyle = "#36393E";
     ctx.fill();
 
+    ctx.fillStyle = `#000000`;
+
     // Draw the base image
     ctx.drawImage(img, 0, 0, 350, 500);
 
