@@ -30,7 +30,8 @@
   "scripts": {
     "start": "yarn node dist/src/index.js",
     "build:watch": "tsc -w",
-    "start:watch": "yarn nodemon dist/src/index.js"
+    "start:watch": "yarn nodemon dist/src/index.js",
+    "start:prof": "yarn node --prof dist/src/index.js"
   },
   "devDependencies": {
     "@types/chroma-js": "^2.1.2"

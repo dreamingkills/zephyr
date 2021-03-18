@@ -36,7 +36,8 @@ export default class ViewUserCard extends BaseCommand {
       this.zephyr
     );
 
-    if (!attachPermission) throw new ZephyrError.CannotAttachFilesError();
+    if (!attachPermission && msg.channel.type !== 1)
+      throw new ZephyrError.CannotAttachFilesError();
 
     const rawIdentifier = options[0];
     let noText = options[1]?.toLowerCase().replace(`—`, `--`) === "--notext";
