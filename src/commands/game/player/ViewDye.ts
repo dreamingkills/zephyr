@@ -40,7 +40,6 @@ export default class ViewDye extends BaseCommand {
     ctx.fillRect(0, 0, 100, 100);
 
     const buffer = canvas.toBuffer("image/jpeg");
-    const buf = Buffer.alloc(buffer.length, buffer, "base64");
 
     const embed = new MessageEmbed(`View Dye`, msg.author)
       .setDescription(
@@ -62,7 +61,7 @@ export default class ViewDye extends BaseCommand {
       .setColor(dyeHex);
 
     await this.send(msg.channel, embed, {
-      file: { file: buf, name: `dyepreview.png` },
+      file: { file: buffer, name: `dyepreview.png` },
     });
     return;
   }

@@ -114,8 +114,7 @@ export abstract class AlbumService {
       ctx.drawImage(image, posX, posY, 245, 350);
     }
 
-    const buf = canvas.toBuffer("image/jpeg");
-    return Buffer.alloc(buf.length, buf, "base64");
+    return canvas.toBuffer("image/jpeg");
   }
 
   /*

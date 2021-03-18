@@ -36,12 +36,11 @@ export default class PreviewSticker extends BaseCommand {
     ctx.drawImage(stickerImg, 0, 0, 120, 120);
 
     const buffer = canvas.toBuffer("image/jpeg");
-    const final = Buffer.alloc(buffer.length, buffer, "base64");
 
     await this.send(
       msg.channel,
       `> **${msg.author.tag}** — Previewing **${sticker.name}**`,
-      { file: { file: final, name: `sticker.png` } }
+      { file: { file: buffer, name: `sticker.png` } }
     );
     return;
   }

@@ -99,12 +99,17 @@ export abstract class CardSpawner {
     }
 
     const collage = await CardService.generateCardCollage(droppedCards, zephyr);
+
+    console.log(Date.now());
+
     const drop = await createMessage(channel, `${title}\n`, {
       file: {
         file: collage,
         name: "collage.png",
       },
     });
+
+    console.log(Date.now());
 
     const filter = (_m: Message, emoji: PartialEmoji, userID: string) =>
       this.emojis.includes(emoji.name) && userID !== channel.client.user.id;

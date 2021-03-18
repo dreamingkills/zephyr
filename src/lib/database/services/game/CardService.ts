@@ -21,7 +21,7 @@ import { AnticheatService } from "../meta/AnticheatService";
 export abstract class CardService {
   // Used for card image generation
   private static toBufferPromise(state: gm.State): Promise<Buffer> {
-    return new Promise((resolve) => {
+    return new Promise(function resolvePromise(resolve) {
       try {
         state.toBuffer((err, buf) => {
           if (err) throw err;
@@ -198,8 +198,7 @@ export abstract class CardService {
     }
 
     // Send it off!
-    const buf = canvas.toBuffer("image/png");
-    return Buffer.alloc(buf.length, buf, "base64");
+    return canvas.toBuffer("image/png");
   }
 
   public static async generateCardPrefab(card: GameBaseCard): Promise<Buffer> {
@@ -246,8 +245,7 @@ export abstract class CardService {
     ctx.fillText(`${card.name}`, 50, 445);
 
     // Send it off!
-    const buf = canvas.toBuffer("image/png");
-    return Buffer.alloc(buf.length, buf, "base64");
+    return canvas.toBuffer("image/png");
   }
 
   public static async drawCardFromPrefab(
@@ -255,10 +253,11 @@ export abstract class CardService {
     serial: number
   ): Promise<Buffer> {
     let prefab: Buffer;
+
     try {
       prefab = await fs.readFile(`./cache/cards/prefab/${card.id}`);
-    } catch {
-      prefab = await this.generateCardPrefab(card);
+    } catch (e) {
+      prefab = await this.updatePrefabCache(card);
     }
 
     // Create the card canvas
@@ -268,6 +267,11 @@ export abstract class CardService {
     // Load the base card image
     let img = await loadImage(prefab);
 
+    ctx.beginPath();
+    ctx.rect(0, 0, 350, 500);
+    ctx.fillStyle = "#36393E";
+    ctx.fill();
+
     // Draw the base image
     ctx.drawImage(img, 0, 0, 350, 500);
 
@@ -275,8 +279,7 @@ export abstract class CardService {
     ctx.font = "20px AlteHaasGroteskBold";
     ctx.fillText(`#${serial}`, 50, 421);
 
-    const buf = canvas.toBuffer(`image/png`);
-    return Buffer.alloc(buf.length, buf, `base64`);
+    return canvas.toBuffer(`image/jpeg`);
   }
 
   public static async generateCardCollage(
@@ -287,27 +290,19 @@ export abstract class CardService {
     const canvas = createCanvas(cards.length * 350, 500);
     const ctx = canvas.getContext("2d");
 
-    // Draw the background - this will be a jpeg, so we need a
-    // Discord-colored background to look transparent.
-    // Sorry lightmode users!
-    ctx.beginPath();
-    ctx.rect(0, 0, cards.length * 350, 500);
-    ctx.fillStyle = "#36393E";
-    ctx.fill();
-
     // Generate each card image and draw it on the collage
     ctx.font = "14px AlteHaasGroteskBold";
     for (let [i, card] of cards.entries()) {
       const base = zephyr.getCard(card.baseCardId)!;
 
       const cardBuffer = await this.drawCardFromPrefab(base, card.serialNumber);
+
       const img = await loadImage(cardBuffer);
       ctx.drawImage(img, i * 350, 0, 350, 500);
     }
 
     // Send it off!
-    const buf = canvas.toBuffer("image/jpeg");
-    return Buffer.alloc(buf.length, buf, "base64");
+    return canvas.toBuffer("image/jpeg");
   }
 
   public static async generateStickerPreview(
@@ -348,8 +343,7 @@ export abstract class CardService {
       ctx.restore();
     }
 
-    const buf = canvas.toBuffer("image/png");
-    return Buffer.alloc(buf.length, buf, "base64");
+    return canvas.toBuffer("image/png");
   }
 
   public static async changeCardFrame(

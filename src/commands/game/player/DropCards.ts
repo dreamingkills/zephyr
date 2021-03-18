@@ -16,6 +16,7 @@ export default class DropCards extends BaseCommand {
   description = `Drops three random cards in the channel.`;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
+    console.log(Date.now());
     /*this.runScript(`./dist/src/lib/arcanum/index.js`, (err: Error) => {
       if (err) throw err;
       console.log(`Done`);
@@ -68,6 +69,7 @@ export default class DropCards extends BaseCommand {
         boost = profile.boosterGroup;
       }
     }
+
     const cards = this.zephyr.getRandomCards(3, wishlist, boost);
 
     await ProfileService.setDropTimestamp(
