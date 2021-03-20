@@ -88,10 +88,20 @@ export abstract class CardGet extends DBClass {
     )) as Frame[];
     return new GameFrame(query[0]);
   }
+
   public static async getFrameById(id: number): Promise<GameFrame> {
     const query = (await DB.query(`SELECT * FROM card_frame WHERE id=?;`, [
       id,
     ])) as Frame[];
+    return new GameFrame(query[0]);
+  }
+
+  public static async getFrameByName(name: string): Promise<GameFrame> {
+    const query = (await DB.query(
+      `SELECT * FROM card_frame WHERE frame_name LIKE (?);`,
+      [name]
+    )) as Frame[];
+
     return new GameFrame(query[0]);
   }
 
@@ -172,7 +182,7 @@ export abstract class CardGet extends DBClass {
 
   public static async getUserCardById(id: number): Promise<GameUserCard> {
     const query = (await DB.query(
-      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card USE INDEX (PRIMARY) LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.id=?;`,
+      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url, card_frame.text_color_hex FROM user_card USE INDEX (PRIMARY) LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.id=?;`,
       [id]
     )) as UserCard[];
     if (!query[0]) throw new ZephyrError.UnknownUserCardError(id.toString(36));

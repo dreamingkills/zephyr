@@ -1,4 +1,4 @@
-/*import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji } from "eris";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { Zephyr } from "../../structures/client/Zephyr";
 import { GameProfile } from "../../structures/game/Profile";
@@ -28,10 +28,12 @@ export async function useFrame(
   if (card.discordId !== msg.author.id)
     throw new ZephyrError.NotOwnerOfCardError(card);
 
-  const frame = await ShopService.getFrameByName(item.names[0]);
+  const frame = await CardService.getFrameByName(item.names[0]);
 
   card.dyeMaskUrl = frame.dyeMaskUrl;
   card.frameUrl = frame.frameUrl;
+  card.textColor = frame.textColor;
+  console.log(frame.textColor.toString());
 
   const preview = await CardService.generateCardImage(card, zephyr);
 
@@ -105,4 +107,3 @@ export async function useFrame(
 
   return;
 }
-*/

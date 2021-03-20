@@ -10,6 +10,7 @@ export interface UserCard {
   frame_id: number;
   frame_name: string;
   frame_url: string;
+  text_color_hex: Buffer;
   dye_mask_url: string;
   dye_r: number | null;
   dye_g: number | null;
@@ -32,6 +33,7 @@ export class GameUserCard {
   frameId: number;
   frameName: string;
   frameUrl: string;
+  textColor: string;
   dyeMaskUrl: string;
   dyeR: number;
   dyeG: number;
@@ -54,6 +56,7 @@ export class GameUserCard {
     this.frameId = data.frame_id;
     this.frameName = data.frame_name;
     this.frameUrl = data.frame_url;
+    this.textColor = data.text_color_hex?.toString() || `000000`;
     this.dyeMaskUrl = data.dye_mask_url;
     this.claimTime = data.claim_time;
     this.originalWear = data.original_wear;

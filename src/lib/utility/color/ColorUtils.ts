@@ -17,6 +17,19 @@ export function rgbToHex(r: number, g: number, b: number): string {
   return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
+export function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+
+  return { r, g, b };
+}
+
+export function hexToCmy(hex: string): { c: number; m: number; y: number } {
+  const rgb = hexToRgb(hex);
+  return rgbToCmy(rgb.r, rgb.g, rgb.b);
+}
+
 export function getNearestColor(
   hex: string
 ): {

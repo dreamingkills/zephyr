@@ -99,7 +99,26 @@ export abstract class AlbumGet extends DBClass {
   */
   public static async getCardsByAlbum(album: GameAlbum): Promise<AlbumCard[]> {
     const query = (await DB.query(
-      `SELECT user_card.*, album_card.slot FROM album_card LEFT JOIN user_card ON user_card.id=album_card.card_id WHERE album_card.album_id=?;`,
+      `SELECT
+        user_card.*,
+        album_card.slot,
+        card_frame.id AS frame_id,
+        card_frame.frame_name,
+        card_frame.frame_url,
+        card_frame.dye_mask_url,
+        card_frame.text_color_hex
+      FROM 
+        album_card
+      LEFT JOIN
+        user_card
+      ON
+        user_card.id=album_card.card_id
+      LEFT JOIN
+        card_frame
+      ON
+        user_card.frame=card_frame.id
+      WHERE
+        album_card.album_id=?;`,
       [album.id]
     )) as (UserCard & { slot: number })[];
 

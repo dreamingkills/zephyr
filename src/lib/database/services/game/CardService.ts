@@ -11,7 +11,7 @@ import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { GameTag } from "../../../../structures/game/Tag";
 import gm from "gm";
 import { GameDye } from "../../../../structures/game/Dye";
-import { rgbToCmy } from "../../../utility/color/ColorUtils";
+import { hexToCmy, rgbToCmy } from "../../../utility/color/ColorUtils";
 import {
   GameCardSticker,
   GameSticker,
@@ -101,6 +101,7 @@ export abstract class CardService {
     noText: boolean = false,
     large: boolean = false
   ): Promise<Buffer> {
+    console.log(card);
     // Need information off the base card to do anything.
     const baseCard = zephyr.getCard(card.baseCardId)!;
     const sizeCoefficient = large ? 2.2 : 1;
@@ -181,12 +182,34 @@ export abstract class CardService {
 
     if (!noText) {
       // Draw the group icon
-      const overlay = await loadImage(
-        `./src/assets/groups/${
-          baseCard.group?.toLowerCase().replace("*", "") || "nogroup"
-        }.png`
-      );
-      ctx.drawImage(overlay, 0, 0, sizeX, sizeY);
+      if (baseCard.group) {
+        if (card.textColor !== `000000`) {
+          const cmy = hexToCmy(card.textColor);
+
+          const dyeBuffer = await this.toBufferPromise(
+            gm(
+              `./src/assets/groups/${baseCard.group
+                .toLowerCase()
+                .replace(`*`, ``)}.png`
+            )
+              .whiteThreshold(100)
+              .colorize(cmy.c, cmy.m, cmy.y)
+          );
+
+          // Load the buffer and draw the dye mask on top of the frame.
+          const dyeImage = await loadImage(dyeBuffer);
+          ctx.drawImage(dyeImage, 0, 0, sizeX, sizeY);
+        } else {
+          const overlay = await loadImage(
+            `./src/assets/groups/${
+              baseCard.group?.toLowerCase().replace("*", "") || "nogroup"
+            }.png`
+          );
+          ctx.drawImage(overlay, 0, 0, sizeX, sizeY);
+        }
+      }
+
+      ctx.fillStyle = `#${card.textColor}`;
 
       // Draw the serial number
       ctx.font = `${serialFontSize}px AlteHaasGroteskBold`;
@@ -365,6 +388,10 @@ export abstract class CardService {
 
   public static async getFrameById(id: number): Promise<GameFrame> {
     return await CardGet.getFrameById(id);
+  }
+
+  public static async getFrameByName(name: string): Promise<GameFrame> {
+    return await CardGet.getFrameByName(name);
   }
 
   public static async transferCardsToUser(
