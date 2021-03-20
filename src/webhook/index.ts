@@ -37,9 +37,9 @@ export class WebhookListener {
 
       if (!body.user) return;
 
-      await zephyr.handleVote(body.user, body.isWeekend);
-
       res.status(200).end();
+
+      await zephyr.handleVote(body.user, body.isWeekend);
     });
   }
 }
