@@ -94,6 +94,7 @@ export abstract class CardSpawner {
           fight_count: 0,
           dropper: "0",
           luck_coeff: 0,
+          text_color_hex: Buffer.from(`000000`, `hex`),
         })
       );
     }
