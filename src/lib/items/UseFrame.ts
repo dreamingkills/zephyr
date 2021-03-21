@@ -28,12 +28,13 @@ export async function useFrame(
   if (card.discordId !== msg.author.id)
     throw new ZephyrError.NotOwnerOfCardError(card);
 
-  const frame = await CardService.getFrameByName(item.names[0]);
+  const frame = await CardService.getFrameByName(
+    item.names[0].split(` `).slice(0, -1).join(` `)
+  );
 
   card.dyeMaskUrl = frame.dyeMaskUrl;
   card.frameUrl = frame.frameUrl;
   card.textColor = frame.textColor;
-  console.log(frame.textColor.toString());
 
   const preview = await CardService.generateCardImage(card, zephyr);
 

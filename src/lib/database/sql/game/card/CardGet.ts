@@ -98,7 +98,7 @@ export abstract class CardGet extends DBClass {
 
   public static async getFrameByName(name: string): Promise<GameFrame> {
     const query = (await DB.query(
-      `SELECT * FROM card_frame WHERE frame_name LIKE (?);`,
+      `SELECT * FROM card_frame WHERE frame_name LIKE (CONCAT(?,"%"));`,
       [name]
     )) as Frame[];
 
