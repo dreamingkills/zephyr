@@ -101,7 +101,6 @@ export abstract class CardService {
     noText: boolean = false,
     large: boolean = false
   ): Promise<Buffer> {
-    console.log(card);
     // Need information off the base card to do anything.
     const baseCard = zephyr.getCard(card.baseCardId)!;
     const sizeCoefficient = large ? 2.2 : 1;
@@ -192,7 +191,7 @@ export abstract class CardService {
                 .toLowerCase()
                 .replace(`*`, ``)}.png`
             )
-              .whiteThreshold(100)
+              .negative()
               .colorize(cmy.c, cmy.m, cmy.y)
           );
 
