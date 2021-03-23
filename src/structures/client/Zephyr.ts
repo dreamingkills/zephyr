@@ -61,6 +61,7 @@ export class Zephyr extends Client {
   public modifiers = {
     boosterModifier: 2.5 /* Drops: card weight modifier for boosters */,
     birthdayModifier: 2.5 /* Drops: card weight modifier for idols whose birthday is "today" */,
+    wishlistChance: 7.5 /* Drops: percent chance to receive a wishlist bonus */,
   };
 
   public confiscatedTagId = 1345;
@@ -487,7 +488,9 @@ export class Zephyr extends Client {
     const pickedCards: GameBaseCard[] = [];
 
     if (wishlist.length > 0) {
-      const receiveWishlistBonus = this.chance.bool({ likelihood: 15 });
+      const receiveWishlistBonus = this.chance.bool({
+        likelihood: this.modifiers.wishlistChance,
+      });
 
       if (receiveWishlistBonus) {
         // Finds only wishlisted idols who have droppable cards
