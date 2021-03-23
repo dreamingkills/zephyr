@@ -109,6 +109,10 @@ export class Zephyr extends Client {
 
     const startTime = Date.now();
 
+    this.on("debug", (msg: string, id: number) => {
+      console.log(`DEBUG: ${msg} (ID ${id})`);
+    });
+
     this.once("ready", async () => {
       if (this.config.topgg.enabled) await this.startTopGg();
       await this.commandLib.setup(this);
