@@ -38,7 +38,7 @@ export default class Birthdays extends BaseCommand {
                 })
                 .join("\n")
       )
-      .setFooter(`All idols have a 2.5x droprate on their birthday!`);
+      .setFooter(`All idols have a 1.5x droprate on their birthday!`);
 
     await this.send(msg.channel, embed);
     return;
