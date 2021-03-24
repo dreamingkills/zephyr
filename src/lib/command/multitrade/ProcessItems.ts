@@ -26,7 +26,7 @@ export async function processItems(
     }
 
     if (split.length === 2) {
-      if (split[1] === "bits") {
+      if ([`bit`, `bits`].includes(split[1])) {
         const amount = strToInt(split[0]);
 
         if (!isNaN(amount) && amount > 0) {
@@ -35,7 +35,7 @@ export async function processItems(
         continue;
       }
 
-      if (split[1] === "cubits") {
+      if ([`cubit`, `cubits`].includes(split[1])) {
         const amount = strToInt(split[0]);
 
         if (!isNaN(amount) && amount > 0) {
