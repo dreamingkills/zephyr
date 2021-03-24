@@ -6,6 +6,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import { Recipe } from "../../../structures/game/Recipe";
 import { GameTag } from "../../../structures/game/Tag";
 import { GameUserCard } from "../../../structures/game/UserCard";
+import { AlbumService } from "../../database/services/game/AlbumService";
 import { ItemService } from "../../ItemService";
 
 export function strToInt(text: string): number {
@@ -42,12 +43,12 @@ export function renderRecipe(recipe: Recipe): string {
     .join("\n")}\n\`\`\``;
 }
 
-export function getDescriptions(
+export async function getDescriptions(
   targets: (GameUserCard | GameDye)[],
   zephyr: Zephyr,
   tags: GameTag[] = [],
   showSubgroup: boolean = false
-): string[] {
+): Promise<string[]> {
   const descriptions = [];
 
   const onlyCards = targets.filter(
@@ -93,6 +94,7 @@ export function getDescriptions(
       const hasTag = tags.filter(
         (tag) => tag.id === (<GameUserCard>t).tagId
       )[0];
+      const isInAlbum = await AlbumService.cardIsInAlbum(t);
 
       descriptions.push(
         `${hasTag?.emoji || `:white_medium_small_square:`} \`${t.id
@@ -107,7 +109,8 @@ export function getDescriptions(
           (baseCard.emoji ? ` ${baseCard.emoji}` : ``) +
           (showSubgroup && baseCard.subgroup
             ? ` **(${baseCard.subgroup})**`
-            : ``)
+            : ``) +
+          (isInAlbum ? ` 🔖` : ``)
       );
     } else if (t instanceof GameDye) {
       descriptions.push(

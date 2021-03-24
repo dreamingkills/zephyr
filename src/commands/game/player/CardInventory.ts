@@ -104,7 +104,7 @@ export default class CardInventory extends BaseCommand {
 
     const embed = new MessageEmbed(`Inventory`, msg.author)
       .setTitle(`${targetUser.tag}'s cards`)
-      .setDescription(this.renderInventory(inventory, userTags, verbose))
+      .setDescription(await this.renderInventory(inventory, userTags, verbose))
       .setFooter(
         `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${size} cards`
       );
@@ -138,7 +138,9 @@ export default class CardInventory extends BaseCommand {
           filters
         );
 
-        embed.setDescription(this.renderInventory(newCards, userTags, verbose));
+        embed.setDescription(
+          await this.renderInventory(newCards, userTags, verbose)
+        );
         embed.setFooter(`Page ${page} of ${totalPages} • ${size} entries`);
         await editMessage(sent, embed);
 
@@ -153,14 +155,14 @@ export default class CardInventory extends BaseCommand {
     if (totalPages > 2) await this.react(sent, `⏭`);
   }
 
-  private renderInventory(
+  private async renderInventory(
     cards: GameUserCard[],
     tags: GameTag[],
     showSubgroup: boolean = false
-  ): string {
+  ): Promise<string> {
     if (cards.length === 0) return "No cards here!";
 
-    const cardDescriptions = getDescriptions(
+    const cardDescriptions = await getDescriptions(
       cards,
       this.zephyr,
       tags,
