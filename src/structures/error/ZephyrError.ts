@@ -1,6 +1,7 @@
 import { User } from "eris";
 import { GameAlbum } from "../game/Album";
 import { GameBadge } from "../game/Badge";
+import { GameFrame } from "../game/BaseCard";
 import { GameBlacklist } from "../game/blacklist/Blacklist";
 import { GameDye } from "../game/Dye";
 import { GameIdol } from "../game/Idol";
@@ -255,6 +256,16 @@ export class NoItemInInventoryError extends ZephyrError {
 export class CannotRemoveFrameError extends ZephyrError {
   constructor() {
     super(`You cannot remove that frame.`);
+  }
+}
+
+export class DuplicateFrameError extends ZephyrError {
+  constructor(card: GameUserCard, frame: GameFrame) {
+    super(
+      `\`${card.id.toString(36)}\` already uses the **${
+        frame.frameName
+      } Frame**.`
+    );
   }
 }
 

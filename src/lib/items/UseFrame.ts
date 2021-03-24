@@ -10,6 +10,7 @@ import { createMessage } from "../discord/message/createMessage";
 import { ReactionCollector } from "eris-collector";
 import { addReaction } from "../discord/message/addReaction";
 import { editMessage } from "../discord/message/editMessage";
+import { AlbumService } from "../database/services/game/AlbumService";
 
 export async function useFrame(
   msg: Message,
@@ -28,9 +29,18 @@ export async function useFrame(
   if (card.discordId !== msg.author.id)
     throw new ZephyrError.NotOwnerOfCardError(card);
 
+  if (card.wear !== 5)
+    throw new ZephyrError.CardConditionTooLowError(card.wear, 5);
+
+  const isInAlbum = await AlbumService.cardIsInAlbum(card);
+  if (isInAlbum) throw new ZephyrError.CardInAlbumError(card);
+
   const frame = await CardService.getFrameByName(
     item.names[0].split(` `).slice(0, -1).join(` `)
   );
+
+  if (frame.id === card.frameId)
+    throw new ZephyrError.DuplicateFrameError(card, frame);
 
   card.dyeMaskUrl = frame.dyeMaskUrl;
   card.frameUrl = frame.frameUrl;
