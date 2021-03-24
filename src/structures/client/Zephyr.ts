@@ -179,7 +179,6 @@ export class Zephyr extends Client {
 
       if (message.author.bot || !message.channel) return;
 
-      console.log(this.userRateLimit);
       if (
         this.modifiers.perUserRateLimit ||
         this.modifiers.perChannelRateLimit ||
@@ -187,21 +186,25 @@ export class Zephyr extends Client {
       ) {
         const now = Date.now();
 
-        if (this.userRateLimit[message.author.id] > now) {
-          return;
-        } else {
-          this.userRateLimit[message.author.id] =
-            now + this.modifiers.perUserRateLimit;
+        if (this.modifiers.perUserRateLimit) {
+          if (this.userRateLimit[message.author.id] > now) {
+            return;
+          } else {
+            this.userRateLimit[message.author.id] =
+              now + this.modifiers.perUserRateLimit;
+          }
         }
 
-        if (this.channelRateLimit[message.channel.id] > now) {
-          return;
-        } else {
-          this.channelRateLimit[message.channel.id] =
-            now + this.modifiers.perChannelRateLimit;
+        if (this.modifiers.perChannelRateLimit) {
+          if (this.channelRateLimit[message.channel.id] > now) {
+            return;
+          } else {
+            this.channelRateLimit[message.channel.id] =
+              now + this.modifiers.perChannelRateLimit;
+          }
         }
 
-        if (message.guildID) {
+        if (this.modifiers.perGuildRateLimit && message.guildID) {
           if (this.guildRateLimit[message.guildID] > now) {
             return;
           } else {
