@@ -656,6 +656,12 @@ export class InvalidStickerError extends ZephyrError {
   }
 }
 
+export class NoStickersOnCardError extends ZephyrError {
+  constructor(card: GameUserCard) {
+    super(`\`${card.id.toString(36)}\` has no stickers.`);
+  }
+}
+
 /*
     HTTP
 */

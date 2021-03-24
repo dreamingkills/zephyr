@@ -26,7 +26,7 @@ import { GameIdol } from "../game/Idol";
 export class Zephyr extends Client {
   commandLib = new CommandLib();
   dmHandler = new DMHandler();
-  config: typeof config;
+  readonly config: typeof config;
   chance = new Chance();
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
@@ -65,7 +65,7 @@ export class Zephyr extends Client {
     wishlistChance: 7.5 /* Drops: percent chance to receive a wishlist bonus */,
 
     /* Cooldown - 0 to disable */
-    perUserRateLimit: 10000 /* Message processing: rate limit, in ms, per user */,
+    perUserRateLimit: 0 /* Message processing: rate limit, in ms, per user */,
     perChannelRateLimit: 0 /* Message processing: rate limit, in ms, per channel */,
     perGuildRateLimit: 0 /* Message processing: rate limit, in ms, per guild */,
   };

@@ -145,7 +145,7 @@ export default class BurnCard extends BaseCommand {
     }
     embedDescription += `?`;
 
-    const targetDescriptions = getDescriptions(
+    const targetDescriptions = await getDescriptions(
       burnTargets.slice(0, 5),
       this.zephyr,
       tags

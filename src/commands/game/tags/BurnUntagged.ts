@@ -59,7 +59,7 @@ export default class BurnUntagged extends BaseCommand {
       }
     }
 
-    const descs = getDescriptions(cards.slice(0, 5), this.zephyr, []);
+    const descs = await getDescriptions(cards.slice(0, 5), this.zephyr, []);
 
     const excess = Math.max(cards.length - 5, 0);
 

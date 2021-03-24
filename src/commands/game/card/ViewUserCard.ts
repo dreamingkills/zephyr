@@ -75,7 +75,9 @@ export default class ViewUserCard extends BaseCommand {
       );
 
     const userTags = await ProfileService.getTags(targetProfile);
-    const cardDescription = getDescriptions([card], this.zephyr, userTags)[0];
+    const cardDescription = (
+      await getDescriptions([card], this.zephyr, userTags)
+    )[0];
 
     const embed = new MessageEmbed(`View Card`, msg.author)
       .setDescription(

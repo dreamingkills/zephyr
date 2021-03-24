@@ -7,7 +7,10 @@ import { IssueHandler } from "../../../../IssueHandler";
 import { CardService } from "../../../services/game/CardService";
 import { Chance } from "chance";
 import { GameDye } from "../../../../../structures/game/Dye";
-import { GameSticker } from "../../../../../structures/game/Sticker";
+import {
+  GameCardSticker,
+  GameSticker,
+} from "../../../../../structures/game/Sticker";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { AlbumService } from "../../../services/game/AlbumService";
 
@@ -170,6 +173,14 @@ export abstract class CardSet extends DBClass {
       `INSERT INTO card_sticker (card_id, sticker_id, position) VALUES (?, ?, ?);`,
       [card.id, sticker.id, position]
     );
+    return;
+  }
+
+  public static async removeCardSticker(
+    sticker: GameCardSticker
+  ): Promise<void> {
+    await DB.query(`DELETE FROM card_sticker WHERE id=?;`, [sticker.id]);
+
     return;
   }
 }

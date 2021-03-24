@@ -60,7 +60,7 @@ export default class GiftCard extends BaseCommand {
 
     const tags = await ProfileService.getTags(profile);
 
-    const cardDescriptions = getDescriptions(
+    const cardDescriptions = await getDescriptions(
       cards.slice(0, 5),
       this.zephyr,
       tags

@@ -610,6 +610,16 @@ export abstract class CardService {
     return await card.fetch();
   }
 
+  public static async removeCardSticker(
+    card: GameUserCard,
+    zephyr: Zephyr,
+    sticker: GameCardSticker
+  ): Promise<Buffer> {
+    await CardSet.removeCardSticker(sticker);
+
+    return await this.updateCardCache(card, zephyr, false, true);
+  }
+
   public static async getLastCard(profile: GameProfile): Promise<GameUserCard> {
     return await CardGet.getLastCard(profile);
   }

@@ -80,7 +80,7 @@ export default class BurnTag extends BaseCommand {
       }
     }
 
-    const descs = getDescriptions(cards.slice(0, 5), this.zephyr, tags);
+    const descs = await getDescriptions(cards.slice(0, 5), this.zephyr, tags);
     const excess = Math.max(cards.length - 5, 0);
 
     let description =
