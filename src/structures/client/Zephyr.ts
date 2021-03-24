@@ -55,6 +55,7 @@ export class Zephyr extends Client {
     useConfiscatedToken: false /* Use of the confiscated card token */,
     postServerCount: true /* Post server count to Top.gg */,
     mainViewing: true /* Viewing cards in #zephyr-main */,
+    debugMessages: false /* Debug messages in console */,
   };
 
   /* These are some numbers that affect various things around Zephyr. */
@@ -62,7 +63,17 @@ export class Zephyr extends Client {
     boosterModifier: 2.5 /* Drops: card weight modifier for boosters */,
     birthdayModifier: 2.5 /* Drops: card weight modifier for idols whose birthday is "today" */,
     wishlistChance: 7.5 /* Drops: percent chance to receive a wishlist bonus */,
+
+    /* Cooldown - 0 to disable */
+    perUserRateLimit: 10000 /* Message processing: rate limit, in ms, per user */,
+    perChannelRateLimit: 0 /* Message processing: rate limit, in ms, per channel */,
+    perGuildRateLimit: 0 /* Message processing: rate limit, in ms, per guild */,
   };
+
+  /* Rate limit sets */
+  public userRateLimit: { [key: string]: number } = {};
+  public channelRateLimit: { [key: string]: number } = {};
+  public guildRateLimit: { [key: string]: number } = {};
 
   public confiscatedTagId = 1345;
 
@@ -110,7 +121,7 @@ export class Zephyr extends Client {
     const startTime = Date.now();
 
     this.on("debug", (msg: string, id: number) => {
-      console.log(`DEBUG: ${msg} (ID ${id})`);
+      if (this.flags.debugMessages) console.log(`DEBUG: ${msg} (ID ${id})`);
     });
 
     this.once("ready", async () => {
@@ -167,6 +178,38 @@ export class Zephyr extends Client {
       if (!this.flags.processMessages) return;
 
       if (message.author.bot || !message.channel) return;
+
+      console.log(this.userRateLimit);
+      if (
+        this.modifiers.perUserRateLimit ||
+        this.modifiers.perChannelRateLimit ||
+        this.modifiers.perGuildRateLimit
+      ) {
+        const now = Date.now();
+
+        if (this.userRateLimit[message.author.id] > now) {
+          return;
+        } else {
+          this.userRateLimit[message.author.id] =
+            now + this.modifiers.perUserRateLimit;
+        }
+
+        if (this.channelRateLimit[message.channel.id] > now) {
+          return;
+        } else {
+          this.channelRateLimit[message.channel.id] =
+            now + this.modifiers.perChannelRateLimit;
+        }
+
+        if (message.guildID) {
+          if (this.guildRateLimit[message.guildID] > now) {
+            return;
+          } else {
+            this.guildRateLimit[message.guildID] =
+              now + this.modifiers.perGuildRateLimit;
+          }
+        }
+      }
 
       await this.fetchUser(message.author.id);
 
