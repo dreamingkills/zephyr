@@ -64,9 +64,9 @@ export default class Trade extends BaseCommand {
         36
       )}\` for \`${tradeeCard.id.toString(36)}\`?` +
         `\n\n__**${targetUser.username} receives:**__` +
-        `\n${getDescriptions([traderCard], this.zephyr, traderTags)}` +
+        `\n${await getDescriptions([traderCard], this.zephyr, traderTags)}` +
         `\n\n__**${msg.author.username} receives:**__` +
-        `\n${getDescriptions([tradeeCard], this.zephyr, tradeeTags)}`
+        `\n${await getDescriptions([tradeeCard], this.zephyr, tradeeTags)}`
     );
 
     const confirmation = await this.send(msg.channel, embed);

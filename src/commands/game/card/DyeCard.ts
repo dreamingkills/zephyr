@@ -57,7 +57,7 @@ export default class DyeCard extends BaseCommand {
       .setDescription(
         `Really dye this card with \`$${targetDye.id.toString(36)}\` **${
           targetDye.name
-        }**?\n` + getDescriptions([targetCard], this.zephyr, userTags)
+        }**?\n` + (await getDescriptions([targetCard], this.zephyr, userTags))
       )
       .setFooter(
         `$${targetDye.id.toString(36)} has ${targetDye.charges} charge${

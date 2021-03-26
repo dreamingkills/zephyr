@@ -71,7 +71,7 @@ export default class UpgradeCard extends BaseCommand {
     const embed = new MessageEmbed(`Upgrade`, msg.author)
       .setDescription(
         `Are you sure you want to upgrade this card?` +
-          `\n${getDescriptions([card], this.zephyr, tags)}` +
+          `\n${await getDescriptions([card], this.zephyr, tags)}` +
           `\n\nThis will cost...` +
           `\n— **${dustCost.toLocaleString()}x** \`${dustItem.names[0]}\`` +
           `\n— **${
