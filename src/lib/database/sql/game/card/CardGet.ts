@@ -309,11 +309,6 @@ export abstract class CardGet extends DBClass {
   /*
       Stickers
   */
-  public static async getAllStickers(): Promise<GameSticker[]> {
-    const query = (await DB.query(`SELECT * FROM sticker;`)) as Sticker[];
-    return query.map((s) => new GameSticker(s));
-  }
-
   public static async getCardStickers(
     card: GameUserCard
   ): Promise<GameCardSticker[]> {
@@ -375,5 +370,29 @@ export abstract class CardGet extends DBClass {
     if (!query[0]) throw new ZephyrError.NoAvailableConfiscatedCardsError();
 
     return new GameUserCard(query[0]);
+  }
+
+  public static async getAllFrames(): Promise<GameFrame[]> {
+    const query = (await DB.query(`
+    SELECT
+      id,
+      frame_name,
+      frame_url,
+      dye_mask_url,
+      text_color_hex
+    FROM card_frame;`)) as Frame[];
+
+    return query.map((q) => new GameFrame(q));
+  }
+
+  public static async getAllStickers(): Promise<GameSticker[]> {
+    const query = (await DB.query(`
+    SELECT
+      sticker.id,
+      sticker.name
+      sticker.image_url,
+      sticker.item_id`)) as Sticker[];
+
+    return query.map((q) => new GameSticker(q));
   }
 }

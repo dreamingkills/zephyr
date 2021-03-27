@@ -1,7 +1,7 @@
 import { createCanvas, loadImage } from "canvas";
 import { User } from "eris";
 import { Zephyr } from "../../../../structures/client/Zephyr";
-import { GameAlbum } from "../../../../structures/game/Album";
+import { GameAlbum, GameAlbumCard } from "../../../../structures/game/Album";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameUserCard } from "../../../../structures/game/UserCard";
 import { AlbumGet } from "../../sql/game/album/AlbumGet";
@@ -56,7 +56,9 @@ export abstract class AlbumService {
     return await album.fetch();
   }
 
-  public static async getCardsByAlbum(album: GameAlbum): Promise<AlbumCard[]> {
+  public static async getCardsByAlbum(
+    album: GameAlbum
+  ): Promise<GameAlbumCard[]> {
     return await AlbumGet.getCardsByAlbum(album);
   }
 
@@ -95,7 +97,7 @@ export abstract class AlbumService {
 
   public static async generateAlbumImage(
     album: GameAlbum,
-    cards: AlbumCard[],
+    cards: GameAlbumCard[],
     _page: number,
     zephyr: Zephyr
   ): Promise<Buffer> {
@@ -109,7 +111,9 @@ export abstract class AlbumService {
       const posX = 22 + 245 * (card.slot - Math.floor(card.slot / 4) * 4); // 25 + 350x
       const posY = 350 * Math.floor(card.slot / 4);
 
-      const buffer = await CardService.checkCacheForCard(card.card, zephyr);
+      const gameCard = await CardService.getUserCardById(card.cardId);
+
+      const buffer = await CardService.checkCacheForCard(gameCard, zephyr);
       const image = await loadImage(buffer);
       ctx.drawImage(image, posX, posY, 245, 350);
     }
@@ -122,7 +126,7 @@ export abstract class AlbumService {
   */
   public static async updateAlbumCache(
     album: GameAlbum,
-    cards: AlbumCard[],
+    cards: GameAlbumCard[],
     page: number,
     zephyr: Zephyr
   ): Promise<Buffer> {
@@ -149,7 +153,7 @@ export abstract class AlbumService {
 
   public static async checkCacheForAlbum(
     album: GameAlbum,
-    cards: AlbumCard[],
+    cards: GameAlbumCard[],
     page: number,
     zephyr: Zephyr
   ): Promise<Buffer> {
@@ -161,7 +165,7 @@ export abstract class AlbumService {
   }
 
   public static async removeCardsFromAlbums(
-    cards: AlbumCard[] | GameUserCard[],
+    cards: GameAlbumCard[] | GameUserCard[],
     albums: GameAlbum[],
     zephyr: Zephyr
   ): Promise<void> {
@@ -176,5 +180,11 @@ export abstract class AlbumService {
     card: GameUserCard
   ): Promise<GameAlbum | undefined> {
     return await AlbumGet.cardIsInAlbum(card);
+  }
+
+  public static async getCardsInAlbums(
+    profile: GameProfile
+  ): Promise<GameAlbumCard[]> {
+    return await AlbumGet.getCardsInAlbums(profile);
   }
 }

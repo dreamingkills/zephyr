@@ -2,7 +2,7 @@ import { Message } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { createCanvas, loadImage } from "canvas";
+import { createCanvas } from "canvas";
 
 export default class PreviewSticker extends BaseCommand {
   id = `dirt`;
@@ -32,8 +32,7 @@ export default class PreviewSticker extends BaseCommand {
     ctx.fillStyle = "#36393E";
     ctx.fill();
 
-    const stickerImg = await loadImage(sticker.imageUrl);
-    ctx.drawImage(stickerImg, 0, 0, 120, 120);
+    ctx.drawImage(sticker.image, 0, 0, 120, 120);
 
     const buffer = canvas.toBuffer("image/jpeg");
 

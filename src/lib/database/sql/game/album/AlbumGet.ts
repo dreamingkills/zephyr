@@ -1,11 +1,13 @@
 import { DB, DBClass } from "../../..";
-import { Album, GameAlbum } from "../../../../../structures/game/Album";
+import {
+  Album,
+  AlbumCard,
+  GameAlbum,
+  GameAlbumCard,
+} from "../../../../../structures/game/Album";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { User } from "eris";
-import {
-  GameUserCard,
-  UserCard,
-} from "../../../../../structures/game/UserCard";
+import { GameUserCard } from "../../../../../structures/game/UserCard";
 import { GameProfile } from "../../../../../structures/game/Profile";
 
 export abstract class AlbumGet extends DBClass {
@@ -97,34 +99,25 @@ export abstract class AlbumGet extends DBClass {
   /*
         Cards
   */
-  public static async getCardsByAlbum(album: GameAlbum): Promise<AlbumCard[]> {
+  public static async getCardsByAlbum(
+    album: GameAlbum
+  ): Promise<GameAlbumCard[]> {
     const query = (await DB.query(
-      `SELECT
-        user_card.*,
-        album_card.slot,
-        card_frame.id AS frame_id,
-        card_frame.frame_name,
-        card_frame.frame_url,
-        card_frame.dye_mask_url,
-        card_frame.text_color_hex
+      `
+      SELECT
+       album_card.id,
+       album_card.card_id,
+       album_card.album_id,
+       album_card.slot
       FROM 
         album_card
-      LEFT JOIN
-        user_card
-      ON
-        user_card.id=album_card.card_id
-      LEFT JOIN
-        card_frame
-      ON
-        user_card.frame=card_frame.id
       WHERE
-        album_card.album_id=?;`,
+        album_card.album_id=?;
+      `,
       [album.id]
-    )) as (UserCard & { slot: number })[];
+    )) as AlbumCard[];
 
-    return query.map((c) => {
-      return { card: new GameUserCard(c), slot: c.slot };
-    });
+    return query.map((q) => new GameAlbumCard(q));
   }
 
   public static async getNumberOfCardsByAlbum(
@@ -142,7 +135,8 @@ export abstract class AlbumGet extends DBClass {
     card: GameUserCard
   ): Promise<GameAlbum | undefined> {
     const query = (await DB.query(
-      `SELECT
+      `
+      SELECT
         album.id,
         album.discord_id,
         album.album_name,
@@ -156,10 +150,32 @@ export abstract class AlbumGet extends DBClass {
         ON album.id=album_card.album_id
       LEFT JOIN album_background
         ON album_background.id=album.background_id
-      WHERE card_id=?;`,
+      WHERE card_id=?;
+      `,
       [card.id]
     )) as Album[];
 
     return query[0] ? new GameAlbum(query[0]) : undefined;
+  }
+
+  public static async getCardsInAlbums(
+    profile: GameProfile
+  ): Promise<GameAlbumCard[]> {
+    const query = (await DB.query(
+      `
+    SELECT
+      album_card.id,
+      album_card.album_id,
+      album_card.card_id,
+      album_card.slot
+    FROM
+      album_card
+    WHERE
+      discord_id=?;
+    `,
+      [profile.discordId]
+    )) as AlbumCard[];
+
+    return query.map((q) => new GameAlbumCard(q));
   }
 }

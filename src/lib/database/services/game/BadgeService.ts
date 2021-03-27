@@ -3,9 +3,6 @@ import { GameProfile } from "../../../../structures/game/Profile";
 import { BadgeGet } from "../../sql/game/badge/BadgeGet";
 import { BadgeSet } from "../../sql/game/badge/BadgeSet";
 
-/*
-    poggers
-*/
 export abstract class BadgeService {
   public static async createBadge(
     name: string,

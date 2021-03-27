@@ -5,7 +5,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { CardService } from "../../../lib/database/services/game/CardService";
-import { GameAlbum } from "../../../structures/game/Album";
+import { GameAlbum, GameAlbumCard } from "../../../structures/game/Album";
 
 export default class AddCardToAlbum extends BaseCommand {
   id = `maybe`;
@@ -124,7 +124,7 @@ export default class AddCardToAlbum extends BaseCommand {
 
   private getFirstFreePage(
     album: GameAlbum,
-    cards: AlbumCard[]
+    cards: GameAlbumCard[]
   ): number | undefined {
     for (let i = 0; i < album.pages; i++) {
       const firstFreeSlot = this.getFirstFreeSlot(
@@ -135,7 +135,7 @@ export default class AddCardToAlbum extends BaseCommand {
     }
   }
 
-  private getFirstFreeSlot(cards: AlbumCard[]): number | undefined {
+  private getFirstFreeSlot(cards: GameAlbumCard[]): number | undefined {
     for (let i = 0; i < 8; i++) {
       if (!cards.find((c) => c.slot === i)) {
         return i + 1;

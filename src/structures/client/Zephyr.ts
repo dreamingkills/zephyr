@@ -17,11 +17,13 @@ import { WebhookListener } from "../../webhook";
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
 import { AnticheatService } from "../../lib/database/services/meta/AnticheatService";
 import dblapi from "dblapi.js";
-import { GameSticker } from "../game/Sticker";
+import { BuiltSticker } from "../game/Sticker";
 import { createMessage } from "../../lib/discord/message/createMessage";
 import dayjs from "dayjs";
 import { ItemService } from "../../lib/ItemService";
 import { GameIdol } from "../game/Idol";
+import { Image, loadImage } from "canvas";
+import fs from "fs/promises";
 
 export class Zephyr extends Client {
   commandLib = new CommandLib();
@@ -30,9 +32,16 @@ export class Zephyr extends Client {
   chance = new Chance();
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
-  private stickers: { [stickerId: number]: GameSticker } = {};
 
   private idols: { [id: number]: GameIdol } = {};
+
+  /* Images */
+  private frames: {
+    [frameId: number]: { name: string; frame?: Image; mask?: Buffer };
+  } = {};
+  private stickers: {
+    [stickerId: number]: BuiltSticker;
+  } = {};
 
   logChannel: TextChannel | undefined;
 
@@ -112,7 +121,11 @@ export class Zephyr extends Client {
   public async start() {
     await this.cachePrefixes();
     await this.cacheCards();
-    await this.cacheStickers();
+
+    /* Preload images into memory */
+    await this.loadFrames();
+    await this.loadStickers();
+
     ItemService.refreshItems();
     const fonts = await FontLoader.init();
 
@@ -389,6 +402,46 @@ export class Zephyr extends Client {
   }
 
   /*
+      Image Precaching (frames, stickers)
+  */
+  public async loadFrames(): Promise<void> {
+    const frames = await CardService.getAllFrames();
+
+    for (let frame of frames) {
+      this.frames[frame.id].name = frame.frameName;
+
+      if (frame.frameUrl) {
+        this.frames[frame.id].frame = await loadImage(frame.frameUrl);
+      }
+
+      if (frame.dyeMaskUrl) {
+        this.frames[frame.id].mask = await fs.readFile(frame.dyeMaskUrl);
+      }
+    }
+
+    return;
+  }
+
+  public getFrameImagesById(id: number): { frame?: Image; mask?: Buffer } {
+    return this.frames[id];
+  }
+
+  public async loadStickers(): Promise<void> {
+    const stickers = await CardService.getAllStickers();
+
+    for (let sticker of stickers) {
+      this.stickers[sticker.id] = {
+        id: sticker.id,
+        name: sticker.name,
+        image: await loadImage(sticker.imageUrl),
+        itemId: sticker.itemId,
+      };
+    }
+
+    return;
+  }
+
+  /*
       Prefix Caching
   */
   public async cachePrefixes(): Promise<void> {
@@ -466,21 +519,11 @@ export class Zephyr extends Client {
     return recached;
   }
 
-  // BETA FUNCTION
   public getRandomCards(
     amount: number,
     wishlist: GameWishlist[] = [],
     booster?: number
   ): GameBaseCard[] {
-    // TODO
-    //  - less weight for high-issue cards to balance them out
-    //  - somehow improve boosters
-    //  - apply weightings to droppableCards before anything else
-
-    // mathematical conundrums
-    //  - how to lower weighting based on total # of card generated? (relative to the lowest print card)
-    //  --> how to "average out" high-issue cards with midrange cards while ignoring low prints?
-
     // Get today's date so we can weigh birthday idols appropriately
     const today = dayjs().format(`MM-DD`);
 
@@ -584,6 +627,8 @@ export class Zephyr extends Client {
     return pickedCards;
   }
 
+  /*
+  OLD FUNCTION
   public __getRandomCards(
     amount: number,
     wishlist: GameWishlist[] = [],
@@ -678,6 +723,7 @@ export class Zephyr extends Client {
 
     return chosenCards;
   }
+  */
 
   public getCards(): GameBaseCard[] {
     return Object.values(this.cards);
@@ -690,23 +736,15 @@ export class Zephyr extends Client {
   /*
       Sticker Caching
   */
-  public async cacheStickers(): Promise<void> {
-    const stickers = await CardService.getAllStickers();
-    for (let sticker of stickers) {
-      this.stickers[sticker.id] = sticker;
-    }
-    return;
-  }
-
-  public getSticker(id: number): GameSticker | undefined {
+  public getStickerById(id: number): BuiltSticker | undefined {
     return this.stickers[id];
   }
 
-  public getStickerByItemId(itemId: number): GameSticker | undefined {
+  public getStickerByItemId(itemId: number): BuiltSticker | undefined {
     return Object.values(this.stickers).filter((s) => s.itemId === itemId)[0];
   }
 
-  public getStickerByName(name: string): GameSticker | undefined {
+  public getStickerByName(name: string): BuiltSticker | undefined {
     return Object.values(this.stickers).filter(
       (s) => s.name.toLowerCase() === name.toLowerCase()
     )[0];

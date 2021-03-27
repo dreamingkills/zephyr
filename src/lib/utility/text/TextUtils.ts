@@ -1,12 +1,12 @@
 import { User } from "eris";
 import { Zephyr } from "../../../structures/client/Zephyr";
+import { GameAlbumCard } from "../../../structures/game/Album";
 import { GameBaseCard } from "../../../structures/game/BaseCard";
 import { GameDye } from "../../../structures/game/Dye";
 import { GameProfile } from "../../../structures/game/Profile";
 import { Recipe } from "../../../structures/game/Recipe";
 import { GameTag } from "../../../structures/game/Tag";
 import { GameUserCard } from "../../../structures/game/UserCard";
-import { AlbumService } from "../../database/services/game/AlbumService";
 import { ItemService } from "../../ItemService";
 
 export function strToInt(text: string): number {
@@ -47,7 +47,8 @@ export async function getDescriptions(
   targets: (GameUserCard | GameDye)[],
   zephyr: Zephyr,
   tags: GameTag[] = [],
-  showSubgroup: boolean = false
+  showSubgroup: boolean = false,
+  albumCards: GameAlbumCard[] = []
 ): Promise<string[]> {
   const descriptions = [];
 
@@ -94,7 +95,6 @@ export async function getDescriptions(
       const hasTag = tags.filter(
         (tag) => tag.id === (<GameUserCard>t).tagId
       )[0];
-      const isInAlbum = await AlbumService.cardIsInAlbum(t);
 
       descriptions.push(
         `${hasTag?.emoji || `:white_medium_small_square:`} \`${t.id
@@ -110,7 +110,7 @@ export async function getDescriptions(
           (showSubgroup && baseCard.subgroup
             ? ` **(${baseCard.subgroup})**`
             : ``) +
-          (isInAlbum ? ` 🔖` : ``)
+          (albumCards.find((c) => c.cardId === t.id) ? ` 🔖` : ``)
       );
     } else if (t instanceof GameDye) {
       descriptions.push(

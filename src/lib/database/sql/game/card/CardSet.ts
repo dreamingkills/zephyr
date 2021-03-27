@@ -8,8 +8,8 @@ import { CardService } from "../../../services/game/CardService";
 import { Chance } from "chance";
 import { GameDye } from "../../../../../structures/game/Dye";
 import {
+  BuiltSticker,
   GameCardSticker,
-  GameSticker,
 } from "../../../../../structures/game/Sticker";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { AlbumService } from "../../../services/game/AlbumService";
@@ -166,7 +166,7 @@ export abstract class CardSet extends DBClass {
 
   public static async addStickerToCard(
     card: GameUserCard,
-    sticker: GameSticker,
+    sticker: BuiltSticker,
     position: number
   ): Promise<void> {
     await DB.query(

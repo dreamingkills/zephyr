@@ -31,7 +31,7 @@ export async function removeSticker(
       `Please choose a sticker to remove from your card.\n${targetStickers.map(
         (s, i) =>
           `\`${i + 1}\` **${
-            zephyr.getSticker(s.stickerId)?.name || `Unknown Sticker`
+            zephyr.getStickerById(s.stickerId)?.name || `Unknown Sticker`
           }**`
       )}`
     )
@@ -81,7 +81,7 @@ export async function removeSticker(
 
   const sticker = targetStickers[choice - 1];
   const stickerName =
-    zephyr.getSticker(sticker.stickerId)?.name || `Unknown Sticker`;
+    zephyr.getStickerById(sticker.stickerId)?.name || `Unknown Sticker`;
 
   if (!sticker) throw new ZephyrError.InvalidStickerError();
 

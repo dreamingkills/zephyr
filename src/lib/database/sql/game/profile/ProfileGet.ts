@@ -67,6 +67,7 @@ export abstract class ProfileGet extends DBClass {
       `SELECT COUNT(DISTINCT item_id) AS count FROM user_item WHERE discord_id=? AND quantity>0;`,
       [discordId]
     )) as { count: number }[];
+
     return query[0].count;
   }
 

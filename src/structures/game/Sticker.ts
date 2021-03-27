@@ -1,3 +1,5 @@
+import { Image } from "canvas";
+
 export interface Sticker {
   id: number;
   name: string;
@@ -38,4 +40,11 @@ export class GameCardSticker {
     this.stickerId = data.sticker_id;
     this.position = data.position;
   }
+}
+
+export interface BuiltSticker {
+  id: number;
+  name: string;
+  image: Image;
+  itemId: number;
 }

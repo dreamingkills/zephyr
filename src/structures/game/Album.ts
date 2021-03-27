@@ -10,6 +10,26 @@ export interface Album {
   image_url: string;
 }
 
+export interface AlbumCard {
+  id: number;
+  card_id: number;
+  album_id: number;
+  slot: number;
+}
+export class GameAlbumCard {
+  id: number;
+  cardId: number;
+  albumId: number;
+  slot: number;
+
+  constructor(data: AlbumCard) {
+    this.id = data.id;
+    this.cardId = data.card_id;
+    this.albumId = data.album_id;
+    this.slot = data.slot;
+  }
+}
+
 export class GameAlbum {
   id: number;
   discordId: string;

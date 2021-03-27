@@ -1,4 +1,4 @@
-import { createCanvas, loadImage, Image } from "canvas";
+import { createCanvas, loadImage } from "canvas";
 import { GameBaseCard, GameFrame } from "../../../../structures/game/BaseCard";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameUserCard } from "../../../../structures/game/UserCard";
@@ -13,6 +13,7 @@ import gm from "gm";
 import { GameDye } from "../../../../structures/game/Dye";
 import { hexToCmy, rgbToCmy } from "../../../utility/color/ColorUtils";
 import {
+  BuiltSticker,
   GameCardSticker,
   GameSticker,
 } from "../../../../structures/game/Sticker";
@@ -115,46 +116,38 @@ export abstract class CardService {
     let img = await loadImage(baseCard.image);
 
     // Load the card's frame, default if the id column is null
-    let frame: Image;
-    if (!card.frameId || !card.frameUrl) {
-      frame = await loadImage(`./src/assets/frames/default/frame-default.png`);
-    } else frame = await loadImage(card.frameUrl);
+    const { frame, mask } = zephyr.getFrameImagesById(card.frameId || 1);
 
     // Draw the base image, then the frame on top of that
     ctx.drawImage(img, 0, 0, sizeX, sizeY);
-    ctx.drawImage(frame, 0, 0, sizeX, sizeY);
 
-    // Handle dye mask (this was so annoying to set up I hate Windows)
-    // Default to the classic "Undyed Mask Gray" if the card is undyed.
-    let [r, g, b] = [185, 185, 185];
+    if (frame) ctx.drawImage(frame, 0, 0, sizeX, sizeY);
 
-    if (card.dyeR >= 0) r = card.dyeR;
-    if (card.dyeG >= 0) g = card.dyeG;
-    if (card.dyeB >= 0) b = card.dyeB;
+    if (mask) {
+      let [r, g, b] = [185, 185, 185];
 
-    const { c, m, y } = rgbToCmy(r, g, b);
+      if (card.dyeR >= 0) r = card.dyeR;
+      if (card.dyeG >= 0) g = card.dyeG;
+      if (card.dyeB >= 0) b = card.dyeB;
 
-    // We need to convert the GM State to a buffer, so that
-    // canvas knows what to do with it.
-    const dyeBuffer = await this.toBufferPromise(
-      gm(
-        card.dyeMaskUrl || `./src/assets/frames/default/mask-default.png`
-      ).colorize(c, m, y)
-    );
+      const { c, m, y } = rgbToCmy(r, g, b);
 
-    // Load the buffer and draw the dye mask on top of the frame.
-    const dyeImage = await loadImage(dyeBuffer);
-    ctx.drawImage(dyeImage, 0, 0, sizeX, sizeY);
+      // We need to convert the GM State to a buffer, so that
+      // canvas knows what to do with it.
+      const dyeBuffer = await this.toBufferPromise(gm(mask).colorize(c, m, y));
+
+      // Load the buffer and draw the dye mask on top of the frame.
+      const dyeImage = await loadImage(dyeBuffer);
+      ctx.drawImage(dyeImage, 0, 0, sizeX, sizeY);
+    }
 
     // Draw the stickers, if any
     const stickers = await this.getCardStickers(card);
     if (stickers.length > 0) {
       const size = 64 * sizeCoefficient;
       for (let sticker of stickers) {
-        const gameSticker = zephyr.getSticker(sticker.stickerId);
+        const gameSticker = zephyr.getStickerById(sticker.stickerId);
         if (!gameSticker) continue;
-
-        const stickerImage = await loadImage(gameSticker.imageUrl);
 
         const posX =
           82 * sizeCoefficient +
@@ -167,7 +160,7 @@ export abstract class CardService {
         ctx.save();
 
         ctx.translate(posX, posY);
-        ctx.drawImage(stickerImage, -size / 2, -size / 2, size, size);
+        ctx.drawImage(gameSticker.image, -size / 2, -size / 2, size, size);
 
         ctx.restore();
       }
@@ -219,7 +212,6 @@ export abstract class CardService {
       ctx.fillText(`${baseCard.name}`, textX, nameY);
     }
 
-    // Send it off!
     return canvas.toBuffer("image/png");
   }
 
@@ -603,7 +595,7 @@ export abstract class CardService {
 
   public static async addStickerToCard(
     card: GameUserCard,
-    sticker: GameSticker,
+    sticker: BuiltSticker,
     position: number
   ): Promise<GameUserCard> {
     await CardSet.addStickerToCard(card, sticker, position);
@@ -628,5 +620,9 @@ export abstract class CardService {
     confiscatedTag: GameTag
   ): Promise<GameUserCard> {
     return await CardGet.getRandomConfiscatedCard(confiscatedTag);
+  }
+
+  public static async getAllFrames(): Promise<GameFrame[]> {
+    return await CardGet.getAllFrames();
   }
 }

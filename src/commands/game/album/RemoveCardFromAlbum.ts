@@ -32,7 +32,7 @@ export default class RemoveCardFromAlbum extends BaseCommand {
     const albumCards = await AlbumService.getCardsByAlbum(isInAlbum);
     const page = Math.max(
       1,
-      Math.ceil(albumCards.find((c) => c.card.id === targetCard.id)!.slot / 8)
+      Math.ceil(albumCards.find((c) => c.cardId === targetCard.id)!.slot / 8)
     );
 
     await AlbumService.removeCardsFromAlbums(
@@ -45,7 +45,7 @@ export default class RemoveCardFromAlbum extends BaseCommand {
       isInAlbum,
       albumCards.filter(
         (c) =>
-          c.card.id !== targetCard.id &&
+          c.cardId !== targetCard.id &&
           c.slot >= page * 8 - 8 &&
           c.slot <= page * 8
       ),

@@ -12,6 +12,8 @@ import { GameTag } from "../../../structures/game/Tag";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { editMessage } from "../../../lib/discord/message/editMessage";
+import { AlbumService } from "../../../lib/database/services/game/AlbumService";
+import { GameAlbumCard } from "../../../structures/game/Album";
 
 export default class CardInventory extends BaseCommand {
   id = `cirice`;
@@ -80,6 +82,7 @@ export default class CardInventory extends BaseCommand {
     const verbose = filters[`verbose`] === `true` || filters[`v`] === `true`;
 
     const userTags = await ProfileService.getTags(target);
+    const cardsInAlbum = await AlbumService.getCardsInAlbums(target);
 
     const size = await CardService.getUserInventorySize(
       target,
@@ -104,7 +107,9 @@ export default class CardInventory extends BaseCommand {
 
     const embed = new MessageEmbed(`Inventory`, msg.author)
       .setTitle(`${targetUser.tag}'s cards`)
-      .setDescription(await this.renderInventory(inventory, userTags, verbose))
+      .setDescription(
+        await this.renderInventory(inventory, userTags, verbose, cardsInAlbum)
+      )
       .setFooter(
         `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${size} cards`
       );
@@ -139,7 +144,7 @@ export default class CardInventory extends BaseCommand {
         );
 
         embed.setDescription(
-          await this.renderInventory(newCards, userTags, verbose)
+          await this.renderInventory(newCards, userTags, verbose, cardsInAlbum)
         );
         embed.setFooter(`Page ${page} of ${totalPages} • ${size} entries`);
         await editMessage(sent, embed);
@@ -158,7 +163,8 @@ export default class CardInventory extends BaseCommand {
   private async renderInventory(
     cards: GameUserCard[],
     tags: GameTag[],
-    showSubgroup: boolean = false
+    showSubgroup: boolean = false,
+    cardsInAlbum: GameAlbumCard[]
   ): Promise<string> {
     if (cards.length === 0) return "No cards here!";
 
@@ -166,8 +172,10 @@ export default class CardInventory extends BaseCommand {
       cards,
       this.zephyr,
       tags,
-      showSubgroup
+      showSubgroup,
+      cardsInAlbum
     );
+
     return cardDescriptions.join("\n");
   }
 }

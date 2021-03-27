@@ -1,5 +1,5 @@
 import { DB, DBClass } from "../../..";
-import { GameAlbum } from "../../../../../structures/game/Album";
+import { GameAlbum, GameAlbumCard } from "../../../../../structures/game/Album";
 import { GameProfile } from "../../../../../structures/game/Profile";
 import { GameUserCard } from "../../../../../structures/game/UserCard";
 import { AlbumService } from "../../../services/game/AlbumService";
@@ -64,13 +64,15 @@ export abstract class AlbumSet extends DBClass {
   }
 
   public static async removeCardsFromAlbum(
-    cards: AlbumCard[] | GameUserCard[]
+    cards: GameAlbumCard[] | GameUserCard[]
   ): Promise<void> {
     const ids = [];
     for (let card of cards) {
       if (card instanceof GameUserCard) {
         ids.push(card.id);
-      } else ids.push(card.card.id);
+      } else {
+        ids.push(card.cardId);
+      }
     }
 
     await DB.query(`DELETE FROM album_card WHERE card_id IN (?);`, [ids]);

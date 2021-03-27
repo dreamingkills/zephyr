@@ -12,8 +12,6 @@ declare type TradeItemResolvable =
   | InteractableCubits
   | InteractableItem;
 
-declare type AlbumCard = { card: GameUserCard; slot: number };
-
 declare global {
   interface TradeItemResolvable {}
   interface InteractableBits {
@@ -25,10 +23,6 @@ declare global {
   interface InteractableItem {
     item: PrefabItem;
     count: number;
-  }
-  interface AlbumCard {
-    card: GameUserCard;
-    slot: number;
   }
   type AutotagKey = `idol` | `group` | `wear` | `issue`;
 }
