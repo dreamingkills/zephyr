@@ -389,7 +389,7 @@ export abstract class CardGet extends DBClass {
     const query = (await DB.query(`
     SELECT
       sticker.id,
-      sticker.name
+      sticker.name,
       sticker.image_url,
       sticker.item_id`)) as Sticker[];
 
