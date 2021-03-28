@@ -170,8 +170,10 @@ export abstract class AlbumGet extends DBClass {
       album_card.slot
     FROM
       album_card
+    LEFT JOIN album
+      ON album.id=album_card.album_id
     WHERE
-      discord_id=?;
+      album.discord_id=?;
     `,
       [profile.discordId]
     )) as AlbumCard[];
