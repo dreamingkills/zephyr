@@ -391,7 +391,9 @@ export abstract class CardGet extends DBClass {
       sticker.id,
       sticker.name,
       sticker.image_url,
-      sticker.item_id`)) as Sticker[];
+      sticker.item_id
+    FROM sticker;
+    `)) as Sticker[];
 
     return query.map((q) => new GameSticker(q));
   }
