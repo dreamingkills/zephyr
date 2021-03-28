@@ -408,15 +408,11 @@ export class Zephyr extends Client {
     const frames = await CardService.getAllFrames();
 
     for (let frame of frames) {
-      this.frames[frame.id].name = frame.frameName;
-
-      if (frame.frameUrl) {
-        this.frames[frame.id].frame = await loadImage(frame.frameUrl);
-      }
-
-      if (frame.dyeMaskUrl) {
-        this.frames[frame.id].mask = await fs.readFile(frame.dyeMaskUrl);
-      }
+      this.frames[frame.id] = {
+        name: frame.frameName,
+        frame: await loadImage(frame.frameUrl),
+        mask: await fs.readFile(frame.dyeMaskUrl),
+      };
     }
 
     return;
