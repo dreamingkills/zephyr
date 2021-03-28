@@ -14,6 +14,8 @@ import { AnticheatService } from "../database/services/meta/AnticheatService";
 
 export class CommandLib {
   commands: BaseCommand[] = [];
+  cooldowns: Set<string> = new Set();
+
   async setup(zephyr: Zephyr): Promise<void> {
     const _glob = promisify(glob);
     const files = await _glob(
@@ -33,6 +35,13 @@ export class CommandLib {
   }
 
   async process(message: Message, zephyr: Zephyr): Promise<void> {
+    if (
+      this.cooldowns.has(
+        message.author.id
+      ) /*&& !zephyr.config.moderators.includes(message.author.id) && !zephyr.config.developers.includes(message.author.id)*/
+    )
+      return;
+
     let prefix;
     if (message.channel.type === 1) {
       prefix = ".";
@@ -60,6 +69,9 @@ export class CommandLib {
       console.warn(`Duplicate command found: ${commandName}`);
 
     const command = commandMatch[0];
+
+    this.cooldowns.add(message.author.id);
+    setTimeout(() => this.cooldowns.delete(message.author.id), 10000);
 
     if (
       command.developerOnly &&

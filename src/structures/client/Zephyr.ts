@@ -24,6 +24,7 @@ import { ItemService } from "../../lib/ItemService";
 import { GameIdol } from "../game/Idol";
 import { Image, loadImage } from "canvas";
 import fs from "fs/promises";
+import { StatsD } from "node-statsd";
 
 export class Zephyr extends Client {
   commandLib = new CommandLib();
@@ -34,6 +35,8 @@ export class Zephyr extends Client {
   private cards: { [cardId: number]: GameBaseCard } = {};
 
   private idols: { [id: number]: GameIdol } = {};
+
+  statsd: StatsD | undefined;
 
   /* Images */
   private frames: {
@@ -119,6 +122,12 @@ export class Zephyr extends Client {
   }
 
   public async start() {
+    console.log(`pee`);
+    if (this.config.statsdEnabled) {
+      this.statsd = new StatsD();
+    }
+    console.log(`poo`);
+
     await this.cachePrefixes();
     await this.cacheCards();
 
@@ -192,7 +201,7 @@ export class Zephyr extends Client {
 
       if (message.author.bot || !message.channel) return;
 
-      const now = Date.now();
+      /*const now = Date.now();
 
       if (this.modifiers.perUserRateLimit > 0) {
         if (this.userRateLimit[message.author.id] > now) {
@@ -219,7 +228,7 @@ export class Zephyr extends Client {
           this.guildRateLimit[message.guildID] =
             now + this.modifiers.perGuildRateLimit;
         }
-      }
+      }*/
 
       await this.fetchUser(message.author.id);
 
@@ -410,8 +419,12 @@ export class Zephyr extends Client {
     for (let frame of frames) {
       this.frames[frame.id] = {
         name: frame.frameName,
-        frame: await loadImage(frame.frameUrl),
-        mask: await fs.readFile(frame.dyeMaskUrl),
+        frame: await loadImage(
+          frame.frameUrl || `./src/assets/frames/default/frame-default.png`
+        ),
+        mask: await fs.readFile(
+          frame.dyeMaskUrl || `./src/assets/frames/default/frame-default.png`
+        ),
       };
     }
 
