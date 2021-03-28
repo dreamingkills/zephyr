@@ -70,8 +70,13 @@ export class CommandLib {
 
     const command = commandMatch[0];
 
-    this.cooldowns.add(message.author.id);
-    setTimeout(() => this.cooldowns.delete(message.author.id), 10000);
+    if (zephyr.modifiers.perUserRateLimit > 0) {
+      this.cooldowns.add(message.author.id);
+      setTimeout(
+        () => this.cooldowns.delete(message.author.id),
+        zephyr.modifiers.perUserRateLimit
+      );
+    }
 
     if (
       command.developerOnly &&
