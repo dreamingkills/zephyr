@@ -146,11 +146,12 @@ export class Zephyr extends Client {
 
     this.on("debug", (msg: string, _id: number) => {
       if (this.flags.debugMessages) {
-        if (msg.includes(" 429 ") || msg.includes("429:"))
+        if (msg.includes(" 429 ") || msg.includes("429:")) {
           console.log(`429 Detected: ${msg}`);
-        this.errors++;
+          this.errors++;
 
-        console.log(`${this.errors} total 429s`);
+          console.log(`${this.errors} total 429s`);
+        }
       }
     });
 
