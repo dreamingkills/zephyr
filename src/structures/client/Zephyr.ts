@@ -38,6 +38,8 @@ export class Zephyr extends Client {
 
   statsd: StatsD | undefined;
 
+  private errors: number = 0;
+
   /* Images */
   private frames: {
     [frameId: number]: { name: string; frame?: Image; mask?: Buffer };
@@ -142,8 +144,14 @@ export class Zephyr extends Client {
 
     const startTime = Date.now();
 
-    this.on("debug", (msg: string, id: number) => {
-      if (this.flags.debugMessages) console.log(`DEBUG: ${msg} (ID ${id})`);
+    this.on("debug", (msg: string, _id: number) => {
+      if (this.flags.debugMessages) {
+        if (msg.includes(" 429 ") || msg.includes("429:"))
+          console.log(`429 Detected: ${msg}`);
+        this.errors++;
+
+        console.log(`${this.errors} total 429s`);
+      }
     });
 
     this.once("ready", async () => {
