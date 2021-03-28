@@ -64,7 +64,7 @@ export class Zephyr extends Client {
     useConfiscatedToken: false /* Use of the confiscated card token */,
     postServerCount: true /* Post server count to Top.gg */,
     mainViewing: true /* Viewing cards in #zephyr-main */,
-    debugMessages: false /* Debug messages in console */,
+    debugMessages: true /* Debug messages in console */,
   };
 
   /* These are some numbers that affect various things around Zephyr. */
