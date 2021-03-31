@@ -71,9 +71,7 @@ export default class DropCards extends BaseCommand {
 
     const restricted = dayjs(msg.author.createdAt) > dayjs().subtract(7, `day`);
 
-    console.log(restricted);
-
-    const cards = this.zephyr.getRandomCards(3, wishlist, boost, false);
+    const cards = this.zephyr.getRandomCards(3, wishlist, boost, restricted);
 
     await ProfileService.setDropTimestamp(
       profile,
