@@ -66,7 +66,7 @@ export default class VaultAdd extends BaseCommand {
 
       return;
     } else if (type === `cubits`) {
-      const quantity = parseInt(options[1]);
+      const quantity = parseInt(options[1], 10);
 
       if (isNaN(quantity) || quantity < 1)
         throw new VaultError.InvalidVaultCubitsQuantityError(prefix);

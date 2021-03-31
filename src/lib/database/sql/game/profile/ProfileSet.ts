@@ -159,7 +159,7 @@ export abstract class ProfileSet extends DBClass {
   ): Promise<GameProfile> {
     const refetchProfile = await profile.fetch();
 
-    if (refetchProfile.bits - amount < 0)
+    if (refetchProfile.cubits - amount < 0)
       throw new ZephyrError.NotEnoughCubitsError(profile.cubits, amount);
 
     await DB.query(
