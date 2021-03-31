@@ -31,13 +31,6 @@ export abstract class ProfileGet extends DBClass {
     )) as Wishlist[];
     return query.map((i) => new GameWishlist(i));
   }
-  public static async getNumberOfClaims(discordId: string): Promise<number> {
-    const query = (await DB.query(
-      `SELECT COUNT(*) AS count FROM user_card WHERE original_owner=?;`,
-      [discordId]
-    )) as { count: number }[];
-    return query[0].count;
-  }
 
   public static async getItems(
     discordId: string,
