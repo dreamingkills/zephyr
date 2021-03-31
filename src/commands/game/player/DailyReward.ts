@@ -35,8 +35,15 @@ export default class DailyReward extends BaseCommand {
         `${this.zephyr.config.discord.emoji.clock} You've already claimed your daily reward today.`
       );
     } else {
-      const reward = new Chance().integer(this.bitsReward);
-      await ProfileService.addBitsToProfile(profile, reward);
+      await ProfileService.setDailyTimestamp(profile, todayFormat);
+
+      const reward = new Chance().weighted(
+        this.rewards.map((t) => t.reward),
+        this.rewards.map((t) => t.chance)
+      );
+
+      if (reward === `75bits`) {
+      }
 
       if (streakBroken) {
         await ProfileService.resetDailyStreak(profile);
@@ -61,4 +68,32 @@ export default class DailyReward extends BaseCommand {
     await this.send(msg.channel, embed);
     return;
   }
+
+  private readonly rewards = [
+    { reward: `75bits`, chance: 50 },
+    {
+      reward: `5cubits`,
+      chance: 30,
+    },
+    {
+      reward: `250bits`,
+      chance: 10,
+    },
+    {
+      reward: `xtoken`,
+      chance: 5,
+    },
+    {
+      reward: `15cubits`,
+      chance: 3.9,
+    },
+    {
+      reward: `darkframe`,
+      chance: 1,
+    },
+    {
+      reward: `100cubits`,
+      chance: 0.1,
+    },
+  ];
 }

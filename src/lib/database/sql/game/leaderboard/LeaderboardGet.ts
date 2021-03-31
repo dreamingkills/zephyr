@@ -6,7 +6,7 @@ export abstract class LeaderboardGet extends DBClass {
 
   public static async getBitLeaderboardCount(): Promise<number> {
     const query = (await DB.query(
-      `SELECT COUNT(*) as count FROM profile WHERE bits+bits_bank>0 AND blacklisted=0;`
+      `SELECT COUNT(*) as count FROM profile WHERE bits>0 AND blacklisted=0;`
     )) as { count: number }[];
     return query[0].count;
   }
@@ -14,7 +14,7 @@ export abstract class LeaderboardGet extends DBClass {
   public static async getBitLeaderboard(page: number): Promise<GameProfile[]> {
     const offset = page * this.entries - this.entries;
     const query = (await DB.query(
-      `SELECT * FROM profile WHERE bits+bits_bank>0 AND blacklisted=0 ORDER BY bits+bits_bank DESC LIMIT ? OFFSET ?`,
+      `SELECT * FROM profile WHERE bits>0 AND blacklisted=0 ORDER BY bits DESC LIMIT ? OFFSET ?`,
       [this.entries, offset]
     )) as Profile[];
     return query.map((p) => new GameProfile(p));
