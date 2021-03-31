@@ -140,9 +140,9 @@ export default class Leaderboards extends BaseCommand {
             leaderboard += `*Private User*`;
           } else
             leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
-          leaderboard += ` — ${this.zephyr.config.discord.emoji.bits}**${(
-            profile.bits + profile.bitsBank
-          ).toLocaleString()}**\n`;
+          leaderboard += ` — ${
+            this.zephyr.config.discord.emoji.bits
+          }**${profile.bits.toLocaleString()}**\n`;
         }
         break;
       }
