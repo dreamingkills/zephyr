@@ -156,8 +156,9 @@ export function generateUserTag(
   if (!user) return `Unknown User`;
 
   const isMod = zephyr.config.moderators.includes(sender.id);
+  const isDev = zephyr.config.developers.includes(sender.id);
 
-  if (isMod || user.id === sender.id) return user.tag;
+  if (isMod || isDev || user.id === sender.id) return user.tag;
 
   if (profile.private) return `Private Profile`;
 
@@ -185,4 +186,11 @@ export function isPrivacyBlocked(
   if (zephyr.config.developers.includes(sender.id)) return false;
 
   return true;
+}
+
+export function canBypass(user: User, zephyr: Zephyr): boolean {
+  if (zephyr.config.moderators.includes(user.id)) return true;
+  if (zephyr.config.developers.includes(user.id)) return true;
+
+  return false;
 }

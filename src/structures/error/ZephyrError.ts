@@ -1079,7 +1079,7 @@ export class ReminderFlagDisabledError extends ZephyrError {
 export class TransactionFlagDisabledError extends ZephyrError {
   constructor() {
     super(
-      `Sorry, but paying, the bank, and the shop are temporarily disabled.\nPlease join [Zephyr Community](https://discord.gg/zephyr) to stay up to date.`
+      `Sorry, but paying, the vault, and the shop are temporarily disabled.\nPlease join [Zephyr Community](https://discord.gg/zephyr) to stay up to date.`
     );
   }
 }

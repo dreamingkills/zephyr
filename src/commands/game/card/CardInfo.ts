@@ -7,6 +7,11 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import dayjs from "dayjs";
+import {
+  canBypass,
+  generateUserTag,
+} from "../../../lib/utility/text/TextUtils";
+import * as ZephyrError from "../../../structures/error/ZephyrError";
 
 export default class CardInfo extends BaseCommand {
   id = `sickman`;
@@ -28,6 +33,13 @@ export default class CardInfo extends BaseCommand {
       card = await CardService.getUserCardByIdentifier(reference);
     }
 
+    if (
+      card.vaulted &&
+      card.discordId !== msg.author.id &&
+      !canBypass(msg.author, this.zephyr)
+    )
+      throw new ZephyrError.CardVaultedError(card);
+
     const claimInfo = await AnticheatService.getClaimInformation(card);
 
     if (!claimInfo) {
@@ -40,36 +52,41 @@ export default class CardInfo extends BaseCommand {
     }
 
     const claimTime = dayjs(claimInfo.claim_time).format(`YYYY/MM/DD HH:mm:ss`);
-    let claimer;
-    let dropper;
+
+    let claimerTag;
+    let dropperTag;
 
     if (claimInfo.claimer) {
       const claimerUser = await this.zephyr.fetchUser(claimInfo.claimer);
-      const claimerProfile = await ProfileService.getProfile(claimInfo.claimer);
-      if (
-        claimerProfile.private &&
-        claimerProfile.discordId !== msg.author.id &&
-        !this.zephyr.config.moderators.includes(msg.author.id)
-      ) {
-        claimer = "Private User";
-      } else claimer = claimerUser?.tag || "Unknown User";
-    }
+
+      if (claimerUser) {
+        const claimerProfile = await ProfileService.getProfile(
+          claimInfo.claimer
+        );
+
+        claimerTag = generateUserTag(
+          msg.author,
+          claimerUser,
+          claimerProfile,
+          this.zephyr
+        );
+      } else claimerTag = `Unknown User`;
+    } else claimerTag = `Unknown User`;
 
     if (claimInfo.dropper) {
       const dropperUser = await this.zephyr.fetchUser(claimInfo.dropper);
-      if (!dropperUser) {
-        dropper = "Unknown User";
-      } else {
+
+      if (dropperUser) {
         const dropperProfile = await ProfileService.getProfile(dropperUser.id);
-        if (
-          dropperProfile.private &&
-          dropperProfile.discordId !== msg.author.id &&
-          !this.zephyr.config.moderators.includes(msg.author.id)
-        ) {
-          dropper = "Private User";
-        } else dropper = dropperUser.tag;
-      }
-    } else dropper = "Server Activity";
+
+        dropperTag = generateUserTag(
+          msg.author,
+          dropperUser,
+          dropperProfile,
+          this.zephyr
+        );
+      } else dropperTag = `Unknown User`;
+    } else dropperTag = "Server Activity";
 
     const cardImage = await CardService.checkCacheForCard(card, this.zephyr);
 
@@ -78,8 +95,8 @@ export default class CardInfo extends BaseCommand {
         `Showing stats for \`${card.id.toString(36)}\`...` +
           `\n\n— Claimed at **${claimTime} UTC**` +
           `\n— Claimed in **${claimInfo.guild_id}**` +
-          `\n— Dropped by **${dropper}**` +
-          `\n— Claimed by **${claimer}**` +
+          `\n— Dropped by **${dropperTag}**` +
+          `\n— Claimed by **${claimerTag}**` +
           `\n\n— Claimed in **${
             ["damaged", "poor", "average", "good", "great", "mint"][
               claimInfo.wear

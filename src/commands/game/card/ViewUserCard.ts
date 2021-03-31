@@ -6,6 +6,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import {
+  canBypass,
   generateUserTag,
   getDescriptions,
 } from "../../../lib/utility/text/TextUtils";
@@ -50,7 +51,11 @@ export default class ViewUserCard extends BaseCommand {
     if (card.discordId === this.zephyr.user.id)
       throw new ZephyrError.CardBurnedError(card);
 
-    if (card.vaulted && card.discordId !== msg.author.id)
+    if (
+      card.vaulted &&
+      card.discordId !== msg.author.id &&
+      !canBypass(msg.author, this.zephyr)
+    )
       throw new ZephyrError.CardVaultedError(card);
 
     let targetProfile;
