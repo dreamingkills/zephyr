@@ -7,6 +7,7 @@ import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { MessageCollector } from "eris-collector";
 import { GameIdol } from "../../../../structures/game/Idol";
 import { getGroupsByIdolId } from "../../../../lib/utility/text/TextUtils";
+import { WishlistError } from "../../../../structures/error/WishlistError";
 
 export default class RemoveWishlist extends BaseCommand {
   id = `combat`;
@@ -20,13 +21,19 @@ export default class RemoveWishlist extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!options[0]) throw new ZephyrError.InvalidWishlistNameRemoveError();
-
     const wishlist = await ProfileService.getWishlist(profile);
+
+    if (wishlist.length === 0) {
+      const prefix = this.zephyr.getPrefix(msg.guildID);
+      throw new WishlistError.WishlistEmptyError(prefix);
+    }
+
+    if (!options[0]) throw new ZephyrError.InvalidIdolError();
 
     const nameQuery = options.join(" ").toLowerCase();
 
     const matches: GameIdol[] = [];
+
     this.zephyr
       .getCards()
       .filter((c) => `${c.group} ${c.name}`.toLowerCase().includes(nameQuery))
@@ -37,6 +44,14 @@ export default class RemoveWishlist extends BaseCommand {
       });
 
     if (matches.length === 0) throw new ZephyrError.UnknownIdolError();
+
+    const matchesOnWishlist = matches.filter((i) =>
+      wishlist.find((w) => w.idolId === i.id)
+    );
+
+    if (matchesOnWishlist.length === 0)
+      throw new WishlistError.IdolNotOnWishlistError();
+
     if (matches.length > 25) throw new ZephyrError.LookupQueryTooBroadError();
 
     let removalTarget: GameIdol;
@@ -110,8 +125,7 @@ export default class RemoveWishlist extends BaseCommand {
 
     const groups = getGroupsByIdolId(removalTarget.id, this.zephyr.getCards());
 
-    if (!exists)
-      throw new ZephyrError.IdolNotOnWishlistError(removalTarget, groups);
+    if (!exists) throw new WishlistError.IdolNotOnWishlistError();
 
     await ProfileService.removeFromWishlist(profile, removalTarget.id);
 

@@ -3,8 +3,8 @@ import { ProfileService } from "../../../../lib/database/services/game/ProfileSe
 import { MessageEmbed } from "../../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../../structures/command/Command";
 import { GameProfile } from "../../../../structures/game/Profile";
-import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { ReactionCollector } from "eris-collector";
+import { WishlistError } from "../../../../structures/error/WishlistError";
 
 export default class ClearWishlist extends BaseCommand {
   id = `handlebars`;
@@ -16,7 +16,10 @@ export default class ClearWishlist extends BaseCommand {
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const wishlist = await ProfileService.getWishlist(profile);
 
-    if (wishlist.length === 0) throw new ZephyrError.WishlistEmptyError();
+    if (wishlist.length === 0) {
+      const prefix = this.zephyr.getPrefix(msg.guildID);
+      throw new WishlistError.WishlistEmptyError(prefix);
+    }
 
     const confirmationEmbed = new MessageEmbed(`Clear Wishlist`, msg.author)
       .setDescription(`Really clear your wishlist?`)

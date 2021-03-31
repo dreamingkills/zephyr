@@ -27,7 +27,7 @@ export default class CardLookup extends BaseCommand {
       const prefabImage = await CardService.getPrefabFromCache(lastBase);
 
       await this.send(msg.channel, embed, {
-        file: { file: prefabImage, name: `prefab.png` },
+        files: [{ file: prefabImage, name: `prefab.png` }],
       });
       return;
     }
@@ -57,7 +57,7 @@ export default class CardLookup extends BaseCommand {
       const prefabImage = await CardService.getPrefabFromCache(find[0]);
 
       await this.send(msg.channel, embed, {
-        file: { file: prefabImage, name: `prefab.png` },
+        files: [{ file: prefabImage, name: `prefab.png` }],
       });
       return;
     }
@@ -115,7 +115,7 @@ export default class CardLookup extends BaseCommand {
     const prefabImage = await CardService.getPrefabFromCache(targetCard);
 
     await this.send(msg.channel, embed, {
-      file: { file: prefabImage, name: `prefab.png` },
+      files: [{ file: prefabImage, name: `prefab.png` }],
     });
     return;
   }

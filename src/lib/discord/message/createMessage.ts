@@ -1,8 +1,7 @@
-import { Message, TextableChannel } from "eris";
+import { Message, MessageFile, TextableChannel } from "eris";
 import { ErisFile } from "../../../structures/client/ErisFile";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { isFile } from "../../ZephyrUtils";
 import { retryOperation } from "../Retry";
 
 function deriveFileExtension(url: string | Buffer): string {
@@ -13,50 +12,38 @@ function deriveFileExtension(url: string | Buffer): string {
 
 export async function createMessage(
   channel: TextableChannel,
-  body: string | MessageEmbed | ErisFile,
-  options?: { embed?: MessageEmbed; file?: ErisFile }
+  body: string | MessageEmbed,
+  options?: { embed?: MessageEmbed; files?: ErisFile[] }
 ): Promise<Message<TextableChannel>> {
   let embed: MessageEmbed | undefined;
   let content: string;
-  let file: { file: string | Buffer; name: string } | undefined;
 
-  if (isFile(body)) {
-    let fileName = body.name;
-
-    if (!fileName) {
-      fileName = `untitled-image.${deriveFileExtension(body.file)}`;
-    }
-
-    file = {
-      file: body.file,
-      name: fileName,
-    };
-  } else if (body instanceof MessageEmbed) {
+  if (body instanceof MessageEmbed) {
     embed = body;
   } else content = body;
+
+  let derivedFiles: MessageFile[] = [];
 
   if (options) {
     if (options.embed) {
       embed = options.embed;
     }
-    if (options.file) {
-      let fileName = options.file.name;
+    if (options.files) {
+      for (let file of options.files) {
+        let fileName = file.name;
 
-      if (!fileName) {
-        fileName = `untitled-image.${deriveFileExtension(options.file.file)}`;
+        if (!fileName)
+          fileName = `untitled-image.${deriveFileExtension(file.file)}`;
+
+        derivedFiles.push({ file: file.file, name: fileName });
       }
-
-      file = {
-        file: options.file.file,
-        name: fileName,
-      };
     }
   }
 
   let message;
 
   message = await retryOperation(
-    async () => channel.createMessage({ content, embed }, file),
+    async () => channel.createMessage({ content, embed }, derivedFiles),
     3000,
     3
   ).catch((e) => {

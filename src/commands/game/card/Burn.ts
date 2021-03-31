@@ -13,6 +13,7 @@ import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { checkPermission } from "../../../lib/ZephyrUtils";
+import { VaultError } from "../../../structures/error/VaultError";
 
 export default class BurnCard extends BaseCommand {
   id = `suffer`;
@@ -69,6 +70,9 @@ export default class BurnCard extends BaseCommand {
         if (cardTarget.discordId !== msg.author.id)
           throw new ZephyrError.NotOwnerOfCardError(cardTarget);
 
+        if (cardTarget.vaulted)
+          throw new VaultError.CardInVaultError(cardTarget);
+
         const isInAlbum = await AlbumService.cardIsInAlbum(cardTarget);
         if (isInAlbum) throw new ZephyrError.CardInAlbumError(cardTarget);
 
@@ -101,13 +105,21 @@ export default class BurnCard extends BaseCommand {
       (t) => t instanceof GameUserCard
     ) as GameUserCard[];
 
+    /*let totalBitValue = 0;
+
+    for (let card of cardTargets) {
+      const bitValue = await CardService.calculateBurnValue(card);
+
+      totalBitValue += bitValue;
+    }*/
+
     const individualRewards = [
       0,
       ...cardTargets.map((c) => {
         return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
       }),
     ];
-    const bitReward = individualRewards.reduce((acc, bits) => acc + bits);
+    const totalBitValue = individualRewards.reduce((acc, bits) => acc + bits);
 
     const dustItems = items.filter((i) =>
       i.names[0].includes("Dust")
@@ -153,11 +165,11 @@ export default class BurnCard extends BaseCommand {
     embedDescription += `\n${targetDescriptions.join("\n")}`;
 
     const rewardsText = [];
-    if (bitReward > 0)
+    if (totalBitValue > 0)
       rewardsText.push(
         `:white_medium_small_square: ${
           this.zephyr.config.discord.emoji.bits
-        } **${bitReward.toLocaleString()}**`
+        } **${totalBitValue.toLocaleString()}**`
       );
 
     for (let item of itemRewards) {
@@ -218,8 +230,8 @@ export default class BurnCard extends BaseCommand {
       // Give the user their dust/glass/droplets and bits
       if (itemRewards.length > 0)
         await ProfileService.addItems(profile, itemRewards);
-      if (bitReward > 0)
-        await ProfileService.addBitsToProfile(profile, bitReward);
+      if (totalBitValue > 0)
+        await ProfileService.addBitsToProfile(profile, totalBitValue);
 
       let footer = `🔥 `;
       if (cardTargets.length > 0) {

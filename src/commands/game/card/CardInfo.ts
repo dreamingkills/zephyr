@@ -82,15 +82,15 @@ export default class CardInfo extends BaseCommand {
           `\n— Claimed by **${claimer}**` +
           `\n\n— Claimed in **${
             ["damaged", "poor", "average", "good", "great", "mint"][
-              card.originalWear
+              claimInfo.wear
             ]
           }** condition` +
-          `\n— Claimed in **${((card.claimTime - 5000) / 1000).toFixed(2)}s**`
+          `\n— Claimed in **${(claimInfo.claimed_after / 1000).toFixed(2)}s**`
       )
       .setThumbnail(`attachment://card.png`);
 
     await this.send(msg.channel, embed, {
-      file: { file: cardImage, name: "card.png" },
+      files: [{ file: cardImage, name: "card.png" }],
     });
     return;
   }

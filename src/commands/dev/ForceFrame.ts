@@ -28,7 +28,7 @@ export default class ForceFrame extends BaseCommand {
     );
 
     await this.send(msg.channel, "OK", {
-      file: { file: pic, name: "card.png" },
+      files: [{ file: pic, name: "card.png" }],
     });
 
     return;

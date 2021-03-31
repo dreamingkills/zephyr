@@ -48,10 +48,12 @@ export async function useSticker(
     .setFooter(`Enter a number 1-20.`);
 
   const previewMessage = await createMessage(msg.channel, embed, {
-    file: {
-      file: preview,
-      name: `sticker-preview-${card.id}.png`,
-    },
+    files: [
+      {
+        file: preview,
+        name: `sticker-preview-${card.id}.png`,
+      },
+    ],
   });
 
   const position: number = await new Promise(async (res, _req) => {
@@ -108,7 +110,7 @@ export async function useSticker(
     .setImage(`attachment://sticker-added-${card.id}.png`);
 
   await createMessage(msg.channel, successEmbed, {
-    file: { file: newCard, name: `sticker-added-${card.id}.png` },
+    files: [{ file: newCard, name: `sticker-added-${card.id}.png` }],
   });
   return;
 }

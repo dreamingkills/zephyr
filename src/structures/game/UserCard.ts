@@ -5,7 +5,7 @@ export interface UserCard {
   card_id: number;
   serial_number: number;
   discord_id: string;
-  original_owner: string;
+  // original_owner: string;
   wear: 0 | 1 | 2 | 3 | 4 | 5;
   frame_id: number;
   frame_name: string;
@@ -15,12 +15,13 @@ export interface UserCard {
   dye_r: number | null;
   dye_g: number | null;
   dye_b: number | null;
-  claim_time: number;
+  // claim_time: number;
   tag_id: number | null;
-  original_wear: number;
-  fight_count: number;
+  // original_wear: number;
+  // fight_count: number;
+  // dropper: string;
+  vaulted: boolean;
   luck_coeff: number;
-  dropper: string;
 }
 
 export class GameUserCard {
@@ -28,7 +29,7 @@ export class GameUserCard {
   baseCardId: number;
   serialNumber: number;
   discordId: string;
-  originalOwner: string;
+  //originalOwner: string;
   wear: 0 | 1 | 2 | 3 | 4 | 5;
   frameId: number;
   frameName: string;
@@ -38,11 +39,12 @@ export class GameUserCard {
   dyeR: number;
   dyeG: number;
   dyeB: number;
-  claimTime: number;
-  originalWear: number;
-  fightCount: number;
+  vaulted: boolean;
   luckCoefficient: number;
-  dropper: string;
+  //claimTime: number;
+  //originalWear: number;
+  //fightCount: number;
+  //dropper: string;
 
   tagId: number | undefined;
 
@@ -51,20 +53,21 @@ export class GameUserCard {
     this.baseCardId = data.card_id;
     this.serialNumber = data.serial_number;
     this.discordId = data.discord_id;
-    this.originalOwner = data.original_owner;
+    // this.originalOwner = data.original_owner;
     this.wear = data.wear;
     this.frameId = data.frame_id;
     this.frameName = data.frame_name;
     this.frameUrl = data.frame_url;
     this.textColor = data.text_color_hex?.toString() || `000000`;
     this.dyeMaskUrl = data.dye_mask_url;
-    this.claimTime = data.claim_time;
-    this.originalWear = data.original_wear;
-    this.fightCount = data.fight_count;
-    this.luckCoefficient = data.luck_coeff;
-    this.dropper = data.dropper;
+    this.vaulted = data.vaulted;
+    // this.claimTime = data.claim_time;
+    // this.originalWear = data.original_wear;
+    // this.fightCount = data.fight_count;
+    // this.dropper = data.dropper;
 
     this.tagId = data.tag_id || undefined;
+    this.luckCoefficient = data.luck_coeff;
 
     if (data.dye_r || data.dye_r === 0) {
       this.dyeR = data.dye_r;

@@ -50,6 +50,9 @@ export default class ViewUserCard extends BaseCommand {
     if (card.discordId === this.zephyr.user.id)
       throw new ZephyrError.CardBurnedError(card);
 
+    if (card.vaulted && card.discordId !== msg.author.id)
+      throw new ZephyrError.CardVaultedError(card);
+
     let targetProfile;
     if (card.discordId !== msg.author.id) {
       targetProfile = await ProfileService.getProfile(card.discordId);
@@ -103,10 +106,12 @@ export default class ViewUserCard extends BaseCommand {
 
     // .setFooter(`Luck Coefficient: ${card.luckCoefficient}`);
     await this.send(msg.channel, embed, {
-      file: {
-        file: image,
-        name: "card.png",
-      },
+      files: [
+        {
+          file: image,
+          name: "card.png",
+        },
+      ],
     });
   }
 }

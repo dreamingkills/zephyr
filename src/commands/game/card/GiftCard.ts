@@ -11,6 +11,7 @@ import { AnticheatService } from "../../../lib/database/services/meta/AnticheatS
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { checkPermission } from "../../../lib/ZephyrUtils";
+import { VaultError } from "../../../structures/error/VaultError";
 
 export default class GiftCard extends BaseCommand {
   id = `stunna`;
@@ -40,6 +41,8 @@ export default class GiftCard extends BaseCommand {
 
       if (card.discordId !== msg.author.id)
         throw new ZephyrError.NotOwnerOfCardError(card);
+
+      if (card.vaulted) throw new VaultError.CardInVaultError(card);
 
       const isInAlbum = await AlbumService.cardIsInAlbum(card);
       if (isInAlbum) throw new ZephyrError.CardInAlbumError(card);

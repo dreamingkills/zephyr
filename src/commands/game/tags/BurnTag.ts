@@ -53,10 +53,22 @@ export default class BurnTag extends BaseCommand {
       throw new ZephyrError.NoAvailableCardsTaggedError(query, inAlbum.length);
     }
 
-    const individualRewards = cards.map((c) => {
-      return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
-    });
-    const bitReward = individualRewards.reduce((acc, bits) => acc + bits);
+    /*let totalBitValue = 0;
+
+    for (let card of cards) {
+      const bitValue = await CardService.calculateBurnValue(card);
+
+      totalBitValue += bitValue;
+    }*/
+
+    const individualRewards = [
+      0,
+      ...cards.map((c) => {
+        return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
+      }),
+    ];
+    const totalBitValue = individualRewards.reduce((acc, bits) => acc + bits);
+
     const dustRewards: { item: PrefabItem; count: number }[] = [];
 
     const dustItems = items.filter((i) =>
@@ -90,7 +102,7 @@ export default class BurnTag extends BaseCommand {
       descs.join("\n") +
       (excess > 0 ? `\n*... and ${excess.toLocaleString()} more ...*` : ``) +
       `\n\nYou will receive:` +
-      `\n:white_medium_small_square: ${this.zephyr.config.discord.emoji.bits} **${bitReward}**\n` +
+      `\n:white_medium_small_square: ${this.zephyr.config.discord.emoji.bits} **${totalBitValue}**\n` +
       dustRewards
         .map(
           (r) =>
@@ -136,7 +148,7 @@ export default class BurnTag extends BaseCommand {
 
       const newProfile = await ProfileService.addBitsToProfile(
         profile,
-        bitReward
+        totalBitValue
       );
 
       await confirmation.edit({

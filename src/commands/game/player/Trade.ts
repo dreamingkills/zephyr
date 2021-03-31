@@ -10,6 +10,7 @@ import { ReactionCollector } from "eris-collector";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { checkPermission } from "../../../lib/ZephyrUtils";
+import { VaultError } from "../../../structures/error/VaultError";
 
 export default class Trade extends BaseCommand {
   id = `rhinestone`;
@@ -47,6 +48,8 @@ export default class Trade extends BaseCommand {
     if (traderCard.discordId !== msg.author.id)
       throw new ZephyrError.NotOwnerOfCardError(traderCard);
 
+    if (traderCard.vaulted) throw new VaultError.CardInVaultError(traderCard);
+
     const traderCardIsInAlbum = await AlbumService.cardIsInAlbum(traderCard);
     if (traderCardIsInAlbum) throw new ZephyrError.CardInAlbumError(traderCard);
 
@@ -54,6 +57,7 @@ export default class Trade extends BaseCommand {
     if (tradeeCard.discordId !== target.discordId)
       throw new ZephyrError.TradeeNotOwnerOfCardError(tradeeCard);
 
+    if (tradeeCard.vaulted) throw new ZephyrError.CardVaultedError(tradeeCard);
     const tradeeCardIsInAlbum = await AlbumService.cardIsInAlbum(tradeeCard);
     if (tradeeCardIsInAlbum) throw new ZephyrError.CardInAlbumError(tradeeCard);
 

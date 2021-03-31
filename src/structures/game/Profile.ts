@@ -1,34 +1,32 @@
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
 
 export interface Profile {
-  /*
-      Currencies
-  */
+  /* Currencies */
   bits: number;
-  bits_bank: number;
   premium_currency: number;
   cubits: number;
 
-  /*
-      Profile
-  */
+  /* Vault */
+  bits_vault: number;
+  cubits_vault: number;
+  bits_vault_max: number;
+  cubits_vault_max: number;
+  cards_vault_max: number;
+
+  /* Profile */
   discord_id: string;
   private: boolean;
   blurb: string;
   patron: number;
   blacklisted: boolean;
 
-  /*
-      Timestamps
-  */
+  /* Timestamps */
   daily_last: string;
   drop_next: string;
   claim_next: string;
   vote_last: string | null;
 
-  /*
-      Reminders
-  */
+  /* Reminders */
   claim_reminder: boolean;
   claim_reminded: boolean;
   drop_reminder: boolean;
@@ -36,72 +34,97 @@ export interface Profile {
   vote_reminder: boolean;
   vote_reminded: boolean;
 
-  /*
-      Boosters
-  */
+  /* Boosters */
   booster_group: number | null;
   booster_expiry: string | null;
 
-  /*
-      Other
-  */
+  /* Other */
   daily_streak: number;
   created_at: string;
 }
 
 export class GameProfile {
+  /* Currencies */
+  bits: number;
+  cubits: number;
+  premiumCurrency: number;
+
+  /* Vault */
+  bitsVault: number;
+  cubitsVault: number;
+  bitsVaultMax: number;
+  cubitsVaultMax: number;
+  cardsVaultMax: number;
+
+  /* Profile */
   discordId: string;
   private: boolean;
   blurb: string;
-  bits: number;
-  bitsBank: number;
-  dailyLast: string;
-  dailyStreak: number;
-  dropNext: string;
-  dropReminder: boolean;
-  dropReminded: boolean;
-  claimNext: string;
-  claimReminder: boolean;
-  claimReminded: boolean;
-  premiumCurrency: number;
   patron: number;
   blacklisted: boolean;
-  cubits: number;
+
+  /* Timestamps */
+  dailyLast: string;
+  dropNext: string;
+  claimNext: string;
   voteLast: string | null;
+
+  /* Reminders */
+  dropReminder: boolean;
+  dropReminded: boolean;
+  claimReminder: boolean;
+  claimReminded: boolean;
   voteReminder: boolean;
   voteReminded: boolean;
 
+  /* Boosters */
   boosterGroup?: number;
   boosterExpiry?: string;
 
+  /* Other */
+  dailyStreak: number;
   createdAt: string;
 
   constructor(data: Profile) {
+    /* Currencies */
+    this.bits = data.bits;
+    this.cubits = data.cubits;
+    this.premiumCurrency = data.premium_currency;
+
+    /* Vault */
+    this.bitsVault = data.bits_vault;
+    this.bitsVaultMax = data.bits_vault_max;
+    this.cubitsVault = data.cubits_vault;
+    this.cubitsVaultMax = data.cubits_vault_max;
+    this.cardsVaultMax = data.cards_vault_max;
+
+    /* Profile */
     this.discordId = data.discord_id;
     this.private = data.private;
     this.blurb = data.blurb;
-    this.bits = data.bits;
-    this.bitsBank = data.bits_bank;
-    this.dailyLast = data.daily_last;
-    this.dailyStreak = data.daily_streak;
     this.patron = data.patron;
+    this.blacklisted = data.blacklisted;
+
+    /* Timestamps */
+    this.dailyLast = data.daily_last;
     this.dropNext = data.drop_next;
     this.claimNext = data.claim_next;
-    this.premiumCurrency = data.premium_currency;
-    this.cubits = data.cubits;
     this.voteLast = data.vote_last;
 
+    /* Reminders */
     this.dropReminder = data.drop_reminder;
     this.dropReminded = data.drop_reminded;
     this.claimReminder = data.claim_reminder;
     this.claimReminded = data.claim_reminded;
     this.voteReminder = data.vote_reminder;
     this.voteReminded = data.vote_reminded;
-    this.blacklisted = data.blacklisted;
 
+    /* Boosters */
     this.boosterGroup = data.booster_group || undefined;
     this.boosterExpiry = data.booster_expiry || undefined;
 
+    /* Other */
+    this.dailyStreak = data.daily_streak;
     this.createdAt = data.created_at;
   }
 

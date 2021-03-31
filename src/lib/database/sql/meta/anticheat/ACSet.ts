@@ -41,7 +41,9 @@ export abstract class ACSet extends DBClass {
     card: GameUserCard,
     claimTime: number,
     dropTime: number,
-    guildId: string
+    guildId: string,
+    fightCount: number,
+    claimedAfter: number
   ): Promise<void> {
     const formattedClaimTimestamp = dayjs(claimTime).format(
       `YYYY/MM/DD HH:mm:ss`
@@ -52,7 +54,10 @@ export abstract class ACSet extends DBClass {
 
     if (dropper) {
       await DB.query(
-        `INSERT INTO claim (claimer, dropper, card_id, guild_id, claim_time, drop_time) VALUES (?, ?, ?, ?, ?, ?);`,
+        `
+        INSERT INTO
+          claim (claimer, dropper, card_id, guild_id, claim_time, drop_time, fight_count, wear, claimed_after)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
         [
           claimer.discordId,
           dropper.discordId,
@@ -60,6 +65,9 @@ export abstract class ACSet extends DBClass {
           guildId,
           formattedClaimTimestamp,
           formattedDropTimestamp,
+          fightCount,
+          card.wear,
+          claimedAfter,
         ]
       );
     } else {

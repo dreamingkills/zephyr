@@ -51,10 +51,29 @@ export abstract class ACGet extends DBClass {
     guild_id: string;
     claim_time: string;
     drop_time: string;
+    fight_count: number;
+    wear: number;
+    claimed_after: number;
   }> {
-    const query = (await DB.query(`SELECT * FROM claim WHERE card_id=?;`, [
-      card.id,
-    ])) as {
+    const query = (await DB.query(
+      `
+      SELECT
+        id,
+        claimer,
+        dropper,
+        card_id,
+        guild_id,
+        claim_time,
+        drop_time,
+        fight_count,
+        wear,
+        claimed_after
+      FROM
+        claim
+      WHERE card_id=?;
+      `,
+      [card.id]
+    )) as {
       id: number;
       claimer: string;
       dropper: string;
@@ -62,7 +81,11 @@ export abstract class ACGet extends DBClass {
       guild_id: string;
       claim_time: string;
       drop_time: string;
+      fight_count: number;
+      wear: number;
+      claimed_after: number;
     }[];
+
     return query[0];
   }
 

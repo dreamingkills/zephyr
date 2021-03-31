@@ -70,6 +70,9 @@ export class CommandLib {
 
     const command = commandMatch[0];
 
+    zephyr.onCooldown.add(message.author.id);
+    setTimeout(() => zephyr.onCooldown.delete(message.author.id), 300);
+
     if (zephyr.modifiers.perUserRateLimit > 0) {
       this.cooldowns.add(message.author.id);
       setTimeout(

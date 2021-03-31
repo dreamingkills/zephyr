@@ -7,6 +7,7 @@ import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { GameIdol } from "../../../../structures/game/Idol";
 import { MessageCollector } from "eris-collector";
 import { getGroupsByIdolId } from "../../../../lib/utility/text/TextUtils";
+import { WishlistError } from "../../../../structures/error/WishlistError";
 
 export default class AddWishlist extends BaseCommand {
   id = `permatrip`;
@@ -19,14 +20,14 @@ export default class AddWishlist extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!options[0]) throw new ZephyrError.InvalidWishlistNameError();
+    if (!options[0]) throw new ZephyrError.InvalidIdolError();
     const wishlist = await ProfileService.getWishlist(profile);
 
     const max = 5 + profile.patron * 5;
 
     if (wishlist.length > max) {
       const prefix = this.zephyr.getPrefix(msg.guildID!);
-      throw new ZephyrError.WishlistFullError(profile.patron, prefix);
+      throw new WishlistError.WishlistFullError(prefix);
     }
 
     const nameQuery = options.join(" ").toLowerCase();
@@ -51,7 +52,7 @@ export default class AddWishlist extends BaseCommand {
     let additionTarget: GameIdol;
 
     if (matches.length === 0) {
-      throw new ZephyrError.InvalidWishlistNameError();
+      throw new ZephyrError.InvalidIdolError();
     } else if (matches.length === 1) {
       additionTarget = matches[0];
     } else {
@@ -119,15 +120,17 @@ export default class AddWishlist extends BaseCommand {
 
     if (refetchWishlist.length >= max) {
       const prefix = this.zephyr.getPrefix(msg.guildID);
-      throw new ZephyrError.WishlistFullError(profile.patron, prefix);
+      throw new WishlistError.WishlistFullError(prefix);
     }
 
     const exists = refetchWishlist.find(
       (wl) => wl.idolId === additionTarget.id
     );
 
-    if (exists)
-      throw new ZephyrError.DuplicateWishlistEntryError(additionTarget, groups);
+    if (exists) {
+      const prefix = this.zephyr.getPrefix(msg.guildID);
+      throw new WishlistError.WishlistDuplicateError(additionTarget, prefix);
+    }
 
     await ProfileService.addToWishlist(profile, additionTarget.id);
 

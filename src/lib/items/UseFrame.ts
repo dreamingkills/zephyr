@@ -55,7 +55,7 @@ export async function useFrame(
     .setImage(`attachment://preview.png`);
 
   const confirmation = await createMessage(msg.channel, embed, {
-    file: { file: preview, name: "preview.png" },
+    files: [{ file: preview, name: "preview.png" }],
   });
 
   const confirmed: boolean = await new Promise(async (res, _req) => {
@@ -113,7 +113,7 @@ export async function useFrame(
   );
   embed.setImage(`attachment://success.png`);
   await createMessage(msg.channel, embed, {
-    file: { file: newCard, name: "success.png" },
+    files: [{ file: newCard, name: "success.png" }],
   });
 
   return;

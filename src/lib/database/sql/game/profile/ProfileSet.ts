@@ -10,6 +10,7 @@ import {
 import dayjs from "dayjs";
 import { PrefabItem } from "../../../../../structures/item/PrefabItem";
 import { GameTag } from "../../../../../structures/game/Tag";
+import { VaultError } from "../../../../../structures/error/VaultError";
 
 export abstract class ProfileSet extends DBClass {
   /*
@@ -103,39 +104,102 @@ export abstract class ProfileSet extends DBClass {
     return;
   }
 
-  public static async addBitsToBank(
+  public static async addBitsToVault(
     profile: GameProfile,
     amount: number
-  ): Promise<void> {
+  ): Promise<GameProfile> {
     const refetchProfile = await profile.fetch();
 
-    if (refetchProfile.bitsBank + amount > 4294967295)
-      throw new ZephyrError.TooManyError();
+    if (refetchProfile.bits - amount < 0)
+      throw new ZephyrError.NotEnoughBitsError(amount);
 
     await DB.query(
-      `UPDATE profile SET bits_bank=bits_bank+? WHERE discord_id=?;`,
-      [amount, profile.discordId]
+      `
+      UPDATE
+        profile
+      SET
+        bits=bits-?,
+        bits_vault=bits_vault+?
+      WHERE
+        discord_id=?;`,
+      [amount, amount, profile.discordId]
     );
-    return;
+
+    return await profile.fetch();
   }
 
-  public static async withdrawBitsFromBank(
+  public static async removeBitsFromVault(
     profile: GameProfile,
-    amount: number
-  ): Promise<void> {
+    amount: number,
+    prefix: string
+  ): Promise<GameProfile> {
     const refetchProfile = await profile.fetch();
 
-    if (refetchProfile.bitsBank - amount < 0)
-      throw new ZephyrError.NotEnoughBitsInBankError(
-        refetchProfile.bitsBank,
-        amount
-      );
+    if (refetchProfile.bitsVault - amount < 0)
+      throw new VaultError.NotEnoughBitsInVaultError(prefix);
 
     await DB.query(
-      `UPDATE profile SET bits_bank=bits_bank-? WHERE discord_id=?;`,
-      [amount, profile.discordId]
+      `
+      UPDATE
+        profile
+      SET
+        bits=bits+?,
+        bits_vault=bits_vault-?
+      WHERE
+        discord_id=?;`,
+      [amount, amount, profile.discordId]
     );
-    return;
+
+    return await profile.fetch();
+  }
+
+  public static async addCubitsToVault(
+    profile: GameProfile,
+    amount: number
+  ): Promise<GameProfile> {
+    const refetchProfile = await profile.fetch();
+
+    if (refetchProfile.bits - amount < 0)
+      throw new ZephyrError.NotEnoughCubitsError(profile.cubits, amount);
+
+    await DB.query(
+      `
+      UPDATE
+        profile
+      SET
+        cubits=cubits-?,
+        cubits_vault=cubits_vault+?
+      WHERE
+        discord_id=?;`,
+      [amount, amount, profile.discordId]
+    );
+
+    return await profile.fetch();
+  }
+
+  public static async removeCubitsFromVault(
+    profile: GameProfile,
+    amount: number,
+    prefix: string
+  ): Promise<GameProfile> {
+    const refetchProfile = await profile.fetch();
+
+    if (refetchProfile.cubitsVault - amount < 0)
+      throw new VaultError.NotEnoughCubitsInVaultError(prefix);
+
+    await DB.query(
+      `
+      UPDATE
+        profile
+      SET
+        cubits=cubits+?,
+        cubits_vault=cubits_vault-?
+      WHERE
+        discord_id=?;`,
+      [amount, amount, profile.discordId]
+    );
+
+    return await profile.fetch();
   }
 
   /*

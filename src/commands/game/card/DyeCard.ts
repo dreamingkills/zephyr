@@ -71,7 +71,7 @@ export default class DyeCard extends BaseCommand {
     );
 
     const confirmation = await this.send(msg.channel, embed, {
-      file: { file: preview, name: "dyepreview.png" },
+      files: [{ file: preview, name: "dyepreview.png" }],
     });
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
@@ -127,7 +127,7 @@ export default class DyeCard extends BaseCommand {
         );
 
       await this.send(msg.channel, successEmbed, {
-        file: { file: dyedCardImage, name: "dyesuccess.png" },
+        files: [{ file: dyedCardImage, name: "dyesuccess.png" }],
       });
       return;
     });

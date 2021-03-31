@@ -21,7 +21,9 @@ export abstract class AnticheatService {
     card: GameUserCard,
     claimTime: number,
     dropTime: number,
-    guildId: string
+    guildId: string,
+    fightCount: number,
+    claimedAfter: number
   ): Promise<void> {
     return await ACSet.logClaim(
       claimer,
@@ -29,7 +31,9 @@ export abstract class AnticheatService {
       card,
       claimTime,
       dropTime,
-      guildId
+      guildId,
+      fightCount,
+      claimedAfter
     );
   }
 
@@ -109,6 +113,9 @@ export abstract class AnticheatService {
     guild_id: string;
     claim_time: string;
     drop_time: string;
+    fight_count: number;
+    wear: number;
+    claimed_after: number;
   }> {
     return await ACGet.getClaimInformation(card);
   }

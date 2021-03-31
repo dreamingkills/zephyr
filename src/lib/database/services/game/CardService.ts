@@ -48,23 +48,9 @@ export abstract class CardService {
   public static async createNewUserCard(
     card: GameBaseCard,
     profile: GameProfile,
-    zephyr: Zephyr,
-    price: number = 0,
-    claimTime: number,
-    dropper: GameProfile | null,
-    frame: number = 1,
-    fightCount: number
+    zephyr: Zephyr
   ): Promise<GameUserCard> {
-    const newCard = await CardSet.createNewUserCard(
-      card,
-      profile,
-      zephyr,
-      price,
-      claimTime,
-      dropper,
-      fightCount,
-      frame
-    );
+    const newCard = await CardSet.createNewUserCard(card, profile, zephyr);
     return newCard;
   }
 
@@ -86,6 +72,12 @@ export abstract class CardService {
     options: Filter
   ): Promise<GameUserCard[]> {
     return await CardGet.getUserInventory(profile, options, tags);
+  }
+
+  public static async getVaultedCards(
+    profile: GameProfile
+  ): Promise<GameUserCard[]> {
+    return await CardGet.getVaultedCards(profile);
   }
 
   public static async getUserInventorySize(
@@ -624,5 +616,30 @@ export abstract class CardService {
 
   public static async getAllFrames(): Promise<GameFrame[]> {
     return await CardGet.getAllFrames();
+  }
+
+  public static async calculateBurnValue(card: GameUserCard): Promise<number> {
+    const claimRecord = await AnticheatService.getClaimInformation(card);
+
+    let base = 10;
+
+    if (card.wear === 5) {
+      if (card.frameId !== 1 && card.frameId) base *= 10;
+      if (card.dyeR >= 0 && card.dyeG >= 0 && card.dyeB >= 0) base *= 1.8;
+    }
+
+    if (claimRecord.claimer === card.discordId) base += 15;
+
+    const final = Math.floor(base * [0.1, 0.3, 0.5, 0.7, 1, 1.2][card.wear]);
+
+    return final;
+  }
+
+  public static async setCardsVaulted(cards: GameUserCard[]): Promise<void> {
+    return await CardSet.setCardsVaulted(cards);
+  }
+
+  public static async unsetCardsVaulted(cards: GameUserCard[]): Promise<void> {
+    return await CardSet.unsetCardsVaulted(cards);
   }
 }

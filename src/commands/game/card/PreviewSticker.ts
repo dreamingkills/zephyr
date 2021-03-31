@@ -39,7 +39,7 @@ export default class PreviewSticker extends BaseCommand {
     await this.send(
       msg.channel,
       `> **${msg.author.tag}** — Previewing **${sticker.name}**`,
-      { file: { file: buffer, name: `sticker.png` } }
+      { files: [{ file: buffer, name: `sticker.png` }] }
     );
     return;
   }

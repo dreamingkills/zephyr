@@ -40,6 +40,8 @@ export class Zephyr extends Client {
 
   private errors: number = 0;
 
+  onCooldown: Set<string> = new Set();
+
   /* Images */
   private frames: {
     [frameId: number]: { name: string; frame?: Image; mask?: Buffer };
@@ -104,7 +106,7 @@ export class Zephyr extends Client {
     super(config.discord.token, { restMode: true, maxShards: `auto` });
     this.config = config;
     this.users.limit = 50000;
-    this.setMaxListeners(250);
+    this.setMaxListeners(500);
   }
 
   public async startTopGg(): Promise<void> {
@@ -124,11 +126,9 @@ export class Zephyr extends Client {
   }
 
   public async start() {
-    console.log(`pee`);
     if (this.config.statsdEnabled) {
       this.statsd = new StatsD();
     }
-    console.log(`poo`);
 
     await this.cachePrefixes();
     await this.cacheCards();
@@ -207,6 +207,7 @@ export class Zephyr extends Client {
 
     this.on("messageCreate", async (message) => {
       if (!this.flags.processMessages) return;
+      if (this.onCooldown.has(message.author.id)) return;
 
       if (message.author.bot || !message.channel) return;
 
@@ -540,18 +541,26 @@ export class Zephyr extends Client {
   public getRandomCards(
     amount: number,
     wishlist: GameWishlist[] = [],
-    booster?: number
+    booster?: number,
+    restricted: boolean = false
   ): GameBaseCard[] {
     // Get today's date so we can weigh birthday idols appropriately
     const today = dayjs().format(`MM-DD`);
 
     // Get median serial number for use in averaging out drops
-    const droppableCards = this.getCards().filter(
-      (c) =>
-        c.rarity > 0 &&
-        c.activated &&
-        (c.serialLimit > 0 ? c.serialTotal < c.serialLimit : true)
-    );
+    const droppableCards = this.getCards().filter((c) => {
+      if (c.rarity === 0) return false;
+
+      if (!c.activated) return false;
+
+      if (c.serialLimit > 0 && c.serialTotal >= c.serialLimit) return false;
+
+      if (restricted && c.serialTotal < 1500) return false;
+
+      return true;
+    });
+
+    console.log(`Restricted: ${restricted} / ${droppableCards.length}`);
 
     const median = droppableCards.map((c) => c.serialTotal)[
       Math.ceil(droppableCards.length / 2)

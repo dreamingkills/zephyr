@@ -111,13 +111,15 @@ export default class AddCardToAlbum extends BaseCommand {
       );
 
     await this.send(msg.channel, embed, {
-      file: {
-        file: buffer,
-        name: `album-${targetAlbum.id}-${Math.max(
-          1,
-          Math.ceil(targetSlot / 8)
-        )}.png`,
-      },
+      files: [
+        {
+          file: buffer,
+          name: `album-${targetAlbum.id}-${Math.max(
+            1,
+            Math.ceil(targetSlot / 8)
+          )}.png`,
+        },
+      ],
     });
     return;
   }

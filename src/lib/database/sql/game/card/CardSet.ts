@@ -18,38 +18,23 @@ export abstract class CardSet extends DBClass {
   public static async createNewUserCard(
     card: GameBaseCard,
     profile: GameProfile,
-    zephyr: Zephyr,
-    price: number,
-    claimTime: number,
-    dropper: GameProfile | null,
-    fightCount: number,
-    frame?: number
+    zephyr: Zephyr
   ): Promise<GameUserCard> {
     const chance = new Chance();
     const wear = chance.weighted(
       [0, 1, 2, 3, 4, 5],
       [12.5, 25, 35, 23.6, 14.6, 4]
     );
-    const luckCoefficient = chance.floating({ min: 0, max: 1, fixed: 10 });
-    let issue = await IssueHandler.queueIssueGeneration(card, profile, price);
+
+    const luck = chance.floating({ min: 0, max: 1 });
+
+    let issue = await IssueHandler.queueIssueGeneration(card);
     let tries = 0;
     while (true) {
       try {
         const query = (await DB.query(
-          `INSERT INTO user_card (card_id, serial_number, discord_id, original_owner, wear, luck_coeff, frame, claim_time, dropper, fight_count, original_wear) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [
-            card.id,
-            issue,
-            profile.discordId,
-            profile.discordId,
-            wear,
-            luckCoefficient,
-            frame,
-            claimTime,
-            dropper ? dropper.discordId : null,
-            fightCount,
-            wear,
-          ]
+          `INSERT INTO user_card (card_id, serial_number, discord_id, wear, luck_coeff) VALUES (?, ?, ?, ?, ?)`,
+          [card.id, issue, profile.discordId, wear, luck]
         )) as { insertId: number };
         zephyr.getCard(card.id)!.serialTotal = issue;
         return await CardService.getUserCardById(query.insertId);
@@ -180,6 +165,38 @@ export abstract class CardSet extends DBClass {
     sticker: GameCardSticker
   ): Promise<void> {
     await DB.query(`DELETE FROM card_sticker WHERE id=?;`, [sticker.id]);
+
+    return;
+  }
+
+  public static async setCardsVaulted(cards: GameUserCard[]): Promise<void> {
+    await DB.query(
+      `
+      UPDATE
+        user_card
+      SET
+        vaulted=1
+      WHERE
+        id IN (?);
+      `,
+      [cards.map((c) => c.id)]
+    );
+
+    return;
+  }
+
+  public static async unsetCardsVaulted(cards: GameUserCard[]): Promise<void> {
+    await DB.query(
+      `
+      UPDATE
+        user_card
+      SET
+        vaulted=0
+      WHERE
+        id IN (?);
+    `,
+      [cards.map((c) => c.id)]
+    );
 
     return;
   }

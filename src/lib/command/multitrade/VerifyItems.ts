@@ -10,6 +10,7 @@ import {
   isInteractableItem,
 } from "./typeguards/MultitradeTypeguards";
 import { AlbumService } from "../../database/services/game/AlbumService";
+import { VaultError } from "../../../structures/error/VaultError";
 
 export async function verifyMultitradeItems(
   msg: Message,
@@ -29,6 +30,11 @@ export async function verifyMultitradeItems(
       )[0] as GameUserCard | undefined;
 
       if (cardInTrade) continue;
+
+      if (card.vaulted) {
+        await handleError(msg, new VaultError.CardInVaultError(card));
+        continue;
+      }
 
       const isInAlbum = await AlbumService.cardIsInAlbum(card);
       if (isInAlbum) {

@@ -86,19 +86,37 @@ export abstract class ProfileService {
     return await profile.fetch();
   }
 
-  public static async addBitsToBank(
+  public static async addBitsToVault(
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    await ProfileSet.addBitsToBank(profile, amount);
+    await ProfileSet.addBitsToVault(profile, amount);
     return await profile.fetch();
   }
 
-  public static async withdrawBitsFromBank(
+  public static async removeBitsFromVault(
+    profile: GameProfile,
+    amount: number,
+    prefix: string
+  ): Promise<GameProfile> {
+    await ProfileSet.removeBitsFromVault(profile, amount, prefix);
+    return await profile.fetch();
+  }
+
+  public static async addCubitsToVault(
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    await ProfileSet.withdrawBitsFromBank(profile, amount);
+    await ProfileSet.addCubitsToVault(profile, amount);
+    return await profile.fetch();
+  }
+
+  public static async removeCubitsFromVault(
+    profile: GameProfile,
+    amount: number,
+    prefix: string
+  ): Promise<GameProfile> {
+    await ProfileSet.removeCubitsFromVault(profile, amount, prefix);
     return await profile.fetch();
   }
 

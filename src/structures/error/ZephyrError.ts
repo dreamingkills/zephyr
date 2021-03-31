@@ -1,16 +1,16 @@
 import { User } from "eris";
+import { renderIdentifier } from "../../lib/utility/text/TextUtils";
 import { GameAlbum } from "../game/Album";
 import { GameBadge } from "../game/Badge";
 import { GameFrame } from "../game/BaseCard";
 import { GameBlacklist } from "../game/blacklist/Blacklist";
 import { GameDye } from "../game/Dye";
-import { GameIdol } from "../game/Idol";
 import { GameTag } from "../game/Tag";
 import { GameUserCard } from "../game/UserCard";
 import { PrefabItem } from "../item/PrefabItem";
 import { GamePoll } from "../poll/Poll";
 
-abstract class ZephyrError extends Error {
+export abstract class ZephyrError extends Error {
   name = "ZephyrError";
   message: string;
   isClientFacing = true;
@@ -113,6 +113,12 @@ export class UnknownIdolError extends ZephyrError {
   }
 }
 
+export class InvalidIdolError extends ZephyrError {
+  constructor() {
+    super(`Please enter the name of an idol.`);
+  }
+}
+
 /*
     Lookup
             */
@@ -180,55 +186,6 @@ export class NotEnoughCubitsError extends ZephyrError {
 export class CannotPayYourselfError extends ZephyrError {
   constructor() {
     super(`You can't give bits to yourself.`);
-  }
-}
-
-export class WishlistFullError extends ZephyrError {
-  constructor(patron: number, prefix: string) {
-    super(
-      `Your wishlist is full!` +
-        (patron >= 4
-          ? ``
-          : `\nYou can get more slots by becoming a patron! Use \`${prefix}patreon\` to find out more!`)
-    );
-  }
-}
-
-export class WishlistEmptyError extends ZephyrError {
-  constructor() {
-    super(`Your wishlist is already empty!`);
-  }
-}
-
-export class InvalidWishlistNameError extends ZephyrError {
-  constructor() {
-    super(`Please enter a valid name to add to your wishlist.`);
-  }
-}
-
-export class InvalidWishlistNameRemoveError extends ZephyrError {
-  constructor() {
-    super(`Please enter an idol to remove from your wishlist.`);
-  }
-}
-
-export class DuplicateWishlistEntryError extends ZephyrError {
-  constructor(idol: GameIdol, groups: string[]) {
-    super(
-      `**${idol.name}**${
-        groups.length === 0 ? `` : ` (${groups.join(`, `)})`
-      } is already on your wishlist.`
-    );
-  }
-}
-
-export class IdolNotOnWishlistError extends ZephyrError {
-  constructor(idol: GameIdol, groups: string[]) {
-    super(
-      `**${idol.name}** (${
-        groups.join(`, `) || `Soloist`
-      }) is not on your wishlist.`
-    );
   }
 }
 
@@ -426,7 +383,7 @@ export class CardsNotTaggedError extends ZephyrError {
 
 export class NoCardsTaggedError extends ZephyrError {
   constructor(tag: GameTag) {
-    super(`You have no cards tagged ${tag.emoji} **${tag.name}**.`);
+    super(`You have no available cards tagged ${tag.emoji} **${tag.name}**.`);
   }
 }
 
@@ -446,7 +403,7 @@ export class NoAvailableCardsTaggedError extends ZephyrError {
 
 export class NoUntaggedCardsError extends ZephyrError {
   constructor() {
-    super(`You have no untagged cards.`);
+    super(`You have no available untagged cards.`);
   }
 }
 
@@ -1202,5 +1159,11 @@ export class NoAvailableConfiscatedCardsError extends ZephyrError {
 export class ItemSoulboundError extends ZephyrError {
   constructor(item: PrefabItem) {
     super(`\`${item.names[0]}\` is a soulbound item and cannot be traded.`);
+  }
+}
+
+export class CardVaultedError extends ZephyrError {
+  constructor(card: GameUserCard) {
+    super(`\`${renderIdentifier(card)}\` is currently in someone's vault.`);
   }
 }

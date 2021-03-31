@@ -33,8 +33,6 @@ export abstract class CardSpawner {
     takers: Set<string>,
     card: GameDroppedCard,
     zephyr: Zephyr,
-    frame: number,
-    start: number,
     prefer?: GameProfile
   ): Promise<{ winner: GameProfile; card: GameUserCard }> {
     let winner;
@@ -46,16 +44,10 @@ export abstract class CardSpawner {
     }
     const baseCard = zephyr.getCard(card.baseCardId)!;
 
-    const now = Date.now();
     const newCard = await CardService.createNewUserCard(
       baseCard,
       winner,
-      zephyr,
-      0,
-      now - start,
-      prefer ? prefer : null,
-      frame,
-      takers.size
+      zephyr
     );
 
     return { winner, card: newCard };
@@ -79,7 +71,6 @@ export abstract class CardSpawner {
           serial_number: card.serialTotal + 1,
           card_id: card.id,
           discord_id: "0",
-          original_owner: "0",
           wear: 0,
           frame_id: 1,
           frame_name: "",
@@ -89,12 +80,9 @@ export abstract class CardSpawner {
           dye_g: 185,
           dye_b: 185,
           tag_id: 0,
-          claim_time: 0,
-          original_wear: 0,
-          fight_count: 0,
-          dropper: "0",
-          luck_coeff: 0,
           text_color_hex: Buffer.from(`000000`, `hex`),
+          vaulted: false,
+          luck_coeff: 0,
         })
       );
     }
@@ -102,10 +90,12 @@ export abstract class CardSpawner {
     const collage = await CardService.generateCardCollage(droppedCards, zephyr);
 
     const drop = await createMessage(channel, `${title}\n`, {
-      file: {
-        file: collage,
-        name: "collage.png",
-      },
+      files: [
+        {
+          file: collage,
+          name: "collage.png",
+        },
+      ],
     });
 
     const filter = (_m: Message, emoji: PartialEmoji, userID: string) =>
@@ -180,11 +170,11 @@ export abstract class CardSpawner {
             takers[num],
             droppedCards[num],
             zephyr,
-            droppedCards[num].frameId,
-            start,
             prefer
           );
           winners.add(fight.winner.discordId);
+
+          const countExl = takers[num].size - 1;
 
           await AnticheatService.logClaim(
             fight.winner,
@@ -192,10 +182,10 @@ export abstract class CardSpawner {
             fight.card,
             Date.now(),
             start,
-            channel.guild.id
+            channel.guild.id,
+            countExl,
+            Date.now() - start
           );
-
-          const countExl = takers[num].size - 1;
 
           for (let t of takers[num]) {
             this.grabbing.delete(t);

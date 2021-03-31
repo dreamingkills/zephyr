@@ -97,9 +97,9 @@ export async function getDescriptions(
       )[0];
 
       descriptions.push(
-        `${hasTag?.emoji || `:white_medium_small_square:`} \`${t.id
-          .toString(36)
-          .padStart(padLeft, " ")}\` : \`${"★"
+        `${hasTag?.emoji || `:white_medium_small_square:`} \`${renderIdentifier(
+          t
+        ).padStart(padLeft, " ")}\` : \`${"★"
           .repeat(t.wear)
           .padEnd(5, "☆")}\` : \`${(`#` + t.serialNumber.toString(10)).padEnd(
           padRight,
@@ -114,7 +114,7 @@ export async function getDescriptions(
       );
     } else if (t instanceof GameDye) {
       descriptions.push(
-        `:white_medium_small_square: \`${`$${t.id.toString(36)}`.padStart(
+        `:white_medium_small_square: \`${`$${renderIdentifier(t)}`.padStart(
           padRight,
           " "
         )}\` : \`☆☆☆☆☆\` : \`${t.charges
@@ -125,6 +125,10 @@ export async function getDescriptions(
   }
 
   return descriptions;
+}
+
+export function renderIdentifier(card: GameUserCard | GameDye): string {
+  return card.id.toString(36).replace(/l/g, `L`);
 }
 
 export function getGroupsByIdolId(
@@ -158,4 +162,27 @@ export function generateUserTag(
   if (profile.private) return `Private Profile`;
 
   return user.tag;
+}
+
+export function isValidSnowflake(str: string): boolean {
+  if (isNaN(parseInt(str))) return false;
+
+  if (str.length > 18 || str.length < 17) return false;
+
+  return true;
+}
+
+export function isPrivacyBlocked(
+  target: GameProfile,
+  sender: User,
+  zephyr: Zephyr
+): boolean {
+  if (target.discordId === sender.id) return false;
+
+  if (!target.private) return false;
+
+  if (zephyr.config.moderators.includes(sender.id)) return false;
+  if (zephyr.config.developers.includes(sender.id)) return false;
+
+  return true;
 }

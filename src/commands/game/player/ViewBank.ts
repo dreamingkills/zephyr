@@ -1,4 +1,4 @@
-import { Message } from "eris";
+/*import { Message } from "eris";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
@@ -7,9 +7,9 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 
 export default class ViewBank extends BaseCommand {
   id = `rats`;
-  names = ["bank"];
-  description = "Shows you the contents of your bit bank.";
-  subcommands = ["deposit <amount>", "withdraw <amount>"];
+  names = [`bank`];
+  description = `Shows you the contents of your bit bank.`;
+  subcommands = [`deposit <amount>`, `withdraw <amount>`];
   allowDm = true;
 
   async exec(
@@ -90,3 +90,4 @@ export default class ViewBank extends BaseCommand {
     return;
   }
 }
+*/

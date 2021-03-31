@@ -82,7 +82,7 @@ export default class ViewAlbums extends BaseCommand {
       .setImage(`attachment://album-${targetAlbum.id}-${page}.jpg`);
 
     await this.send(msg.channel, embed, {
-      file: { file: image, name: `album-${targetAlbum.id}-${page}.jpg` },
+      files: [{ file: image, name: `album-${targetAlbum.id}-${page}.jpg` }],
     });
 
     return;

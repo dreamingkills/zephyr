@@ -100,7 +100,7 @@ export async function removeSticker(
     .setImage(`attachment://newCard.png`);
 
   await createMessage(msg.channel, embed, {
-    file: { file: newCardImage, name: `newCard.png` },
+    files: [{ file: newCardImage, name: `newCard.png` }],
   });
   return;
 }

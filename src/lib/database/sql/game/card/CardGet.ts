@@ -125,7 +125,9 @@ export abstract class CardGet extends DBClass {
                    ON subgroup.id=card_base.subgroup_id
                  LEFT JOIN base_group
                    ON base_group.id=subgroup.group_id
-                 WHERE discord_id=${DB.connection.escape(profile.discordId)}`;
+                 WHERE discord_id=${DB.connection.escape(
+                   profile.discordId
+                 )} AND vaulted=0`;
 
     const queryOptions = FilterService.parseOptions(options, tags);
     const page = <number>options["page"];
@@ -143,8 +145,6 @@ export abstract class CardGet extends DBClass {
       query += ` ORDER BY serial_number ${reverse ? `DESC` : `ASC`}`;
     } else if (["wear", "w"].includes(order)) {
       query += ` ORDER BY wear ${reverse ? `ASC` : `DESC`}`;
-    } else if (["luck", "lc"].includes(order)) {
-      query += ` ORDER BY luck_coeff ${reverse ? `ASC` : `DESC`}`;
     } else if (["group", "g"].includes(order)) {
       query += ` ORDER BY base_group.group_name ${reverse ? `DESC` : `ASC`}`;
     } else if (["name", "n"].includes(order)) {
@@ -171,13 +171,45 @@ export abstract class CardGet extends DBClass {
   ): Promise<number> {
     let query = `SELECT COUNT(*) AS count FROM user_card USE INDEX (CardOwner) LEFT JOIN card_base ON user_card.card_id=card_base.id LEFT JOIN idol ON idol.id=card_base.idol_id LEFT JOIN subgroup ON subgroup.id=card_base.subgroup_id LEFT JOIN base_group ON base_group.id=subgroup.group_id WHERE discord_id=${DB.connection.escape(
       profile.discordId
-    )}`;
+    )} AND vaulted=0`;
     const queryOptions = FilterService.parseOptions(options, tags);
     query +=
       (queryOptions.length > 0 ? ` AND` : ``) + queryOptions.join(` AND`);
 
     const result = (await DB.query(query + `;`)) as { count: number }[];
     return result[0].count;
+  }
+
+  public static async getVaultedCards(
+    profile: GameProfile
+  ): Promise<GameUserCard[]> {
+    const query = (await DB.query(
+      `
+      SELECT
+        id,
+        card_id,
+        serial_number,
+        wear,
+        frame,
+        tag_id,
+        dye_r,
+        dye_g,
+        dye_b,
+        vaulted,
+        updated_at
+      FROM
+        user_card
+      WHERE
+        discord_id=?
+      AND
+        vaulted=1
+      ORDER BY
+        updated_at DESC;
+      `,
+      [profile.discordId]
+    )) as UserCard[];
+
+    return query.map((q) => new GameUserCard(q));
   }
 
   public static async getUserCardById(id: number): Promise<GameUserCard> {
@@ -241,7 +273,26 @@ export abstract class CardGet extends DBClass {
     profile: GameProfile
   ): Promise<GameUserCard[]> {
     const query = (await DB.query(
-      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.tag_id=? AND user_card.discord_id=?;`,
+      `
+      SELECT
+        user_card.*,
+        card_frame.id AS frame_id,
+        card_frame.frame_name,
+        card_frame.frame_url,
+        card_frame.dye_mask_url
+      FROM
+        user_card
+      LEFT JOIN
+        card_frame
+      ON
+        user_card.frame=card_frame.id
+      WHERE
+        user_card.tag_id=?
+      AND
+        user_card.discord_id=?
+      AND
+        user_card.vaulted=0;
+      `,
       [id, profile.discordId]
     )) as UserCard[];
     return query.map((c) => new GameUserCard(c));
@@ -251,7 +302,26 @@ export abstract class CardGet extends DBClass {
     discordId: string
   ): Promise<GameUserCard[]> {
     const query = (await DB.query(
-      `SELECT user_card.*, card_frame.id AS frame_id, card_frame.frame_name, card_frame.frame_url, card_frame.dye_mask_url FROM user_card LEFT JOIN card_frame ON user_card.frame=card_frame.id WHERE user_card.tag_id IS NULL AND discord_id=?;`,
+      `
+      SELECT
+        user_card.*,
+        card_frame.id AS frame_id,
+        card_frame.frame_name,
+        card_frame.frame_url,
+        card_frame.dye_mask_url
+      FROM
+        user_card
+      LEFT JOIN
+        card_frame
+      ON
+        user_card.frame=card_frame.id
+      WHERE
+        user_card.tag_id IS NULL
+      AND
+        user_card.discord_id=?
+      AND
+        user_card.vaulted=0;
+      `,
       [discordId]
     )) as UserCard[];
     return query.map((c) => new GameUserCard(c));
