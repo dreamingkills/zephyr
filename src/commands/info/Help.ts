@@ -99,12 +99,17 @@ export default class Help extends BaseCommand {
       })
       .addField({
         name: `Information`,
-        value: `\`timers\`, \`reminders\`, \`lookup\`, \`recipes\`, \`iteminfo\`, \`previewframe\`, \`previewsticker\`, \`top\`, \`topgroup\`, \`topwishlist\`, \`grouplist\`, \`birthdays\``,
+        value: `\`timers\`, \`reminders\`, \`lookup\`, \`recipes\`, \`iteminfo\`, \`previewframe\`, \`previewsticker\`, \`top\`, \`topwishlist\`, \`grouplist\`, \`birthdays\``,
         inline: true,
       })
       .addField({
         name: `Profile`,
-        value: `\`blurb\`, \`private\`, \`bank\`, \`userinfo\`, \`badges\`, \`badge\``,
+        value: `\`blurb\`, \`private\`, \`userinfo\`, \`badges\`, \`badge\``,
+        inline: true,
+      })
+      .addField({
+        name: `Vault`,
+        value: `\`vault\`, \`vaultadd\`, \`vaultremove\`, \`vaultcards\``,
         inline: true,
       })
       .addField({
