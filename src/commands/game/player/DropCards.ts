@@ -18,7 +18,11 @@ export default class DropCards extends BaseCommand {
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const timeStart = Date.now();
 
-    if (!this.zephyr.flags.drops) throw new ZephyrError.DropFlagDisabledError();
+    if (
+      !this.zephyr.flags.drops &&
+      !this.zephyr.config.developers.includes(msg.author.id)
+    )
+      throw new ZephyrError.DropFlagDisabledError();
 
     const reactPermission = checkPermission(
       `addReactions`,
@@ -38,16 +42,20 @@ export default class DropCards extends BaseCommand {
 
     const dropChannel = await GuildService.getDropChannel(msg.guildID!);
 
-    if (!dropChannel) {
+    if (
+      !dropChannel &&
+      !this.zephyr.config.developers.includes(msg.author.id)
+    ) {
       const prefix = this.zephyr.getPrefix(msg.guildID);
       throw new ZephyrError.UnsetZephyrChannelError(prefix);
     }
 
     if (
       msg.channel.id !== dropChannel &&
-      !this.zephyr.config.discord.secondaryChannels.includes(msg.channel.id)
+      !this.zephyr.config.discord.secondaryChannels.includes(msg.channel.id) &&
+      !this.zephyr.config.developers.includes(msg.author.id)
     )
-      throw new ZephyrError.CannotDropInChannelError(dropChannel);
+      throw new ZephyrError.CannotDropInChannelError(dropChannel!);
 
     const now = dayjs(Date.now());
     const until = dayjs(profile.dropNext);
