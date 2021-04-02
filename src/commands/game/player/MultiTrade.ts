@@ -127,7 +127,7 @@ export default class MultiTrade extends BaseCommand {
         if (selectItems.length > 50) return;
 
         const processed = await processItems(
-          m.content.split(",").map((i) => i.trim())
+          m.content.split(",").map((i) => i.trim().toLowerCase())
         );
 
         if (processed.length === 0) return;

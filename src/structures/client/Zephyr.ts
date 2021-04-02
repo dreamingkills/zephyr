@@ -128,6 +128,10 @@ export class Zephyr extends Client {
   public async start() {
     if (this.config.statsdEnabled) {
       this.statsd = new StatsD();
+
+      this.statsd.socket.on(`error`, (err) => {
+        console.log(`!!! StatsD error: ${err}`);
+      });
     }
 
     await this.cachePrefixes();
