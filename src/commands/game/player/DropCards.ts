@@ -16,10 +16,8 @@ export default class DropCards extends BaseCommand {
   description = `Drops three random cards in the channel.`;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    /*this.runScript(`./dist/src/lib/arcanum/index.js`, (err: Error) => {
-      if (err) throw err;
-      console.log(`Done`);
-    });*/
+    const timeStart = Date.now();
+
     if (!this.zephyr.flags.drops) throw new ZephyrError.DropFlagDisabledError();
 
     const reactPermission = checkPermission(
@@ -84,6 +82,13 @@ export default class DropCards extends BaseCommand {
       profile,
       this.zephyr
     );
+
+    const timeEnd = Date.now();
+
+    if (this.zephyr.config.statsdEnabled && this.zephyr.statsd) {
+      this.zephyr.statsd.gauge(`zephyr.command.drop`, timeEnd - timeStart);
+    }
+
     return;
   }
 
