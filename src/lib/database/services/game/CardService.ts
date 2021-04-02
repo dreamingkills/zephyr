@@ -185,9 +185,9 @@ export abstract class CardService {
           ctx.drawImage(dyeImage, 0, 0, sizeX, sizeY);
         } else {
           const overlay = await loadImage(
-            `./src/assets/groups/${
-              baseCard.group?.toLowerCase().replace("*", "") || "nogroup"
-            }.png`
+            `./src/assets/groups/${baseCard.group
+              ?.toLowerCase()
+              .replace(`*`, ``)}.png`
           );
           ctx.drawImage(overlay, 0, 0, sizeX, sizeY);
         }

@@ -42,8 +42,7 @@ export async function useFrame(
   if (frame.id === card.frameId)
     throw new ZephyrError.DuplicateFrameError(card, frame);
 
-  card.dyeMaskUrl = frame.dyeMaskUrl;
-  card.frameUrl = frame.frameUrl;
+  card.frameId = frame.id;
   card.textColor = frame.textColor;
 
   const preview = await CardService.generateCardImage(card, zephyr);
