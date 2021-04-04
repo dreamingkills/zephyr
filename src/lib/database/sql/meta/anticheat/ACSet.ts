@@ -72,13 +72,16 @@ export abstract class ACSet extends DBClass {
       );
     } else {
       await DB.query(
-        `INSERT INTO claim (claimer, card_id, guild_id, claim_time, drop_time) VALUES (?, ?, ?, ?, ?);`,
+        `INSERT INTO claim (claimer, card_id, guild_id, claim_time, drop_time, fight_count, wear, claimed_after) VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
         [
           claimer.discordId,
           card.id,
           guildId,
           formattedClaimTimestamp,
           formattedDropTimestamp,
+          fightCount,
+          card.wear,
+          claimedAfter,
         ]
       );
     }

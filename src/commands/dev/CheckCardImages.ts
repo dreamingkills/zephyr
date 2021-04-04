@@ -30,6 +30,7 @@ export default class CheckCardImages extends BaseCommand {
           failed.length === 1 ? `` : `s`
         } failed. See console for further information.`
       );
+      console.log(failed);
     }
 
     await this.send(msg.channel, embed);

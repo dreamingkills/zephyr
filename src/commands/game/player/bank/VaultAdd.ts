@@ -45,7 +45,7 @@ export default class VaultAdd extends BaseCommand {
           ? profile.bitsVaultMax - profile.bitsVault
           : quantity;
 
-      if (trueQuantity === 0) throw new VaultError.BitsVaultFullError(prefix);
+      if (trueQuantity <= 0) throw new VaultError.BitsVaultFullError(prefix);
 
       const _profile = await ProfileService.addBitsToVault(
         profile,
@@ -79,7 +79,7 @@ export default class VaultAdd extends BaseCommand {
           ? profile.cubitsVaultMax - profile.cubitsVault
           : quantity;
 
-      if (trueQuantity === 0) throw new VaultError.CubitsVaultFullError(prefix);
+      if (trueQuantity <= 0) throw new VaultError.CubitsVaultFullError(prefix);
 
       const _profile = await ProfileService.addCubitsToVault(
         profile,
