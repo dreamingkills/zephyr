@@ -72,6 +72,7 @@ export class Zephyr extends Client {
     postServerCount: true /* Post server count to Top.gg */,
     mainViewing: true /* Viewing cards in #zephyr-main */,
     debugMessages: true /* Debug messages in console */,
+    claimAlerts: false /* "You must wait X to claim" */,
   };
 
   /* These are some numbers that affect various things around Zephyr. */

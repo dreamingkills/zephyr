@@ -136,15 +136,17 @@ export abstract class CardSpawner {
         const until = dayjs(profile.claimNext);
         if (until > now && !winners.has(profile.discordId)) {
           // Don't warn people more than once -- anti-spam
-          if (!warned.has(profile.discordId)) {
-            await createMessage(
-              channel,
-              `<@${userId}>, you must wait **${getTimeUntil(
-                now,
-                until
-              )}** before claiming another card.`
-            );
-            warned.add(profile.discordId);
+          if (zephyr.flags.claimAlerts) {
+            if (!warned.has(profile.discordId)) {
+              await createMessage(
+                channel,
+                `<@${userId}>, you must wait **${getTimeUntil(
+                  now,
+                  until
+                )}** before claiming another card.`
+              );
+              warned.add(profile.discordId);
+            }
           }
           return;
         }
