@@ -565,8 +565,6 @@ export class Zephyr extends Client {
       return true;
     });
 
-    console.log(`Restricted: ${restricted} / ${droppableCards.length}`);
-
     const median = droppableCards.map((c) => c.serialTotal)[
       Math.ceil(droppableCards.length / 2)
     ];
