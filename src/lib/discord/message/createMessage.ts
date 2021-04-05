@@ -44,7 +44,7 @@ export async function createMessage(
 
   message = await retryOperation(
     async () => channel.createMessage({ content, embed }, derivedFiles),
-    3000,
+    10000,
     3
   ).catch((e) => {
     if (!e?.stack.includes(`[50013]:`)) {

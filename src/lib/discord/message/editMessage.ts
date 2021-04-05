@@ -25,7 +25,7 @@ export async function editMessage(
 
   message = await retryOperation(
     async () => msg.edit({ content, embed }),
-    3000,
+    10000,
     3
   ).catch((e) => {
     console.log(

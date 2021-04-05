@@ -8,7 +8,7 @@ export async function addReaction(
 ): Promise<void> {
   await retryOperation(
     async () => message.addReaction(reaction),
-    3000,
+    10000,
     3
   ).catch((e) => {
     console.log(
