@@ -404,7 +404,7 @@ export class Zephyr extends Client {
     });
 
     this.on("error", (error) => {
-      console.log(error.message);
+      console.log(`${error.message} - ${error.stack}`);
     });
 
     /*
