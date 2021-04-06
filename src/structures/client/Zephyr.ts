@@ -25,6 +25,7 @@ import { GameIdol } from "../game/Idol";
 import { Image, loadImage } from "canvas";
 import fs from "fs/promises";
 import { StatsD } from "../../lib/StatsD";
+import { AlbumService } from "../../lib/database/services/game/AlbumService";
 
 export class Zephyr extends Client {
   commandLib = new CommandLib();
@@ -42,8 +43,22 @@ export class Zephyr extends Client {
 
   /* Images */
   private frames: {
-    [frameId: number]: { name: string; frame?: Image; mask?: Buffer };
+    [frameId: number]: {
+      name: string;
+      frame?: Image;
+      mask?: Buffer;
+      overlay?: boolean;
+    };
   } = {};
+
+  private backgrounds: {
+    [backgroundId: number]: {
+      id: number;
+      name: string;
+      image: Image;
+    };
+  } = {};
+
   private stickers: {
     [stickerId: number]: BuiltSticker;
   } = {};
@@ -131,6 +146,7 @@ export class Zephyr extends Client {
     /* Preload images into memory */
     await this.loadFrames();
     await this.loadStickers();
+    await this.loadBackgrounds();
 
     ItemService.refreshItems();
     const fonts = await FontLoader.init();
@@ -418,7 +434,7 @@ export class Zephyr extends Client {
   }
 
   /*
-      Image Precaching (frames, stickers)
+      Image Precaching (frames, stickers, backgrounds)
   */
   public async loadFrames(): Promise<void> {
     const frames = await CardService.getAllFrames();
@@ -432,14 +448,47 @@ export class Zephyr extends Client {
         mask: await fs.readFile(
           frame.dyeMaskUrl || `./src/assets/frames/default/frame-default.png`
         ),
+        overlay: frame.overlay,
       };
     }
 
     return;
   }
 
-  public getFrameImagesById(id: number): { frame?: Image; mask?: Buffer } {
+  public getFrameImagesById(
+    id: number
+  ): { frame?: Image; mask?: Buffer; overlay?: boolean } {
     return this.frames[id];
+  }
+
+  public async loadBackgrounds(): Promise<void> {
+    const backgrounds = await AlbumService.getAllBackgrounds();
+
+    for (let bg of backgrounds) {
+      this.backgrounds[bg.id] = {
+        id: bg.id,
+        name: bg.name,
+        image: await loadImage(
+          bg.imageUrl || `./src/assets/backgrounds/default.jpg`
+        ),
+      };
+    }
+  }
+
+  public getBackgroundById(
+    id: number
+  ): { id: number; name: string; image: Image } | undefined {
+    return this.backgrounds[id];
+  }
+
+  public getBackgroundByName(
+    name: string
+  ): { id: number; name: string; image: Image } | undefined {
+    const background = Object.values(this.backgrounds).find(
+      (b) => b.name.toLowerCase() === name.toLowerCase()
+    );
+
+    return background;
   }
 
   public async loadStickers(): Promise<void> {

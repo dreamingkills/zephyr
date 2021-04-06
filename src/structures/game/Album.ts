@@ -16,6 +16,13 @@ export interface AlbumCard {
   album_id: number;
   slot: number;
 }
+
+export interface AlbumBackground {
+  id: number;
+  background_name: string;
+  image_url: string;
+}
+
 export class GameAlbumCard {
   id: number;
   cardId: number;
@@ -52,5 +59,17 @@ export class GameAlbum {
 
   public async fetch(): Promise<GameAlbum> {
     return await AlbumService.getAlbumById(this.id);
+  }
+}
+
+export class GameAlbumBackground {
+  id: number;
+  name: string;
+  imageUrl: string;
+
+  constructor(data: AlbumBackground) {
+    this.id = data.id;
+    this.name = data.background_name;
+    this.imageUrl = data.image_url;
   }
 }

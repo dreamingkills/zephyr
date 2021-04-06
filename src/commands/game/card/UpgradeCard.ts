@@ -82,60 +82,78 @@ export default class UpgradeCard extends BaseCommand {
 
     const confirmation = await this.send(msg.channel, embed);
 
-    const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
-      userId === msg.author.id &&
-      emoji.id === this.zephyr.config.discord.emojiId.check;
-    const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
-      time: 15000,
-      max: 1,
+    const confirmed: boolean = await new Promise(async (res) => {
+      const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
+        userId === msg.author.id && emoji.name === `☑️`;
+
+      const collector = new ReactionCollector(
+        this.zephyr,
+        confirmation,
+        filter,
+        {
+          time: 15000,
+          max: 1,
+        }
+      );
+
+      collector.on("error", async (e: Error) => {
+        await this.handleError(msg, e);
+        res(false);
+      });
+
+      collector.on("collect", async () => {
+        res(true);
+      });
+
+      collector.on("end", async (_collected: unknown) => {
+        res(false);
+      });
+
+      await this.react(confirmation, `☑️`);
     });
 
-    collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
-    });
-
-    collector.on("collect", async () => {
-      // We need to check that this user is still the owner, or they can do some nasty stuff
-      const refetchCard = await card.fetch();
-      if (refetchCard.discordId !== msg.author.id)
-        throw new ZephyrError.NotOwnerOfCardError(refetchCard);
-
-      await ProfileService.removeItems(profile, [
-        { item: dustItem, count: dustCost },
-      ]);
-      await ProfileService.removeBitsFromProfile(profile, bitCost);
-
-      const chance = new Chance();
-      const success = chance.bool({ likelihood: successChance });
-
-      if (success) {
-        await CardService.increaseCardWear(card);
-        await confirmation.edit({
-          embed: embed.setFooter(`🎉 The upgrade succeeded!`),
-        });
-      } else {
-        await confirmation.edit({
-          embed: embed.setFooter(`😕 The upgrade failed.`),
-        });
-      }
-      return;
-    });
-
-    collector.on("end", async (_collected: unknown, reason: string) => {
-      if (reason === "time") {
-        await confirmation.edit({
-          embed: embed.setFooter(`🕒 This confirmation has expired.`),
-        });
-      }
+    if (!confirmed) {
+      await this.edit(
+        confirmation,
+        embed.setFooter(`🕒 This upgrade confirmation has expired.`)
+      );
 
       if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
         await confirmation.removeReactions();
-    });
+      return;
+    }
 
-    await this.react(
-      confirmation,
-      `check:${this.zephyr.config.discord.emojiId.check}`
-    );
+    // We need to check that this user is still the owner, or they can do some nasty stuff
+    const refetchCard = await card.fetch();
+
+    if (refetchCard.discordId !== msg.author.id)
+      throw new ZephyrError.NotOwnerOfCardError(refetchCard);
+
+    if (refetchCard.wear !== card.wear)
+      throw new ZephyrError.UpgradeFailedError();
+
+    await ProfileService.removeItems(profile, [
+      { item: dustItem, count: dustCost },
+    ]);
+    await ProfileService.removeBitsFromProfile(profile, bitCost);
+
+    const chance = new Chance();
+    const success = chance.bool({ likelihood: successChance });
+
+    if (success) {
+      await CardService.increaseCardWear(card);
+      await confirmation.edit({
+        embed: embed.setFooter(`🎉 The upgrade succeeded!`),
+      });
+    } else {
+      await confirmation.edit({
+        embed: embed.setFooter(`😕 The upgrade failed.`),
+      });
+    }
+
+    if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+      await confirmation.removeReactions();
+
     return;
   }
 }

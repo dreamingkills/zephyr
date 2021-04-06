@@ -449,7 +449,8 @@ export abstract class CardGet extends DBClass {
       frame_name,
       frame_url,
       dye_mask_url,
-      text_color_hex
+      text_color_hex,
+      overlay
     FROM card_frame;`)) as Frame[];
 
     return query.map((q) => new GameFrame(q));

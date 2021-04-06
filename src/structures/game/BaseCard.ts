@@ -25,6 +25,7 @@ export interface Frame {
   frame_url: string;
   dye_mask_url: string;
   text_color_hex: Buffer;
+  overlay: boolean;
 }
 
 export class GameBaseCard {
@@ -76,11 +77,13 @@ export class GameFrame {
   frameUrl: string;
   dyeMaskUrl: string;
   textColor: string;
+  overlay: boolean;
   constructor(data: Frame) {
     this.id = data.id;
     this.frameName = data.frame_name;
     this.frameUrl = data.frame_url;
     this.dyeMaskUrl = data.dye_mask_url;
     this.textColor = data.text_color_hex?.toString() || `000000`;
+    this.overlay = data.overlay;
   }
 }

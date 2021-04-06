@@ -108,27 +108,35 @@ export abstract class CardService {
     let img = await loadImage(baseCard.image);
 
     // Load the card's frame, default if the id column is null
-    const { frame, mask } = zephyr.getFrameImagesById(card.frameId || 1);
+    const { frame, mask, overlay } = zephyr.getFrameImagesById(
+      card.frameId || 1
+    );
 
     // Draw the base image, then the frame on top of that
     ctx.drawImage(img, 0, 0, sizeX, sizeY);
 
-    if (frame) ctx.drawImage(frame, 0, 0, sizeX, sizeY);
+    let [r, g, b] = [185, 185, 185];
 
-    if (mask) {
-      let [r, g, b] = [185, 185, 185];
+    if (card.dyeR >= 0) r = card.dyeR;
+    if (card.dyeG >= 0) g = card.dyeG;
+    if (card.dyeB >= 0) b = card.dyeB;
 
-      if (card.dyeR >= 0) r = card.dyeR;
-      if (card.dyeG >= 0) g = card.dyeG;
-      if (card.dyeB >= 0) b = card.dyeB;
+    const { c, m, y } = rgbToCmy(r, g, b);
 
-      const { c, m, y } = rgbToCmy(r, g, b);
+    console.log(overlay);
 
+    if (overlay && mask) {
       // We need to convert the GM State to a buffer, so that
       // canvas knows what to do with it.
       const dyeBuffer = await this.toBufferPromise(gm(mask).colorize(c, m, y));
+      const dyeImage = await loadImage(dyeBuffer);
+      ctx.drawImage(dyeImage, 0, 0, sizeX, sizeY);
+    }
 
-      // Load the buffer and draw the dye mask on top of the frame.
+    if (frame) ctx.drawImage(frame, 0, 0, sizeX, sizeY);
+
+    if (!overlay && mask) {
+      const dyeBuffer = await this.toBufferPromise(gm(mask).colorize(c, m, y));
       const dyeImage = await loadImage(dyeBuffer);
       ctx.drawImage(dyeImage, 0, 0, sizeX, sizeY);
     }

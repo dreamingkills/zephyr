@@ -195,6 +195,12 @@ export class InvalidReminderTypeError extends ZephyrError {
   }
 }
 
+export class UpgradeFailedError extends ZephyrError {
+  constructor() {
+    super(`The upgrade failed because your card condition changed.`);
+  }
+}
+
 /*
     Items
            */
@@ -717,6 +723,18 @@ export class NotEnoughAlbumPagesError extends ZephyrError {
 export class AlbumFullError extends ZephyrError {
   constructor() {
     super(`That album is full!`);
+  }
+}
+
+export class InvalidAlbumBackgroundError extends ZephyrError {
+  constructor() {
+    super(`There is no album background by that name.`);
+  }
+}
+
+export class DuplicateAlbumBackgroundError extends ZephyrError {
+  constructor(name: string) {
+    super(`That album already uses **${name}**.`);
   }
 }
 

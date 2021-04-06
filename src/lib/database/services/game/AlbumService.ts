@@ -1,7 +1,11 @@
 import { createCanvas, loadImage } from "canvas";
 import { User } from "eris";
 import { Zephyr } from "../../../../structures/client/Zephyr";
-import { GameAlbum, GameAlbumCard } from "../../../../structures/game/Album";
+import {
+  GameAlbum,
+  GameAlbumBackground,
+  GameAlbumCard,
+} from "../../../../structures/game/Album";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameUserCard } from "../../../../structures/game/UserCard";
 import { AlbumGet } from "../../sql/game/album/AlbumGet";
@@ -20,6 +24,10 @@ export abstract class AlbumService {
     sender: User
   ): Promise<GameAlbum> {
     return await AlbumGet.getAlbumByName(name, owner, sender);
+  }
+
+  public static async getAllBackgrounds(): Promise<GameAlbumBackground[]> {
+    return await AlbumGet.getAllBackgrounds();
   }
 
   public static async getNumberOfAlbumsByProfile(
