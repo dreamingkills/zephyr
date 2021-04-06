@@ -3,6 +3,7 @@ import { ErisFile } from "../../../structures/client/ErisFile";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { retryOperation } from "../Retry";
+import { StatsD } from "../../StatsD";
 
 function deriveFileExtension(url: string | Buffer): string {
   if (url instanceof Buffer) {
@@ -42,6 +43,7 @@ export async function createMessage(
 
   let message;
 
+  StatsD.increment(`zephyr.message.create`, 1)
   message = await retryOperation(
     async () => channel.createMessage({ content, embed }, derivedFiles),
     10000,

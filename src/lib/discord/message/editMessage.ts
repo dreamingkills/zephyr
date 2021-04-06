@@ -2,6 +2,7 @@ import { Message, TextableChannel } from "eris";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { retryOperation } from "../Retry";
+import { StatsD } from "../../StatsD";
 
 export async function editMessage(
   msg: Message,
@@ -23,8 +24,9 @@ export async function editMessage(
 
   let message: Message<TextableChannel>;
 
+  StatsD.increment(`zephyr.message.edit`, 1)
   message = await retryOperation(
-    async () => msg.edit({ content, embed }),
+  async () => msg.edit({ content, embed }),
     10000,
     3
   ).catch((e) => {

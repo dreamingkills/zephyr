@@ -24,7 +24,7 @@ import { ItemService } from "../../lib/ItemService";
 import { GameIdol } from "../game/Idol";
 import { Image, loadImage } from "canvas";
 import fs from "fs/promises";
-import { StatsD } from "node-statsd";
+import { StatsD } from "../../lib/StatsD";
 
 export class Zephyr extends Client {
   commandLib = new CommandLib();
@@ -35,8 +35,6 @@ export class Zephyr extends Client {
   private cards: { [cardId: number]: GameBaseCard } = {};
 
   private idols: { [id: number]: GameIdol } = {};
-
-  statsd: StatsD | undefined;
 
   private errors: number = 0;
 
@@ -127,14 +125,6 @@ export class Zephyr extends Client {
   }
 
   public async start() {
-    if (this.config.statsdEnabled) {
-      this.statsd = new StatsD();
-
-      this.statsd.socket.on(`error`, (err) => {
-        console.log(`!!! StatsD error: ${err}`);
-      });
-    }
-
     await this.cachePrefixes();
     await this.cacheCards();
 
@@ -152,6 +142,7 @@ export class Zephyr extends Client {
     this.on("debug", (msg: string, _id: number) => {
       if (this.flags.debugMessages) {
         if (msg.includes(" 429 ") || msg.includes("429:")) {
+          StatsD.increment(`zephyr.response.429`, 1)
           console.log(`429 Detected: ${msg}`);
           this.errors++;
 
@@ -215,6 +206,7 @@ export class Zephyr extends Client {
       if (this.onCooldown.has(message.author.id)) return;
 
       if (message.author.bot || !message.channel) return;
+      StatsD.increment(`zephyr.message.receive`, 1)
 
       /*const now = Date.now();
 
@@ -789,6 +781,7 @@ export class Zephyr extends Client {
   ): Promise<User | undefined> {
     if (ignoreCache) {
       try {
+        StatsD.increment(`zephyr.rest.channel.get`, 1);
         const user = await this.getRESTUser(userId);
         this.users.add(user);
         return user;
@@ -800,6 +793,7 @@ export class Zephyr extends Client {
     const findUser = this.users.get(userId);
     if (!findUser) {
       try {
+        StatsD.increment(`zephyr.rest.channel.get`, 1);
         const user = await this.getRESTUser(userId);
         this.users.add(user);
         return user;
@@ -807,6 +801,7 @@ export class Zephyr extends Client {
         return;
       }
     } else {
+      StatsD.increment(`zephyr.rest.channel.cache_hit`, 1);
       this.users.update(findUser);
       return findUser;
     }
@@ -818,6 +813,7 @@ export class Zephyr extends Client {
   ): Promise<Guild | undefined> {
     if (ignoreCache) {
       try {
+        StatsD.increment(`zephyr.rest.guild.get`, 1);
         const guild = await this.getRESTGuild(guildId);
         this.guilds.add(guild);
         return guild;
@@ -830,6 +826,7 @@ export class Zephyr extends Client {
     const findGuild = this.guilds.find((g) => g.id === guildId);
     if (!findGuild) {
       try {
+        StatsD.increment(`zephyr.rest.guild.get`, 1);
         const guild = await this.getRESTGuild(guildId);
         this.guilds.add(guild);
         return guild;
@@ -837,6 +834,7 @@ export class Zephyr extends Client {
         return;
       }
     } else {
+      StatsD.increment(`zephyr.rest.guild.cache_hit`, 1);
       this.guilds.update(findGuild);
       return findGuild;
     }

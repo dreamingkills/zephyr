@@ -1,3 +1,5 @@
+import { StatsD } from "../StatsD";
+
 export const wait: (ms: number) => Promise<void> = (ms: number) =>
   new Promise((r) => setTimeout(r, ms));
 
@@ -14,6 +16,7 @@ export function retryOperation<T>(
 
       if (retries > 0) {
         await wait(delay);
+        StatsD.increment(`zephyr.message.retry`, 1)
         return resolve(retryOperation(operation, delay, retries - 1));
       }
     }

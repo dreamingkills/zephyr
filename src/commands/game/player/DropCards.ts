@@ -8,6 +8,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { getTimeUntil } from "../../../lib/utility/time/TimeUtils";
 import { GuildService } from "../../../lib/database/services/guild/GuildService";
 import { checkPermission } from "../../../lib/ZephyrUtils";
+import { StatsD } from "../../../lib/StatsD";
 // import childProcess from "child_process";
 
 export default class DropCards extends BaseCommand {
@@ -93,9 +94,7 @@ export default class DropCards extends BaseCommand {
 
     const timeEnd = Date.now();
 
-    if (this.zephyr.config.statsdEnabled && this.zephyr.statsd) {
-      this.zephyr.statsd.gauge(`zephyr.command.drop`, timeEnd - timeStart);
-    }
+    StatsD.gauge(`zephyr.command.drop`, timeEnd - timeStart);
 
     return;
   }
