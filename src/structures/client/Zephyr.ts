@@ -142,7 +142,7 @@ export class Zephyr extends Client {
     this.on("debug", (msg: string, _id: number) => {
       if (this.flags.debugMessages) {
         if (msg.includes(" 429 ") || msg.includes("429:")) {
-          StatsD.increment(`zephyr.response.429`, 1)
+          StatsD.increment(`zephyr.response.429`, 1);
           console.log(`429 Detected: ${msg}`);
           this.errors++;
 
@@ -206,7 +206,7 @@ export class Zephyr extends Client {
       if (this.onCooldown.has(message.author.id)) return;
 
       if (message.author.bot || !message.channel) return;
-      StatsD.increment(`zephyr.message.receive`, 1)
+      StatsD.increment(`zephyr.message.receive`, 1);
 
       /*const now = Date.now();
 

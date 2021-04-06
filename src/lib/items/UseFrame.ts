@@ -11,6 +11,7 @@ import { ReactionCollector } from "eris-collector";
 import { addReaction } from "../discord/message/addReaction";
 import { editMessage } from "../discord/message/editMessage";
 import { AlbumService } from "../database/services/game/AlbumService";
+import { checkPermission } from "../ZephyrUtils";
 
 export async function useFrame(
   msg: Message,
@@ -87,7 +88,8 @@ export async function useFrame(
     );
   });
 
-  await confirmation.removeReactions();
+  if (checkPermission(`manageMessages`, msg.channel, zephyr))
+    await confirmation.removeReactions();
 
   if (!confirmed) {
     await editMessage(
