@@ -15,4 +15,8 @@ function isFile(body: any): body is ErisFile {
   return !!(body as ErisFile).file;
 }
 
-export { checkPermission, isFile };
+function isDeveloper(user: User, zephyr: Zephyr): boolean {
+  return zephyr.config.developers.includes(user.id);
+}
+
+export { checkPermission, isFile, isDeveloper };
