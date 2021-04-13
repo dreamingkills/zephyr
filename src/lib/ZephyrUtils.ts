@@ -1,4 +1,4 @@
-import { Channel, TextChannel } from "eris";
+import { Channel, TextChannel, User } from "eris";
 import { Zephyr } from "../structures/client/Zephyr";
 import { ErisFile } from "../structures/client/ErisFile";
 
