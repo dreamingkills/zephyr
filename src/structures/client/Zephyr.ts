@@ -218,7 +218,11 @@ export class Zephyr extends Client {
     });
 
     this.on("messageCreate", async (message) => {
-      if (!this.flags.processMessages) return;
+      await OrpheusService.test(message, this);
+
+      if (!this.flags.processMessages && !isDeveloper(message.author, this))
+        return;
+
       if (this.onCooldown.has(message.author.id)) return;
 
       if (message.author.bot || !message.channel) return;
