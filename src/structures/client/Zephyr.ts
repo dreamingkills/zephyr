@@ -36,6 +36,9 @@ export class Zephyr extends Client {
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
 
+  public t: string[] = [];
+  public t_c: string[] = [];
+
   private idols: { [id: number]: GameIdol } = {};
 
   private errors: number = 0;
