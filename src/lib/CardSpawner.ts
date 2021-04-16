@@ -302,7 +302,7 @@ export abstract class CardSpawner {
     zephyr: Zephyr
   ): Promise<void> {
     return await this.dropCards(
-      `— **${cards.length} cards** are dropping due to server activity!`,
+      `— **${cards.length} cards** are dropping due to server activity!\n**NOTICE**: You need to manually react :one:, :two:, or :three: temporarily due to poor performance.`,
       channel,
       cards,
       zephyr
@@ -316,7 +316,7 @@ export abstract class CardSpawner {
     zephyr: Zephyr
   ): Promise<void> {
     return await this.dropCards(
-      `— <@${profile.discordId}> is dropping **${cards.length} cards**!`,
+      `— <@${profile.discordId}> is dropping **${cards.length} cards**!\n**NOTICE**: You need to manually react :one:, :two:, or :three: temporarily due to poor performance.`,
       channel,
       cards,
       zephyr,
@@ -330,7 +330,7 @@ export abstract class CardSpawner {
   ): Promise<void> {
     const cards = zephyr.getRandomCards(3);
     await this.dropCards(
-      "— **3 cards** are dropping due to server activity!",
+      "— **3 cards** are dropping due to server activity!\n**NOTICE**: You need to manually react :one:, :two:, or :three: temporarily due to poor performance.",
       channel,
       cards,
       zephyr
