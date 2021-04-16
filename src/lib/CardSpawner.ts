@@ -13,7 +13,7 @@ import { GuildService } from "./database/services/guild/GuildService";
 import { GameBaseCard } from "../structures/game/BaseCard";
 import { AnticheatService } from "./database/services/meta/AnticheatService";
 import { createMessage } from "./discord/message/createMessage";
-import { addReaction } from "./discord/message/addReaction";
+// import { addReaction } from "./discord/message/addReaction";
 import { checkPermission } from "./ZephyrUtils";
 import { AutotagService } from "./database/services/game/AutotagService";
 import { deleteMessage } from "./discord/message/deleteMessage";
@@ -285,9 +285,11 @@ export abstract class CardSpawner {
 
     await CardService.incrementGenerated(cards);
 
+    /*
     await addReaction(drop, this.emojis[0]);
     await addReaction(drop, this.emojis[1]);
     await addReaction(drop, this.emojis[2]);
+    */
 
     setTimeout(() => collector.stop(), 30000);
 
