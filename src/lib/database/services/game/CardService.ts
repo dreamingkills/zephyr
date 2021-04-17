@@ -1,7 +1,10 @@
 import { createCanvas, loadImage } from "canvas";
-import { GameBaseCard, GameFrame } from "../../../../structures/game/BaseCard";
+import { GameBaseCard } from "../../../../structures/game/BaseCard";
 import { GameProfile } from "../../../../structures/game/Profile";
-import { GameUserCard } from "../../../../structures/game/UserCard";
+import {
+  GameUserCard,
+  MockUserCard,
+} from "../../../../structures/game/UserCard";
 import { Filter } from "../../sql/Filters";
 import { CardGet, WearSpread } from "../../sql/game/card/CardGet";
 import fs from "fs/promises";
@@ -16,8 +19,10 @@ import {
   BuiltSticker,
   GameCardSticker,
   GameSticker,
+  Sticker,
 } from "../../../../structures/game/Sticker";
 import { AnticheatService } from "../meta/AnticheatService";
+import { Frame } from "../../../../structures/game/Frame";
 
 export abstract class CardService {
   // Used for card image generation
@@ -89,13 +94,18 @@ export abstract class CardService {
   }
 
   public static async generateCardImage(
-    card: GameUserCard,
+    card: GameUserCard | MockUserCard,
     zephyr: Zephyr,
     noText: boolean = false,
     large: boolean = false
   ): Promise<Buffer> {
+    let baseCard;
+
     // Need information off the base card to do anything.
-    const baseCard = zephyr.getCard(card.baseCardId)!;
+    if (card instanceof GameUserCard) {
+      baseCard = zephyr.getCard(card.baseCardId)!;
+    } else baseCard = card.baseCard;
+
     const sizeCoefficient = large ? 2.2 : 1;
 
     const [sizeX, sizeY] = large ? [770, 1100] : [350, 500];
@@ -105,39 +115,46 @@ export abstract class CardService {
     const ctx = canvas.getContext("2d");
 
     // Load the base card image (the subject of the card)
+
     let img = await loadImage(baseCard.image);
 
     // Load the card's frame, default if the id column is null
-    const { frame, mask, overlay } = zephyr.getFrameImagesById(
-      card.frameId || 1
-    );
+    let frame;
+
+    if (card instanceof GameUserCard) {
+      frame = zephyr.getFrameById(card.frameId || 1);
+    } else frame = card.frame;
 
     // Draw the base image, then the frame on top of that
     ctx.drawImage(img, 0, 0, sizeX, sizeY);
 
     let [r, g, b] = [185, 185, 185];
 
-    if (card.dyeR >= 0) r = card.dyeR;
-    if (card.dyeG >= 0) g = card.dyeG;
-    if (card.dyeB >= 0) b = card.dyeB;
+    if (card.dye.r >= 0) r = card.dye.b;
+    if (card.dye.g >= 0) g = card.dye.g;
+    if (card.dye.b >= 0) b = card.dye.b;
 
     const { c, m, y } = rgbToCmy(r, g, b);
 
-    console.log(overlay);
-
-    if (overlay && mask) {
+    if (frame.overlay) {
       // We need to convert the GM State to a buffer, so that
       // canvas knows what to do with it.
-      const dyeBuffer = await this.toBufferPromise(gm(mask).colorize(c, m, y));
+      const dyeBuffer = await this.toBufferPromise(
+        gm(frame.mask).colorize(c, m, y)
+      );
       const dyeImage = await loadImage(dyeBuffer);
+
       ctx.drawImage(dyeImage, 0, 0, sizeX, sizeY);
     }
 
-    if (frame) ctx.drawImage(frame, 0, 0, sizeX, sizeY);
+    if (frame) ctx.drawImage(frame.frame, 0, 0, sizeX, sizeY);
 
-    if (!overlay && mask) {
-      const dyeBuffer = await this.toBufferPromise(gm(mask).colorize(c, m, y));
+    if (!frame.overlay) {
+      const dyeBuffer = await this.toBufferPromise(
+        gm(frame.mask).colorize(c, m, y)
+      );
       const dyeImage = await loadImage(dyeBuffer);
+
       ctx.drawImage(dyeImage, 0, 0, sizeX, sizeY);
     }
 
@@ -173,10 +190,16 @@ export abstract class CardService {
     const nameY = 445 * sizeCoefficient;
 
     if (!noText) {
+      let textColor;
+
+      if (card instanceof GameUserCard) {
+        textColor = card.textColor;
+      } else textColor = card.frame.textColor;
+
       // Draw the group icon
       if (baseCard.group) {
-        if (card.textColor !== `000000`) {
-          const cmy = hexToCmy(card.textColor);
+        if (textColor !== `000000`) {
+          const cmy = hexToCmy(textColor);
 
           const dyeBuffer = await this.toBufferPromise(
             gm(
@@ -190,6 +213,7 @@ export abstract class CardService {
 
           // Load the buffer and draw the dye mask on top of the frame.
           const dyeImage = await loadImage(dyeBuffer);
+
           ctx.drawImage(dyeImage, 0, 0, sizeX, sizeY);
         } else {
           const overlay = await loadImage(
@@ -197,11 +221,12 @@ export abstract class CardService {
               ?.toLowerCase()
               .replace(`*`, ``)}.png`
           );
+
           ctx.drawImage(overlay, 0, 0, sizeX, sizeY);
         }
       }
 
-      ctx.fillStyle = `#${card.textColor}`;
+      ctx.fillStyle = `#${textColor}`;
 
       // Draw the serial number
       ctx.font = `${serialFontSize}px AlteHaasGroteskBold`;
@@ -299,8 +324,7 @@ export abstract class CardService {
   }
 
   public static async generateCardCollage(
-    cards: GameUserCard[],
-    zephyr: Zephyr
+    cards: MockUserCard[]
   ): Promise<Buffer> {
     // Create the collage canvas
     const canvas = createCanvas(cards.length * 350, 500);
@@ -309,9 +333,10 @@ export abstract class CardService {
     // Generate each card image and draw it on the collage
     ctx.font = "14px AlteHaasGroteskBold";
     for (let [i, card] of cards.entries()) {
-      const base = zephyr.getCard(card.baseCardId)!;
-
-      const cardBuffer = await this.drawCardFromPrefab(base, card.serialNumber);
+      const cardBuffer = await this.drawCardFromPrefab(
+        card.baseCard,
+        card.serialNumber
+      );
 
       const img = await loadImage(cardBuffer);
       ctx.drawImage(img, i * 350, 0, 350, 500);
@@ -344,7 +369,6 @@ export abstract class CardService {
 
     if (sticker) {
       if (!position) position = 1;
-      const stickerImage = await loadImage(sticker.imageUrl);
 
       const posX = 82 + (position - Math.floor(position / 4) * 4) * 62;
       const posY = 90 + Math.floor(position / 4) * 68;
@@ -354,7 +378,7 @@ export abstract class CardService {
       ctx.translate(posX, posY);
       // ctx.rotate((Math.PI / 180) * rot);
 
-      ctx.drawImage(stickerImage, -64 / 2, -64 / 2, 64, 64);
+      ctx.drawImage(sticker.image, -64 / 2, -64 / 2, 64, 64);
 
       ctx.restore();
     }
@@ -369,20 +393,6 @@ export abstract class CardService {
   ): Promise<Buffer> {
     const newCard = await CardSet.setCardFrame(card, frameId);
     return await this.updateCardCache(newCard, zephyr);
-  }
-
-  public static async getRandomFrame(
-    includeUnshoppable: boolean = false
-  ): Promise<GameFrame> {
-    return await CardGet.getRandomFrame(includeUnshoppable);
-  }
-
-  public static async getFrameById(id: number): Promise<GameFrame> {
-    return await CardGet.getFrameById(id);
-  }
-
-  public static async getFrameByName(name: string): Promise<GameFrame> {
-    return await CardGet.getFrameByName(name);
   }
 
   public static async transferCardsToUser(
@@ -583,12 +593,12 @@ export abstract class CardService {
   /*
       Stickers
   */
-  public static async getAllStickers(): Promise<GameSticker[]> {
+  public static async getAllStickers(): Promise<Sticker[]> {
     return await CardGet.getAllStickers();
   }
 
   public static async getCardStickers(
-    card: GameUserCard
+    card: GameUserCard | MockUserCard
   ): Promise<GameCardSticker[]> {
     return await CardGet.getCardStickers(card);
   }
@@ -622,7 +632,7 @@ export abstract class CardService {
     return await CardGet.getRandomConfiscatedCard(confiscatedTag);
   }
 
-  public static async getAllFrames(): Promise<GameFrame[]> {
+  public static async getAllFrames(): Promise<Frame[]> {
     return await CardGet.getAllFrames();
   }
 
@@ -633,7 +643,7 @@ export abstract class CardService {
 
     if (card.wear === 5) {
       if (card.frameId !== 1 && card.frameId) base *= 10;
-      if (card.dyeR >= 0 && card.dyeG >= 0 && card.dyeB >= 0) base *= 1.8;
+      if (card.dye.r >= 0 && card.dye.g >= 0 && card.dye.b >= 0) base *= 1.8;
     }
 
     if (claimRecord.claimer === card.discordId) base += 15;

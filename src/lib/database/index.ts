@@ -15,5 +15,3 @@ export class DB {
     this.connection = _pool;
   }
 }
-
-export class DBClass {}

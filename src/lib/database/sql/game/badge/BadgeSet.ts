@@ -1,60 +1,72 @@
-import { DB, DBClass } from "../../..";
+import { DB } from "../../..";
 import { GameBadge, GameUserBadge } from "../../../../../structures/game/Badge";
 import { GameProfile } from "../../../../../structures/game/Profile";
 import { BadgeService } from "../../../services/game/BadgeService";
 
-export abstract class BadgeSet extends DBClass {
-  public static async createBadge(
-    name: string,
-    emoji: string
-  ): Promise<GameBadge> {
-    const query = (await DB.query(
-      `INSERT INTO badge (badge_name, badge_emoji) VALUES (?, ?);`,
-      [name, emoji]
-    )) as { insertId: number };
+export async function createBadge(
+  name: string,
+  emoji: string
+): Promise<GameBadge> {
+  const query = (await DB.query(
+    `INSERT INTO badge (badge_name, badge_emoji) VALUES (?, ?);`,
+    [name, emoji]
+  )) as { insertId: number };
 
-    return await BadgeService.getBadgeById(query.insertId);
-  }
+  return await BadgeService.getBadgeById(query.insertId);
+}
 
-  public static async deleteBadge(badge: GameBadge): Promise<void> {
-    await DB.query(
-      `DELETE badge.*, user_badge.* FROM 
+export async function deleteBadge(badge: GameBadge): Promise<void> {
+  await DB.query(
+    `DELETE badge.*, user_badge.* FROM 
          badge
        LEFT JOIN
          user_badge
        ON
          user_badge.badge_id=badge.id
        WHERE badge.id=? OR user_badge.badge_id=?;`,
-      [badge.id, badge.id]
-    );
+    [badge.id, badge.id]
+  );
 
-    return;
-  }
-
-  public static async createUserBadge(
-    profile: GameProfile,
-    badge: GameBadge
-  ): Promise<GameUserBadge> {
-    const query = (await DB.query(
-      `INSERT INTO user_badge (discord_id, badge_id) VALUES (?, ?);`,
-      [profile.discordId, badge.id]
-    )) as { insertId: number };
-
-    return await BadgeService.getUserBadgeById(query.insertId);
-  }
-
-  public static async deleteUserBadge(
-    profile: GameProfile,
-    badge: GameUserBadge
-  ): Promise<void> {
-    await DB.query(`DELETE FROM user_badge WHERE id=? AND discord_id=?;`, [
-      badge.id,
-      profile.discordId,
-    ]);
-
-    return;
-  }
+  return;
 }
+
+export async function setBadgeDescription(
+  badge: GameBadge,
+  description: string
+): Promise<GameBadge> {
+  await DB.query(`UPDATE badge SET badge_description=? WHERE id=?;`, [
+    description,
+    badge.id,
+  ]);
+
+  return await badge.fetch();
+}
+
+export async function createUserBadge(
+  profile: GameProfile,
+  badge: GameBadge
+): Promise<GameUserBadge> {
+  const query = (await DB.query(
+    `INSERT INTO user_badge (discord_id, badge_id) VALUES (?, ?);`,
+    [profile.discordId, badge.id]
+  )) as { insertId: number };
+
+  return await BadgeService.getUserBadgeById(query.insertId);
+}
+
+export async function deleteUserBadge(
+  profile: GameProfile,
+  badge: GameUserBadge
+): Promise<void> {
+  await DB.query(`DELETE FROM user_badge WHERE id=? AND discord_id=?;`, [
+    badge.id,
+    profile.discordId,
+  ]);
+
+  return;
+}
+
+export * as BadgeSet from "./BadgeSet";
 
 /*
 

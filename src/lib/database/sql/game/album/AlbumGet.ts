@@ -1,4 +1,4 @@
-import { DB, DBClass } from "../../..";
+import { DB } from "../../..";
 import {
   Album,
   AlbumBackground,
@@ -12,10 +12,9 @@ import { User } from "eris";
 import { GameUserCard } from "../../../../../structures/game/UserCard";
 import { GameProfile } from "../../../../../structures/game/Profile";
 
-export abstract class AlbumGet extends DBClass {
-  public static async getAlbumById(id: number): Promise<GameAlbum> {
-    const query = (await DB.query(
-      `SELECT
+export async function getAlbumById(id: number): Promise<GameAlbum> {
+  const query = (await DB.query(
+    `SELECT
          album.id,
          album.discord_id,
          album.album_name,
@@ -27,21 +26,21 @@ export abstract class AlbumGet extends DBClass {
        LEFT JOIN album_background
          ON album_background.id=album.background_id
        WHERE album.id=?;`,
-      [id]
-    )) as Album[];
+    [id]
+  )) as Album[];
 
-    if (!query[0]) throw new ZephyrError.NonexistentAlbumIdError();
+  if (!query[0]) throw new ZephyrError.NonexistentAlbumIdError();
 
-    return new GameAlbum(query[0]);
-  }
+  return new GameAlbum(query[0]);
+}
 
-  public static async getAlbumByName(
-    name: string,
-    owner: User,
-    sender: User
-  ): Promise<GameAlbum> {
-    const query = (await DB.query(
-      `SELECT
+export async function getAlbumByName(
+  name: string,
+  owner: User,
+  sender: User
+): Promise<GameAlbum> {
+  const query = (await DB.query(
+    `SELECT
         album.id,
         album.discord_id,
         album.album_name,
@@ -53,20 +52,20 @@ export abstract class AlbumGet extends DBClass {
        LEFT JOIN album_background
          ON album_background.id=album.background_id
        WHERE album_name=? AND discord_id=?;`,
-      [name, owner.id]
-    )) as Album[];
+    [name, owner.id]
+  )) as Album[];
 
-    if (!query[0])
-      throw new ZephyrError.AlbumNotFoundError(
-        owner.id === sender.id ? undefined : owner
-      );
+  if (!query[0])
+    throw new ZephyrError.AlbumNotFoundError(
+      owner.id === sender.id ? undefined : owner
+    );
 
-    return new GameAlbum(query[0]);
-  }
+  return new GameAlbum(query[0]);
+}
 
-  public static async getAllBackgrounds(): Promise<GameAlbumBackground[]> {
-    const query = (await DB.query(
-      `
+export async function getAllBackgrounds(): Promise<GameAlbumBackground[]> {
+  const query = (await DB.query(
+    `
       SELECT
         album_background.id,
         album_background.background_name,
@@ -74,27 +73,27 @@ export abstract class AlbumGet extends DBClass {
       FROM
         album_background;
       `
-    )) as AlbumBackground[];
+  )) as AlbumBackground[];
 
-    return query.map((b) => new GameAlbumBackground(b));
-  }
+  return query.map((b) => new GameAlbumBackground(b));
+}
 
-  public static async getNumberOfAlbumsByProfile(
-    profile: GameProfile
-  ): Promise<number> {
-    const query = (await DB.query(
-      `SELECT COUNT(*) AS count FROM album WHERE discord_id=?;`,
-      [profile.discordId]
-    )) as { count: number }[];
+export async function getNumberOfAlbumsByProfile(
+  profile: GameProfile
+): Promise<number> {
+  const query = (await DB.query(
+    `SELECT COUNT(*) AS count FROM album WHERE discord_id=?;`,
+    [profile.discordId]
+  )) as { count: number }[];
 
-    return query[0]?.count || 0;
-  }
+  return query[0]?.count || 0;
+}
 
-  public static async getAlbumsByProfile(
-    profile: GameProfile
-  ): Promise<GameAlbum[]> {
-    const query = (await DB.query(
-      `
+export async function getAlbumsByProfile(
+  profile: GameProfile
+): Promise<GameAlbum[]> {
+  const query = (await DB.query(
+    `
       SELECT
         album.id,
         album.discord_id,
@@ -107,20 +106,20 @@ export abstract class AlbumGet extends DBClass {
       LEFT JOIN album_background
         ON album_background.id=album.background_id
       WHERE discord_id=?;`,
-      [profile.discordId]
-    )) as Album[];
+    [profile.discordId]
+  )) as Album[];
 
-    return query.map((a) => new GameAlbum(a));
-  }
+  return query.map((a) => new GameAlbum(a));
+}
 
-  /*
+/*
         Cards
   */
-  public static async getCardsByAlbum(
-    album: GameAlbum
-  ): Promise<GameAlbumCard[]> {
-    const query = (await DB.query(
-      `
+export async function getCardsByAlbum(
+  album: GameAlbum
+): Promise<GameAlbumCard[]> {
+  const query = (await DB.query(
+    `
       SELECT
        album_card.id,
        album_card.card_id,
@@ -131,28 +130,28 @@ export abstract class AlbumGet extends DBClass {
       WHERE
         album_card.album_id=?;
       `,
-      [album.id]
-    )) as AlbumCard[];
+    [album.id]
+  )) as AlbumCard[];
 
-    return query.map((q) => new GameAlbumCard(q));
-  }
+  return query.map((q) => new GameAlbumCard(q));
+}
 
-  public static async getNumberOfCardsByAlbum(
-    album: GameAlbum
-  ): Promise<number> {
-    const query = (await DB.query(
-      `SELECT COUNT(*) AS count FROM album_card WHERE album_id=?;`,
-      [album.id]
-    )) as { count: number }[];
+export async function getNumberOfCardsByAlbum(
+  album: GameAlbum
+): Promise<number> {
+  const query = (await DB.query(
+    `SELECT COUNT(*) AS count FROM album_card WHERE album_id=?;`,
+    [album.id]
+  )) as { count: number }[];
 
-    return query[0]?.count || 0;
-  }
+  return query[0]?.count || 0;
+}
 
-  public static async cardIsInAlbum(
-    card: GameUserCard
-  ): Promise<GameAlbum | undefined> {
-    const query = (await DB.query(
-      `
+export async function cardIsInAlbum(
+  card: GameUserCard
+): Promise<GameAlbum | undefined> {
+  const query = (await DB.query(
+    `
       SELECT
         album.id,
         album.discord_id,
@@ -169,17 +168,17 @@ export abstract class AlbumGet extends DBClass {
         ON album_background.id=album.background_id
       WHERE card_id=?;
       `,
-      [card.id]
-    )) as Album[];
+    [card.id]
+  )) as Album[];
 
-    return query[0] ? new GameAlbum(query[0]) : undefined;
-  }
+  return query[0] ? new GameAlbum(query[0]) : undefined;
+}
 
-  public static async getCardsInAlbums(
-    profile: GameProfile
-  ): Promise<GameAlbumCard[]> {
-    const query = (await DB.query(
-      `
+export async function getCardsInAlbums(
+  profile: GameProfile
+): Promise<GameAlbumCard[]> {
+  const query = (await DB.query(
+    `
     SELECT
       album_card.id,
       album_card.album_id,
@@ -192,9 +191,10 @@ export abstract class AlbumGet extends DBClass {
     WHERE
       album.discord_id=?;
     `,
-      [profile.discordId]
-    )) as AlbumCard[];
+    [profile.discordId]
+  )) as AlbumCard[];
 
-    return query.map((q) => new GameAlbumCard(q));
-  }
+  return query.map((q) => new GameAlbumCard(q));
 }
+
+export * as AlbumGet from "./AlbumGet";

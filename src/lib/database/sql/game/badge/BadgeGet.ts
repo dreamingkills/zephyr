@@ -1,4 +1,4 @@
-import { DB, DBClass } from "../../..";
+import { DB } from "../../..";
 import {
   Badge,
   GameBadge,
@@ -8,32 +8,31 @@ import {
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { GameProfile } from "../../../../../structures/game/Profile";
 
-export abstract class BadgeGet extends DBClass {
-  public static async getBadgeById(id: number): Promise<GameBadge> {
-    const query = (await DB.query(`SELECT * FROM badge WHERE id=?;`, [
-      id,
-    ])) as Badge[];
+export async function getBadgeById(id: number): Promise<GameBadge> {
+  const query = (await DB.query(`SELECT * FROM badge WHERE id=?;`, [
+    id,
+  ])) as Badge[];
 
-    if (!query[0]) throw new ZephyrError.BadgeNotFoundError(id);
+  if (!query[0]) throw new ZephyrError.BadgeNotFoundError(id);
 
-    return new GameBadge(query[0]);
-  }
+  return new GameBadge(query[0]);
+}
 
-  public static async getUserBadgeById(id: number): Promise<GameUserBadge> {
-    const query = (await DB.query(`SELECT * FROM user_badge WHERE id=?;`, [
-      id,
-    ])) as UserBadge[];
+export async function getUserBadgeById(id: number): Promise<GameUserBadge> {
+  const query = (await DB.query(`SELECT * FROM user_badge WHERE id=?;`, [
+    id,
+  ])) as UserBadge[];
 
-    if (!query[0]) throw new ZephyrError.UserBadgeNotFoundError(id);
+  if (!query[0]) throw new ZephyrError.UserBadgeNotFoundError(id);
 
-    return new GameUserBadge(query[0]);
-  }
+  return new GameUserBadge(query[0]);
+}
 
-  public static async getProfileBadges(
-    profile: GameProfile
-  ): Promise<GameUserBadge[]> {
-    const query = (await DB.query(
-      `SELECT 
+export async function getProfileBadges(
+  profile: GameProfile
+): Promise<GameUserBadge[]> {
+  const query = (await DB.query(
+    `SELECT 
         user_badge.id,
         user_badge.discord_id,
         user_badge.badge_id,
@@ -49,42 +48,42 @@ export abstract class BadgeGet extends DBClass {
         badge.id=user_badge.badge_id
       WHERE
         discord_id=?;`,
-      [profile.discordId]
-    )) as UserBadge[];
+    [profile.discordId]
+  )) as UserBadge[];
 
-    return query.map((b) => new GameUserBadge(b));
-  }
+  return query.map((b) => new GameUserBadge(b));
+}
 
-  public static async getBadgeByName(
-    name: string
-  ): Promise<GameBadge | undefined> {
-    const query = (await DB.query(
-      `SELECT * FROM badge WHERE badge_name LIKE ?;`,
-      [name]
-    )) as Badge[];
+export async function getBadgeByName(
+  name: string
+): Promise<GameBadge | undefined> {
+  const query = (await DB.query(
+    `SELECT * FROM badge WHERE badge_name LIKE ?;`,
+    [name]
+  )) as Badge[];
 
-    if (!query[0]) return;
+  if (!query[0]) return;
 
-    return new GameBadge(query[0]);
-  }
+  return new GameBadge(query[0]);
+}
 
-  public static async getBadgeByEmoji(
-    emoji: string
-  ): Promise<GameBadge | undefined> {
-    const query = (await DB.query(`SELECT * FROM badge WHERE badge_emoji=?;`, [
-      emoji,
-    ])) as Badge[];
+export async function getBadgeByEmoji(
+  emoji: string
+): Promise<GameBadge | undefined> {
+  const query = (await DB.query(`SELECT * FROM badge WHERE badge_emoji=?;`, [
+    emoji,
+  ])) as Badge[];
 
-    if (!query[0]) return;
+  if (!query[0]) return;
 
-    return new GameBadge(query[0]);
-  }
+  return new GameBadge(query[0]);
+}
 
-  public static async getNumberOfBadgeGranted(
-    badge: GameBadge
-  ): Promise<number> {
-    const query = (await DB.query(
-      `SELECT
+export async function getNumberOfBadgeGranted(
+  badge: GameBadge
+): Promise<number> {
+  const query = (await DB.query(
+    `SELECT
          COUNT(*) AS count
        FROM
          user_badge
@@ -95,12 +94,13 @@ export abstract class BadgeGet extends DBClass {
        WHERE
          user_badge.badge_id=?
          AND profile.blacklisted=0;`,
-      [badge.id]
-    )) as { count: number }[];
+    [badge.id]
+  )) as { count: number }[];
 
-    return query[0].count;
-  }
+  return query[0].count;
 }
+
+export * as BadgeGet from "./BadgeGet";
 
 /*
 CREATE TABLE badge

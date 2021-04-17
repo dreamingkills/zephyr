@@ -2,16 +2,17 @@ import { Message } from "eris";
 import { CardService } from "../../../../lib/database/services/game/CardService";
 import { ProfileService } from "../../../../lib/database/services/game/ProfileService";
 import { renderIdentifier } from "../../../../lib/utility/text/TextUtils";
+import { isDeveloper } from "../../../../lib/ZephyrUtils";
 import { MessageEmbed } from "../../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../../structures/command/Command";
 import { VaultError } from "../../../../structures/error/VaultError";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { GameProfile } from "../../../../structures/game/Profile";
 
-export default class VaultAdd extends BaseCommand {
-  id = `ares`;
-  names = [`vaultadd`, `va`];
-  description = `Allows you to add currency or cards to your vault.`;
+export default class VaultRemove extends BaseCommand {
+  id = `petal`;
+  names = [`vaultremove`, `vr`];
+  description = `Allows you to remove cards or currency from your vault.`;
   usage = [`$CMD$ <bits/cubits> <number>`, `$CMD$ cards <cards>`];
   allowDm = true;
 
@@ -20,7 +21,10 @@ export default class VaultAdd extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.transactions)
+    if (
+      !this.zephyr.flags.transactions &&
+      !isDeveloper(msg.author, this.zephyr)
+    )
       throw new ZephyrError.TransactionFlagDisabledError();
 
     const type = options[0]?.toLowerCase();
@@ -34,29 +38,23 @@ export default class VaultAdd extends BaseCommand {
     if (type === `bits`) {
       const quantity = parseInt(options[1]);
 
-      if (isNaN(quantity) || quantity < 1)
+      if (isNaN(quantity) || quantity < 1 || quantity < 1)
         throw new VaultError.InvalidVaultBitsQuantityError(prefix);
 
-      if (profile.bits < quantity)
-        throw new ZephyrError.NotEnoughBitsError(quantity);
+      if (profile.bitsVault < quantity)
+        throw new VaultError.NotEnoughBitsInVaultError(prefix);
 
-      const trueQuantity =
-        quantity + profile.bitsVault > profile.bitsVaultMax
-          ? profile.bitsVaultMax - profile.bitsVault
-          : quantity;
-
-      if (trueQuantity <= 0) throw new VaultError.BitsVaultFullError(prefix);
-
-      const _profile = await ProfileService.addBitsToVault(
+      const _profile = await ProfileService.removeBitsFromVault(
         profile,
-        trueQuantity
+        quantity,
+        prefix
       );
 
       const embed = new MessageEmbed(`Vault`, msg.author)
         .setDescription(
-          `✅ **Added __${trueQuantity}__ bits to your vault!**\n${
-            _profile.bitsVault === _profile.bitsVaultMax
-              ? `Your bits vault is now **full**!`
+          `✅ **Withdrew __${quantity.toLocaleString()}__ bits from your vault!**\n${
+            _profile.bitsVault === 0
+              ? `Your bits vault is now **empty**!`
               : `You now have **${_profile.bitsVault.toLocaleString()}** bits in your vault.`
           }`
         )
@@ -66,31 +64,25 @@ export default class VaultAdd extends BaseCommand {
 
       return;
     } else if (type === `cubits`) {
-      const quantity = parseInt(options[1], 10);
+      const quantity = parseInt(options[1]);
 
       if (isNaN(quantity) || quantity < 1)
         throw new VaultError.InvalidVaultCubitsQuantityError(prefix);
 
-      if (profile.cubits < quantity)
-        throw new ZephyrError.NotEnoughCubitsError(profile.cubits, quantity);
+      if (profile.cubitsVault < quantity)
+        throw new VaultError.NotEnoughCubitsInVaultError(prefix);
 
-      const trueQuantity =
-        quantity + profile.cubitsVault > profile.cubitsVaultMax
-          ? profile.cubitsVaultMax - profile.cubitsVault
-          : quantity;
-
-      if (trueQuantity <= 0) throw new VaultError.CubitsVaultFullError(prefix);
-
-      const _profile = await ProfileService.addCubitsToVault(
+      const _profile = await ProfileService.removeCubitsFromVault(
         profile,
-        trueQuantity
+        quantity,
+        prefix
       );
 
       const embed = new MessageEmbed(`Vault`, msg.author)
         .setDescription(
-          `✅ **Added __${trueQuantity}__ cubits to your vault!**\n${
-            _profile.cubitsVault === _profile.cubitsVaultMax
-              ? `Your cubits vault is now **full**!`
+          `✅ **Withdrew __${quantity.toLocaleString()}__ cubits from your vault!**\n${
+            _profile.cubitsVault === 0
+              ? `Your cubits vault is now **empty**!`
               : `You now have **${_profile.cubitsVault.toLocaleString()}** cubits in your vault.`
           }`
         )
@@ -102,12 +94,7 @@ export default class VaultAdd extends BaseCommand {
     } else if (type === `cards`) {
       const cardsInVault = await CardService.getVaultedCards(profile);
 
-      if (cardsInVault.length >= profile.cardsVaultMax)
-        throw new VaultError.CardsVaultFullError(prefix);
-
-      const cardIdentifiers = options
-        .slice(1)
-        .slice(0, profile.cardsVaultMax - cardsInVault.length);
+      const cardIdentifiers = options.slice(1);
 
       if (cardIdentifiers.length === 0)
         throw new VaultError.InvalidVaultCardIdentifierError(prefix);
@@ -120,18 +107,18 @@ export default class VaultAdd extends BaseCommand {
         if (card.discordId !== msg.author.id)
           throw new ZephyrError.NotOwnerOfCardError(card);
 
-        if (card.vaulted)
-          throw new VaultError.CardAlreadyInVaultError(prefix, card);
+        if (!cardsInVault.find((c) => c.id === card.id))
+          throw new VaultError.CardNotInVaultError(prefix, card);
 
         cards.push(card);
       }
 
-      await CardService.setCardsVaulted(cards);
+      await CardService.unsetCardsVaulted(cards);
 
       const embed = new MessageEmbed(`Vault`, msg.author).setDescription(
-        `✅ **Added** \`${cards
+        `✅ **Removed** \`${cards
           .map((c) => renderIdentifier(c))
-          .join(`\`, \``)}\` **to your vault**!`
+          .join(`\`, \``)}\` **from your vault**!`
       );
 
       await this.send(msg.channel, embed);
