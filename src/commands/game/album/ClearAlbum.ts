@@ -59,7 +59,7 @@ export default class ClearAlbum extends BaseCommand {
       );
 
       collector.on("error", async (e: Error) => {
-        await this.handleError(msg, e);
+        await this.handleError(msg, msg.author, e);
       });
 
       collector.on(`collect`, async () => {

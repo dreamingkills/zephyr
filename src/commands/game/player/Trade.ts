@@ -9,7 +9,7 @@ import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { ReactionCollector } from "eris-collector";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { VaultError } from "../../../structures/error/VaultError";
 
 export default class Trade extends BaseCommand {
@@ -23,7 +23,7 @@ export default class Trade extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.trades)
+    if (!this.zephyr.flags.trades && !isDeveloper(msg.author, this.zephyr))
       throw new ZephyrError.TradeFlagDisabledError();
 
     const targetUser = msg.mentions[0];
@@ -84,7 +84,7 @@ export default class Trade extends BaseCommand {
     });
 
     collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
+      await this.handleError(msg, msg.author, e);
     });
 
     const confirmed: string[] = [];

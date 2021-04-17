@@ -10,7 +10,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { VaultError } from "../../../structures/error/VaultError";
 
 export default class GiftCard extends BaseCommand {
@@ -23,7 +23,7 @@ export default class GiftCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.trades)
+    if (!this.zephyr.flags.trades && !isDeveloper(msg.author, this.zephyr))
       throw new ZephyrError.TradeFlagDisabledError();
 
     const identifiers = options.filter((o) => !o.includes(`<@`));
@@ -90,7 +90,7 @@ export default class GiftCard extends BaseCommand {
       max: 1,
     });
     collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
+      await this.handleError(msg, msg.author, e);
     });
 
     collector.on("collect", async () => {

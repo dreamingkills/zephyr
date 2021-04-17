@@ -4,7 +4,7 @@ import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 import * as ZephyrError from "../../structures/error/ZephyrError";
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
-import { ItemService } from "../../lib/ItemService";
+import { getItemByName } from "../../assets/Items";
 
 export default class DevUserCard extends BaseCommand {
   names = ["dgi"];
@@ -19,7 +19,7 @@ export default class DevUserCard extends BaseCommand {
     const targetUser = msg.mentions[0];
     if (!targetUser) throw new ZephyrError.InvalidMentionError();
 
-    const targetItem = ItemService.getItemByName(options.slice(1).join(" "));
+    const targetItem = getItemByName(options.slice(1).join(" "));
     if (!targetItem) throw new ZephyrError.InvalidItemError();
 
     const targetProfile = await ProfileService.getProfile(targetUser.id);

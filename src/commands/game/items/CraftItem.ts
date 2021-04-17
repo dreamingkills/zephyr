@@ -9,8 +9,8 @@ import { renderRecipe } from "../../../lib/utility/text/TextUtils";
 import { Recipe } from "../../../structures/game/Recipe";
 import { ReactionCollector } from "eris-collector";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
-import { ItemService } from "../../../lib/ItemService";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
+import { getItemById } from "../../../assets/Items";
 
 export default class CraftItem extends BaseCommand {
   id = `crescendolls`;
@@ -25,7 +25,7 @@ export default class CraftItem extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.crafting)
+    if (!this.zephyr.flags.crafting && !isDeveloper(msg.author, this.zephyr))
       throw new ZephyrError.CraftingFlagDisabledError();
 
     if (!options[0]) throw new ZephyrError.UnspecifiedRecipeError();
@@ -37,7 +37,7 @@ export default class CraftItem extends BaseCommand {
     if (!recipeQuery) throw new ZephyrError.RecipeNotFoundError();
 
     const requiredBaseItems = recipeQuery.ingredients.map((i) =>
-      ItemService.getItemById(i.itemId)
+      getItemById(i.itemId)
     ) as PrefabItem[];
     const requiredItemCounts = recipeQuery.ingredients.map((i) => i.count);
 
@@ -77,7 +77,7 @@ export default class CraftItem extends BaseCommand {
       max: 1,
     });
     collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
+      await this.handleError(msg, msg.author, e);
     });
 
     collector.on("collect", async () => {
@@ -93,7 +93,7 @@ export default class CraftItem extends BaseCommand {
       await ProfileService.addItems(
         profile,
         recipeQuery.result.map((r) => {
-          const resultBaseItem = ItemService.getItemById(r.itemId)!;
+          const resultBaseItem = getItemById(r.itemId)!;
           return { item: resultBaseItem, count: r.count };
         })
       );

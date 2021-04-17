@@ -116,15 +116,16 @@ export default class CardInventory extends BaseCommand {
     const sent = await this.send(msg.channel, embed);
     if (totalPages < 2) return;
 
-    const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
-      userId === msg.author.id;
+    const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
+      userId === msg.author.id && [`⏮`, `◀`, `▶`, `⏭`].includes(emoji.name);
+
     const collector = new ReactionCollector(this.zephyr, sent, filter, {
       time: 2 * 60 * 1000,
     });
 
     collector.on("error", async (e: Error) => {
       console.error(e);
-      await this.handleError(msg, e);
+      await this.handleError(msg, msg.author, e);
     });
 
     collector.on(

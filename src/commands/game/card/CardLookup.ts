@@ -32,11 +32,7 @@ export default class CardLookup extends BaseCommand {
       return;
     }
 
-    let nameQuery = options
-      .join(" ")
-      .toLowerCase()
-      .trim()
-      .replace(/([()])/g, ``);
+    let nameQuery = options.join(" ").toLowerCase().trim();
 
     if (!nameQuery) throw new ZephyrError.InvalidLookupQueryError();
 
@@ -89,7 +85,7 @@ export default class CardLookup extends BaseCommand {
       });
 
       collector.on("error", async (e: Error) => {
-        await this.handleError(msg, e);
+        await this.handleError(msg, msg.author, e);
       });
 
       collector.on("collect", async (m: Message) => {

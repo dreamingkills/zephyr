@@ -7,7 +7,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { PatreonService } from "../../../lib/database/services/meta/PatreonService";
-import { ItemService } from "../../../lib/ItemService";
+import { getItemByName } from "../../../assets/Items";
 
 export default class ClaimMonthlyPatronReward extends BaseCommand {
   id = `majesty`;
@@ -21,9 +21,7 @@ export default class ClaimMonthlyPatronReward extends BaseCommand {
     const information = await PatreonService.getPatronInformation(profile);
 
     if (!information.nextFrameTime) {
-      const frameVoucherItem = ItemService.getItemByName(
-        `Patron Frame Voucher`
-      );
+      const frameVoucherItem = getItemByName(`Patron Frame Voucher`);
 
       if (!frameVoucherItem) throw new ZephyrError.InvalidItemError();
 
@@ -53,9 +51,7 @@ export default class ClaimMonthlyPatronReward extends BaseCommand {
         await this.send(msg.channel, embed);
         return;
       } else {
-        const frameVoucherItem = ItemService.getItemByName(
-          `Patron Frame Voucher`
-        );
+        const frameVoucherItem = getItemByName(`Patron Frame Voucher`);
         if (!frameVoucherItem) throw new ZephyrError.InvalidItemError();
 
         await ProfileService.addItems(profile, [

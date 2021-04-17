@@ -8,7 +8,8 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ReactionCollector } from "eris-collector";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
+import { MockUserCard } from "../../../structures/game/UserCard";
 
 export default class DyeCard extends BaseCommand {
   id = `junkhead`;
@@ -22,7 +23,8 @@ export default class DyeCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.dyes) throw new ZephyrError.DyeFlagDisabledError();
+    if (!this.zephyr.flags.dyes && !isDeveloper(msg.author, this.zephyr))
+      throw new ZephyrError.DyeFlagDisabledError();
 
     if (!options[0]?.startsWith("$"))
       throw new ZephyrError.InvalidDyeIdentifierError();
@@ -46,11 +48,16 @@ export default class DyeCard extends BaseCommand {
     const isInAlbum = await AlbumService.cardIsInAlbum(targetCard);
     if (isInAlbum) throw new ZephyrError.CardInAlbumError(targetCard);
 
-    [targetCard.dyeR, targetCard.dyeG, targetCard.dyeB] = [
-      targetDye.dyeR,
-      targetDye.dyeG,
-      targetDye.dyeB,
-    ];
+    const baseCard = this.zephyr.getCard(targetCard.baseCardId)!;
+    const frame = this.zephyr.getFrameById(targetCard.frameId);
+
+    const mockCard = new MockUserCard({
+      id: targetCard.id,
+      baseCard: baseCard,
+      serialNumber: targetCard.serialNumber,
+      frame: frame,
+      dye: { r: targetDye.dyeR, g: targetDye.dyeG, b: targetDye.dyeB },
+    });
 
     const userTags = await ProfileService.getTags(profile);
     const embed = new MessageEmbed(`Dye Card`, msg.author)
@@ -65,10 +72,7 @@ export default class DyeCard extends BaseCommand {
         }.`
       );
 
-    const preview = await CardService.generateCardImage(
-      targetCard,
-      this.zephyr
-    );
+    const preview = await CardService.generateCardImage(mockCard, this.zephyr);
 
     const confirmation = await this.send(msg.channel, embed, {
       files: [{ file: preview, name: "dyepreview.png" }],
@@ -83,7 +87,7 @@ export default class DyeCard extends BaseCommand {
     });
 
     collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
+      await this.handleError(msg, msg.author, e);
     });
 
     collector.on("collect", async () => {

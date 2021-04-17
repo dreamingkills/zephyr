@@ -7,7 +7,7 @@ import { ReactionCollector } from "eris-collector";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { strToInt } from "../../../lib/utility/text/TextUtils";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 
 export default class Pay extends BaseCommand {
   id = `silvera`;
@@ -20,7 +20,10 @@ export default class Pay extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.transactions)
+    if (
+      !this.zephyr.flags.transactions &&
+      !isDeveloper(msg.author, this.zephyr)
+    )
       throw new ZephyrError.TransactionFlagDisabledError();
 
     if (!msg.mentions[0]) throw new ZephyrError.InvalidMentionError();
@@ -61,7 +64,7 @@ export default class Pay extends BaseCommand {
     });
 
     collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
+      await this.handleError(msg, msg.author, e);
     });
 
     collector.on("collect", async () => {

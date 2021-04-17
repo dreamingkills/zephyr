@@ -47,7 +47,7 @@ export default class ResetFrame extends BaseCommand {
       max: 1,
     });
     collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
+      await this.handleError(msg, msg.author, e);
     });
 
     collector.on("collect", async () => {

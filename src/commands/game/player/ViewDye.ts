@@ -18,8 +18,6 @@ export default class ViewDye extends BaseCommand {
     _profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.dyes) throw new ZephyrError.DyeFlagDisabledError();
-
     if (!options[0] || !options[0].startsWith("$"))
       throw new ZephyrError.InvalidDyeIdentifierError();
 

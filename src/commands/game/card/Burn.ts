@@ -12,7 +12,7 @@ import { GameDye } from "../../../structures/game/Dye";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { VaultError } from "../../../structures/error/VaultError";
 
 export default class BurnCard extends BaseCommand {
@@ -27,7 +27,8 @@ export default class BurnCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.burns) throw new ZephyrError.BurnFlagDisabledError();
+    if (!this.zephyr.flags.burns && !isDeveloper(msg.author, this.zephyr))
+      throw new ZephyrError.BurnFlagDisabledError();
 
     const burnTargets: (GameUserCard | GameDye)[] = [];
 
@@ -201,7 +202,7 @@ export default class BurnCard extends BaseCommand {
       max: 1,
     });
     collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
+      await this.handleError(msg, msg.author, e);
     });
 
     collector.on("collect", async () => {

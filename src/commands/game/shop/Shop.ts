@@ -6,8 +6,8 @@ import shop from "../../../assets/shop.json";
 import { ReactionCollector } from "eris-collector";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
-import { ItemService } from "../../../lib/ItemService";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
+import { getItemById, getItemByName } from "../../../assets/Items";
 
 export default class Shop extends BaseCommand {
   id = `dreamer`;
@@ -21,7 +21,10 @@ export default class Shop extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.transactions)
+    if (
+      !this.zephyr.flags.transactions &&
+      !isDeveloper(msg.author, this.zephyr)
+    )
       throw new ZephyrError.TransactionFlagDisabledError();
 
     const subcommand = options[0];
@@ -71,7 +74,7 @@ export default class Shop extends BaseCommand {
         max: 1,
       });
       collector.on("error", async (e: Error) => {
-        await this.handleError(msg, e);
+        await this.handleError(msg, msg.author, e);
       });
 
       const prefix = this.zephyr.getPrefix(msg.guildID);
@@ -117,7 +120,7 @@ export default class Shop extends BaseCommand {
 
     if (subcommand === "buy") {
       const itemQuery = options.slice(1).join(" ")?.toLowerCase();
-      const targetItem = ItemService.getItemByName(itemQuery);
+      const targetItem = getItemByName(itemQuery);
 
       if (!targetItem) throw new ZephyrError.InvalidItemError();
 
@@ -148,7 +151,7 @@ export default class Shop extends BaseCommand {
           { time: 30000, max: 1 }
         );
         collector.on("error", async (e: Error) => {
-          await this.handleError(msg, e);
+          await this.handleError(msg, msg.author, e);
         });
 
         collector.on("collect", async () => {
@@ -193,7 +196,7 @@ export default class Shop extends BaseCommand {
       case `cubits`: {
         let products = [];
         for (let item of shop.cubits) {
-          const baseItem = ItemService.getItemById(item.itemId);
+          const baseItem = getItemById(item.itemId);
 
           if (!baseItem) continue;
           products.push({
@@ -206,7 +209,7 @@ export default class Shop extends BaseCommand {
       case `bits`: {
         let products = [];
         for (let item of shop.bits) {
-          const baseItem = ItemService.getItemById(item.itemId);
+          const baseItem = getItemById(item.itemId);
 
           if (!baseItem) continue;
           products.push({

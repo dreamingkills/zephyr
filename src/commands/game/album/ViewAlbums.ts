@@ -123,7 +123,7 @@ export default class ViewAlbums extends BaseCommand {
     );
 
     collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
+      await this.handleError(msg, msg.author, e);
     });
 
     if (maxPage > 2) await this.react(albumsMessage, `⏮`);

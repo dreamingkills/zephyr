@@ -3,7 +3,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
-import { ItemService } from "../../../lib/ItemService";
+import { getItemByName, getItemIndex } from "../../../assets/Items";
 
 export default class ItemInfo extends BaseCommand {
   id = `nightvision`;
@@ -24,7 +24,7 @@ export default class ItemInfo extends BaseCommand {
       .filter((i) => i.toLowerCase() !== "--dev")
       .join(" ")
       .toLowerCase();
-    const targetItem = ItemService.getItemByName(itemQuery);
+    const targetItem = getItemByName(itemQuery);
 
     if (!targetItem) throw new ZephyrError.InvalidItemError();
 
@@ -47,9 +47,7 @@ export default class ItemInfo extends BaseCommand {
 
     if (options.map((o) => o.toLowerCase()).includes("--dev"))
       embed.setFooter(
-        `id ${
-          targetItem.id
-        } / use?: ${!!targetItem.use} / idx ${ItemService.items.indexOf(
+        `id ${targetItem.id} / use?: ${!!targetItem.use} / idx ${getItemIndex(
           targetItem
         )}`
       );

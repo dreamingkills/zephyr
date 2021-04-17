@@ -36,7 +36,7 @@ export default class CreateTag extends BaseCommand {
       throw new ZephyrError.TagsFullError(profile.patron, prefix);
     }
 
-    const tagName = options[0].toLowerCase();
+    const tagName = options[0].toLowerCase().trim();
 
     if (tagName.length > 12)
       throw new ZephyrError.UnspecifiedTagInCreationError();

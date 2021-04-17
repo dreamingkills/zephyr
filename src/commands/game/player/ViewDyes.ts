@@ -19,8 +19,6 @@ export default class ViewDyes extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.dyes) throw new ZephyrError.DyeFlagDisabledError();
-
     let target: GameProfile | undefined = undefined;
     let targetUser: User;
     if (msg.mentions[0]) {
@@ -68,8 +66,9 @@ export default class ViewDyes extends BaseCommand {
       const collector = new ReactionCollector(this.zephyr, sent, filter, {
         time: 2 * 60 * 1000,
       });
+
       collector.on("error", async (e: Error) => {
-        await this.handleError(msg, e);
+        await this.handleError(msg, msg.author, e);
       });
 
       collector.on(

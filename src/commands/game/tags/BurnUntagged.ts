@@ -11,6 +11,7 @@ import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { GameUserCard } from "../../../structures/game/UserCard";
+import { isDeveloper } from "../../../lib/ZephyrUtils";
 
 export default class BurnUntagged extends BaseCommand {
   id = `firefox`;
@@ -20,7 +21,8 @@ export default class BurnUntagged extends BaseCommand {
   allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!this.zephyr.flags.burns) throw new ZephyrError.BurnFlagDisabledError();
+    if (!this.zephyr.flags.burns && !isDeveloper(msg.author, this.zephyr))
+      throw new ZephyrError.BurnFlagDisabledError();
 
     const cardsRaw = await CardService.getUntaggedCards(profile);
 
@@ -103,8 +105,9 @@ export default class BurnUntagged extends BaseCommand {
       time: 30000,
       max: 1,
     });
+
     collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
+      await this.handleError(msg, msg.author, e);
     });
 
     collector.on("collect", async () => {

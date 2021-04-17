@@ -11,6 +11,7 @@ import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { GameUserCard } from "../../../structures/game/UserCard";
+import { isDeveloper } from "../../../lib/ZephyrUtils";
 
 export default class BurnTag extends BaseCommand {
   id = `refuse`;
@@ -24,7 +25,8 @@ export default class BurnTag extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.burns) throw new ZephyrError.BurnFlagDisabledError();
+    if (!this.zephyr.flags.burns && !isDeveloper(msg.author, this.zephyr))
+      throw new ZephyrError.BurnFlagDisabledError();
 
     if (!options[0]) throw new ZephyrError.UnspecifiedBurnTagsError();
 
@@ -128,8 +130,9 @@ export default class BurnTag extends BaseCommand {
       time: 30000,
       max: 1,
     });
+
     collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
+      await this.handleError(msg, msg.author, e);
     });
 
     collector.on("collect", async () => {

@@ -6,7 +6,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ReactionCollector } from "eris-collector";
 import { GameItem } from "../../../structures/game/Item";
 import { checkPermission } from "../../../lib/ZephyrUtils";
-import { ItemService } from "../../../lib/ItemService";
+import { getItemById } from "../../../assets/Items";
 
 export default class ItemInventory extends BaseCommand {
   id = `ritual`;
@@ -36,7 +36,7 @@ export default class ItemInventory extends BaseCommand {
         time: 2 * 60 * 1000,
       });
       collector.on("error", async (e: Error) => {
-        await this.handleError(msg, e);
+        await this.handleError(msg, msg.author, e);
       });
 
       collector.on(
@@ -74,7 +74,7 @@ export default class ItemInventory extends BaseCommand {
       return (
         inv
           .map((i) => {
-            const itemEntry = ItemService.getItemById(i.itemId);
+            const itemEntry = getItemById(i.itemId);
             return `— \`${itemEntry?.names[0] || `Unknown Item`}\` **x${
               i.quantity
             }**`;

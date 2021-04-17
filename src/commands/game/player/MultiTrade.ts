@@ -10,7 +10,7 @@ import { verifyMultitradeItems } from "../../../lib/command/multitrade/VerifyIte
 import { renderMultitradeInventory } from "../../../lib/command/multitrade/RenderInventory";
 import { transferItems } from "../../../lib/command/multitrade/TransferItems";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 
 export default class MultiTrade extends BaseCommand {
   id = `inhuman`;
@@ -18,7 +18,7 @@ export default class MultiTrade extends BaseCommand {
   description = `Initiates a multitrade.`;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!this.zephyr.flags.trades)
+    if (!this.zephyr.flags.trades && !isDeveloper(msg.author, this.zephyr))
       throw new ZephyrError.TradeFlagDisabledError();
 
     const targetUser = msg.mentions[0];
@@ -46,7 +46,7 @@ export default class MultiTrade extends BaseCommand {
         filter,
         { time: 15000, max: 1 }
       );
-      collector.on("error", (e: Error) => this.handleError(msg, e));
+      collector.on("error", (e: Error) => this.handleError(msg, msg.author, e));
 
       collector.on("collect", () => {
         res(true);
@@ -113,7 +113,7 @@ export default class MultiTrade extends BaseCommand {
 
       messageCollector.on(
         "error",
-        async (e: Error) => await this.handleError(msg, e)
+        async (e: Error) => await this.handleError(msg, msg.author, e)
       );
 
       messageCollector.on("collect", async (m: Message) => {
@@ -133,7 +133,8 @@ export default class MultiTrade extends BaseCommand {
         if (processed.length === 0) return;
 
         await verifyMultitradeItems(
-          msg,
+          m,
+          isSender ? msg.author : targetUser,
           this.handleError,
           processed,
           await selectProfile.fetch(),
@@ -172,7 +173,7 @@ export default class MultiTrade extends BaseCommand {
 
       reactionCollector.on(
         "error",
-        async (e: Error) => await this.handleError(msg, e)
+        async (e: Error) => await this.handleError(msg, msg.author, e)
       );
 
       reactionCollector.on(
@@ -268,6 +269,7 @@ export default class MultiTrade extends BaseCommand {
     try {
       await verifyMultitradeItems(
         msg,
+        msg.author,
         this.handleError,
         senderItems,
         await profile.fetch(),
@@ -275,6 +277,7 @@ export default class MultiTrade extends BaseCommand {
       );
       await verifyMultitradeItems(
         msg,
+        targetUser,
         this.handleError,
         recipientItems,
         await targetProfile.fetch(),

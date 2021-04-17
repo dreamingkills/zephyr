@@ -87,7 +87,7 @@ export default class Leaderboards extends BaseCommand {
       time: 2 * 60 * 1000,
     });
     collector.on("error", async (e: Error) => {
-      await this.handleError(msg, e);
+      await this.handleError(msg, msg.author, e);
     });
 
     collector.on(

@@ -43,7 +43,7 @@ export default class ClearWishlist extends BaseCommand {
       );
 
       collector.on("error", async (e: Error) => {
-        await this.handleError(msg, e);
+        await this.handleError(msg, msg.author, e);
         res(false);
       });
 

@@ -5,7 +5,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { ReactionCollector } from "eris-collector";
-import { ItemService } from "../../../lib/ItemService";
+import { getItemByName } from "../../../assets/Items";
 
 export default class UseItem extends BaseCommand {
   id = `superheroes`;
@@ -24,9 +24,10 @@ export default class UseItem extends BaseCommand {
 
     // Item names may contain spaces, so join everything after `.use`.
     const query = options.join(" ")?.toLowerCase();
+    console.log(query);
 
     // If our query matches any item names or aliases, that's our item.
-    const targetItem = ItemService.getItemByName(query);
+    const targetItem = getItemByName(query);
 
     if (!targetItem) throw new ZephyrError.InvalidItemError();
 
@@ -85,9 +86,9 @@ export default class UseItem extends BaseCommand {
         { time: 15000, max: 1 }
       );
 
-      collector.on("error", (e: Error) => {
+      collector.on("error", async (e: Error) => {
         res(false);
-        return this.handleError(msg, e);
+        return await this.handleError(msg, msg.author, e);
       });
 
       collector.on("collect", () => {

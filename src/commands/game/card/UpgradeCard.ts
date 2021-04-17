@@ -11,7 +11,7 @@ import { GameUserCard } from "../../../structures/game/UserCard";
 import { Dust } from "../../../structures/game/Dust";
 import { items } from "../../../assets/Items";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 
 export default class UpgradeCard extends BaseCommand {
   id = `sunshine`;
@@ -25,7 +25,7 @@ export default class UpgradeCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.upgrades)
+    if (!this.zephyr.flags.upgrades && !isDeveloper(msg.author, this.zephyr))
       throw new ZephyrError.UpgradeFlagDisabledError();
 
     const reference = options[0];
@@ -97,7 +97,7 @@ export default class UpgradeCard extends BaseCommand {
       );
 
       collector.on("error", async (e: Error) => {
-        await this.handleError(msg, e);
+        await this.handleError(msg, msg.author, e);
         res(false);
       });
 

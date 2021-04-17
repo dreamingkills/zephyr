@@ -102,9 +102,9 @@ export default class ViewUserCard extends BaseCommand {
       .setImage(`attachment://card.png`);
 
     const [r, g, b] = [
-      card.dyeR < 0 ? 185 : card.dyeR,
-      card.dyeG < 0 ? 185 : card.dyeG,
-      card.dyeB < 0 ? 185 : card.dyeB,
+      card.dye.r < 0 ? 185 : card.dye.r,
+      card.dye.g < 0 ? 185 : card.dye.g,
+      card.dye.b < 0 ? 185 : card.dye.b,
     ];
 
     embed.setColor(rgbToHex(r, g, b));
