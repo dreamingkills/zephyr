@@ -12,21 +12,27 @@ import { MessageEmbed } from "./RichEmbed";
 import { Chance } from "chance";
 import { CardSpawner } from "../../lib/CardSpawner";
 import { GameWishlist } from "../game/Wishlist";
-import { OrpheusService } from "../../lib/database/services/orpheus/OrpheusService";
 import { DMHandler } from "../../lib/DMHandler";
 import { WebhookListener } from "../../webhook";
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
 import { AnticheatService } from "../../lib/database/services/meta/AnticheatService";
 import dblapi from "dblapi.js";
-import { BuiltSticker } from "../game/Sticker";
+import {
+  BuiltSticker,
+  GameSticker,
+  IntermediateSticker,
+} from "../game/Sticker";
 import { createMessage } from "../../lib/discord/message/createMessage";
 import dayjs from "dayjs";
-import { ItemService } from "../../lib/ItemService";
 import { GameIdol } from "../game/Idol";
 import { Image, loadImage } from "canvas";
 import fs from "fs/promises";
 import { StatsD } from "../../lib/StatsD";
 import { AlbumService } from "../../lib/database/services/game/AlbumService";
+import { GameFrame, IntermediateFrame } from "../game/Frame";
+import * as ZephyrError from "../error/ZephyrError";
+import { ShopService } from "../../lib/database/services/game/ShopService";
+import { GameStickerPack } from "../shop/StickerPack";
 
 export class Zephyr extends Client {
   commandLib = new CommandLib();
@@ -36,9 +42,6 @@ export class Zephyr extends Client {
   private prefixes: { [guildId: string]: string } = {};
   private cards: { [cardId: number]: GameBaseCard } = {};
 
-  public t: string[] = [];
-  public t_c: string[] = [];
-
   private idols: { [id: number]: GameIdol } = {};
 
   private errors: number = 0;
@@ -46,14 +49,11 @@ export class Zephyr extends Client {
   onCooldown: Set<string> = new Set();
 
   /* Images */
-  private frames: {
-    [frameId: number]: {
-      name: string;
-      frame?: Image;
-      mask?: Buffer;
-      overlay?: boolean;
-    };
-  } = {};
+  private frames: GameFrame[] = [];
+  private stickers: GameSticker[] = [];
+
+  /* Shop */
+  private stickerPacks: GameStickerPack[] = [];
 
   private backgrounds: {
     [backgroundId: number]: {
@@ -61,10 +61,6 @@ export class Zephyr extends Client {
       name: string;
       image: Image;
     };
-  } = {};
-
-  private stickers: {
-    [stickerId: number]: BuiltSticker;
   } = {};
 
   logChannel: TextChannel | undefined;
@@ -152,7 +148,9 @@ export class Zephyr extends Client {
     await this.loadStickers();
     await this.loadBackgrounds();
 
-    ItemService.refreshItems();
+    /* Shop stuff */
+    await this.loadStickerPacks();
+
     const fonts = await FontLoader.init();
 
     await this.generatePrefabs();
@@ -222,8 +220,6 @@ export class Zephyr extends Client {
     });
 
     this.on("messageCreate", async (message) => {
-      await OrpheusService.test(message, this);
-
       if (!this.flags.processMessages && !isDeveloper(message.author, this))
         return;
 
@@ -231,35 +227,6 @@ export class Zephyr extends Client {
 
       if (message.author.bot || !message.channel) return;
       StatsD.increment(`zephyr.message.receive`, 1);
-
-      /*const now = Date.now();
-
-      if (this.modifiers.perUserRateLimit > 0) {
-        if (this.userRateLimit[message.author.id] > now) {
-          return;
-        } else {
-          this.userRateLimit[message.author.id] =
-            now + this.modifiers.perUserRateLimit;
-        }
-      }
-
-      if (this.modifiers.perChannelRateLimit > 0) {
-        if (this.channelRateLimit[message.channel.id] > now) {
-          return;
-        } else {
-          this.channelRateLimit[message.channel.id] =
-            now + this.modifiers.perChannelRateLimit;
-        }
-      }
-
-      if (this.modifiers.perGuildRateLimit > 0 && message.guildID) {
-        if (this.guildRateLimit[message.guildID] > now) {
-          return;
-        } else {
-          this.guildRateLimit[message.guildID] =
-            now + this.modifiers.perGuildRateLimit;
-        }
-      }*/
 
       await this.fetchUser(message.author.id);
 
@@ -442,34 +409,72 @@ export class Zephyr extends Client {
   }
 
   /*
+      Shop Loading
+  */
+  public async loadStickerPacks(): Promise<void> {
+    const stickerPacks = await ShopService.getStickerPacks();
+
+    const final = [];
+    for (let pack of stickerPacks) {
+      const completePack = new GameStickerPack(
+        pack,
+        this.stickers.filter((s) => s.packId === pack.id)
+      );
+
+      final.push(completePack);
+    }
+
+    this.stickerPacks = final;
+    return;
+  }
+
+  public getStickerPacks(): GameStickerPack[] {
+    return this.stickerPacks;
+  }
+
+  public getStickerPackById(id: number): GameStickerPack | undefined {
+    return this.stickerPacks.find((pack) => pack.id === id);
+  }
+
+  public getStickerPackByItemId(id: number): GameStickerPack | undefined {
+    return this.stickerPacks.find((pack) => pack.itemId === id);
+  }
+
+  public getStickerPackByName(name: string): GameStickerPack | undefined {
+    return this.stickerPacks.find(
+      (pack) => pack.name.toLowerCase() === name.toLowerCase()
+    );
+  }
+
+  /*
       Image Precaching (frames, stickers, backgrounds)
   */
-  public async loadFrames(): Promise<void> {
+  private async loadFrames(): Promise<void> {
     const frames = await CardService.getAllFrames();
 
     for (let frame of frames) {
-      this.frames[frame.id] = {
-        name: frame.frameName,
+      const intermediate: IntermediateFrame = {
+        id: frame.id,
+        name: frame.frame_name || `Unknown Frame`,
         frame: await loadImage(
-          frame.frameUrl || `./src/assets/frames/default/frame-default.png`
+          frame.frame_url || `./src/assets/frames/default/frame-default.png`
         ),
         mask: await fs.readFile(
-          frame.dyeMaskUrl || `./src/assets/frames/default/frame-default.png`
+          frame.dye_mask_url || `./src/assets/frames/default/mask-default.png`
         ),
         overlay: frame.overlay,
+        textColor: frame.text_color_hex || `000000`,
       };
+
+      const completeFrame = new GameFrame(intermediate);
+
+      this.frames.push(completeFrame);
     }
 
     return;
   }
 
-  public getFrameImagesById(
-    id: number
-  ): { frame?: Image; mask?: Buffer; overlay?: boolean } {
-    return this.frames[id];
-  }
-
-  public async loadBackgrounds(): Promise<void> {
+  private async loadBackgrounds(): Promise<void> {
     const backgrounds = await AlbumService.getAllBackgrounds();
 
     for (let bg of backgrounds) {
@@ -481,6 +486,47 @@ export class Zephyr extends Client {
         ),
       };
     }
+  }
+
+  public async loadStickers(): Promise<void> {
+    const stickers = await CardService.getAllStickers();
+    const final = [];
+
+    for (let sticker of stickers) {
+      const intermediate: IntermediateSticker = {
+        id: sticker.id,
+        name: sticker.name,
+        image: await loadImage(sticker.image_url),
+        itemId: sticker.item_id,
+        packId: sticker.pack_id,
+        rarity: sticker.rarity,
+      };
+
+      const gameSticker = new GameSticker(intermediate);
+
+      final.push(gameSticker);
+    }
+
+    this.stickers = final;
+    return;
+  }
+
+  public getFrameById(id: number): GameFrame {
+    const frame = this.frames.find((f) => f.id === id);
+
+    if (!frame) throw new ZephyrError.FrameNotFoundError();
+
+    return frame;
+  }
+
+  public getFrameByName(name: string): GameFrame {
+    const frame = this.frames.find(
+      (f) => f.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (!frame) throw new ZephyrError.FrameNotFoundError();
+
+    return frame;
   }
 
   public getBackgroundById(
@@ -497,21 +543,6 @@ export class Zephyr extends Client {
     );
 
     return background;
-  }
-
-  public async loadStickers(): Promise<void> {
-    const stickers = await CardService.getAllStickers();
-
-    for (let sticker of stickers) {
-      this.stickers[sticker.id] = {
-        id: sticker.id,
-        name: sticker.name,
-        image: await loadImage(sticker.imageUrl),
-        itemId: sticker.itemId,
-      };
-    }
-
-    return;
   }
 
   /*
@@ -568,6 +599,12 @@ export class Zephyr extends Client {
 
   public getCard(id: number): GameBaseCard | undefined {
     return this.cards[id];
+  }
+
+  public incrementBaseCardSerialNumber(card: GameBaseCard): GameBaseCard {
+    this.cards[card.id].serialTotal += 1;
+
+    return this.cards[card.id];
   }
 
   public getIdol(id: number): GameIdol | undefined {
@@ -629,11 +666,6 @@ export class Zephyr extends Client {
         (median / Math.max(1, c.serialTotal)) * 1.025
       );
 
-      /*console.log(
-        `Relative: ${relativeMultiplier} - Total: ${
-          c.serialTotal
-        } - Average: ${median} - Final: ${relativeMultiplier * weight}`
-      );*/
       weight *= relativeMultiplier;
 
       // The base weighting is multiplied by the boost modifier if the boosted group matches the card's group
@@ -706,104 +738,6 @@ export class Zephyr extends Client {
     return pickedCards;
   }
 
-  /*
-  OLD FUNCTION
-  public __getRandomCards(
-    amount: number,
-    wishlist: GameWishlist[] = [],
-    booster?: number
-  ): GameBaseCard[] {
-    const today = dayjs().format(`MM-DD`);
-    const chosenCards: GameBaseCard[] = [];
-
-    const eligibleCards = this.getCards().filter(
-      (c) => c.rarity > 0 && c.activated
-    );
-
-    const trueWishlist = wishlist.filter((wl) =>
-      eligibleCards.find((c) => c.idolId === wl.idolId)
-    );
-
-    const groupIds: (number | undefined)[] = [];
-    for (let card of eligibleCards) {
-      if (!groupIds.includes(card.groupId)) {
-        groupIds.push(card.groupId);
-      }
-    }
-
-    const weightings = groupIds.map((g) => {
-      let weight = 100;
-
-      if (booster && booster === g) weight *= 2.5;
-
-      return weight;
-    });
-
-    const groups: (number | undefined)[] = [];
-
-    let wishlistProc = false;
-    if (trueWishlist.length > 0) {
-      wishlistProc = this.chance.bool({ likelihood: 15 });
-    }
-
-    while (groups.length < amount - (wishlistProc ? 1 : 0)) {
-      groups.push(this.chance.weighted(groupIds, weightings));
-    }
-
-    if (wishlistProc) {
-      const wishlistWeightings = trueWishlist.map((w) => {
-        let weight = 100;
-
-        const idol = this.getIdol(w.idolId);
-
-        if (idol && idol.birthday === today) weight *= 2.5;
-
-        return weight;
-      });
-
-      const randomWishlist = this.chance.weighted(
-        trueWishlist,
-        wishlistWeightings
-      );
-
-      const idolCards = eligibleCards.filter(
-        (c) => c.idolId === randomWishlist.idolId
-      );
-
-      chosenCards.push(this.chance.pickone(idolCards));
-    }
-
-    for (let group of groups) {
-      const groupCards = eligibleCards.filter(
-        (c) => c.groupId === group && !chosenCards.includes(c)
-      );
-
-      if (groupCards.length > 0) {
-        const weightings = groupCards.map((c) => {
-          let weight = 100;
-
-          const idol = this.getIdol(c.idolId);
-          if (idol && idol.birthday === today) weight *= 2.5;
-
-          return weight;
-        });
-
-        const randomCard = this.chance.weighted(groupCards, weightings);
-        chosenCards.push(randomCard);
-      }
-    }
-
-    while (chosenCards.length < amount) {
-      const randomCard = this.chance.pickone(
-        eligibleCards.filter((c) => !chosenCards.includes(c))
-      );
-      chosenCards.push(randomCard);
-    }
-
-    return chosenCards;
-  }
-  */
-
   public getCards(): GameBaseCard[] {
     return Object.values(this.cards);
   }
@@ -816,17 +750,17 @@ export class Zephyr extends Client {
       Sticker Caching
   */
   public getStickerById(id: number): BuiltSticker | undefined {
-    return this.stickers[id];
+    return this.stickers.find((s) => s.id === id);
   }
 
   public getStickerByItemId(itemId: number): BuiltSticker | undefined {
-    return Object.values(this.stickers).filter((s) => s.itemId === itemId)[0];
+    return this.stickers.filter((s) => s.itemId === itemId)[0];
   }
 
   public getStickerByName(name: string): BuiltSticker | undefined {
-    return Object.values(this.stickers).filter(
+    return this.stickers.find(
       (s) => s.name.toLowerCase() === name.toLowerCase()
-    )[0];
+    );
   }
 
   /*
