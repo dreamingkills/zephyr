@@ -1,4 +1,5 @@
 import { Message } from "eris";
+import { Stickers } from "../../lib/cosmetics/Stickers";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 
@@ -9,7 +10,7 @@ export default class RefreshStickers extends BaseCommand {
   allowDm = true;
 
   async exec(msg: Message): Promise<void> {
-    await this.zephyr.loadStickers();
+    await Stickers.loadStickers();
 
     const embed = new MessageEmbed(
       `Refresh Stickers`,

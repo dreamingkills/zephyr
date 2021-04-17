@@ -7,6 +7,7 @@ import { ProfileService } from "../database/services/game/ProfileService";
 import { createMessage } from "../discord/message/createMessage";
 import { getItemById } from "../../assets/Items";
 import * as ZephyrError from "../../structures/error/ZephyrError";
+import { Stickers } from "../cosmetics/Stickers";
 
 export async function useStickerPack(
   msg: Message,
@@ -14,7 +15,7 @@ export async function useStickerPack(
   packItem: PrefabItem,
   zephyr: Zephyr
 ): Promise<void> {
-  const targetPack = zephyr.getStickerPackByItemId(packItem.id);
+  const targetPack = Stickers.getStickerPackByItemId(packItem.id);
 
   if (!targetPack) throw new ZephyrError.NoPackBoundToItemError();
 

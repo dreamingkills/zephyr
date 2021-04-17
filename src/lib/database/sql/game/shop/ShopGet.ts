@@ -1,4 +1,5 @@
 import { DB } from "../../..";
+import { Sticker } from "../../../../../structures/game/Sticker";
 import { StickerPack } from "../../../../../structures/shop/StickerPack";
 
 export async function getStickerPacks(): Promise<StickerPack[]> {
@@ -16,6 +17,21 @@ export async function getStickerPacks(): Promise<StickerPack[]> {
         sticker_pack;
       `
   )) as StickerPack[];
+
+  return query;
+}
+
+export async function getStickers(): Promise<Sticker[]> {
+  const query = (await DB.query(`
+    SELECT
+      sticker.id,
+      sticker.name,
+      sticker.image_url,
+      sticker.item_id,
+      sticker.pack_id,
+      sticker.rarity
+    FROM sticker;
+    `)) as Sticker[];
 
   return query;
 }

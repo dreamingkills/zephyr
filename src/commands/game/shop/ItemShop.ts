@@ -10,10 +10,10 @@ import { GameStickerPack } from "../../../structures/shop/StickerPack";
 import { getItemById } from "../../../assets/Items";
 import { Stickers } from "../../../lib/cosmetics/Stickers";
 
-export default class Shop extends BaseCommand {
-  id = `repentless`;
-  names = [`stickershop`, `ss`];
-  description = `Displays the sticker shop.`;
+export default class ItemShop extends BaseCommand {
+  id = `delusion`;
+  names = [`itemshop`, `is`];
+  description = `Displays the item shop.`;
   subcommands = [`buy <item>`];
   allowDm = true;
 

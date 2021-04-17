@@ -19,7 +19,6 @@ import {
   BuiltSticker,
   GameCardSticker,
   GameSticker,
-  Sticker,
 } from "../../../../structures/game/Sticker";
 import { AnticheatService } from "../meta/AnticheatService";
 import { Frame } from "../../../../structures/game/Frame";
@@ -593,10 +592,6 @@ export abstract class CardService {
   /*
       Stickers
   */
-  public static async getAllStickers(): Promise<Sticker[]> {
-    return await CardGet.getAllStickers();
-  }
-
   public static async getCardStickers(
     card: GameUserCard | MockUserCard
   ): Promise<GameCardSticker[]> {

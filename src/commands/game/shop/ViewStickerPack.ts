@@ -4,6 +4,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ShopError } from "../../../structures/error/ShopError";
 import { getItemById } from "../../../assets/Items";
+import { Stickers } from "../../../lib/cosmetics/Stickers";
 
 export default class ViewTags extends BaseCommand {
   id = `mandatory`;
@@ -22,7 +23,7 @@ export default class ViewTags extends BaseCommand {
 
     if (!targetPackName) throw new ShopError.InvalidPackNameError(prefix);
 
-    const targetPack = this.zephyr.getStickerPackByName(targetPackName);
+    const targetPack = Stickers.getStickerPackByName(targetPackName);
 
     if (!targetPack) throw new ShopError.PackNotFoundError();
 

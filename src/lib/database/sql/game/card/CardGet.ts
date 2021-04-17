@@ -15,7 +15,6 @@ import { GameTag } from "../../../../../structures/game/Tag";
 import {
   CardSticker,
   GameCardSticker,
-  Sticker,
 } from "../../../../../structures/game/Sticker";
 import { Frame } from "../../../../../structures/game/Frame";
 
@@ -418,21 +417,6 @@ export async function getAllFrames(): Promise<Frame[]> {
       text_color_hex,
       overlay
     FROM card_frame;`)) as Frame[];
-
-  return query;
-}
-
-export async function getAllStickers(): Promise<Sticker[]> {
-  const query = (await DB.query(`
-    SELECT
-      sticker.id,
-      sticker.name,
-      sticker.image_url,
-      sticker.item_id,
-      sticker.pack_id,
-      sticker.rarity
-    FROM sticker;
-    `)) as Sticker[];
 
   return query;
 }

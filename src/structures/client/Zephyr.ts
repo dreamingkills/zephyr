@@ -17,11 +17,7 @@ import { WebhookListener } from "../../webhook";
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
 import { AnticheatService } from "../../lib/database/services/meta/AnticheatService";
 import dblapi from "dblapi.js";
-import {
-  BuiltSticker,
-  GameSticker,
-  IntermediateSticker,
-} from "../game/Sticker";
+import { BuiltSticker, GameSticker } from "../game/Sticker";
 import { createMessage } from "../../lib/discord/message/createMessage";
 import dayjs from "dayjs";
 import { GameIdol } from "../game/Idol";
@@ -31,8 +27,7 @@ import { StatsD } from "../../lib/StatsD";
 import { AlbumService } from "../../lib/database/services/game/AlbumService";
 import { GameFrame, IntermediateFrame } from "../game/Frame";
 import * as ZephyrError from "../error/ZephyrError";
-import { ShopService } from "../../lib/database/services/game/ShopService";
-import { GameStickerPack } from "../shop/StickerPack";
+import { Stickers } from "../../lib/cosmetics/Stickers";
 
 export class Zephyr extends Client {
   commandLib = new CommandLib();
@@ -51,9 +46,6 @@ export class Zephyr extends Client {
   /* Images */
   private frames: GameFrame[] = [];
   private stickers: GameSticker[] = [];
-
-  /* Shop */
-  private stickerPacks: GameStickerPack[] = [];
 
   private backgrounds: {
     [backgroundId: number]: {
@@ -145,11 +137,11 @@ export class Zephyr extends Client {
 
     /* Preload images into memory */
     await this.loadFrames();
-    await this.loadStickers();
+    await Stickers.loadStickers();
     await this.loadBackgrounds();
 
     /* Shop stuff */
-    await this.loadStickerPacks();
+    await Stickers.loadStickerPacks();
 
     const fonts = await FontLoader.init();
 
@@ -409,44 +401,6 @@ export class Zephyr extends Client {
   }
 
   /*
-      Shop Loading
-  */
-  public async loadStickerPacks(): Promise<void> {
-    const stickerPacks = await ShopService.getStickerPacks();
-
-    const final = [];
-    for (let pack of stickerPacks) {
-      const completePack = new GameStickerPack(
-        pack,
-        this.stickers.filter((s) => s.packId === pack.id)
-      );
-
-      final.push(completePack);
-    }
-
-    this.stickerPacks = final;
-    return;
-  }
-
-  public getStickerPacks(): GameStickerPack[] {
-    return this.stickerPacks;
-  }
-
-  public getStickerPackById(id: number): GameStickerPack | undefined {
-    return this.stickerPacks.find((pack) => pack.id === id);
-  }
-
-  public getStickerPackByItemId(id: number): GameStickerPack | undefined {
-    return this.stickerPacks.find((pack) => pack.itemId === id);
-  }
-
-  public getStickerPackByName(name: string): GameStickerPack | undefined {
-    return this.stickerPacks.find(
-      (pack) => pack.name.toLowerCase() === name.toLowerCase()
-    );
-  }
-
-  /*
       Image Precaching (frames, stickers, backgrounds)
   */
   private async loadFrames(): Promise<void> {
@@ -486,29 +440,6 @@ export class Zephyr extends Client {
         ),
       };
     }
-  }
-
-  public async loadStickers(): Promise<void> {
-    const stickers = await CardService.getAllStickers();
-    const final = [];
-
-    for (let sticker of stickers) {
-      const intermediate: IntermediateSticker = {
-        id: sticker.id,
-        name: sticker.name,
-        image: await loadImage(sticker.image_url),
-        itemId: sticker.item_id,
-        packId: sticker.pack_id,
-        rarity: sticker.rarity,
-      };
-
-      const gameSticker = new GameSticker(intermediate);
-
-      final.push(gameSticker);
-    }
-
-    this.stickers = final;
-    return;
   }
 
   public getFrameById(id: number): GameFrame {
