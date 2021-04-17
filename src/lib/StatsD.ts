@@ -1,8 +1,8 @@
 import { StatsD } from "node-statsd";
 
-let Stats = new StatsD();
+const Stats = new StatsD();
 Stats.socket.on(`error`, (err) => {
-    console.log(`!!! StatsD error: ${err}`);
+  console.log(`!!! StatsD error: ${err}`);
 });
 
-export { Stats as StatsD }
+export { Stats as StatsD };

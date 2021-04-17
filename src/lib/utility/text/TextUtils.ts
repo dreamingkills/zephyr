@@ -1,4 +1,5 @@
 import { User } from "eris";
+import { getItemById } from "../../../assets/Items";
 import { Zephyr } from "../../../structures/client/Zephyr";
 import { GameAlbumCard } from "../../../structures/game/Album";
 import { GameBaseCard } from "../../../structures/game/BaseCard";
@@ -7,7 +8,6 @@ import { GameProfile } from "../../../structures/game/Profile";
 import { Recipe } from "../../../structures/game/Recipe";
 import { GameTag } from "../../../structures/game/Tag";
 import { GameUserCard } from "../../../structures/game/UserCard";
-import { ItemService } from "../../ItemService";
 
 export function strToInt(text: string): number {
   let result = parseInt(text.replace(/[, ]+/g, ""), 10);
@@ -32,12 +32,12 @@ export function escapeMarkdown(value: string): string {
 export function renderRecipe(recipe: Recipe): string {
   return `\`\`\`diff\n${recipe.ingredients
     .map((i) => {
-      const baseItem = ItemService.getItemById(i.itemId);
+      const baseItem = getItemById(i.itemId);
       return `- ${i.count}x ${baseItem?.names[0] || "Unknown Item"}`;
     })
     .join("\n")}\`\`\`\`\`\`diff\n${recipe.result
     .map((i) => {
-      const baseItem = ItemService.getItemById(i.itemId);
+      const baseItem = getItemById(i.itemId);
       return `+ ${i.count}x ${baseItem?.names[0] || "Unknown Item"}`;
     })
     .join("\n")}\n\`\`\``;

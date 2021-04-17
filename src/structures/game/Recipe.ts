@@ -1,11 +1,11 @@
 type RecipeItem = {
-  itemId: number;
-  count: number;
+  readonly itemId: number;
+  readonly count: number;
 };
 
 export type Recipe = {
-  name: string;
-  query: string;
-  ingredients: RecipeItem[];
-  result: RecipeItem[];
+  readonly name: string;
+  readonly query: string;
+  readonly ingredients: RecipeItem[];
+  readonly result: RecipeItem[];
 };

@@ -1,59 +1,52 @@
 import { CardService } from "../../lib/database/services/game/CardService";
+import { GameBaseCard } from "./BaseCard";
+import { GameFrame } from "./Frame";
 
 export interface UserCard {
-  id: number;
-  card_id: number;
-  serial_number: number;
-  discord_id: string;
-  // original_owner: string;
-  wear: 0 | 1 | 2 | 3 | 4 | 5;
-  frame_id: number;
-  frame_name: string;
-  frame_url: string;
-  text_color_hex: Buffer;
-  dye_mask_url: string;
-  dye_r: number | null;
-  dye_g: number | null;
-  dye_b: number | null;
-  // claim_time: number;
-  tag_id: number | null;
-  // original_wear: number;
-  // fight_count: number;
-  // dropper: string;
-  vaulted: boolean;
-  luck_coeff: number;
+  readonly id: number;
+  readonly card_id: number;
+  readonly serial_number: number;
+  readonly discord_id: string;
+  readonly wear: 0 | 1 | 2 | 3 | 4 | 5;
+  readonly frame_id: number;
+  readonly frame_name: string;
+  readonly frame_url: string;
+  readonly text_color_hex: Buffer;
+  readonly dye_mask_url: string;
+  readonly dye_r: number | null;
+  readonly dye_g: number | null;
+  readonly dye_b: number | null;
+  readonly tag_id: number | null;
+  readonly vaulted: boolean;
+  readonly luck_coeff: number;
 }
 
 export class GameUserCard {
-  id: number;
-  baseCardId: number;
-  serialNumber: number;
-  discordId: string;
-  //originalOwner: string;
-  wear: 0 | 1 | 2 | 3 | 4 | 5;
-  frameId: number;
-  frameName: string;
-  frameUrl: string;
-  textColor: string;
-  dyeMaskUrl: string;
-  dyeR: number;
-  dyeG: number;
-  dyeB: number;
-  vaulted: boolean;
-  luckCoefficient: number;
-  //claimTime: number;
-  //originalWear: number;
-  //fightCount: number;
-  //dropper: string;
+  readonly id: number;
+  readonly baseCardId: number;
+  readonly serialNumber: number;
+  readonly discordId: string;
+  readonly wear: 0 | 1 | 2 | 3 | 4 | 5;
+  readonly frameId: number;
+  readonly frameName: string;
+  readonly frameUrl: string;
+  readonly textColor: string;
+  readonly dyeMaskUrl: string;
+  readonly dye: {
+    r: number;
+    g: number;
+    b: number;
+  };
+  readonly vaulted: boolean;
+  readonly luckCoefficient: number;
 
-  tagId: number | undefined;
+  readonly tagId: number | undefined;
 
   constructor(data: UserCard) {
     this.id = data.id;
     this.baseCardId = data.card_id;
     this.serialNumber = data.serial_number;
     this.discordId = data.discord_id;
-    // this.originalOwner = data.original_owner;
     this.wear = data.wear;
     this.frameId = data.frame_id;
     this.frameName = data.frame_name;
@@ -61,26 +54,50 @@ export class GameUserCard {
     this.textColor = data.text_color_hex?.toString() || `000000`;
     this.dyeMaskUrl = data.dye_mask_url;
     this.vaulted = data.vaulted;
-    // this.claimTime = data.claim_time;
-    // this.originalWear = data.original_wear;
-    // this.fightCount = data.fight_count;
-    // this.dropper = data.dropper;
 
     this.tagId = data.tag_id || undefined;
     this.luckCoefficient = data.luck_coeff;
 
+    let r, g, b;
+
     if (data.dye_r || data.dye_r === 0) {
-      this.dyeR = data.dye_r;
-    } else this.dyeR = -1;
+      r = data.dye_r;
+    } else r = -1;
     if (data.dye_g || data.dye_g === 0) {
-      this.dyeG = data.dye_g;
-    } else this.dyeG = -1;
+      g = data.dye_g;
+    } else g = -1;
     if (data.dye_b || data.dye_b === 0) {
-      this.dyeB = data.dye_b;
-    } else this.dyeB = -1;
+      b = data.dye_b;
+    } else b = -1;
+
+    this.dye = { r, g, b };
   }
 
   public async fetch(): Promise<GameUserCard> {
     return await CardService.getUserCardById(this.id);
+  }
+}
+
+export class MockUserCard {
+  readonly id: number;
+  readonly baseCard: GameBaseCard;
+  readonly serialNumber: number;
+
+  readonly frame: GameFrame;
+  readonly dye: { r: number; g: number; b: number };
+
+  constructor(data: {
+    id: number;
+    baseCard: GameBaseCard;
+    serialNumber: number;
+    frame: GameFrame;
+    dye: { r: number; g: number; b: number };
+  }) {
+    this.id = data.id;
+    this.baseCard = data.baseCard;
+    this.serialNumber = data.serialNumber;
+
+    this.frame = data.frame;
+    this.dye = data.dye;
   }
 }

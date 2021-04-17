@@ -1,4 +1,4 @@
-import { Message } from "eris";
+import { Message, User } from "eris";
 import { addReaction } from "../../lib/discord/message/addReaction";
 import { createMessage } from "../../lib/discord/message/createMessage";
 import { deleteMessage } from "../../lib/discord/message/deleteMessage";
@@ -62,10 +62,12 @@ export abstract class BaseCommand implements Command {
     return "💥 Self destructing...";
   }
 
-  public async handleError(msg: Message, error: Error): Promise<void> {
-    const embed = new MessageEmbed(`Error`, msg.author).setDescription(
-      error.message
-    );
+  public async handleError(
+    msg: Message,
+    user: User,
+    error: Error
+  ): Promise<void> {
+    const embed = new MessageEmbed(`Error`, user).setDescription(error.message);
     await createMessage(msg.channel, embed);
     return;
   }

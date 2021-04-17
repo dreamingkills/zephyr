@@ -1,15 +1,15 @@
 export interface Item {
-  id: number;
-  discord_id: string;
-  item_id: number;
-  quantity: number;
+  readonly id: number;
+  readonly discord_id: string;
+  readonly item_id: number;
+  readonly quantity: number;
 }
 
 export class GameItem {
-  id: number;
-  discordId: string;
-  itemId: number;
-  quantity: number;
+  readonly id: number;
+  readonly discordId: string;
+  readonly itemId: number;
+  readonly quantity: number;
   constructor(data: Item) {
     this.id = data.id;
     this.discordId = data.discord_id;

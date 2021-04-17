@@ -1,13 +1,13 @@
 interface Idol {
-  id: number;
-  idol_name: string;
-  birthday: string | null | undefined;
+  readonly id: number;
+  readonly idol_name: string;
+  readonly birthday: string | null | undefined;
 }
 
 export class GameIdol {
-  id: number;
-  name: string;
-  birthday: string | undefined;
+  readonly id: number;
+  readonly name: string;
+  readonly birthday: string | undefined;
   constructor(idol: Idol) {
     this.id = idol.id;
     this.name = idol.idol_name;

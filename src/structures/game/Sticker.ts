@@ -1,38 +1,53 @@
 import { Image } from "canvas";
 
 export interface Sticker {
-  id: number;
-  name: string;
-  image_url: string;
-  item_id: number;
+  readonly id: number;
+  readonly name: string;
+  readonly image_url: string;
+  readonly item_id: number;
+  readonly pack_id: number;
+  readonly rarity: number;
 }
 
 export interface CardSticker {
-  id: number;
-  card_id: number;
-  sticker_id: number;
-  position: number;
+  readonly id: number;
+  readonly card_id: number;
+  readonly sticker_id: number;
+  readonly position: number;
+}
+
+export interface IntermediateSticker {
+  readonly id: number;
+  readonly name: string;
+  readonly image: Image;
+  readonly itemId: number;
+  readonly packId: number;
+  readonly rarity: number;
 }
 
 export class GameSticker {
-  id: number;
-  name: string;
-  imageUrl: string;
-  itemId: number;
+  readonly id: number;
+  readonly name: string;
+  readonly image: Image;
+  readonly itemId: number;
+  readonly packId: number;
+  readonly rarity: number;
 
-  constructor(data: Sticker) {
+  constructor(data: IntermediateSticker) {
     this.id = data.id;
     this.name = data.name;
-    this.imageUrl = data.image_url;
-    this.itemId = data.item_id;
+    this.image = data.image;
+    this.itemId = data.itemId;
+    this.packId = data.packId;
+    this.rarity = data.rarity;
   }
 }
 
 export class GameCardSticker {
-  id: number;
-  cardId: number;
-  stickerId: number;
-  position: number;
+  readonly id: number;
+  readonly cardId: number;
+  readonly stickerId: number;
+  readonly position: number;
 
   constructor(data: CardSticker) {
     this.id = data.id;
@@ -43,8 +58,8 @@ export class GameCardSticker {
 }
 
 export interface BuiltSticker {
-  id: number;
-  name: string;
-  image: Image;
-  itemId: number;
+  readonly id: number;
+  readonly name: string;
+  readonly image: Image;
+  readonly itemId: number;
 }

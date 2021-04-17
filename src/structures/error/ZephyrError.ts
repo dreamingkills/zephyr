@@ -2,9 +2,9 @@ import { User } from "eris";
 import { renderIdentifier } from "../../lib/utility/text/TextUtils";
 import { GameAlbum } from "../game/Album";
 import { GameBadge } from "../game/Badge";
-import { GameFrame } from "../game/BaseCard";
 import { GameBlacklist } from "../game/blacklist/Blacklist";
 import { GameDye } from "../game/Dye";
+import { GameFrame } from "../game/Frame";
 import { GameTag } from "../game/Tag";
 import { GameUserCard } from "../game/UserCard";
 import { PrefabItem } from "../item/PrefabItem";
@@ -225,9 +225,7 @@ export class CannotRemoveFrameError extends ZephyrError {
 export class DuplicateFrameError extends ZephyrError {
   constructor(card: GameUserCard, frame: GameFrame) {
     super(
-      `\`${card.id.toString(36)}\` already uses the **${
-        frame.frameName
-      } Frame**.`
+      `\`${card.id.toString(36)}\` already uses the **${frame.name} Frame**.`
     );
   }
 }
@@ -297,6 +295,12 @@ export class NotOwnerOfCardError extends ZephyrError {
 export class FrameAlreadyDefaultError extends ZephyrError {
   constructor(card: GameUserCard) {
     super(`\`${card.id.toString(36)}\` already has the default frame.`);
+  }
+}
+
+export class FrameNotFoundError extends ZephyrError {
+  constructor() {
+    super(`There was a problem attempting to retrieve a frame.`);
   }
 }
 
@@ -592,6 +596,22 @@ export class NotAPatronError extends ZephyrError {
 /*
     Stickers
               */
+export class NoStickerItemError extends ZephyrError {
+  constructor() {
+    super(
+      `**That sticker has no item bound to it!**\nPlease report this to the developer at [https://discord.gg/zephyr].`
+    );
+  }
+}
+
+export class NoPackBoundToItemError extends ZephyrError {
+  constructor() {
+    super(
+      `**That item does not have a pack bound to it!**\nPlease report this to the developer at [https://discord.gg/zephyr].`
+    );
+  }
+}
+
 export class TooManyStickersError extends ZephyrError {
   constructor(card: GameUserCard) {
     super(`\`${card.id.toString(36)}\` has three stickers already.`);

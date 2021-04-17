@@ -1,25 +1,25 @@
 import { BlacklistService } from "../../../lib/database/services/meta/BlacklistService";
 
 export interface Blacklist {
-  id: number;
-  discord_id: string;
-  reason: string;
-  moderator_id: string;
-  active: boolean;
-  created_at: string;
-  quashed_by: string;
-  quash_note: string;
+  readonly id: number;
+  readonly discord_id: string;
+  readonly reason: string;
+  readonly moderator_id: string;
+  readonly active: boolean;
+  readonly created_at: string;
+  readonly quashed_by: string;
+  readonly quash_note: string;
 }
 
 export class GameBlacklist {
-  id: number;
-  discordId: string;
-  reason: string;
-  moderator: string;
-  active: boolean;
-  createdAt: string;
-  quasher: string;
-  quashNote: string;
+  readonly id: number;
+  readonly discordId: string;
+  readonly reason: string;
+  readonly moderator: string;
+  readonly active: boolean;
+  readonly createdAt: string;
+  readonly quasher: string;
+  readonly quashNote: string;
 
   constructor(blacklist: Blacklist) {
     this.id = blacklist.id;

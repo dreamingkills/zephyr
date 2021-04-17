@@ -1,23 +1,23 @@
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
 
 export interface Dye {
-  id: number;
-  discord_id: string;
-  name: string;
-  dye_r: number;
-  dye_g: number;
-  dye_b: number;
-  charges: number;
+  readonly id: number;
+  readonly discord_id: string;
+  readonly name: string;
+  readonly dye_r: number;
+  readonly dye_g: number;
+  readonly dye_b: number;
+  readonly charges: number;
 }
 
 export class GameDye {
-  id: number;
-  discordId: string;
-  name: string;
-  dyeR: number;
-  dyeG: number;
-  dyeB: number;
-  charges: number;
+  readonly id: number;
+  readonly discordId: string;
+  readonly name: string;
+  readonly dyeR: number;
+  readonly dyeG: number;
+  readonly dyeB: number;
+  readonly charges: number;
   constructor(data: Dye) {
     this.id = data.id;
     this.discordId = data.discord_id;

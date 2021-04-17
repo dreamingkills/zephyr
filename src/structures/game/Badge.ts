@@ -1,3 +1,5 @@
+import { BadgeService } from "../../lib/database/services/game/BadgeService";
+
 export interface Badge {
   readonly id: number;
   readonly badge_name: string;
@@ -27,6 +29,10 @@ export class GameBadge {
     this.badgeEmoji = badge.badge_emoji;
     this.badgeDescription = badge.badge_description || undefined;
   }
+
+  public async fetch(): Promise<GameBadge> {
+    return await BadgeService.getBadgeById(this.id);
+  }
 }
 
 export class GameUserBadge {
@@ -46,5 +52,9 @@ export class GameUserBadge {
     this.badgeEmoji = userBadge.badge_emoji;
     this.createdAt = userBadge.created_at;
     this.badgeDescription = userBadge.badge_description || undefined;
+  }
+
+  public async fetch(): Promise<GameBadge> {
+    return await BadgeService.getUserBadgeById(this.id);
   }
 }

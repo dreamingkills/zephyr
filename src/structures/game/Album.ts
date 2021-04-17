@@ -1,33 +1,33 @@
 import { AlbumService } from "../../lib/database/services/game/AlbumService";
 
 export interface Album {
-  id: number;
-  discord_id: string;
-  album_name: string;
-  pages: number;
-  background_id: number;
-  background_name: string;
-  image_url: string;
+  readonly id: number;
+  readonly discord_id: string;
+  readonly album_name: string;
+  readonly pages: number;
+  readonly background_id: number;
+  readonly background_name: string;
+  readonly image_url: string;
 }
 
 export interface AlbumCard {
-  id: number;
-  card_id: number;
-  album_id: number;
-  slot: number;
+  readonly id: number;
+  readonly card_id: number;
+  readonly album_id: number;
+  readonly slot: number;
 }
 
 export interface AlbumBackground {
-  id: number;
-  background_name: string;
-  image_url: string;
+  readonly id: number;
+  readonly background_name: string;
+  readonly image_url: string;
 }
 
 export class GameAlbumCard {
-  id: number;
-  cardId: number;
-  albumId: number;
-  slot: number;
+  readonly id: number;
+  readonly cardId: number;
+  readonly albumId: number;
+  readonly slot: number;
 
   constructor(data: AlbumCard) {
     this.id = data.id;
@@ -38,14 +38,14 @@ export class GameAlbumCard {
 }
 
 export class GameAlbum {
-  id: number;
-  discordId: string;
-  name: string;
-  pages: number;
+  readonly id: number;
+  readonly discordId: string;
+  readonly name: string;
+  readonly pages: number;
 
-  backgroundId: number;
-  backgroundName: string;
-  backgroundUrl: string;
+  readonly backgroundId: number;
+  readonly backgroundName: string;
+  readonly backgroundUrl: string;
   constructor(data: Album) {
     this.id = data.id;
     this.discordId = data.discord_id;
@@ -63,9 +63,9 @@ export class GameAlbum {
 }
 
 export class GameAlbumBackground {
-  id: number;
-  name: string;
-  imageUrl: string;
+  readonly id: number;
+  readonly name: string;
+  readonly imageUrl: string;
 
   constructor(data: AlbumBackground) {
     this.id = data.id;

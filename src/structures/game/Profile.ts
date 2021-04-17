@@ -2,88 +2,88 @@ import { ProfileService } from "../../lib/database/services/game/ProfileService"
 
 export interface Profile {
   /* Currencies */
-  bits: number;
-  premium_currency: number;
-  cubits: number;
+  readonly bits: number;
+  readonly premium_currency: number;
+  readonly cubits: number;
 
   /* Vault */
-  bits_vault: number;
-  cubits_vault: number;
-  bits_vault_max: number;
-  cubits_vault_max: number;
-  cards_vault_max: number;
+  readonly bits_vault: number;
+  readonly cubits_vault: number;
+  readonly bits_vault_max: number;
+  readonly cubits_vault_max: number;
+  readonly cards_vault_max: number;
 
   /* Profile */
-  discord_id: string;
-  private: boolean;
-  blurb: string;
-  patron: number;
-  blacklisted: boolean;
+  readonly discord_id: string;
+  readonly private: boolean;
+  readonly blurb: string;
+  readonly patron: number;
+  readonly blacklisted: boolean;
 
   /* Timestamps */
-  daily_last: string;
-  drop_next: string;
-  claim_next: string;
-  vote_last: string | null;
+  readonly daily_last: string;
+  readonly drop_next: string;
+  readonly claim_next: string;
+  readonly vote_last: string | null;
 
   /* Reminders */
-  claim_reminder: boolean;
-  claim_reminded: boolean;
-  drop_reminder: boolean;
-  drop_reminded: boolean;
-  vote_reminder: boolean;
-  vote_reminded: boolean;
+  readonly claim_reminder: boolean;
+  readonly claim_reminded: boolean;
+  readonly drop_reminder: boolean;
+  readonly drop_reminded: boolean;
+  readonly vote_reminder: boolean;
+  readonly vote_reminded: boolean;
 
   /* Boosters */
-  booster_group: number | null;
-  booster_expiry: string | null;
+  readonly booster_group: number | null;
+  readonly booster_expiry: string | null;
 
   /* Other */
-  daily_streak: number;
-  created_at: string;
+  readonly daily_streak: number;
+  readonly created_at: string;
 }
 
 export class GameProfile {
   /* Currencies */
-  bits: number;
-  cubits: number;
-  premiumCurrency: number;
+  readonly bits: number;
+  readonly cubits: number;
+  readonly premiumCurrency: number;
 
   /* Vault */
-  bitsVault: number;
-  cubitsVault: number;
-  bitsVaultMax: number;
-  cubitsVaultMax: number;
-  cardsVaultMax: number;
+  readonly bitsVault: number;
+  readonly cubitsVault: number;
+  readonly bitsVaultMax: number;
+  readonly cubitsVaultMax: number;
+  readonly cardsVaultMax: number;
 
   /* Profile */
-  discordId: string;
-  private: boolean;
-  blurb: string;
-  patron: number;
-  blacklisted: boolean;
+  readonly discordId: string;
+  readonly private: boolean;
+  readonly blurb: string;
+  readonly patron: number;
+  readonly blacklisted: boolean;
 
   /* Timestamps */
-  dailyLast: string;
-  dropNext: string;
-  claimNext: string;
-  voteLast: string | null;
+  readonly dailyLast: string;
+  readonly dropNext: string;
+  readonly claimNext: string;
+  readonly voteLast: string | null;
 
   /* Reminders */
-  dropReminder: boolean;
-  dropReminded: boolean;
-  claimReminder: boolean;
-  claimReminded: boolean;
-  voteReminder: boolean;
-  voteReminded: boolean;
+  readonly dropReminder: boolean;
+  readonly dropReminded: boolean;
+  readonly claimReminder: boolean;
+  readonly claimReminded: boolean;
+  readonly voteReminder: boolean;
+  readonly voteReminded: boolean;
 
   /* Boosters */
-  boosterGroup?: number;
-  boosterExpiry?: string;
+  readonly boosterGroup?: number;
+  readonly boosterExpiry?: string;
 
   /* Other */
-  dailyStreak: number;
-  createdAt: string;
+  readonly dailyStreak: number;
+  readonly createdAt: string;
 
   constructor(data: Profile) {
     /* Currencies */
