@@ -364,7 +364,7 @@ export async function toggleVoteReminders(discordId: string[]): Promise<void> {
 
 export async function disableReminders(discordId: string[]): Promise<void> {
   await DB.query(
-    `UPDATE profile SET claim_reminder=0,drop_reminder=0,vote_reminder WHERE discord_id IN (?);`,
+    `UPDATE profile SET claim_reminder=0,drop_reminder=0,vote_reminder=0 WHERE discord_id IN (?);`,
     [discordId]
   );
   return;
