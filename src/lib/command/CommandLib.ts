@@ -70,9 +70,6 @@ export class CommandLib {
 
     const command = commandMatch[0];
 
-    zephyr.onCooldown.add(message.author.id);
-    setTimeout(() => zephyr.onCooldown.delete(message.author.id), 300);
-
     if (zephyr.modifiers.perUserRateLimit > 0) {
       this.cooldowns.add(message.author.id);
       setTimeout(
@@ -91,10 +88,9 @@ export class CommandLib {
 
       try {
         await createMessage(message.channel, embed);
-      } catch {
-      } finally {
-        return;
-      }
+      } catch {}
+
+      return;
     } else if (
       command.moderatorOnly &&
       !zephyr.config.moderators.includes(message.author.id) &&
@@ -106,10 +102,9 @@ export class CommandLib {
 
       try {
         await createMessage(message.channel, embed);
-      } catch {
-      } finally {
-        return;
-      }
+      } catch {}
+
+      return;
     }
 
     try {
@@ -168,6 +163,11 @@ export class CommandLib {
 
       if (message.channel.type === 1 && !command.allowDm)
         throw new ZephyrError.NotAllowedInDMError();
+
+      if (zephyr.onCooldown.has(message.author.id)) return;
+
+      zephyr.onCooldown.add(message.author.id);
+      setTimeout(() => zephyr.onCooldown.delete(message.author.id), 600);
 
       await command.run(message, profile, zephyr);
 

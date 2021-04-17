@@ -1,10 +1,9 @@
 import { Guild, Message, PartialEmoji, TextChannel, User } from "eris";
-import { GameDroppedCard } from "../structures/game/DroppedCard";
 import { CardService } from "./database/services/game/CardService";
 import { ReactionCollector } from "eris-collector";
 import { GameProfile } from "../structures/game/Profile";
 import { ProfileService } from "./database/services/game/ProfileService";
-import { GameUserCard } from "../structures/game/UserCard";
+import { GameUserCard, MockUserCard } from "../structures/game/UserCard";
 import { Chance } from "chance";
 import { Zephyr } from "../structures/client/Zephyr";
 import { getTimeUntil } from "../lib/utility/time/TimeUtils";
@@ -31,7 +30,7 @@ export abstract class CardSpawner {
 
   private static async fight(
     takers: Set<string>,
-    card: GameDroppedCard,
+    card: MockUserCard,
     zephyr: Zephyr,
     prefer?: GameProfile
   ): Promise<{ winner: GameProfile; card: GameUserCard }> {
@@ -42,10 +41,9 @@ export abstract class CardSpawner {
       const winnerId: string = new Chance().pickone(Array.from(takers));
       winner = await ProfileService.getProfile(winnerId);
     }
-    const baseCard = zephyr.getCard(card.baseCardId)!;
 
     const newCard = await CardService.createNewUserCard(
-      baseCard,
+      card.baseCard,
       winner,
       zephyr
     );
@@ -61,33 +59,26 @@ export abstract class CardSpawner {
     prefer?: GameProfile
   ): Promise<void> {
     const start = Date.now();
-    const droppedCards: GameUserCard[] = [];
+    const droppedCards: MockUserCard[] = [];
     let deleted = false;
 
     for (let card of cards) {
       droppedCards.push(
-        new GameUserCard({
+        new MockUserCard({
           id: 0,
-          serial_number: card.serialTotal + 1,
-          card_id: card.id,
-          discord_id: "0",
-          wear: 0,
-          frame_id: 1,
-          frame_name: "",
-          frame_url: "",
-          dye_mask_url: "",
-          dye_r: 185,
-          dye_g: 185,
-          dye_b: 185,
-          tag_id: 0,
-          text_color_hex: Buffer.from(`000000`, `hex`),
-          vaulted: false,
-          luck_coeff: 0,
+          baseCard: card,
+          frame: zephyr.getFrameById(1),
+          serialNumber: card.serialTotal + 1,
+          dye: {
+            r: -1,
+            g: -1,
+            b: -1,
+          },
         })
       );
     }
 
-    const collage = await CardService.generateCardCollage(droppedCards, zephyr);
+    const collage = await CardService.generateCardCollage(droppedCards);
 
     const drop = await createMessage(channel, `${title}\n`, {
       files: [

@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { getTimeUntil } from "../../../lib/utility/time/TimeUtils";
 import { GuildService } from "../../../lib/database/services/guild/GuildService";
-import { checkPermission } from "../../../lib/ZephyrUtils";
+import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { StatsD } from "../../../lib/StatsD";
 // import childProcess from "child_process";
 
@@ -19,10 +19,7 @@ export default class DropCards extends BaseCommand {
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const timeStart = Date.now();
 
-    if (
-      !this.zephyr.flags.drops &&
-      !this.zephyr.config.developers.includes(msg.author.id)
-    )
+    if (!this.zephyr.flags.drops && !isDeveloper(msg.author, this.zephyr))
       throw new ZephyrError.DropFlagDisabledError();
 
     const reactPermission = checkPermission(

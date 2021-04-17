@@ -2,7 +2,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { ProfileService } from "../../database/services/game/ProfileService";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { Message, TextableChannel } from "eris";
+import { Message, TextableChannel, User } from "eris";
 import { GameDye } from "../../../structures/game/Dye";
 import {
   isBitItem,
@@ -14,7 +14,12 @@ import { VaultError } from "../../../structures/error/VaultError";
 
 export async function verifyMultitradeItems(
   msg: Message,
-  handleError: (msg: Message<TextableChannel>, error: Error) => Promise<void>,
+  user: User,
+  handleError: (
+    msg: Message<TextableChannel>,
+    user: User,
+    error: Error
+  ) => Promise<void>,
   items: TradeItemResolvable[],
   profile: GameProfile,
   existingItems: TradeItemResolvable[] = []
@@ -32,13 +37,13 @@ export async function verifyMultitradeItems(
       if (cardInTrade) continue;
 
       if (card.vaulted) {
-        await handleError(msg, new VaultError.CardInVaultError(card));
+        await handleError(msg, user, new VaultError.CardInVaultError(card));
         continue;
       }
 
       const isInAlbum = await AlbumService.cardIsInAlbum(card);
       if (isInAlbum) {
-        await handleError(msg, new ZephyrError.CardInAlbumError(card));
+        await handleError(msg, user, new ZephyrError.CardInAlbumError(card));
         continue;
       }
 
@@ -57,7 +62,11 @@ export async function verifyMultitradeItems(
       continue;
     } else if (isBitItem(item)) {
       if (item.bits > newProfile.bits) {
-        await handleError(msg, new ZephyrError.NotEnoughBitsError(item.bits));
+        await handleError(
+          msg,
+          user,
+          new ZephyrError.NotEnoughBitsError(item.bits)
+        );
         continue;
       }
 
@@ -66,7 +75,11 @@ export async function verifyMultitradeItems(
         | undefined;
 
       if ((bitsInTrade?.bits || 0) + item.bits > newProfile.bits) {
-        await handleError(msg, new ZephyrError.NotEnoughBitsError(item.bits));
+        await handleError(
+          msg,
+          user,
+          new ZephyrError.NotEnoughBitsError(item.bits)
+        );
         continue;
       }
 
@@ -82,6 +95,7 @@ export async function verifyMultitradeItems(
       if (item.cubits > newProfile.cubits) {
         await handleError(
           msg,
+          user,
           new ZephyrError.NotEnoughCubitsError(newProfile.cubits, item.cubits)
         );
         continue;
@@ -94,6 +108,7 @@ export async function verifyMultitradeItems(
       if ((cubitsInTrade?.cubits || 0) + item.cubits > newProfile.cubits) {
         await handleError(
           msg,
+          user,
           new ZephyrError.NotEnoughCubitsError(newProfile.cubits, item.cubits)
         );
         continue;
@@ -127,6 +142,7 @@ export async function verifyMultitradeItems(
         if ((itemInTrade?.count || 0) + item.count > userItem.quantity) {
           await handleError(
             msg,
+            user,
             new ZephyrError.NotEnoughOfItemError(item.item.names[0])
           );
           continue;
@@ -139,7 +155,7 @@ export async function verifyMultitradeItems(
         }
         continue;
       } catch (e) {
-        await handleError(msg, e);
+        await handleError(msg, user, e);
         continue;
       }
     }

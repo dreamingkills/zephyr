@@ -18,7 +18,7 @@ export async function useSticker(
   parameters: string[],
   item: PrefabItem,
   zephyr: Zephyr
-) {
+): Promise<void> {
   const targetSticker = zephyr.getStickerByItemId(item.id);
 
   if (!targetSticker) throw new ZephyrError.NoStickerBoundToItemError(item);

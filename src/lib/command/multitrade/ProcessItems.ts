@@ -1,6 +1,6 @@
+import { getItemByName } from "../../../assets/Items";
 import { CardService } from "../../database/services/game/CardService";
 import { ProfileService } from "../../database/services/game/ProfileService";
-import { ItemService } from "../../ItemService";
 import { strToInt } from "../../utility/text/TextUtils";
 
 export async function processItems(
@@ -47,7 +47,7 @@ export async function processItems(
 
     // Single Item Detection
     let amount = 1;
-    let baseItem = ItemService.getItemByName(item);
+    let baseItem = getItemByName(item);
     if (!baseItem) {
       const noNumber = item.split(" ").slice(1).join(" ").toLowerCase();
       const derivedAmount = parseInt(item.split(" ")[0]);
@@ -55,7 +55,7 @@ export async function processItems(
 
       amount = derivedAmount;
 
-      baseItem = ItemService.getItemByName(noNumber);
+      baseItem = getItemByName(noNumber);
     }
 
     if (!baseItem) continue;

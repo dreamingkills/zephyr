@@ -12,6 +12,7 @@ import { addReaction } from "../discord/message/addReaction";
 import { editMessage } from "../discord/message/editMessage";
 import { AlbumService } from "../database/services/game/AlbumService";
 import { checkPermission } from "../ZephyrUtils";
+import { MockUserCard } from "../../structures/game/UserCard";
 
 export async function useFrame(
   msg: Message,
@@ -19,7 +20,7 @@ export async function useFrame(
   parameters: string[],
   item: PrefabItem,
   zephyr: Zephyr
-) {
+): Promise<void> {
   const cardIdentifier = parameters[0];
   if (!cardIdentifier) throw new ZephyrError.InvalidCardReferenceError();
 
@@ -36,17 +37,21 @@ export async function useFrame(
   const isInAlbum = await AlbumService.cardIsInAlbum(card);
   if (isInAlbum) throw new ZephyrError.CardInAlbumError(card);
 
-  const frame = await CardService.getFrameByName(
-    item.names[0].split(` `).slice(0, -1).join(` `)
-  );
+  const baseCard = zephyr.getCard(card.baseCardId)!;
+  const frame = zephyr.getFrameByName(item.names[0]);
 
   if (frame.id === card.frameId)
     throw new ZephyrError.DuplicateFrameError(card, frame);
 
-  card.frameId = frame.id;
-  card.textColor = frame.textColor;
+  const mockCard = new MockUserCard({
+    id: card.id,
+    baseCard: baseCard,
+    serialNumber: card.serialNumber,
+    frame,
+    dye: card.dye,
+  });
 
-  const preview = await CardService.generateCardImage(card, zephyr);
+  const preview = await CardService.generateCardImage(mockCard, zephyr);
 
   const embed = new MessageEmbed(`Apply Frame`, msg.author)
     .setDescription(

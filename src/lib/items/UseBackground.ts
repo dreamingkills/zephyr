@@ -14,7 +14,7 @@ export async function useBackground(
   parameters: string[],
   item: PrefabItem,
   zephyr: Zephyr
-) {
+): Promise<void> {
   const albumName = parameters[0]?.toLowerCase();
   if (!albumName) throw new ZephyrError.InvalidAlbumNameError();
 
