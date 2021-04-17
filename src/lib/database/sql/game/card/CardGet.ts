@@ -16,7 +16,6 @@ import {
   CardSticker,
   GameCardSticker,
 } from "../../../../../structures/game/Sticker";
-import { Frame } from "../../../../../structures/game/Frame";
 
 export type WearSpread = {
   0: number;
@@ -405,20 +404,6 @@ export async function getRandomConfiscatedCard(
   if (!query[0]) throw new ZephyrError.NoAvailableConfiscatedCardsError();
 
   return new GameUserCard(query[0]);
-}
-
-export async function getAllFrames(): Promise<Frame[]> {
-  const query = (await DB.query(`
-    SELECT
-      id,
-      frame_name,
-      frame_url,
-      dye_mask_url,
-      text_color_hex,
-      overlay
-    FROM card_frame;`)) as Frame[];
-
-  return query;
 }
 
 export * as CardGet from "./CardGet";

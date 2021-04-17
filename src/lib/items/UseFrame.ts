@@ -13,6 +13,7 @@ import { editMessage } from "../discord/message/editMessage";
 import { AlbumService } from "../database/services/game/AlbumService";
 import { checkPermission } from "../ZephyrUtils";
 import { MockUserCard } from "../../structures/game/UserCard";
+import { Frames } from "../cosmetics/Frames";
 
 export async function useFrame(
   msg: Message,
@@ -38,16 +39,16 @@ export async function useFrame(
   if (isInAlbum) throw new ZephyrError.CardInAlbumError(card);
 
   const baseCard = zephyr.getCard(card.baseCardId)!;
-  const frame = zephyr.getFrameByName(item.names[0]);
+  const frame = Frames.getFrameByName(item.names[0]);
 
-  if (frame.id === card.frameId)
-    throw new ZephyrError.DuplicateFrameError(card, frame);
+  if (frame!.id === card.frameId)
+    throw new ZephyrError.DuplicateFrameError(card, frame!);
 
   const mockCard = new MockUserCard({
     id: card.id,
     baseCard: baseCard,
     serialNumber: card.serialNumber,
-    frame,
+    frame: frame!,
     dye: card.dye,
   });
 
@@ -110,7 +111,7 @@ export async function useFrame(
   if (refetchCard.discordId !== msg.author.id)
     throw new ZephyrError.NotOwnerOfCardError(refetchCard);
 
-  const newCard = await CardService.changeCardFrame(card, frame.id, zephyr);
+  const newCard = await CardService.changeCardFrame(card, frame!.id, zephyr);
 
   await ProfileService.removeItems(profile, [{ item: item, count: 1 }]);
 

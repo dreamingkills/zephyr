@@ -1,14 +1,14 @@
 import { loadImage } from "canvas";
 import { GameSticker } from "../../structures/game/Sticker";
 import { GameStickerPack } from "../../structures/shop/StickerPack";
-import { ShopGet } from "../database/sql/game/shop/ShopGet";
+import { CosmeticGetter } from "../database/sql/game/shop/CosmeticGetter";
 
 class StickerService {
   private stickers: GameSticker[] = [];
   private stickerPacks: GameStickerPack[] = [];
 
   public async loadStickers(): Promise<GameSticker[]> {
-    const stickers = await ShopGet.getStickers();
+    const stickers = await CosmeticGetter.getStickers();
 
     const builtStickers: GameSticker[] = [];
     for (let sticker of stickers) {
@@ -40,8 +40,14 @@ class StickerService {
     return this.stickers.find((s) => s.itemId === itemId);
   }
 
+  public getStickerByName(name: string): GameSticker | undefined {
+    return this.stickers.find((s) =>
+      s.name.toLowerCase().startsWith(name.toLowerCase())
+    );
+  }
+
   public async loadStickerPacks(): Promise<GameStickerPack[]> {
-    const stickerPacks = await ShopGet.getStickerPacks();
+    const stickerPacks = await CosmeticGetter.getStickerPacks();
 
     const builtPacks: GameStickerPack[] = [];
     for (let pack of stickerPacks) {
@@ -73,6 +79,12 @@ class StickerService {
     return this.stickerPacks.find(
       (pack) => pack.name.toLowerCase() === name.toLowerCase()
     );
+  }
+
+  public async init(): Promise<void> {
+    await this.loadStickers();
+    await this.loadStickerPacks();
+    return;
   }
 }
 

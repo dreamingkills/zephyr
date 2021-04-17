@@ -17,17 +17,13 @@ import { WebhookListener } from "../../webhook";
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
 import { AnticheatService } from "../../lib/database/services/meta/AnticheatService";
 import dblapi from "dblapi.js";
-import { BuiltSticker, GameSticker } from "../game/Sticker";
 import { createMessage } from "../../lib/discord/message/createMessage";
 import dayjs from "dayjs";
 import { GameIdol } from "../game/Idol";
-import { Image, loadImage } from "canvas";
-import fs from "fs/promises";
 import { StatsD } from "../../lib/StatsD";
-import { AlbumService } from "../../lib/database/services/game/AlbumService";
-import { GameFrame, IntermediateFrame } from "../game/Frame";
-import * as ZephyrError from "../error/ZephyrError";
 import { Stickers } from "../../lib/cosmetics/Stickers";
+import { Frames } from "../../lib/cosmetics/Frames";
+import { Backgrounds } from "../../lib/cosmetics/Backgrounds";
 
 export class Zephyr extends Client {
   commandLib = new CommandLib();
@@ -42,18 +38,6 @@ export class Zephyr extends Client {
   private errors: number = 0;
 
   onCooldown: Set<string> = new Set();
-
-  /* Images */
-  private frames: GameFrame[] = [];
-  private stickers: GameSticker[] = [];
-
-  private backgrounds: {
-    [backgroundId: number]: {
-      id: number;
-      name: string;
-      image: Image;
-    };
-  } = {};
 
   logChannel: TextChannel | undefined;
 
@@ -136,12 +120,9 @@ export class Zephyr extends Client {
     await this.cacheCards();
 
     /* Preload images into memory */
-    await this.loadFrames();
-    await Stickers.loadStickers();
-    await this.loadBackgrounds();
-
-    /* Shop stuff */
-    await Stickers.loadStickerPacks();
+    await Frames.init();
+    await Stickers.init();
+    await Backgrounds.init();
 
     const fonts = await FontLoader.init();
 
@@ -401,82 +382,6 @@ export class Zephyr extends Client {
   }
 
   /*
-      Image Precaching (frames, stickers, backgrounds)
-  */
-  private async loadFrames(): Promise<void> {
-    const frames = await CardService.getAllFrames();
-
-    for (let frame of frames) {
-      const intermediate: IntermediateFrame = {
-        id: frame.id,
-        name: frame.frame_name || `Unknown Frame`,
-        frame: await loadImage(
-          frame.frame_url || `./src/assets/frames/default/frame-default.png`
-        ),
-        mask: await fs.readFile(
-          frame.dye_mask_url || `./src/assets/frames/default/mask-default.png`
-        ),
-        overlay: frame.overlay,
-        textColor: frame.text_color_hex || `000000`,
-      };
-
-      const completeFrame = new GameFrame(intermediate);
-
-      this.frames.push(completeFrame);
-    }
-
-    return;
-  }
-
-  private async loadBackgrounds(): Promise<void> {
-    const backgrounds = await AlbumService.getAllBackgrounds();
-
-    for (let bg of backgrounds) {
-      this.backgrounds[bg.id] = {
-        id: bg.id,
-        name: bg.name,
-        image: await loadImage(
-          bg.imageUrl || `./src/assets/backgrounds/default.jpg`
-        ),
-      };
-    }
-  }
-
-  public getFrameById(id: number): GameFrame {
-    const frame = this.frames.find((f) => f.id === id);
-
-    if (!frame) throw new ZephyrError.FrameNotFoundError();
-
-    return frame;
-  }
-
-  public getFrameByName(name: string): GameFrame {
-    const frame = this.frames.find(
-      (f) => f.name.toLowerCase() === name.toLowerCase()
-    );
-
-    if (!frame) throw new ZephyrError.FrameNotFoundError();
-
-    return frame;
-  }
-
-  public getBackgroundById(
-    id: number
-  ): { id: number; name: string; image: Image } | undefined {
-    return this.backgrounds[id];
-  }
-
-  public getBackgroundByName(
-    name: string
-  ): { id: number; name: string; image: Image } | undefined {
-    const background = Object.values(this.backgrounds).find(
-      (b) => b.name.toLowerCase() === name.toLowerCase()
-    );
-
-    return background;
-  }
-
-  /*
       Prefix Caching
   */
   public async cachePrefixes(): Promise<void> {
@@ -675,23 +580,6 @@ export class Zephyr extends Client {
 
   public getCardsByGroup(id: number): GameBaseCard[] {
     return this.getCards().filter((c) => c.groupId === id);
-  }
-
-  /*
-      Sticker Caching
-  */
-  public getStickerById(id: number): BuiltSticker | undefined {
-    return this.stickers.find((s) => s.id === id);
-  }
-
-  public getStickerByItemId(itemId: number): BuiltSticker | undefined {
-    return this.stickers.filter((s) => s.itemId === itemId)[0];
-  }
-
-  public getStickerByName(name: string): BuiltSticker | undefined {
-    return this.stickers.find(
-      (s) => s.name.toLowerCase() === name.toLowerCase()
-    );
   }
 
   /*

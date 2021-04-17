@@ -3,6 +3,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { createCanvas } from "canvas";
+import { Stickers } from "../../../lib/cosmetics/Stickers";
 
 export default class PreviewSticker extends BaseCommand {
   id = `dirt`;
@@ -19,9 +20,7 @@ export default class PreviewSticker extends BaseCommand {
     const query = options.join(" ").toLowerCase();
     if (!query) throw new ZephyrError.InvalidStickerError();
 
-    const sticker = this.zephyr.getStickerByName(
-      query.toLowerCase().replace("sticker", "").trim()
-    );
+    const sticker = Stickers.getStickerByName(query.toLowerCase().trim());
     if (!sticker) throw new ZephyrError.InvalidStickerError();
 
     const canvas = createCanvas(120, 120);

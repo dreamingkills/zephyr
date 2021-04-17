@@ -1,10 +1,8 @@
 import { DB } from "../../..";
 import {
   Album,
-  AlbumBackground,
   AlbumCard,
   GameAlbum,
-  GameAlbumBackground,
   GameAlbumCard,
 } from "../../../../../structures/game/Album";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
@@ -61,21 +59,6 @@ export async function getAlbumByName(
     );
 
   return new GameAlbum(query[0]);
-}
-
-export async function getAllBackgrounds(): Promise<GameAlbumBackground[]> {
-  const query = (await DB.query(
-    `
-      SELECT
-        album_background.id,
-        album_background.background_name,
-        album_background.image_url
-      FROM
-        album_background;
-      `
-  )) as AlbumBackground[];
-
-  return query.map((b) => new GameAlbumBackground(b));
 }
 
 export async function getNumberOfAlbumsByProfile(

@@ -7,6 +7,7 @@ import { editMessage } from "../discord/message/editMessage";
 import { MessageCollector } from "eris-collector";
 import * as ZephyrError from "../../structures/error/ZephyrError";
 import { Zephyr } from "../../structures/client/Zephyr";
+import { Stickers } from "../cosmetics/Stickers";
 
 export async function removeSticker(
   msg: Message,
@@ -31,7 +32,7 @@ export async function removeSticker(
       `Please choose a sticker to remove from your card.\n${targetStickers.map(
         (s, i) =>
           `\`${i + 1}\` **${
-            zephyr.getStickerById(s.stickerId)?.name || `Unknown Sticker`
+            Stickers.getStickerById(s.stickerId)?.name || `Unknown Sticker`
           }**`
       )}`
     )
@@ -81,7 +82,7 @@ export async function removeSticker(
 
   const sticker = targetStickers[choice - 1];
   const stickerName =
-    zephyr.getStickerById(sticker.stickerId)?.name || `Unknown Sticker`;
+    Stickers.getStickerById(sticker.stickerId)?.name || `Unknown Sticker`;
 
   if (!sticker) throw new ZephyrError.InvalidStickerError();
 

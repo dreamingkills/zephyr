@@ -21,7 +21,8 @@ import {
   GameSticker,
 } from "../../../../structures/game/Sticker";
 import { AnticheatService } from "../meta/AnticheatService";
-import { Frame } from "../../../../structures/game/Frame";
+import { Stickers } from "../../../cosmetics/Stickers";
+import { Frames } from "../../../cosmetics/Frames";
 
 export abstract class CardService {
   // Used for card image generation
@@ -121,7 +122,7 @@ export abstract class CardService {
     let frame;
 
     if (card instanceof GameUserCard) {
-      frame = zephyr.getFrameById(card.frameId || 1);
+      frame = Frames.getFrameById(card.frameId || 1);
     } else frame = card.frame;
 
     // Draw the base image, then the frame on top of that
@@ -135,7 +136,7 @@ export abstract class CardService {
 
     const { c, m, y } = rgbToCmy(r, g, b);
 
-    if (frame.overlay) {
+    if (frame?.overlay) {
       // We need to convert the GM State to a buffer, so that
       // canvas knows what to do with it.
       const dyeBuffer = await this.toBufferPromise(
@@ -148,9 +149,9 @@ export abstract class CardService {
 
     if (frame) ctx.drawImage(frame.frame, 0, 0, sizeX, sizeY);
 
-    if (!frame.overlay) {
+    if (!frame?.overlay) {
       const dyeBuffer = await this.toBufferPromise(
-        gm(frame.mask).colorize(c, m, y)
+        gm(frame!.mask).colorize(c, m, y)
       );
       const dyeImage = await loadImage(dyeBuffer);
 
@@ -162,7 +163,7 @@ export abstract class CardService {
     if (stickers.length > 0) {
       const size = 64 * sizeCoefficient;
       for (let sticker of stickers) {
-        const gameSticker = zephyr.getStickerById(sticker.stickerId);
+        const gameSticker = Stickers.getStickerById(sticker.stickerId);
         if (!gameSticker) continue;
 
         const posX =
@@ -625,10 +626,6 @@ export abstract class CardService {
     confiscatedTag: GameTag
   ): Promise<GameUserCard> {
     return await CardGet.getRandomConfiscatedCard(confiscatedTag);
-  }
-
-  public static async getAllFrames(): Promise<Frame[]> {
-    return await CardGet.getAllFrames();
   }
 
   public static async calculateBurnValue(card: GameUserCard): Promise<number> {

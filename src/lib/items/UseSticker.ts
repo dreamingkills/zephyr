@@ -11,6 +11,7 @@ import { MessageCollector } from "eris-collector";
 import { editMessage } from "../discord/message/editMessage";
 import { AlbumService } from "../database/services/game/AlbumService";
 import { deleteMessage } from "../discord/message/deleteMessage";
+import { Stickers } from "../cosmetics/Stickers";
 
 export async function useSticker(
   msg: Message,
@@ -19,7 +20,7 @@ export async function useSticker(
   item: PrefabItem,
   zephyr: Zephyr
 ): Promise<void> {
-  const targetSticker = zephyr.getStickerByItemId(item.id);
+  const targetSticker = Stickers.getStickerByItemId(item.id);
 
   if (!targetSticker) throw new ZephyrError.NoStickerBoundToItemError(item);
 

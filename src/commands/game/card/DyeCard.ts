@@ -10,6 +10,7 @@ import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { MockUserCard } from "../../../structures/game/UserCard";
+import { Frames } from "../../../lib/cosmetics/Frames";
 
 export default class DyeCard extends BaseCommand {
   id = `junkhead`;
@@ -49,13 +50,13 @@ export default class DyeCard extends BaseCommand {
     if (isInAlbum) throw new ZephyrError.CardInAlbumError(targetCard);
 
     const baseCard = this.zephyr.getCard(targetCard.baseCardId)!;
-    const frame = this.zephyr.getFrameById(targetCard.frameId);
+    const frame = Frames.getFrameById(targetCard.frameId);
 
     const mockCard = new MockUserCard({
       id: targetCard.id,
       baseCard: baseCard,
       serialNumber: targetCard.serialNumber,
-      frame: frame,
+      frame: frame!,
       dye: { r: targetDye.dyeR, g: targetDye.dyeG, b: targetDye.dyeB },
     });
 

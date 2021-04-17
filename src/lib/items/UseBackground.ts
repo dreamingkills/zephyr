@@ -7,6 +7,7 @@ import { ProfileService } from "../database/services/game/ProfileService";
 import * as ZephyrError from "../../structures/error/ZephyrError";
 import { createMessage } from "../discord/message/createMessage";
 import { AlbumService } from "../database/services/game/AlbumService";
+import { Backgrounds } from "../cosmetics/Backgrounds";
 
 export async function useBackground(
   msg: Message,
@@ -18,7 +19,7 @@ export async function useBackground(
   const albumName = parameters[0]?.toLowerCase();
   if (!albumName) throw new ZephyrError.InvalidAlbumNameError();
 
-  const targetBackground = zephyr.getBackgroundByName(item.names[0]);
+  const targetBackground = Backgrounds.getBackgroundByName(item.names[0]);
 
   if (!targetBackground) throw new ZephyrError.InvalidAlbumBackgroundError();
 

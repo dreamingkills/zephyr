@@ -16,6 +16,7 @@ import { createMessage } from "./discord/message/createMessage";
 import { checkPermission } from "./ZephyrUtils";
 import { AutotagService } from "./database/services/game/AutotagService";
 import { deleteMessage } from "./discord/message/deleteMessage";
+import { Frames } from "./cosmetics/Frames";
 
 export abstract class CardSpawner {
   private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
@@ -67,7 +68,7 @@ export abstract class CardSpawner {
         new MockUserCard({
           id: 0,
           baseCard: card,
-          frame: zephyr.getFrameById(1),
+          frame: Frames.getFrameById(1)!,
           serialNumber: card.serialTotal + 1,
           dye: {
             r: -1,

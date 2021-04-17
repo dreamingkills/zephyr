@@ -1,3 +1,4 @@
+import { Image } from "canvas";
 import { AlbumService } from "../../lib/database/services/game/AlbumService";
 
 export interface Album {
@@ -62,14 +63,20 @@ export class GameAlbum {
   }
 }
 
+export interface IntermediateBackground {
+  readonly id: number;
+  readonly background_name: string;
+  readonly image: Image;
+}
+
 export class GameAlbumBackground {
   readonly id: number;
   readonly name: string;
-  readonly imageUrl: string;
+  readonly image: Image;
 
-  constructor(data: AlbumBackground) {
+  constructor(data: IntermediateBackground) {
     this.id = data.id;
     this.name = data.background_name;
-    this.imageUrl = data.image_url;
+    this.image = data.image;
   }
 }

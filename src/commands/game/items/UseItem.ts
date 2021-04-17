@@ -24,7 +24,6 @@ export default class UseItem extends BaseCommand {
 
     // Item names may contain spaces, so join everything after `.use`.
     const query = options.join(" ")?.toLowerCase();
-    console.log(query);
 
     // If our query matches any item names or aliases, that's our item.
     const targetItem = getItemByName(query);
