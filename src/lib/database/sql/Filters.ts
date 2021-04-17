@@ -60,52 +60,181 @@ export class FilterService {
           ` user_card.serial_number IN (${DB.connection.escape(targetIssues)})`
         );
       } else if (["name", "n"].includes(prop)) {
-        const names = value
-          .toString()
-          .split(`,`)
-          .map(
-            (n) =>
-              `LOWER(idol.idol_name) LIKE CONCAT("%",${DB.connection.escape(
-                n
-              )},"%")`
-          );
+        const names = value.toString().split(`,`);
 
-        queryOptions.push(` (${names.join(` OR `)})`);
+        const include = [];
+        const exclude = [];
+
+        for (let name of names) {
+          const not = name.startsWith(`!`);
+          if (not) name = name.slice(1);
+
+          const specific = name.startsWith(`"`) && name.endsWith(`"`);
+          if (specific) name = name.slice(1, -1);
+
+          if (not) {
+            if (specific) {
+              exclude.push(
+                `LOWER(idol.idol_name) != LOWER(${DB.connection.escape(name)})`
+              );
+            } else
+              exclude.push(
+                `LOWER(idol.idol_name) NOT LIKE CONCAT("%", ${DB.connection.escape(
+                  name
+                )}, "%")`
+              );
+          } else {
+            if (specific) {
+              include.push(
+                `LOWER(idol.idol_name) = LOWER(${DB.connection.escape(name)})`
+              );
+            } else {
+              include.push(
+                `LOWER(idol.idol_name) LIKE CONCAT("%", ${DB.connection.escape(
+                  name
+                )}, "%")`
+              );
+            }
+          }
+        }
+
+        let finalQuery = ` ((`;
+
+        if (include.length > 0) {
+          finalQuery += `${include.join(` OR `)}`;
+        }
+        if (exclude.length > 0) {
+          if (include.length > 0) {
+            finalQuery += ` AND (${exclude.join(` AND `)})`;
+          } else finalQuery += `${exclude.join(` AND `)}`;
+        }
+
+        finalQuery += `))`;
+
+        queryOptions.push(`${finalQuery}`);
       } else if (["group", "g"].includes(prop)) {
         if (!value) {
           queryOptions.push(` subgroup.group_id IS NULL`);
           continue;
         }
 
-        const groups = value
-          .toString()
-          .split(`,`)
-          .map(
-            (n) =>
-              `LOWER(base_group.group_name) LIKE CONCAT("%",${DB.connection.escape(
-                n
-              )},"%") OR LOWER(base_group.alias) LIKE CONCAT("%",${DB.connection.escape(
-                n
-              )},"%")`
-          );
+        const groups = value.toString().split(`,`);
 
-        queryOptions.push(` (${groups.join(` OR `)})`);
+        const include = [];
+        const exclude = [];
+
+        for (let name of groups) {
+          const not = name.startsWith(`!`);
+          if (not) name = name.slice(1);
+
+          const specific = name.startsWith(`"`) && name.endsWith(`"`);
+          if (specific) name = name.slice(1, -1);
+
+          if (not) {
+            if (specific) {
+              exclude.push(
+                `LOWER(base_group.group_name) != LOWER(${DB.connection.escape(
+                  name
+                )})`
+              );
+            } else
+              exclude.push(
+                `LOWER(base_group.group_name) NOT LIKE CONCAT("%", ${DB.connection.escape(
+                  name
+                )}, "%")`
+              );
+          } else {
+            if (specific) {
+              include.push(
+                `LOWER(base_group.group_name) = LOWER(${DB.connection.escape(
+                  name
+                )})`
+              );
+            } else {
+              include.push(
+                `LOWER(base_group.group_name) LIKE CONCAT("%", ${DB.connection.escape(
+                  name
+                )}, "%")`
+              );
+            }
+          }
+        }
+
+        let finalQuery = ` ((`;
+
+        if (include.length > 0) {
+          finalQuery += `${include.join(` OR `)}`;
+        }
+        if (exclude.length > 0) {
+          if (include.length > 0) {
+            finalQuery += ` AND (${exclude.join(` AND `)})`;
+          } else finalQuery += `${exclude.join(` AND `)}`;
+        }
+
+        finalQuery += `))`;
+
+        queryOptions.push(`${finalQuery}`);
       } else if (["subgroup", "sg"].includes(prop)) {
         if (!value) {
           queryOptions.push(` subgroup.subgroup_name IS NULL`);
         }
 
-        const subgroups = value
-          .toString()
-          .split(`,`)
-          .map(
-            (n) =>
-              `LOWER(subgroup.subgroup_name) LIKE CONCAT("%",${DB.connection.escape(
-                n
-              )},"%")`
-          );
+        const subgroups = value.toString().split(`,`);
 
-        queryOptions.push(` (${subgroups.join(` OR `)})`);
+        const include = [];
+        const exclude = [];
+
+        for (let name of subgroups) {
+          const not = name.startsWith(`!`);
+          if (not) name = name.slice(1);
+
+          const specific = name.startsWith(`"`) && name.endsWith(`"`);
+          if (specific) name = name.slice(1, -1);
+
+          if (not) {
+            if (specific) {
+              exclude.push(
+                `LOWER(subgroup.subgroup_name) != LOWER(${DB.connection.escape(
+                  name
+                )})`
+              );
+            } else
+              exclude.push(
+                `LOWER(subgroup.subgroup_name) NOT LIKE CONCAT("%", ${DB.connection.escape(
+                  name
+                )}, "%")`
+              );
+          } else {
+            if (specific) {
+              include.push(
+                `LOWER(subgroup.subgroup_name) = LOWER(${DB.connection.escape(
+                  name
+                )})`
+              );
+            } else {
+              include.push(
+                `LOWER(subgroup.subgroup_name) LIKE CONCAT("%", ${DB.connection.escape(
+                  name
+                )}, "%")`
+              );
+            }
+          }
+        }
+
+        let finalQuery = ` ((`;
+
+        if (include.length > 0) {
+          finalQuery += `${include.join(` OR `)}`;
+        }
+        if (exclude.length > 0) {
+          if (include.length > 0) {
+            finalQuery += ` AND (${exclude.join(` AND `)})`;
+          } else finalQuery += `${exclude.join(` AND `)}`;
+        }
+
+        finalQuery += `))`;
+
+        queryOptions.push(`${finalQuery}`);
       } else if (["wear", "w", "condition", "c"].includes(prop)) {
         const targetWears = [];
 
