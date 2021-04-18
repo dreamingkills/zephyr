@@ -116,12 +116,12 @@ export default class Shop extends BaseCommand {
         const _profile = await profile.fetch();
         if (currency === `bits`) {
           if (price > _profile.bits)
-            throw new ShopError.NotEnoughBitsError(targetPack);
+            throw new ShopError.NotEnoughBitsForPackError(targetPack);
 
           await ProfileService.removeBitsFromProfile(_profile, price);
         } else if (currency === `cubits`) {
           if (price > _profile.cubits)
-            throw new ShopError.NotEnoughCubitsError(targetPack);
+            throw new ShopError.NotEnoughCubitsForPackError(targetPack);
 
           await ProfileService.removeCubits(_profile, price);
         } else throw new ShopError.InvalidCurrencyError();
@@ -165,7 +165,7 @@ export default class Shop extends BaseCommand {
           this.zephyr.config.discord.emoji.blank
         } ${featuredPack.name} - **${featuredPack.price.toLocaleString()}** ${
           featuredPack.currency
-        }\n${this.zephyr.config.discord.emoji.blank} ${
+        } *(20% off!)*\n${this.zephyr.config.discord.emoji.blank} ${
           packItem.description ? `*"${packItem.description}"*` : ``
         }`;
       }
@@ -176,7 +176,7 @@ export default class Shop extends BaseCommand {
     const embed = new MessageEmbed(`Sticker Shop`, msg.author).setDescription(
       `${
         featuredString || ``
-      }\n\n__Use __\`${prefix}ss buy <pack>\`__ to purchase something!__\n${this.renderShopCodeblock(
+      }\n\nUse \`${prefix}ss buy <pack>\` to purchase something!\n${this.renderShopCodeblock(
         stickerPacks,
         page
       )}`

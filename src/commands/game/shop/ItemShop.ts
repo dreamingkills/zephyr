@@ -6,9 +6,8 @@ import { ReactionCollector } from "eris-collector";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { isDeveloper } from "../../../lib/ZephyrUtils";
 import { ShopError } from "../../../structures/error/ShopError";
-import { GameStickerPack } from "../../../structures/shop/StickerPack";
-import { getItemById } from "../../../assets/Items";
-import { Stickers } from "../../../lib/cosmetics/Stickers";
+import { Shop } from "../../../lib/shop/Shop";
+import { GameShop } from "../../../structures/shop/Shop";
 
 export default class ItemShop extends BaseCommand {
   id = `delusion`;
@@ -27,44 +26,31 @@ export default class ItemShop extends BaseCommand {
 
     if (subcommand) {
       if (subcommand === `refresh` && isDeveloper(msg.author, this.zephyr)) {
-        await Stickers.loadStickerPacks();
+        await Shop.init();
 
-        const embed = new MessageEmbed(
-          `Sticker Shop`,
-          msg.author
-        ).setDescription(
-          `:white_check_mark: Successfully refreshed the sticker shop.`
+        const embed = new MessageEmbed(`Item Shop`, msg.author).setDescription(
+          `:white_check_mark: Successfully re-initialized the item shop.`
         );
 
         await this.send(msg.channel, embed);
         return;
       } else if (subcommand === `buy`) {
-        const targetPackName = options.slice(1).join(` `).toLowerCase();
+        const targetItemName = options.slice(1).join(` `).toLowerCase();
 
-        if (!targetPackName) throw new ShopError.InvalidPackNameError(prefix);
+        if (!targetItemName) throw new ShopError.InvalidItemNameError(prefix);
 
-        const targetPack = Stickers.getStickerPackByName(targetPackName);
+        const targetItem = Shop.getShopItemByName(targetItemName);
 
-        if (!targetPack) throw new ShopError.PackNotFoundError();
+        if (!targetItem) throw new ShopError.ItemNotFoundError();
 
-        if (!targetPack.shoppable && !isDeveloper(msg.author, this.zephyr)) {
-          const prefix = this.zephyr.getPrefix(msg.guildID);
-
-          throw new ShopError.PackNotForSaleError(prefix);
-        }
-
-        const packItem = getItemById(targetPack.itemId);
-
-        if (!packItem) throw new ShopError.ItemNotBoundError();
-
-        const currency = targetPack.currency;
-        const price = targetPack.price;
+        const currency = targetItem.currency;
+        const price = targetItem.price;
 
         const confirmationEmbed = new MessageEmbed(
-          `Sticker Shop`,
+          `Item Shop`,
           msg.author
         ).setDescription(
-          `:warning: __**Please confirm the following purchase:**__\n1x **${targetPack.name}** for **${targetPack.price}** ${targetPack.currency}`
+          `:warning: __**Please confirm the following purchase:**__\n1x **${targetItem.item.names[0]}** for **${targetItem.price}** ${targetItem.currency}`
         );
         const confirmationMessage = await this.send(
           msg.channel,
@@ -85,7 +71,7 @@ export default class ItemShop extends BaseCommand {
           );
 
           collector.on(`error`, (error: Error) => {
-            console.log(`Error in Sticker Shop reaction collector:\n${error}`);
+            console.log(`Error in Item Shop reaction collector:\n${error}`);
 
             res(false);
           });
@@ -116,23 +102,22 @@ export default class ItemShop extends BaseCommand {
         const _profile = await profile.fetch();
         if (currency === `bits`) {
           if (price > _profile.bits)
-            throw new ShopError.NotEnoughBitsError(targetPack);
+            throw new ShopError.NotEnoughBitsForItemError(targetItem);
 
           await ProfileService.removeBitsFromProfile(_profile, price);
         } else if (currency === `cubits`) {
           if (price > _profile.cubits)
-            throw new ShopError.NotEnoughCubitsError(targetPack);
+            throw new ShopError.NotEnoughCubitsForItemError(targetItem);
 
           await ProfileService.removeCubits(_profile, price);
         } else throw new ShopError.InvalidCurrencyError();
 
-        await ProfileService.addItems(_profile, [{ item: packItem, count: 1 }]);
+        await ProfileService.addItems(_profile, [
+          { item: targetItem.item, count: 1 },
+        ]);
 
-        const embed = new MessageEmbed(
-          `Sticker Shop`,
-          msg.author
-        ).setDescription(
-          `:white_check_mark: __**Purchase Successful!**__\nYou purchased a **${targetPack.name}** for **${targetPack.price}** ${targetPack.currency}.`
+        const embed = new MessageEmbed(`Item Shop`, msg.author).setDescription(
+          `:white_check_mark: __**Purchase Successful!**__\nYou purchased a **${targetItem.item.names[0]}** for **${targetItem.price}** ${targetItem.currency}.`
         );
 
         await this.send(msg.channel, embed);
@@ -141,43 +126,43 @@ export default class ItemShop extends BaseCommand {
       }
     }
 
-    const stickerPacks = Stickers.getStickerPacks()
-      .sort((a, b) => (a.name > b.name ? 1 : -1))
-      .filter((p) => p.shoppable && p.stickers.length > 0);
+    const shopItems = Shop.getShop().sort((a, b) =>
+      a.item.names[0] > b.item.names[0] ? 1 : -1
+    );
 
-    if (stickerPacks.length === 0) {
-      const embed = new MessageEmbed(`Sticker Shop`, msg.author).setDescription(
-        `__**There are currently no sticker packs for sale!**__\nTry again later, there may be packs available in the future.`
+    if (shopItems.length === 0) {
+      const embed = new MessageEmbed(`Item Shop`, msg.author).setDescription(
+        `__**There are currently no items for sale!**__\nTry again later, there may be items available in the future.`
       );
 
       await this.send(msg.channel, embed);
       return;
     }
 
-    const featuredPack = stickerPacks.find((s) => s.featured);
+    const featuredPack = shopItems.find((s) => s.featured);
     let featuredString;
 
     if (featuredPack) {
-      const packItem = getItemById(featuredPack.itemId);
-
-      if (packItem) {
-        featuredString = `🤩 __**Featured Sticker Pack**__\n${
-          this.zephyr.config.discord.emoji.blank
-        } ${featuredPack.name} - **${featuredPack.price.toLocaleString()}** ${
-          featuredPack.currency
-        }\n${this.zephyr.config.discord.emoji.blank} ${
-          packItem.description ? `*"${packItem.description}"*` : ``
-        }`;
-      }
+      featuredString = `🤩 __**Featured Item**__\n${
+        this.zephyr.config.discord.emoji.blank
+      } ${
+        featuredPack.item.names[0]
+      } - **${featuredPack.price.toLocaleString()}** ${
+        featuredPack.currency
+      }\n${this.zephyr.config.discord.emoji.blank} ${
+        featuredPack.item.description
+          ? `*"${featuredPack.item.description}"*`
+          : ``
+      }`;
     }
 
     let page = 1;
 
-    const embed = new MessageEmbed(`Sticker Shop`, msg.author).setDescription(
+    const embed = new MessageEmbed(`Item Shop`, msg.author).setDescription(
       `${
         featuredString || ``
-      }\n\n__Use __\`${prefix}ss buy <pack>\`__ to purchase something!__\n${this.renderShopCodeblock(
-        stickerPacks,
+      }\n\nUse \`${prefix}is buy <item>\` to purchase something!\n${this.renderShopCodeblock(
+        shopItems,
         page
       )}`
     );
@@ -186,24 +171,24 @@ export default class ItemShop extends BaseCommand {
     return;
   }
 
-  private renderShopCodeblock(packs: GameStickerPack[], page: number): string {
-    const pagePacks = packs.slice(page * 10 - 10, page * 10);
+  private renderShopCodeblock(items: GameShop[], page: number): string {
+    const pageItems = items.slice(page * 10 - 10, page * 10);
 
     let longestNameLength = 0;
-    const packStrings: string[] = [];
+    const itemStrings: string[] = [];
 
-    for (let pack of pagePacks) {
-      const packString = this.renderPack(pack);
+    for (let item of pageItems) {
+      const packString = this.renderShopItem(item);
 
       const leftSide = packString.split(` - `).slice(0, -1).join(` - `);
 
       if (leftSide.length > longestNameLength)
         longestNameLength = leftSide.length;
 
-      packStrings.push(packString);
+      itemStrings.push(packString);
     }
 
-    const formattedStrings = packStrings.map(
+    const formattedStrings = itemStrings.map(
       (ps) =>
         `${ps
           .split(` - `)
@@ -218,9 +203,9 @@ export default class ItemShop extends BaseCommand {
     return `\`\`\`\n${formattedStrings.join(`\n`)}\n\`\`\``;
   }
 
-  private renderPack(pack: GameStickerPack): string {
-    return `${pack.name} (${
-      pack.stickers.length
-    } stickers) - ${pack.price.toLocaleString()} ${pack.currency}`;
+  private renderShopItem(item: GameShop): string {
+    return `${item.item.names[0]} - ${item.price.toLocaleString()} ${
+      item.currency
+    }`;
   }
 }

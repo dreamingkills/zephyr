@@ -24,6 +24,7 @@ import { StatsD } from "../../lib/StatsD";
 import { Stickers } from "../../lib/cosmetics/Stickers";
 import { Frames } from "../../lib/cosmetics/Frames";
 import { Backgrounds } from "../../lib/cosmetics/Backgrounds";
+import { Shop } from "../../lib/shop/Shop";
 
 export class Zephyr extends Client {
   commandLib = new CommandLib();
@@ -123,6 +124,8 @@ export class Zephyr extends Client {
     await Frames.init();
     await Stickers.init();
     await Backgrounds.init();
+
+    await Shop.init();
 
     const fonts = await FontLoader.init();
 

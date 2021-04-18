@@ -1,5 +1,42 @@
+import { GameShop } from "../shop/Shop";
 import { GameStickerPack } from "../shop/StickerPack";
 import { ZephyrError } from "./ZephyrError";
+
+export class InvalidItemNameError extends ZephyrError {
+  constructor(prefix: string) {
+    super(
+      `**Please enter a valid item to purchase!**\nYou can view available items by using \`${prefix}itemshop\`.`
+    );
+  }
+}
+
+export class ItemNotFoundError extends ZephyrError {
+  constructor() {
+    super(
+      `**I couldn't find an item with that name!**\nPlease make sure your spelling is correct.`
+    );
+  }
+}
+
+export class NotEnoughBitsForItemError extends ZephyrError {
+  constructor(item: GameShop) {
+    super(
+      `**You don't have enough bits to buy that!**\nThe \`${
+        item.item.names[0]
+      }\` costs **${item.price.toLocaleString()}** bits.`
+    );
+  }
+}
+
+export class NotEnoughCubitsForItemError extends ZephyrError {
+  constructor(item: GameShop) {
+    super(
+      `**You don't have enough cubits to buy that!**\nThe \`${
+        item.item.names[0]
+      }\` costs **${item.price.toLocaleString()}** cubits.`
+    );
+  }
+}
 
 export class InvalidPackNameError extends ZephyrError {
   constructor(prefix: string) {
@@ -25,7 +62,7 @@ export class InvalidCurrencyError extends ZephyrError {
   }
 }
 
-export class NotEnoughBitsError extends ZephyrError {
+export class NotEnoughBitsForPackError extends ZephyrError {
   constructor(pack: GameStickerPack) {
     super(
       `**You don't have enough bits to buy that!**\nThe \`${
@@ -35,7 +72,7 @@ export class NotEnoughBitsError extends ZephyrError {
   }
 }
 
-export class NotEnoughCubitsError extends ZephyrError {
+export class NotEnoughCubitsForPackError extends ZephyrError {
   constructor(pack: GameStickerPack) {
     super(
       `**You don't have enough cubits to buy that!**\nThe \`${
