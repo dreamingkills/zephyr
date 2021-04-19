@@ -133,28 +133,61 @@ export class FilterService {
           if (not) {
             if (specific) {
               exclude.push(
-                `LOWER(base_group.group_name) != LOWER(${DB.connection.escape(
-                  name
-                )})`
+                `
+                (
+                  LOWER(base_group.group_name)
+                    != LOWER(${DB.connection.escape(name)})
+                  AND
+                  (
+                    LOWER(base_group.alias)
+                      != LOWER(${DB.connection.escape(name)})
+                    OR
+                    base_group.alias IS NULL
+                  )
+                )
+                `
               );
             } else
               exclude.push(
-                `LOWER(base_group.group_name) NOT LIKE CONCAT("%", ${DB.connection.escape(
-                  name
-                )}, "%")`
+                `
+                (
+                  LOWER(base_group.group_name) 
+                    NOT LIKE
+                    CONCAT("%", ${DB.connection.escape(name)}, "%")
+                  AND
+                  (
+                    LOWER(base_group.alias)
+                      NOT LIKE
+                      CONCAT("%", ${DB.connection.escape(name)}, "%")
+                    OR
+                    base_group.alias IS NULL
+                  )
+                )
+                `
               );
           } else {
             if (specific) {
               include.push(
-                `LOWER(base_group.group_name) = LOWER(${DB.connection.escape(
-                  name
-                )})`
+                `
+                (
+                  LOWER(base_group.group_name)
+                    = LOWER(${DB.connection.escape(name)})
+                  OR
+                  LOWER(base_group.alias)
+                    = LOWER(${DB.connection.escape(name)})
+                )
+                `
               );
             } else {
               include.push(
-                `LOWER(base_group.group_name) LIKE CONCAT("%", ${DB.connection.escape(
-                  name
-                )}, "%")`
+                `
+                (
+                  LOWER(base_group.group_name)
+                    LIKE CONCAT("%", ${DB.connection.escape(name)}, "%")
+                  OR
+                  LOWER(base_group.alias)
+                    = LOWER(${DB.connection.escape(name)})
+                )`
               );
             }
           }

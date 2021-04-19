@@ -130,7 +130,7 @@ export abstract class CardService {
 
     let [r, g, b] = [185, 185, 185];
 
-    if (card.dye.r >= 0) r = card.dye.b;
+    if (card.dye.r >= 0) r = card.dye.r;
     if (card.dye.g >= 0) g = card.dye.g;
     if (card.dye.b >= 0) b = card.dye.b;
 
