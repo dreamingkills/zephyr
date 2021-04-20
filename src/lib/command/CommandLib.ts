@@ -167,7 +167,10 @@ export class CommandLib {
       if (zephyr.onCooldown.has(message.author.id)) return;
 
       zephyr.onCooldown.add(message.author.id);
-      setTimeout(() => zephyr.onCooldown.delete(message.author.id), 600);
+      setTimeout(
+        () => zephyr.onCooldown.delete(message.author.id),
+        zephyr.modifiers.globalRateLimit
+      );
 
       await command.run(message, profile, zephyr);
 

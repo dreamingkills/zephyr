@@ -106,6 +106,8 @@ export abstract class CardService {
       baseCard = zephyr.getCard(card.baseCardId)!;
     } else baseCard = card.baseCard;
 
+    console.log(baseCard.name);
+
     const sizeCoefficient = large ? 2.2 : 1;
 
     const [sizeX, sizeY] = large ? [770, 1100] : [350, 500];
@@ -183,59 +185,59 @@ export abstract class CardService {
       }
     }
 
+    if (noText) return canvas.toBuffer("image/png");
+
     const textX = 50 * sizeCoefficient;
     const serialFontSize = 20 * sizeCoefficient;
     const serialY = 421 * sizeCoefficient;
     const nameFontSize = 30 * sizeCoefficient;
     const nameY = 445 * sizeCoefficient;
 
-    if (!noText) {
-      let textColor;
+    let textColor;
 
-      if (card instanceof GameUserCard) {
-        textColor = card.textColor;
-      } else textColor = card.frame.textColor;
+    if (card instanceof GameUserCard) {
+      textColor = card.textColor;
+    } else textColor = card.frame.textColor;
 
-      // Draw the group icon
-      if (baseCard.group) {
-        if (textColor !== `000000`) {
-          const cmy = hexToCmy(textColor);
+    // Draw the group icon
+    if (baseCard.group) {
+      if (textColor !== `000000`) {
+        const cmy = hexToCmy(textColor);
 
-          const dyeBuffer = await this.toBufferPromise(
-            gm(
-              `./src/assets/groups/${baseCard.group
-                .toLowerCase()
-                .replace(`*`, ``)}.png`
-            )
-              .negative()
-              .colorize(cmy.c, cmy.m, cmy.y)
-          );
-
-          // Load the buffer and draw the dye mask on top of the frame.
-          const dyeImage = await loadImage(dyeBuffer);
-
-          ctx.drawImage(dyeImage, 0, 0, sizeX, sizeY);
-        } else {
-          const overlay = await loadImage(
+        const dyeBuffer = await this.toBufferPromise(
+          gm(
             `./src/assets/groups/${baseCard.group
-              ?.toLowerCase()
+              .toLowerCase()
               .replace(`*`, ``)}.png`
-          );
+          )
+            .negative()
+            .colorize(cmy.c, cmy.m, cmy.y)
+        );
 
-          ctx.drawImage(overlay, 0, 0, sizeX, sizeY);
-        }
+        // Load the buffer and draw the dye mask on top of the frame.
+        const dyeImage = await loadImage(dyeBuffer);
+
+        ctx.drawImage(dyeImage, 0, 0, sizeX, sizeY);
+      } else {
+        const overlay = await loadImage(
+          `./src/assets/groups/${baseCard.group
+            ?.toLowerCase()
+            .replace(`*`, ``)}.png`
+        );
+
+        ctx.drawImage(overlay, 0, 0, sizeX, sizeY);
       }
-
-      ctx.fillStyle = `#${textColor}`;
-
-      // Draw the serial number
-      ctx.font = `${serialFontSize}px AlteHaasGroteskBold`;
-      ctx.fillText(`#${card.serialNumber}`, textX, serialY);
-
-      // Draw the name of the subject
-      ctx.font = `${nameFontSize}px AlteHaasGroteskBold`;
-      ctx.fillText(`${baseCard.name}`, textX, nameY);
     }
+
+    ctx.fillStyle = `#${textColor}`;
+
+    // Draw the serial number
+    ctx.font = `${serialFontSize}px AlteHaasGroteskBold`;
+    ctx.fillText(`#${card.serialNumber}`, textX, serialY);
+
+    // Draw the name of the subject
+    ctx.font = `${nameFontSize}px AlteHaasGroteskBold`;
+    ctx.fillText(`${baseCard.name}`, textX, nameY);
 
     return canvas.toBuffer("image/png");
   }

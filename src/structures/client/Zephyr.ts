@@ -67,6 +67,8 @@ export class Zephyr extends Client {
 
   /* These are some numbers that affect various things around Zephyr. */
   public modifiers = {
+    globalRateLimit: 5000,
+
     boosterModifier: 5 /* Drops: card weight modifier for boosters */,
     birthdayModifier: 1.5 /* Drops: card weight modifier for idols whose birthday is "today" */,
     wishlistChance: 7.5 /* Drops: percent chance to receive a wishlist bonus */,
