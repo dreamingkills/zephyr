@@ -164,13 +164,15 @@ export class CommandLib {
       if (message.channel.type === 1 && !command.allowDm)
         throw new ZephyrError.NotAllowedInDMError();
 
-      if (zephyr.onCooldown.has(message.author.id)) return;
+      if (!zephyr.config.moderators.includes(message.author.id)) {
+        if (zephyr.onCooldown.has(message.author.id)) return;
 
-      zephyr.onCooldown.add(message.author.id);
-      setTimeout(
-        () => zephyr.onCooldown.delete(message.author.id),
-        zephyr.modifiers.globalRateLimit
-      );
+        zephyr.onCooldown.add(message.author.id);
+        setTimeout(
+          () => zephyr.onCooldown.delete(message.author.id),
+          zephyr.modifiers.globalRateLimit
+        );
+      }
 
       await command.run(message, profile, zephyr);
 
