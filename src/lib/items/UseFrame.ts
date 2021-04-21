@@ -14,6 +14,7 @@ import { AlbumService } from "../database/services/game/AlbumService";
 import { checkPermission } from "../ZephyrUtils";
 import { MockUserCard } from "../../structures/game/UserCard";
 import { Frames } from "../cosmetics/Frames";
+import { Logger } from "../logger/Logger";
 
 export async function useFrame(
   msg: Message,
@@ -75,7 +76,7 @@ export async function useFrame(
     });
 
     collector.on("error", async (e: Error) => {
-      console.log(e);
+      Logger.error(e);
       res(false);
     });
 

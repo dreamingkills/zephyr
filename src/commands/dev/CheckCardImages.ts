@@ -2,6 +2,7 @@ import { Message } from "eris";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 import fs from "fs/promises";
+import { Logger } from "../../lib/logger/Logger";
 
 export default class CheckCardImages extends BaseCommand {
   names = ["cci"];
@@ -30,7 +31,8 @@ export default class CheckCardImages extends BaseCommand {
           failed.length === 1 ? `` : `s`
         } failed. See console for further information.`
       );
-      console.log(failed);
+
+      Logger.warn(failed);
     }
 
     await this.send(msg.channel, embed);

@@ -1,5 +1,5 @@
 import express from "express";
-import bodyparser from "body-parser";
+import { Logger } from "../lib/logger/Logger";
 import { Zephyr } from "../structures/client/Zephyr";
 
 export class WebhookListener {
@@ -8,14 +8,14 @@ export class WebhookListener {
     const port = zephyr.config.topgg.webhook.port;
     const auth = zephyr.config.topgg.webhook.auth;
 
-    app.use(bodyparser.json());
+    app.use(express.json());
     app.listen(port, () =>
-      console.log(`Top.gg listener is running on PORT ${port}.`)
+      Logger.info(`Top.gg listener is running on port ${port}.`)
     );
 
     app.post(`/vote`, async (req, res) => {
       if (req.headers.authorization !== auth) {
-        console.log(
+        Logger.error(
           "Authorization header did not match." +
             `\n- ${req.headers.authorization}`
         );
@@ -31,7 +31,7 @@ export class WebhookListener {
       };
 
       if (body.type === "test") {
-        console.log("Test request received, authorization OK.");
+        Logger.info("Test request received, authorization OK.");
         // return;
       }
 

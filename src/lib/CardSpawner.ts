@@ -17,6 +17,7 @@ import { checkPermission } from "./ZephyrUtils";
 import { AutotagService } from "./database/services/game/AutotagService";
 import { deleteMessage } from "./discord/message/deleteMessage";
 import { Frames } from "./cosmetics/Frames";
+import { Logger } from "./logger/Logger";
 
 export abstract class CardSpawner {
   private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
@@ -96,8 +97,9 @@ export abstract class CardSpawner {
     const collector = new ReactionCollector(channel.client, drop, filter);
 
     collector.on("error", async (e: Error) => {
-      // we should do something here but idk what yet lol
-      console.log(e);
+      Logger.error(`${e}`);
+
+      await createMessage(channel, `An unexpected error occurred.`);
     });
 
     const finished = [false, false, false];
@@ -250,7 +252,7 @@ export abstract class CardSpawner {
               const targetTag = tags.find((t) => t.id === autotag.tag);
 
               if (!targetTag) {
-                console.log(
+                Logger.error(
                   `Unexpected autotag behavior: targetTag undefined where Tag ${autotag.tag}`
                 );
               } else {

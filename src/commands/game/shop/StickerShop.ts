@@ -9,6 +9,7 @@ import { ShopError } from "../../../structures/error/ShopError";
 import { GameStickerPack } from "../../../structures/shop/StickerPack";
 import { getItemById } from "../../../assets/Items";
 import { Stickers } from "../../../lib/cosmetics/Stickers";
+import { Logger } from "../../../lib/logger/Logger";
 
 export default class Shop extends BaseCommand {
   id = `repentless`;
@@ -85,7 +86,7 @@ export default class Shop extends BaseCommand {
           );
 
           collector.on(`error`, (error: Error) => {
-            console.log(`Error in Sticker Shop reaction collector:\n${error}`);
+            Logger.error(`Error in Sticker Shop reaction collector:\n${error}`);
 
             res(false);
           });

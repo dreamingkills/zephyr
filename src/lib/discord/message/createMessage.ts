@@ -4,6 +4,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { retryOperation } from "../Retry";
 import { StatsD } from "../../StatsD";
+import { Logger } from "../../logger/Logger";
 
 function deriveFileExtension(url: string | Buffer): string {
   if (url instanceof Buffer) {
@@ -43,7 +44,7 @@ export async function createMessage(
 
   let message;
 
-  StatsD.increment(`zephyr.message.create`, 1)
+  StatsD.increment(`zephyr.message.create`, 1);
   message = await retryOperation(
     async () => channel.createMessage({ content, embed }, derivedFiles),
     10000,
@@ -51,7 +52,7 @@ export async function createMessage(
   ).catch((e) => {
     if (!e?.stack.includes(`[50013]:`)) {
       if (channel.type !== 1) {
-        console.log(
+        Logger.error(
           `Failed trying to send message with content ${content} (embed content: ${embed?.description}) in channel ${channel.id}. Full stack:\n${e.stack}`
         );
       }

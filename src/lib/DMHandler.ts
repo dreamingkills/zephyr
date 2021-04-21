@@ -3,6 +3,7 @@ import { ProfileService } from "./database/services/game/ProfileService";
 import dayjs from "dayjs";
 import { createMessage } from "./discord/message/createMessage";
 import { GameProfile } from "../structures/game/Profile";
+import { Logger, loggerSettings } from "./logger/Logger";
 
 export class DMHandler {
   public async handle(zephyr: Zephyr): Promise<void> {
@@ -12,7 +13,11 @@ export class DMHandler {
     }
 
     const eligible = await ProfileService.getAvailableReminderRecipients();
-    console.log(`Grabbed ${eligible.length} users to DM...`);
+
+    if (loggerSettings.debug) {
+      Logger.debug(`Grabbed ${eligible.length} users to DM...`);
+    }
+
     const start = Date.now();
     const [claimSuccess, dropSuccess, voteSuccess] = [[], [], []] as [
       GameProfile[],
@@ -60,17 +65,19 @@ export class DMHandler {
         message = types.slice(0, -1).join(`, `) + `, and ` + types.slice(-1);
       }
 
-      /*console.log(
-        `Attempting to DM ${p.discordId} (${types.join(
-          `, `
-        )}).\n- Now: ${now.format(
-          `YYYY-MM-DD HH:mm:ss`
-        )}\n- Next Claim: ${nextClaim.format(
-          `YYYY-MM-DD HH:mm:ss`
-        )}\n- Next Drop: ${nextDrop.format(
-          `YYYY-MM-DD HH:mm:ss`
-        )}\n- Next Vote: ${nextVote.format(`YYYY-MM-DD HH:mm:ss`)}`
-      );*/
+      if (loggerSettings.verbose) {
+        Logger.verbose(
+          `Attempting to DM ${p.discordId} (${types.join(
+            `, `
+          )}).\n- Now: ${now.format(
+            `YYYY-MM-DD HH:mm:ss`
+          )}\n- Next Claim: ${nextClaim.format(
+            `YYYY-MM-DD HH:mm:ss`
+          )}\n- Next Drop: ${nextDrop.format(
+            `YYYY-MM-DD HH:mm:ss`
+          )}\n- Next Vote: ${nextVote.format(`YYYY-MM-DD HH:mm:ss`)}`
+        );
+      }
 
       try {
         const dmChannel = await zephyr.getDMChannel(p.discordId);
@@ -87,7 +94,7 @@ export class DMHandler {
         if (vote) voteSuccess.push(p);
         continue;
       } catch (e) {
-        console.log(`Vote message failed - ${e}`);
+        Logger.error(`Vote message failed - ${e}`);
         failed.push(p);
         continue;
       }
@@ -103,15 +110,17 @@ export class DMHandler {
     if (failed.length > 0) await ProfileService.disableReminders(failed);
 
     const end = Date.now();
-    console.log(
-      `Finished DMing ${
-        claimSuccess.length + dropSuccess.length + voteSuccess.length
-      } users (${failed.length} failed). ${end - start}ms elapsed.${
-        failed.length > 0
-          ? `\n${failed.map((p) => p.discordId).join(`, `)}`
-          : ``
-      }`
-    );
+    if (loggerSettings.debug) {
+      Logger.debug(
+        `Finished DMing ${
+          claimSuccess.length + dropSuccess.length + voteSuccess.length
+        } users (${failed.length} failed). ${end - start}ms elapsed.${
+          failed.length > 0
+            ? `\n${failed.map((p) => p.discordId).join(`, `)}`
+            : ``
+        }`
+      );
+    }
 
     setTimeout(() => this.handle(zephyr), 30000);
   }

@@ -1,6 +1,7 @@
 import { items } from "../../assets/Items";
 import { GameShop, IntermediateShop } from "../../structures/shop/Shop";
 import { ShopGetter } from "../database/sql/game/shop/ShopGetter";
+import { Logger } from "../logger/Logger";
 
 class ShopService {
   private shop: GameShop[] = [];
@@ -13,7 +14,7 @@ class ShopService {
       const prefabItem = items.find((i) => i.id === item.item_id);
 
       if (!prefabItem) {
-        console.log(`WARNING: Item not found for shop entry ${item.id}`);
+        Logger.error(`Item not found for shop entry ${item.id}.`);
         continue;
       }
 

@@ -28,7 +28,8 @@
     "node-statsd": "^0.1.1",
     "nodemon": "^2.0.6",
     "strip-ansi": "^6.0.0",
-    "typescript": "^4.1.2"
+    "typescript": "^4.1.2",
+    "winston": "^3.3.3"
   },
   "scripts": {
     "start": "yarn node dist/src/index.js",

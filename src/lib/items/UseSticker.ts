@@ -12,6 +12,7 @@ import { editMessage } from "../discord/message/editMessage";
 import { AlbumService } from "../database/services/game/AlbumService";
 import { deleteMessage } from "../discord/message/deleteMessage";
 import { Stickers } from "../cosmetics/Stickers";
+import { Logger } from "../logger/Logger";
 
 export async function useSticker(
   msg: Message,
@@ -69,7 +70,7 @@ export async function useSticker(
     });
 
     collector.on("error", async (e: Error) => {
-      console.log(e);
+      Logger.error(e);
       res(-1);
     });
 

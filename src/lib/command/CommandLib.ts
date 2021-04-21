@@ -11,6 +11,7 @@ import { GameProfile } from "../../structures/game/Profile";
 import dayjs from "dayjs";
 import { BlacklistService } from "../database/services/meta/BlacklistService";
 import { AnticheatService } from "../database/services/meta/AnticheatService";
+import { Logger } from "../logger/Logger";
 
 export class CommandLib {
   commands: BaseCommand[] = [];
@@ -194,7 +195,10 @@ export class CommandLib {
         } catch {}
       } else {
         if (e.name === "Missing Access") return;
-        console.log(`ERROR NAME: ${e}\n${e.stack}`);
+        Logger.error(
+          `Error executing command "${command.names[0]}" (ID ${command.id}):\n${e} - ${e?.stack}`
+        );
+
         const embed = new MessageEmbed(`Error`, message.author).setDescription(
           `An unexpected error occurred. Please try again.`
         );

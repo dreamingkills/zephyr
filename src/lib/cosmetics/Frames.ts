@@ -31,6 +31,10 @@ class FrameService {
     return this.frames;
   }
 
+  public getFrames(): GameFrame[] {
+    return this.frames;
+  }
+
   public getFrameById(id: number): GameFrame | undefined {
     return this.frames.find((frame) => frame.id === id);
   }

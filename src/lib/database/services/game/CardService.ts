@@ -23,6 +23,8 @@ import {
 import { AnticheatService } from "../meta/AnticheatService";
 import { Stickers } from "../../../cosmetics/Stickers";
 import { Frames } from "../../../cosmetics/Frames";
+import { Logger, loggerSettings } from "../../../logger/Logger";
+import { GameFrame } from "../../../../structures/game/Frame";
 
 export abstract class CardService {
   // Used for card image generation
@@ -106,8 +108,6 @@ export abstract class CardService {
       baseCard = zephyr.getCard(card.baseCardId)!;
     } else baseCard = card.baseCard;
 
-    console.log(baseCard.name);
-
     const sizeCoefficient = large ? 2.2 : 1;
 
     const [sizeX, sizeY] = large ? [770, 1100] : [350, 500];
@@ -121,10 +121,16 @@ export abstract class CardService {
     let img = await loadImage(baseCard.image);
 
     // Load the card's frame, default if the id column is null
-    let frame;
+    let frame: GameFrame;
 
     if (card instanceof GameUserCard) {
-      frame = Frames.getFrameById(card.frameId || 1);
+      const findFrame = Frames.getFrameById(card.frameId || 1);
+
+      if (findFrame) {
+        frame = findFrame;
+      } else {
+        frame = Frames.getFrames()[0];
+      }
     } else frame = card.frame;
 
     // Draw the base image, then the frame on top of that
@@ -394,7 +400,7 @@ export abstract class CardService {
     zephyr: Zephyr
   ): Promise<Buffer> {
     const newCard = await CardSet.setCardFrame(card, frameId);
-    return await this.updateCardCache(newCard, zephyr);
+    return await this.updateCardCache(newCard, zephyr, false, true);
   }
 
   public static async transferCardsToUser(
@@ -458,11 +464,17 @@ export abstract class CardService {
   public static async generatePrefabCache(card: GameBaseCard): Promise<Buffer> {
     try {
       await fs.readFile(`./cache/cards/prefab/${card.id}`);
-      console.log(`Skipping ${card.id}`);
+
+      if (loggerSettings.verbose) {
+        Logger.verbose(`Read prefab ${card.id} from disk.`);
+      }
     } catch {
       const image = await this.generateCardPrefab(card);
       await fs.writeFile(`./cache/cards/prefab/${card.id}`, image);
-      console.log(`Generated ${card.id}`);
+
+      if (loggerSettings.verbose) {
+        Logger.verbose(`Generated prefab ${card.id} and saved it to disk.`);
+      }
     }
 
     return await fs.readFile(`./cache/cards/prefab/${card.id}`);

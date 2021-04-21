@@ -3,6 +3,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { retryOperation } from "../Retry";
 import { StatsD } from "../../StatsD";
+import { Logger } from "../../logger/Logger";
 
 export async function editMessage(
   msg: Message,
@@ -24,13 +25,13 @@ export async function editMessage(
 
   let message: Message<TextableChannel>;
 
-  StatsD.increment(`zephyr.message.edit`, 1)
+  StatsD.increment(`zephyr.message.edit`, 1);
   message = await retryOperation(
-  async () => msg.edit({ content, embed }),
+    async () => msg.edit({ content, embed }),
     10000,
     3
   ).catch((e) => {
-    console.log(
+    Logger.error(
       `Failed trying to edit message ${msg.id} with content ${content} in channel ${msg.channel.id}. Full stack:\n${e.stack}`
     );
     throw new ZephyrError.FailedToEditMessageError();

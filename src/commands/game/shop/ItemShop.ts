@@ -8,6 +8,7 @@ import { isDeveloper } from "../../../lib/ZephyrUtils";
 import { ShopError } from "../../../structures/error/ShopError";
 import { Shop } from "../../../lib/shop/Shop";
 import { GameShop } from "../../../structures/shop/Shop";
+import { Logger } from "../../../lib/logger/Logger";
 
 export default class ItemShop extends BaseCommand {
   id = `delusion`;
@@ -71,7 +72,7 @@ export default class ItemShop extends BaseCommand {
           );
 
           collector.on(`error`, (error: Error) => {
-            console.log(`Error in Item Shop reaction collector:\n${error}`);
+            Logger.error(`Error in Item Shop reaction collector:\n${error}`);
 
             res(false);
           });

@@ -25,6 +25,7 @@ import { Stickers } from "../../lib/cosmetics/Stickers";
 import { Frames } from "../../lib/cosmetics/Frames";
 import { Backgrounds } from "../../lib/cosmetics/Backgrounds";
 import { Shop } from "../../lib/shop/Shop";
+import { Logger, loggerSettings } from "../../lib/logger/Logger";
 
 export class Zephyr extends Client {
   commandLib = new CommandLib();
@@ -137,12 +138,15 @@ export class Zephyr extends Client {
 
     this.on("debug", (msg: string, _id: number) => {
       if (this.flags.debugMessages) {
-        if (msg.includes(" 429 ") || msg.includes("429:")) {
+        if (
+          (msg.includes(" 429 ") || msg.includes("429:")) &&
+          msg.includes(`"global": true`)
+        ) {
           StatsD.increment(`zephyr.response.429`, 1);
-          console.log(`429 Detected: ${msg}`);
+
           this.errors++;
 
-          console.log(`${this.errors} total 429s`);
+          Logger.warn(`Global 429 detected, ${this.errors} total!`);
         }
       }
     });
@@ -179,11 +183,12 @@ export class Zephyr extends Client {
             type: 0,
           });
         } catch (e) {
-          console.log(
+          Logger.error(
             `Failed to update status with error ${e}.\nStack trace: ${e?.stack}`
           );
         }
       }, 300000);
+
       await this.dmHandler.handle(this);
 
       if (this.config.discord.logChannel) {
@@ -278,7 +283,7 @@ export class Zephyr extends Client {
             `:outbox_tray: Zephyr left a server: **${guild.name}** (${guild.id}).\nMember count: **${guild.memberCount}**`
           );
         } catch (e) {
-          console.log(
+          Logger.error(
             `Failed to send guild delete log (${guild.id}) - ${e.stack}`
           );
         }
@@ -294,7 +299,7 @@ export class Zephyr extends Client {
             `:inbox_tray: Zephyr joined a new server: **${guild.name}** (${guild.id}).\nMember count: **${guild.memberCount}**`
           );
         } catch (e) {
-          console.log(
+          Logger.error(
             `Failed to send guild create log (${guild.id}) - ${e.stack}`
           );
         }
@@ -365,18 +370,18 @@ export class Zephyr extends Client {
     });
 
     this.on("error", (error) => {
-      console.log(`${error.message} - ${error.stack}`);
+      Logger.error(`${error.message} - ${error.stack}`);
     });
 
     /*
         Shards
     */
     this.on("shardReady", (id) => {
-      console.log(`Shard ${id} is ready!`);
+      Logger.debug(`Shard ${id} is ready!`);
     });
 
     this.on("shardDisconnect", (err, id) => {
-      console.log(
+      Logger.error(
         `Shard ${id} disconnected${
           err ? `  with error: ${err}\n${err?.stack}` : `. No error was given.`
         }`
@@ -435,7 +440,12 @@ export class Zephyr extends Client {
     for (let card of cards) {
       await CardService.generatePrefabCache(card);
     }
-    console.log(`Generated ${cards.length} prefabs.`);
+
+    if (loggerSettings.debug) {
+      Logger.debug(`${cards.length} prefabs were read or generated.`);
+    }
+
+    return;
   }
 
   public getCard(id: number): GameBaseCard | undefined {
