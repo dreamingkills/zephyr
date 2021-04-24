@@ -5,6 +5,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ReactionCollector } from "eris-collector";
 import { GameUserCard } from "../../../structures/game/UserCard";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ResetFrame extends BaseCommand {
   id = `would`;
@@ -36,13 +37,13 @@ export default class ResetFrame extends BaseCommand {
 
     const confirmation = await this.send(
       msg.channel,
-      `${this.zephyr.config.discord.emoji.warn} Really reset the frame of \`${trueIdentifier}\`?`
+      `${Zephyr.config.discord.emoji.warn} Really reset the frame of \`${trueIdentifier}\`?`
     );
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
-      emoji.id === this.zephyr.config.discord.emojiId.check;
-    const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
+      emoji.id === Zephyr.config.discord.emojiId.check;
+    const collector = new ReactionCollector(Zephyr, confirmation, filter, {
       time: 30000,
       max: 1,
     });
@@ -51,9 +52,9 @@ export default class ResetFrame extends BaseCommand {
     });
 
     collector.on("collect", async () => {
-      await CardService.changeCardFrame(card, 1, this.zephyr);
+      await CardService.changeCardFrame(card, 1);
       await confirmation.edit(
-        `${this.zephyr.config.discord.emoji.check} Reset the frame of \`${trueIdentifier}\`.`
+        `${Zephyr.config.discord.emoji.check} Reset the frame of \`${trueIdentifier}\`.`
       );
       collector.en;
       return;
@@ -62,11 +63,11 @@ export default class ResetFrame extends BaseCommand {
     collector.on("end", async (_collected: unknown, reason: string) => {
       if (reason === "time") {
         await confirmation.edit(
-          `${this.zephyr.config.discord.emoji.warn} Did not reset the frame.`
+          `${Zephyr.config.discord.emoji.warn} Did not reset the frame.`
         );
         await confirmation.removeReaction(
-          `check:${this.zephyr.config.discord.emojiId.check}`,
-          this.zephyr.user.id
+          `check:${Zephyr.config.discord.emojiId.check}`,
+          Zephyr.user.id
         );
         return;
       }
@@ -74,7 +75,7 @@ export default class ResetFrame extends BaseCommand {
 
     await this.react(
       confirmation,
-      `check:${this.zephyr.config.discord.emojiId.check}`
+      `check:${Zephyr.config.discord.emojiId.check}`
     );
     return;
   }

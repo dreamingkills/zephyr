@@ -45,7 +45,6 @@ export function renderRecipe(recipe: Recipe): string {
 
 export async function getDescriptions(
   targets: (GameUserCard | GameDye)[],
-  zephyr: Zephyr,
   tags: GameTag[] = [],
   showSubgroup: boolean = false,
   albumCards: GameAlbumCard[] = []
@@ -91,7 +90,7 @@ export async function getDescriptions(
 
   for (let t of targets) {
     if (t instanceof GameUserCard) {
-      const baseCard = zephyr.getCard(t.baseCardId)!;
+      const baseCard = Zephyr.getCard(t.baseCardId)!;
       const hasTag = tags.filter(
         (tag) => tag.id === (<GameUserCard>t).tagId
       )[0];
@@ -150,13 +149,12 @@ export function getGroupsByIdolId(
 export function generateUserTag(
   sender: User,
   user: User | undefined,
-  profile: GameProfile,
-  zephyr: Zephyr
+  profile: GameProfile
 ): string {
   if (!user) return `Unknown User`;
 
-  const isMod = zephyr.config.moderators.includes(sender.id);
-  const isDev = zephyr.config.developers.includes(sender.id);
+  const isMod = Zephyr.config.moderators.includes(sender.id);
+  const isDev = Zephyr.config.developers.includes(sender.id);
 
   if (isMod || isDev || user.id === sender.id) return user.tag;
 
@@ -173,24 +171,20 @@ export function isValidSnowflake(str: string): boolean {
   return true;
 }
 
-export function isPrivacyBlocked(
-  target: GameProfile,
-  sender: User,
-  zephyr: Zephyr
-): boolean {
+export function isPrivacyBlocked(target: GameProfile, sender: User): boolean {
   if (target.discordId === sender.id) return false;
 
   if (!target.private) return false;
 
-  if (zephyr.config.moderators.includes(sender.id)) return false;
-  if (zephyr.config.developers.includes(sender.id)) return false;
+  if (Zephyr.config.moderators.includes(sender.id)) return false;
+  if (Zephyr.config.developers.includes(sender.id)) return false;
 
   return true;
 }
 
-export function canBypass(user: User, zephyr: Zephyr): boolean {
-  if (zephyr.config.moderators.includes(user.id)) return true;
-  if (zephyr.config.developers.includes(user.id)) return true;
+export function canBypass(user: User): boolean {
+  if (Zephyr.config.moderators.includes(user.id)) return true;
+  if (Zephyr.config.developers.includes(user.id)) return true;
 
   return false;
 }

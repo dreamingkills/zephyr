@@ -6,6 +6,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { MessageCollector } from "eris-collector";
 import { GameBaseCard } from "../../../structures/game/BaseCard";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class CardLookup extends BaseCommand {
   id = `rooster`;
@@ -21,7 +22,7 @@ export default class CardLookup extends BaseCommand {
   ): Promise<void> {
     if (!options[0]) {
       const lastCard = await CardService.getLastCard(profile);
-      const lastBase = this.zephyr.getCard(lastCard.baseCardId)!;
+      const lastBase = Zephyr.getCard(lastCard.baseCardId)!;
 
       const embed = await this.getCardStats(lastBase, msg.author);
       const prefabImage = await CardService.getPrefabFromCache(lastBase);
@@ -36,7 +37,7 @@ export default class CardLookup extends BaseCommand {
 
     if (!nameQuery) throw new ZephyrError.InvalidLookupQueryError();
 
-    const find = this.zephyr.getCards().filter((c) => {
+    const find = Zephyr.getCards().filter((c) => {
       return `${c.group ? c.group : ``} ${c.name} ${
         c.subgroup ? c.subgroup : ``
       }`
@@ -79,7 +80,7 @@ export default class CardLookup extends BaseCommand {
       const filter = (m: Message) =>
         find[parseInt(m.content) - 1] && m.author.id === msg.author.id;
 
-      const collector = new MessageCollector(this.zephyr, msg.channel, filter, {
+      const collector = new MessageCollector(Zephyr, msg.channel, filter, {
         time: 30000,
         max: 1,
       });
@@ -120,15 +121,12 @@ export default class CardLookup extends BaseCommand {
     card: GameBaseCard,
     author: User
   ): Promise<MessageEmbed> {
-    card = await this.zephyr.refreshCard(card.id);
+    card = await Zephyr.refreshCard(card.id);
 
-    const timesDestroyed = await CardService.getTimesCardDestroyed(
-      card,
-      this.zephyr
-    );
+    const timesDestroyed = await CardService.getTimesCardDestroyed(card);
     const timesWishlisted = await CardService.getTimesCardWishlisted(card);
     const avgClaimTime = await CardService.getAverageClaimTime(card);
-    const wearSpread = await CardService.getCardWearSpread(card, this.zephyr);
+    const wearSpread = await CardService.getCardWearSpread(card);
 
     const embed = new MessageEmbed(`Lookup`, author)
       .setDescription(

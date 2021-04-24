@@ -1,6 +1,7 @@
 import { Message } from "eris";
 import { BaseCommand } from "../../structures/command/Command";
 import { Logger } from "../../lib/logger/Logger";
+import { Zephyr } from "../../structures/client/Zephyr";
 
 export default class ScanCards extends BaseCommand {
   names = ["scancards"];
@@ -8,7 +9,7 @@ export default class ScanCards extends BaseCommand {
   developerOnly = true;
 
   async exec(msg: Message): Promise<void> {
-    const cards = this.zephyr.getCards();
+    const cards = Zephyr.getCards();
 
     for (let card of cards) {
       if (!card.groupId) {

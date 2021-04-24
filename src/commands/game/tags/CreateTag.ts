@@ -5,6 +5,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import emoji from "node-emoji";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class CreateTag extends BaseCommand {
   id = `tori`;
@@ -32,7 +33,7 @@ export default class CreateTag extends BaseCommand {
       (userTags.length >= 40 && profile.patron === 3) ||
       (userTags.length >= 75 && profile.patron === 4)
     ) {
-      const prefix = this.zephyr.getPrefix(msg.guildID!);
+      const prefix = Zephyr.getPrefix(msg.guildID!);
       throw new ZephyrError.TagsFullError(profile.patron, prefix);
     }
 
@@ -67,7 +68,7 @@ export default class CreateTag extends BaseCommand {
       trueEmoji.emoji
     );
 
-    const prefix = this.zephyr.getPrefix(msg.guildID);
+    const prefix = Zephyr.getPrefix(msg.guildID);
     const embed = new MessageEmbed(`Create Tag`, msg.author).setDescription(
       `The tag ${tag.emoji} **${tag.name}** has been created.\nTag your cards by using \`${prefix}tc <cards>\`!`
     );

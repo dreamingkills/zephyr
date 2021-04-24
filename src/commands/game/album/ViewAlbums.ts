@@ -8,6 +8,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { GameAlbum } from "../../../structures/game/Album";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 import { ReactionCollector } from "eris-collector";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ViewAlbums extends BaseCommand {
   id = `aerodynamic`;
@@ -29,7 +30,7 @@ export default class ViewAlbums extends BaseCommand {
       targetProfile = profile;
       targetUser = msg.author;
     } else if (msg.mentions[0]) {
-      targetUser = await this.zephyr.fetchUser(msg.mentions[0].id);
+      targetUser = await Zephyr.fetchUser(msg.mentions[0].id);
 
       if (!targetUser) throw new ZephyrError.InvalidMentionError();
 
@@ -38,7 +39,7 @@ export default class ViewAlbums extends BaseCommand {
       if (isNaN(parseInt(options[0])) || options[0].length < 17)
         throw new ZephyrError.InvalidSnowflakeError();
 
-      targetUser = await this.zephyr.fetchUser(options[0]);
+      targetUser = await Zephyr.fetchUser(options[0]);
 
       if (!targetUser) throw new ZephyrError.InvalidSnowflakeError();
 
@@ -89,14 +90,9 @@ export default class ViewAlbums extends BaseCommand {
     const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id;
 
-    const collector = new ReactionCollector(
-      this.zephyr,
-      albumsMessage,
-      filter,
-      {
-        time: 2 * 60 * 1000,
-      }
-    );
+    const collector = new ReactionCollector(Zephyr, albumsMessage, filter, {
+      time: 2 * 60 * 1000,
+    });
 
     collector.on(
       "collect",
@@ -117,7 +113,7 @@ export default class ViewAlbums extends BaseCommand {
 
         await albumsMessage.edit({ embed });
 
-        if (checkPermission("manageMessages", msg.textChannel, this.zephyr))
+        if (checkPermission("manageMessages", msg.textChannel))
           await albumsMessage.removeReaction(emoji.name, userId);
       }
     );

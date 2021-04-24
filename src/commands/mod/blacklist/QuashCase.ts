@@ -5,6 +5,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { BlacklistService } from "../../../lib/database/services/meta/BlacklistService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class QuashCase extends BaseCommand {
   id = `one`;
@@ -31,7 +32,7 @@ export default class QuashCase extends BaseCommand {
     if (!blacklist.active)
       throw new ZephyrError.CaseAlreadyQuashedError(blacklist);
 
-    const blacklistee = await this.zephyr.fetchUser(blacklist.discordId);
+    const blacklistee = await Zephyr.fetchUser(blacklist.discordId);
     const blacklisteeProfile = await ProfileService.getProfile(
       blacklist.discordId
     );
@@ -52,9 +53,9 @@ export default class QuashCase extends BaseCommand {
 
     await this.send(msg.channel, embed);
 
-    if (this.zephyr.logChannel) {
+    if (Zephyr.logChannel) {
       await this.send(
-        this.zephyr.logChannel,
+        Zephyr.logChannel,
         `:unlock: \`Case #${blacklist.id}\` was quashed by **${
           msg.author.tag
         }**, unblacklisted **${blacklistee?.tag || blacklist.discordId}**.`

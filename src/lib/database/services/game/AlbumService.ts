@@ -1,6 +1,5 @@
 import { createCanvas, loadImage } from "canvas";
 import { User } from "eris";
-import { Zephyr } from "../../../../structures/client/Zephyr";
 import { GameAlbum, GameAlbumCard } from "../../../../structures/game/Album";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { GameUserCard } from "../../../../structures/game/UserCard";
@@ -65,8 +64,7 @@ export abstract class AlbumService {
   public static async addCardToAlbum(
     album: GameAlbum,
     card: GameUserCard,
-    slot: number,
-    zephyr: Zephyr
+    slot: number
   ): Promise<Buffer> {
     await AlbumSet.addCardToAlbum(album, card, slot);
 
@@ -75,8 +73,7 @@ export abstract class AlbumService {
     return await this.updateAlbumCache(
       album,
       cards.slice(page * 8 - 8, page * 8),
-      page,
-      zephyr
+      page
     );
   }
 
@@ -98,8 +95,7 @@ export abstract class AlbumService {
   public static async generateAlbumImage(
     album: GameAlbum,
     cards: GameAlbumCard[],
-    _page: number,
-    zephyr: Zephyr
+    _page: number
   ): Promise<Buffer> {
     const canvas = createCanvas(1024, 700);
     const ctx = canvas.getContext("2d");
@@ -113,7 +109,7 @@ export abstract class AlbumService {
 
       const gameCard = await CardService.getUserCardById(card.cardId);
 
-      const buffer = await CardService.checkCacheForCard(gameCard, zephyr);
+      const buffer = await CardService.checkCacheForCard(gameCard);
       const image = await loadImage(buffer);
       ctx.drawImage(image, posX, posY, 245, 350);
     }
@@ -127,10 +123,9 @@ export abstract class AlbumService {
   public static async updateAlbumCache(
     album: GameAlbum,
     cards: GameAlbumCard[],
-    page: number,
-    zephyr: Zephyr
+    page: number
   ): Promise<Buffer> {
-    const collage = await this.generateAlbumImage(album, cards, page, zephyr);
+    const collage = await this.generateAlbumImage(album, cards, page);
 
     // fs will throw an error if the directory already exists.
     // TODO - Change this do detect directory, removing need for error handling.
@@ -154,25 +149,23 @@ export abstract class AlbumService {
   public static async checkCacheForAlbum(
     album: GameAlbum,
     cards: GameAlbumCard[],
-    page: number,
-    zephyr: Zephyr
+    page: number
   ): Promise<Buffer> {
     try {
       return await fs.readFile(`./cache/albums/${album.id}/${page}`);
     } catch (e) {
-      return await this.updateAlbumCache(album, cards, page, zephyr);
+      return await this.updateAlbumCache(album, cards, page);
     }
   }
 
   public static async removeCardsFromAlbums(
     cards: GameAlbumCard[] | GameUserCard[],
-    albums: GameAlbum[],
-    zephyr: Zephyr
+    albums: GameAlbum[]
   ): Promise<void> {
     await AlbumSet.removeCardsFromAlbum(cards);
     for (let album of albums) {
       const albumCards = await this.getCardsByAlbum(album);
-      await this.updateAlbumCache(album, albumCards, 1, zephyr);
+      await this.updateAlbumCache(album, albumCards, 1);
     }
   }
 

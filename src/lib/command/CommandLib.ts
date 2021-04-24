@@ -15,9 +15,8 @@ import { Logger } from "../logger/Logger";
 
 export class CommandLib {
   commands: BaseCommand[] = [];
-  cooldowns: Set<string> = new Set();
 
-  async setup(zephyr: Zephyr): Promise<void> {
+  async setup(): Promise<void> {
     const _glob = promisify(glob);
     const files = await _glob(
       `${require("path").dirname(require.main?.filename)}/commands/**/*.js`
@@ -27,7 +26,7 @@ export class CommandLib {
         const cmdExport = require(f);
         if (!cmdExport.default) continue;
 
-        const cmd = new cmdExport.default(zephyr) as BaseCommand;
+        const cmd = new cmdExport.default(Zephyr) as BaseCommand;
         this.commands.push(cmd);
       } catch {
         continue;
@@ -35,22 +34,13 @@ export class CommandLib {
     }
   }
 
-  async process(message: Message, zephyr: Zephyr): Promise<void> {
-    if (
-      this.cooldowns.has(
-        message.author.id
-      ) /*&& !zephyr.config.moderators.includes(message.author.id) && !zephyr.config.developers.includes(message.author.id)*/
-    )
-      return;
+  async process(message: Message): Promise<void> {
+    const isDm = !message.guildID;
 
-    let prefix;
-    if (message.channel.type === 1) {
-      prefix = ".";
-    } else {
-      const guild = await zephyr.fetchGuild(message.guildID!);
-      if (!guild) return;
+    let prefix = Zephyr.config.discord.defaultPrefix;
 
-      prefix = zephyr.getPrefix(guild!.id);
+    if (!isDm) {
+      prefix = Zephyr.getPrefix(message.guildID);
     }
 
     const commandNameRegExp = new RegExp(
@@ -71,17 +61,18 @@ export class CommandLib {
 
     const command = commandMatch[0];
 
-    if (zephyr.modifiers.perUserRateLimit > 0) {
-      this.cooldowns.add(message.author.id);
-      setTimeout(
-        () => this.cooldowns.delete(message.author.id),
-        zephyr.modifiers.perUserRateLimit
+    if (isDm && !command.allowDm) {
+      const embed = new MessageEmbed(`Error`, message.author).setDescription(
+        `You cannot use that command in DMs.`
       );
+
+      await createMessage(message.channel, embed);
+      return;
     }
 
     if (
       command.developerOnly &&
-      !zephyr.config.developers.includes(message.author.id)
+      !Zephyr.config.developers.includes(message.author.id)
     ) {
       const embed = new MessageEmbed(`Error`, message.author).setDescription(
         `This command is only usable by the developer.`
@@ -94,8 +85,8 @@ export class CommandLib {
       return;
     } else if (
       command.moderatorOnly &&
-      !zephyr.config.moderators.includes(message.author.id) &&
-      !zephyr.config.developers.includes(message.author.id)
+      !Zephyr.config.moderators.includes(message.author.id) &&
+      !Zephyr.config.developers.includes(message.author.id)
     ) {
       const embed = new MessageEmbed(`Error`, message.author).setDescription(
         `This command is only usable by Zephyr staff.`
@@ -142,9 +133,9 @@ export class CommandLib {
         const creationDate = dayjs(message.author.createdAt);
         const now = dayjs();
 
-        if (now < creationDate.add(14, `day`) && zephyr.logChannel) {
+        if (now < creationDate.add(14, `day`) && Zephyr.logChannel) {
           await createMessage(
-            zephyr.logChannel,
+            Zephyr.logChannel,
             `:warning: New account (<2 weeks) joined: **${
               message.author.tag
             }** (${message.author.id})\nCreation date: ${creationDate.format(
@@ -162,20 +153,17 @@ export class CommandLib {
         throw new ZephyrError.AccountBlacklistedError(blacklist);
       }
 
-      if (message.channel.type === 1 && !command.allowDm)
-        throw new ZephyrError.NotAllowedInDMError();
+      if (!Zephyr.config.moderators.includes(message.author.id)) {
+        if (Zephyr.onCooldown.has(message.author.id)) return;
 
-      if (!zephyr.config.moderators.includes(message.author.id)) {
-        if (zephyr.onCooldown.has(message.author.id)) return;
-
-        zephyr.onCooldown.add(message.author.id);
+        Zephyr.onCooldown.add(message.author.id);
         setTimeout(
-          () => zephyr.onCooldown.delete(message.author.id),
-          zephyr.modifiers.globalRateLimit
+          () => Zephyr.onCooldown.delete(message.author.id),
+          Zephyr.modifiers.globalRateLimit
         );
       }
 
-      await command.run(message, profile, zephyr);
+      await command.run(message, profile);
 
       if (command.id) {
         await AnticheatService.logCommand(

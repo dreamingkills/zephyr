@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { Message } from "eris";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
+import { Zephyr } from "../../structures/client/Zephyr";
 import { BaseCommand } from "../../structures/command/Command";
 
 export default class Stats extends BaseCommand {
@@ -23,11 +24,11 @@ export default class Stats extends BaseCommand {
       ramStatusEmoji = ":hot_face:";
     }
 
-    const shard = this.zephyr.guildShardMap[msg.guildID!] || 0;
+    const shard = Zephyr.guildShardMap[msg.guildID!] || 0;
 
-    const rtfl = await this.zephyr.fetchUser(`197186779843919877`);
+    const rtfl = await Zephyr.fetchUser(`197186779843919877`);
 
-    const startup = dayjs().subtract(this.zephyr.uptime, `millisecond`);
+    const startup = dayjs().subtract(Zephyr.uptime, `millisecond`);
     const now = dayjs();
 
     const days = now.diff(startup, `day`);
@@ -39,15 +40,15 @@ export default class Stats extends BaseCommand {
 
     const embed = new MessageEmbed(`Stats`, msg.author)
       .setDescription(
-        `Shard - **${this.zephyr.config.discord.shardNames[shard]}** (${
-          this.zephyr.shards.size
+        `Shard - **${Zephyr.config.discord.shardNames[shard]}** (${
+          Zephyr.shards.size
         } total)\nUptime - **${days > 0 ? `${days}d ` : ``}${
           hours > 0 ? `${hours}h ` : ``
         }${minutes > 0 ? `${minutes}m ` : ``}${
           seconds > 0 ? `${seconds}s` : ``
-        }**\nCache Size - **${this.zephyr.users.size}** users / **${
-          this.zephyr.guilds.size
-        }** guilds\nGame - **${this.zephyr.getCards().length}** cards`
+        }**\nCache Size - **${Zephyr.users.size}** users / **${
+          Zephyr.guilds.size
+        }** guilds\nGame - **${Zephyr.getCards().length}** cards`
       )
       .addField({
         name: `Memory Usage`,

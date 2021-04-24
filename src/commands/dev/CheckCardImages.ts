@@ -3,6 +3,7 @@ import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 import fs from "fs/promises";
 import { Logger } from "../../lib/logger/Logger";
+import { Zephyr } from "../../structures/client/Zephyr";
 
 export default class CheckCardImages extends BaseCommand {
   names = ["cci"];
@@ -10,7 +11,7 @@ export default class CheckCardImages extends BaseCommand {
   developerOnly = true;
 
   async exec(msg: Message): Promise<void> {
-    const images = this.zephyr.getCards().map((c) => c.image);
+    const images = Zephyr.getCards().map((c) => c.image);
 
     const failed = [];
     for (let i of images) {

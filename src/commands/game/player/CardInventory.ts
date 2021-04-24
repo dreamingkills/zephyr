@@ -14,6 +14,7 @@ import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { editMessage } from "../../../lib/discord/message/editMessage";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { GameAlbumCard } from "../../../structures/game/Album";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class CardInventory extends BaseCommand {
   id = `cirice`;
@@ -37,7 +38,7 @@ export default class CardInventory extends BaseCommand {
     if (msg.mentions[0]) {
       targetUser = msg.mentions[0];
     } else if (id) {
-      targetUser = await this.zephyr.fetchUser(id);
+      targetUser = await Zephyr.fetchUser(id);
     } else {
       targetUser = msg.author;
       target = profile;
@@ -50,8 +51,8 @@ export default class CardInventory extends BaseCommand {
     if (
       target.private &&
       target.discordId !== msg.author.id &&
-      !this.zephyr.config.moderators.includes(msg.author.id) &&
-      !this.zephyr.config.developers.includes(msg.author.id)
+      !Zephyr.config.moderators.includes(msg.author.id) &&
+      !Zephyr.config.developers.includes(msg.author.id)
     )
       throw new ZephyrError.PrivateProfileError(targetUser.tag);
 
@@ -119,7 +120,7 @@ export default class CardInventory extends BaseCommand {
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id && [`⏮`, `◀`, `▶`, `⏭`].includes(emoji.name);
 
-    const collector = new ReactionCollector(this.zephyr, sent, filter, {
+    const collector = new ReactionCollector(Zephyr, sent, filter, {
       time: 2 * 60 * 1000,
     });
 
@@ -150,7 +151,7 @@ export default class CardInventory extends BaseCommand {
         embed.setFooter(`Page ${page} of ${totalPages} • ${size} entries`);
         await editMessage(sent, embed);
 
-        if (checkPermission("manageMessages", msg.textChannel, this.zephyr))
+        if (checkPermission("manageMessages", msg.textChannel))
           await sent.removeReaction(emoji.name, userId);
       }
     );
@@ -171,7 +172,6 @@ export default class CardInventory extends BaseCommand {
 
     const cardDescriptions = await getDescriptions(
       cards,
-      this.zephyr,
       tags,
       showSubgroup,
       cardsInAlbum

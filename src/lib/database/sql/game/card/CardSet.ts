@@ -16,8 +16,7 @@ import { AlbumService } from "../../../services/game/AlbumService";
 
 export async function createNewUserCard(
   card: GameBaseCard,
-  profile: GameProfile,
-  zephyr: Zephyr
+  profile: GameProfile
 ): Promise<GameUserCard> {
   const chance = new Chance();
   const wear = chance.weighted(
@@ -36,7 +35,7 @@ export async function createNewUserCard(
         [card.id, issue, profile.discordId, wear, luck]
       )) as { insertId: number };
 
-      zephyr.incrementBaseCardSerialNumber(card);
+      Zephyr.incrementBaseCardSerialNumber(card);
 
       return await CardService.getUserCardById(query.insertId);
     } catch (e) {
@@ -79,10 +78,7 @@ export async function transferCardsToUser(
   return;
 }
 
-export async function burnCards(
-  cards: GameUserCard[],
-  zephyrId: string
-): Promise<void> {
+export async function burnCards(cards: GameUserCard[]): Promise<void> {
   for (let card of cards) {
     const refetchCard = await card.fetch();
 
@@ -96,7 +92,7 @@ export async function burnCards(
 
   await DB.query(
     `UPDATE user_card SET discord_id=?,tag_id=NULL WHERE id IN (?);`,
-    [zephyrId, cards.map((c) => c.id)]
+    [Zephyr.user.id, cards.map((c) => c.id)]
   );
   return;
 }

@@ -5,6 +5,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ShopError } from "../../../structures/error/ShopError";
 import { getItemById } from "../../../assets/Items";
 import { Stickers } from "../../../lib/cosmetics/Stickers";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ViewTags extends BaseCommand {
   id = `mandatory`;
@@ -19,7 +20,7 @@ export default class ViewTags extends BaseCommand {
     options: string[]
   ): Promise<void> {
     const targetPackName = options.join(` `)?.toLowerCase();
-    const prefix = this.zephyr.getPrefix(msg.guildID);
+    const prefix = Zephyr.getPrefix(msg.guildID);
 
     if (!targetPackName) throw new ShopError.InvalidPackNameError(prefix);
 

@@ -8,6 +8,7 @@ import { checkPermission } from "../../../lib/ZephyrUtils";
 import { ReactionCollector } from "eris-collector";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { escapeMarkdown } from "../../../lib/utility/text/TextUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class TopGroup extends BaseCommand {
   id = `emotion`;
@@ -25,25 +26,20 @@ export default class TopGroup extends BaseCommand {
     const groupRaw = options.join(" ").toLowerCase();
     if (!groupRaw) throw new ZephyrError.UnspecifiedGroupError();
 
-    const match = this.zephyr
-      .getCards()
-      .filter((c) => c.group && c.group.toLowerCase() === groupRaw)[0];
+    const match = Zephyr.getCards().filter(
+      (c) => c.group && c.group.toLowerCase() === groupRaw
+    )[0];
     if (!match || !match.group) throw new ZephyrError.InvalidGroupError();
 
     const group = match.group;
-    const ids = this.zephyr
-      .getCards()
+    const ids = Zephyr.getCards()
       .filter((c) => c.group === group)
       .map((c) => c.id);
 
     let page = 1;
-    const topCollectorCount = await CardService.getNumberOfTopCollectors(
-      ids,
-      this.zephyr
-    );
+    const topCollectorCount = await CardService.getNumberOfTopCollectors(ids);
     const topCollectors = await CardService.getTopCollectorsByBaseIds(
       ids,
-      this.zephyr,
       page
     );
 
@@ -71,7 +67,7 @@ export default class TopGroup extends BaseCommand {
 
     const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id;
-    const collector = new ReactionCollector(this.zephyr, board, filter, {
+    const collector = new ReactionCollector(Zephyr, board, filter, {
       time: 2 * 60 * 1000,
     });
     collector.on("error", async (e: Error) => {
@@ -89,7 +85,6 @@ export default class TopGroup extends BaseCommand {
 
         const newTopCollectors = await CardService.getTopCollectorsByBaseIds(
           ids,
-          this.zephyr,
           page
         );
         embed.setTitle(
@@ -105,7 +100,7 @@ export default class TopGroup extends BaseCommand {
         );
         await board.edit({ embed });
 
-        if (checkPermission("manageMessages", msg.textChannel, this.zephyr))
+        if (checkPermission("manageMessages", msg.textChannel))
           await board.removeReaction(emoji.name, userId);
       }
     );
@@ -120,7 +115,7 @@ export default class TopGroup extends BaseCommand {
     let description = "";
     const pad = `#${page * 10}`.length;
     for (let col of collectors) {
-      const user = await this.zephyr.fetchUser(col.discordId);
+      const user = await Zephyr.fetchUser(col.discordId);
       const profile = await ProfileService.getProfile(col.discordId);
       description += `\`${(
         `#` + (page * 10 - 10 + collectors.indexOf(col) + 1).toString()

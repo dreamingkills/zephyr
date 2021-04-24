@@ -5,6 +5,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { isDeveloper } from "../../../lib/ZephyrUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class Reminders extends BaseCommand {
   id = `elizabeth`;
@@ -18,7 +19,7 @@ export default class Reminders extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.reminders && !isDeveloper(msg.author, this.zephyr))
+    if (!Zephyr.flags.reminders && !isDeveloper(msg.author))
       throw new ZephyrError.ReminderFlagDisabledError();
 
     const subcommand = options[0]?.toLowerCase();

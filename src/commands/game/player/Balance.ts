@@ -4,6 +4,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class Balance extends BaseCommand {
   id = `spirit`;
@@ -23,7 +24,7 @@ export default class Balance extends BaseCommand {
     } else if (!isNaN(parseInt(options[0]))) {
       if (options[0].length < 17) throw new ZephyrError.InvalidSnowflakeError();
 
-      targetUser = await this.zephyr.fetchUser(options[0]);
+      targetUser = await Zephyr.fetchUser(options[0]);
       if (!targetUser) throw new ZephyrError.InvalidSnowflakeError();
 
       targetProfile = await ProfileService.getProfile(targetUser.id);
@@ -39,14 +40,14 @@ export default class Balance extends BaseCommand {
       .setTitle(`${targetUser.tag}'s balance`)
       .addFields([
         {
-          name: `${this.zephyr.config.discord.emoji.blank} Bits`,
+          name: `${Zephyr.config.discord.emoji.blank} Bits`,
           value: `${
-            this.zephyr.config.discord.emoji.bits
+            Zephyr.config.discord.emoji.bits
           } \`${targetProfile.bits.toLocaleString()}\``,
           inline: true,
         },
         {
-          name: `${this.zephyr.config.discord.emoji.blank} Cubits`,
+          name: `${Zephyr.config.discord.emoji.blank} Cubits`,
           value: `:package: \`${targetProfile.cubits.toLocaleString()}\``,
           inline: true,
         },

@@ -5,6 +5,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { BlacklistService } from "../../../lib/database/services/meta/BlacklistService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class BlacklistUser extends BaseCommand {
   id = `forgotten`;
@@ -26,7 +27,7 @@ export default class BlacklistUser extends BaseCommand {
     if (isNaN(parseInt(mention)) || mention.length < 16 || mention.length > 18)
       throw new ZephyrError.InvalidMentionError();
 
-    const target = await this.zephyr.fetchUser(mention);
+    const target = await Zephyr.fetchUser(mention);
 
     if (!target) throw new ZephyrError.UserNotFoundError();
 
@@ -65,9 +66,9 @@ export default class BlacklistUser extends BaseCommand {
 
     await this.send(msg.channel, embed);
 
-    if (this.zephyr.logChannel) {
+    if (Zephyr.logChannel) {
       await this.send(
-        this.zephyr.logChannel,
+        Zephyr.logChannel,
         `:lock: **${target.tag}** was blacklisted by **${msg.author.tag}**. Case ID: \`${blacklist.id}\``
       );
     }

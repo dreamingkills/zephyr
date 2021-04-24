@@ -16,6 +16,7 @@ import {
   CardSticker,
   GameCardSticker,
 } from "../../../../../structures/game/Sticker";
+import { Zephyr } from "../../../../../structures/client/Zephyr";
 
 export type WearSpread = {
   0: number;
@@ -186,25 +187,21 @@ export async function getUserCardById(id: number): Promise<GameUserCard> {
   return new GameUserCard(query[0]);
 }
 
-export async function getNumberOfTopCollectors(
-  ids: number[],
-  zephyrId: string
-): Promise<number> {
+export async function getNumberOfTopCollectors(ids: number[]): Promise<number> {
   const query = (await DB.query(
     `SELECT COUNT(*) as count FROM (SELECT COUNT(*) as count FROM user_card WHERE user_card.card_id IN (?) AND NOT user_card.discord_id=? GROUP BY user_card.discord_id HAVING COUNT(*)>0) AS total;`,
-    [ids, zephyrId]
+    [ids, Zephyr.user.id]
   )) as { count: number }[];
   return query[0].count;
 }
 
 export async function getTopCollectorsByBaseIds(
   ids: number[],
-  zephyrId: string,
   page: number
 ): Promise<{ discordId: string; amount: number }[]> {
   const query = (await DB.query(
     `SELECT user_card.discord_id, COUNT(*) as count FROM user_card WHERE user_card.card_id IN (?) AND NOT user_card.discord_id=? GROUP BY user_card.discord_id HAVING COUNT(*)>0 ORDER BY count DESC LIMIT 10 OFFSET ?;`,
-    [ids, zephyrId, page * 10 - 10]
+    [ids, Zephyr.user.id, page * 10 - 10]
   )) as {
     discord_id: string;
     count: number;
@@ -292,13 +289,10 @@ export async function getUntaggedCards(
   return query.map((c) => new GameUserCard(c));
 }
 
-export async function getTimesCardDestroyed(
-  id: number,
-  zephyrId: string
-): Promise<number> {
+export async function getTimesCardDestroyed(id: number): Promise<number> {
   const query = (await DB.query(
     `SELECT COUNT(*) AS count FROM user_card USE INDEX(PRIMARY) WHERE card_id=? AND discord_id=?;`,
-    [id, zephyrId]
+    [id, Zephyr.user.id]
   )) as { count: number }[];
   return query[0].count;
 }
@@ -322,13 +316,10 @@ export async function getAverageClaimTime(cardId: number): Promise<number> {
   return query[0].average;
 }
 
-export async function getCardWearSpread(
-  cardId: number,
-  zephyrId: string
-): Promise<WearSpread> {
+export async function getCardWearSpread(cardId: number): Promise<WearSpread> {
   const query = (await DB.query(
     `SELECT wear, COUNT(*) AS count FROM user_card WHERE card_id=? AND discord_id!=? GROUP BY wear;`,
-    [cardId, zephyrId]
+    [cardId, Zephyr.user.id]
   )) as { wear: number; count: number }[];
 
   return {

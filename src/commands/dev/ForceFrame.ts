@@ -21,11 +21,7 @@ export default class ForceFrame extends BaseCommand {
 
     const frameId = parseInt(options[1]);
 
-    const pic = await CardService.changeCardFrame(
-      userCard,
-      frameId,
-      this.zephyr
-    );
+    const pic = await CardService.changeCardFrame(userCard, frameId);
 
     await this.send(msg.channel, "OK", {
       files: [{ file: pic, name: "card.png" }],

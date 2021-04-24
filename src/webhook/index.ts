@@ -3,10 +3,10 @@ import { Logger } from "../lib/logger/Logger";
 import { Zephyr } from "../structures/client/Zephyr";
 
 export class WebhookListener {
-  public async init(zephyr: Zephyr) {
+  public async init() {
     const app = express();
-    const port = zephyr.config.topgg.webhook.port;
-    const auth = zephyr.config.topgg.webhook.auth;
+    const port = Zephyr.config.topgg.webhook.port;
+    const auth = Zephyr.config.topgg.webhook.auth;
 
     app.use(express.json());
     app.listen(port, () =>
@@ -39,7 +39,7 @@ export class WebhookListener {
 
       res.status(200).end();
 
-      await zephyr.handleVote(body.user, body.isWeekend);
+      await Zephyr.handleVote(body.user, body.isWeekend);
     });
   }
 }

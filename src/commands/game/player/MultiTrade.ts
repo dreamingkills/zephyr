@@ -11,6 +11,7 @@ import { renderMultitradeInventory } from "../../../lib/command/multitrade/Rende
 import { transferItems } from "../../../lib/command/multitrade/TransferItems";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class MultiTrade extends BaseCommand {
   id = `inhuman`;
@@ -18,7 +19,7 @@ export default class MultiTrade extends BaseCommand {
   description = `Initiates a multitrade.`;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!this.zephyr.flags.trades && !isDeveloper(msg.author, this.zephyr))
+    if (!Zephyr.flags.trades && !isDeveloper(msg.author))
       throw new ZephyrError.TradeFlagDisabledError();
 
     const targetUser = msg.mentions[0];
@@ -40,12 +41,10 @@ export default class MultiTrade extends BaseCommand {
     const requestConfirmed: boolean = await new Promise(async (res, _req) => {
       const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
         userId === targetUser.id && emoji.name === "☑";
-      const collector = new ReactionCollector(
-        this.zephyr,
-        tradeMessage,
-        filter,
-        { time: 15000, max: 1 }
-      );
+      const collector = new ReactionCollector(Zephyr, tradeMessage, filter, {
+        time: 15000,
+        max: 1,
+      });
       collector.on("error", (e: Error) => this.handleError(msg, msg.author, e));
 
       collector.on("collect", () => {
@@ -67,7 +66,7 @@ export default class MultiTrade extends BaseCommand {
       return;
     }
 
-    if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+    if (checkPermission(`manageMessages`, msg.channel))
       await tradeMessage.removeReactions();
 
     const tradeInterfaceEmbed = new MessageEmbed(
@@ -105,7 +104,7 @@ export default class MultiTrade extends BaseCommand {
       const messageFilter = (m: Message) =>
         [targetUser.id, msg.author.id].includes(m.author.id);
       const messageCollector = new MessageCollector(
-        this.zephyr,
+        Zephyr,
         msg.channel,
         messageFilter,
         { time: 300000 }
@@ -163,7 +162,7 @@ export default class MultiTrade extends BaseCommand {
         [targetUser.id, msg.author.id].includes(userId) &&
         ["❌", "🔒", "✅"].includes(emoji.name);
       const reactionCollector = new ReactionCollector(
-        this.zephyr,
+        Zephyr,
         tradeMessage,
         reactionFilter,
         {

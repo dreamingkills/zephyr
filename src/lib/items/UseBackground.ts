@@ -1,6 +1,5 @@
 import { Message } from "eris";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
-import { Zephyr } from "../../structures/client/Zephyr";
 import { GameProfile } from "../../structures/game/Profile";
 import { PrefabItem } from "../../structures/item/PrefabItem";
 import { ProfileService } from "../database/services/game/ProfileService";
@@ -13,8 +12,7 @@ export async function useBackground(
   msg: Message,
   profile: GameProfile,
   parameters: string[],
-  item: PrefabItem,
-  zephyr: Zephyr
+  item: PrefabItem
 ): Promise<void> {
   const albumName = parameters[0]?.toLowerCase();
   if (!albumName) throw new ZephyrError.InvalidAlbumNameError();
@@ -39,7 +37,7 @@ export async function useBackground(
     targetBackground.id
   );
 
-  const image = await AlbumService.updateAlbumCache(newAlbum, cards, 1, zephyr);
+  const image = await AlbumService.updateAlbumCache(newAlbum, cards, 1);
 
   await ProfileService.removeItems(profile, [{ item: item, count: 1 }]);
 

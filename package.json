@@ -15,7 +15,7 @@
     "color-name-list": "^7.27.0",
     "dayjs": "^1.9.6",
     "dblapi.js": "^2.4.1",
-    "eris": "0.13.4",
+    "eris": "0.15.0",
     "eris-collector": "^1.0.1",
     "express": "^4.17.1",
     "ffmpeg": "^0.0.4",

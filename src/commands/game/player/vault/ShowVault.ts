@@ -3,6 +3,7 @@ import { CardService } from "../../../../lib/database/services/game/CardService"
 import { ProfileService } from "../../../../lib/database/services/game/ProfileService";
 import { isValidSnowflake } from "../../../../lib/utility/text/TextUtils";
 import { MessageEmbed } from "../../../../structures/client/RichEmbed";
+import { Zephyr } from "../../../../structures/client/Zephyr";
 import { BaseCommand } from "../../../../structures/command/Command";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { GameProfile } from "../../../../structures/game/Profile";
@@ -19,14 +20,14 @@ export default class ShowVault extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    const prefix = this.zephyr.getPrefix(msg.guildID);
+    const prefix = Zephyr.getPrefix(msg.guildID);
     let targetProfile;
     let targetUser;
 
     if (
       options[0] &&
-      (this.zephyr.config.developers.includes(msg.author.id) ||
-        this.zephyr.config.moderators.includes(msg.author.id))
+      (Zephyr.config.developers.includes(msg.author.id) ||
+        Zephyr.config.moderators.includes(msg.author.id))
     ) {
       if (msg.mentions[0]) {
         targetUser = msg.mentions[0];
@@ -37,7 +38,7 @@ export default class ShowVault extends BaseCommand {
         if (!isValidSnowflake(userId))
           throw new ZephyrError.InvalidSnowflakeError();
 
-        const fetchUser = await this.zephyr.fetchUser(userId);
+        const fetchUser = await Zephyr.fetchUser(userId);
 
         if (!fetchUser) throw new ZephyrError.UserNotFoundError();
 

@@ -9,6 +9,7 @@ import { getTimeUntil } from "../../../lib/utility/time/TimeUtils";
 import { GuildService } from "../../../lib/database/services/guild/GuildService";
 import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { StatsD } from "../../../lib/StatsD";
+import { Zephyr } from "../../../structures/client/Zephyr";
 // import childProcess from "child_process";
 
 export default class DropCards extends BaseCommand {
@@ -19,39 +20,28 @@ export default class DropCards extends BaseCommand {
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     const timeStart = Date.now();
 
-    if (!this.zephyr.flags.drops && !isDeveloper(msg.author, this.zephyr))
+    if (!Zephyr.flags.drops && !isDeveloper(msg.author))
       throw new ZephyrError.DropFlagDisabledError();
 
-    const reactPermission = checkPermission(
-      `addReactions`,
-      msg.channel,
-      this.zephyr
-    );
+    const reactPermission = checkPermission(`addReactions`, msg.channel);
 
     if (!reactPermission) throw new ZephyrError.CannotReactError();
 
-    const attachPermission = checkPermission(
-      `attachFiles`,
-      msg.channel,
-      this.zephyr
-    );
+    const attachPermission = checkPermission(`attachFiles`, msg.channel);
 
     if (!attachPermission) throw new ZephyrError.CannotAttachFilesError();
 
     const dropChannel = await GuildService.getDropChannel(msg.guildID!);
 
-    if (
-      !dropChannel &&
-      !this.zephyr.config.developers.includes(msg.author.id)
-    ) {
-      const prefix = this.zephyr.getPrefix(msg.guildID);
+    if (!dropChannel && !Zephyr.config.developers.includes(msg.author.id)) {
+      const prefix = Zephyr.getPrefix(msg.guildID);
       throw new ZephyrError.UnsetZephyrChannelError(prefix);
     }
 
     if (
       msg.channel.id !== dropChannel &&
-      !this.zephyr.config.discord.secondaryChannels.includes(msg.channel.id) &&
-      !this.zephyr.config.developers.includes(msg.author.id)
+      !Zephyr.config.discord.secondaryChannels.includes(msg.channel.id) &&
+      !Zephyr.config.developers.includes(msg.author.id)
     )
       throw new ZephyrError.CannotDropInChannelError(dropChannel!);
 
@@ -75,19 +65,14 @@ export default class DropCards extends BaseCommand {
 
     const restricted = dayjs(msg.author.createdAt) > dayjs().subtract(7, `day`);
 
-    const cards = this.zephyr.getRandomCards(3, wishlist, boost, restricted);
+    const cards = Zephyr.getRandomCards(3, wishlist, boost, restricted);
 
     await ProfileService.setDropTimestamp(
       profile,
       dayjs(new Date()).add(30, "minute").format(`YYYY/MM/DD HH:mm:ss`)
     );
 
-    await CardSpawner.userDrop(
-      <TextChannel>msg.channel,
-      cards,
-      profile,
-      this.zephyr
-    );
+    await CardSpawner.userDrop(<TextChannel>msg.channel, cards, profile);
 
     const timeEnd = Date.now();
 

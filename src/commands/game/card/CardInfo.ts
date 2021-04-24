@@ -12,6 +12,7 @@ import {
   generateUserTag,
 } from "../../../lib/utility/text/TextUtils";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class CardInfo extends BaseCommand {
   id = `sickman`;
@@ -36,7 +37,7 @@ export default class CardInfo extends BaseCommand {
     if (
       card.vaulted &&
       card.discordId !== msg.author.id &&
-      !canBypass(msg.author, this.zephyr)
+      !canBypass(msg.author)
     )
       throw new ZephyrError.CardVaultedError(card);
 
@@ -57,38 +58,28 @@ export default class CardInfo extends BaseCommand {
     let dropperTag;
 
     if (claimInfo.claimer) {
-      const claimerUser = await this.zephyr.fetchUser(claimInfo.claimer);
+      const claimerUser = await Zephyr.fetchUser(claimInfo.claimer);
 
       if (claimerUser) {
         const claimerProfile = await ProfileService.getProfile(
           claimInfo.claimer
         );
 
-        claimerTag = generateUserTag(
-          msg.author,
-          claimerUser,
-          claimerProfile,
-          this.zephyr
-        );
+        claimerTag = generateUserTag(msg.author, claimerUser, claimerProfile);
       } else claimerTag = `Unknown User`;
     } else claimerTag = `Unknown User`;
 
     if (claimInfo.dropper) {
-      const dropperUser = await this.zephyr.fetchUser(claimInfo.dropper);
+      const dropperUser = await Zephyr.fetchUser(claimInfo.dropper);
 
       if (dropperUser) {
         const dropperProfile = await ProfileService.getProfile(dropperUser.id);
 
-        dropperTag = generateUserTag(
-          msg.author,
-          dropperUser,
-          dropperProfile,
-          this.zephyr
-        );
+        dropperTag = generateUserTag(msg.author, dropperUser, dropperProfile);
       } else dropperTag = `Unknown User`;
     } else dropperTag = "Server Activity";
 
-    const cardImage = await CardService.checkCacheForCard(card, this.zephyr);
+    const cardImage = await CardService.checkCacheForCard(card);
 
     const embed = new MessageEmbed(`Card Info`, msg.author)
       .setDescription(

@@ -1,4 +1,5 @@
 import { Message } from "eris";
+import { Zephyr } from "../../structures/client/Zephyr";
 import { BaseCommand } from "../../structures/command/Command";
 
 export default class RecacheCards extends BaseCommand {
@@ -7,11 +8,11 @@ export default class RecacheCards extends BaseCommand {
   developerOnly = true;
 
   async exec(msg: Message): Promise<void> {
-    await this.zephyr.cacheCards();
+    await Zephyr.cacheCards();
 
     await this.send(
       msg.channel,
-      `:white_check_mark: Cached **${this.zephyr.getCards().length}** cards.`
+      `:white_check_mark: Cached **${Zephyr.getCards().length}** cards.`
     );
     return;
   }

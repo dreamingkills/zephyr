@@ -1,8 +1,9 @@
 import canvas from "canvas";
 import { glob } from "glob";
 import { promisify } from "util";
-export class FontLoader {
-  static async init(): Promise<number> {
+
+class FontService {
+  async init(): Promise<number> {
     const globp = promisify(glob);
     const files = await globp(`./src/assets/fonts/*`);
     for (let file of files) {
@@ -11,3 +12,5 @@ export class FontLoader {
     return files.length;
   }
 }
+
+export const FontLoader = new FontService();

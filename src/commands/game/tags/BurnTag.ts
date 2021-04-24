@@ -12,6 +12,7 @@ import { PrefabItem } from "../../../structures/item/PrefabItem";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { GameUserCard } from "../../../structures/game/UserCard";
 import { isDeveloper } from "../../../lib/ZephyrUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class BurnTag extends BaseCommand {
   id = `refuse`;
@@ -25,7 +26,7 @@ export default class BurnTag extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.burns && !isDeveloper(msg.author, this.zephyr))
+    if (!Zephyr.flags.burns && !isDeveloper(msg.author))
       throw new ZephyrError.BurnFlagDisabledError();
 
     if (!options[0]) throw new ZephyrError.UnspecifiedBurnTagsError();
@@ -94,7 +95,7 @@ export default class BurnTag extends BaseCommand {
       }
     }
 
-    const descs = await getDescriptions(cards.slice(0, 5), this.zephyr, tags);
+    const descs = await getDescriptions(cards.slice(0, 5), tags);
     const excess = Math.max(cards.length - 5, 0);
 
     let description =
@@ -104,7 +105,7 @@ export default class BurnTag extends BaseCommand {
       descs.join("\n") +
       (excess > 0 ? `\n*... and ${excess.toLocaleString()} more ...*` : ``) +
       `\n\nYou will receive:` +
-      `\n:white_medium_small_square: ${this.zephyr.config.discord.emoji.bits} **${totalBitValue}**\n` +
+      `\n:white_medium_small_square: ${Zephyr.config.discord.emoji.bits} **${totalBitValue}**\n` +
       dustRewards
         .map(
           (r) =>
@@ -125,8 +126,8 @@ export default class BurnTag extends BaseCommand {
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
-      emoji.id === this.zephyr.config.discord.emojiId.check;
-    const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
+      emoji.id === Zephyr.config.discord.emojiId.check;
+    const collector = new ReactionCollector(Zephyr, confirmation, filter, {
       time: 30000,
       max: 1,
     });
@@ -144,7 +145,7 @@ export default class BurnTag extends BaseCommand {
       }
 
       // Give the card to the bot
-      await CardService.burnCards(profile, cards, this.zephyr);
+      await CardService.burnCards(profile, cards);
 
       // Give the user their dust
       await ProfileService.addItems(profile, dustRewards);
@@ -170,8 +171,8 @@ export default class BurnTag extends BaseCommand {
           embed: embed.setFooter(`🕒 This destruction has expired.`),
         });
         await confirmation.removeReaction(
-          `check:${this.zephyr.config.discord.emojiId.check}`,
-          this.zephyr.user.id
+          `check:${Zephyr.config.discord.emojiId.check}`,
+          Zephyr.user.id
         );
         return;
       }
@@ -179,7 +180,7 @@ export default class BurnTag extends BaseCommand {
 
     await this.react(
       confirmation,
-      `check:${this.zephyr.config.discord.emojiId.check}`
+      `check:${Zephyr.config.discord.emojiId.check}`
     );
     return;
   }

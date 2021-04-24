@@ -5,6 +5,7 @@ import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ViewAlbums extends BaseCommand {
   id = `crystallized`;
@@ -30,7 +31,7 @@ export default class ViewAlbums extends BaseCommand {
       targetUser = msg.author;
       albumQuery = options[0].toLowerCase();
     } else if (msg.mentions[0] && options[1]) {
-      targetUser = await this.zephyr.fetchUser(msg.mentions[0].id);
+      targetUser = await Zephyr.fetchUser(msg.mentions[0].id);
 
       if (!targetUser) throw new ZephyrError.InvalidMentionError();
 
@@ -42,7 +43,7 @@ export default class ViewAlbums extends BaseCommand {
       if (isNaN(parseInt(userId)) || userId.length < 17)
         throw new ZephyrError.InvalidSnowflakeError();
 
-      targetUser = await this.zephyr.fetchUser(userId);
+      targetUser = await Zephyr.fetchUser(userId);
 
       if (!targetUser) throw new ZephyrError.InvalidSnowflakeError();
 
@@ -62,8 +63,7 @@ export default class ViewAlbums extends BaseCommand {
     const image = await AlbumService.checkCacheForAlbum(
       targetAlbum,
       albumCards.slice(page * 8 - 8, page * 8),
-      1,
-      this.zephyr
+      1
     );
 
     const embed = new MessageEmbed(`Album`, msg.author)

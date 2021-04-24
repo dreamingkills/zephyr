@@ -3,6 +3,7 @@ import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 import * as ZephyrError from "../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
+import { Zephyr } from "../../structures/client/Zephyr";
 
 export default class SetFlag extends BaseCommand {
   names = [`setflag`];
@@ -19,7 +20,7 @@ export default class SetFlag extends BaseCommand {
     if (!options[1] || ![`true`, `false`].includes(options[1].toLowerCase()))
       throw new ZephyrError.InvalidFlagValueError();
 
-    const flags = this.zephyr.flags;
+    const flags = Zephyr.flags;
 
     const flagName = options[0];
     const flagValue = options[1].toLowerCase();

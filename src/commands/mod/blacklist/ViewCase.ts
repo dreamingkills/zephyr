@@ -6,6 +6,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { BlacklistService } from "../../../lib/database/services/meta/BlacklistService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import dayjs from "dayjs";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ViewCase extends BaseCommand {
   id = `escape`;
@@ -28,12 +29,12 @@ export default class ViewCase extends BaseCommand {
 
     const blacklist = await BlacklistService.getBlacklistById(caseId);
 
-    const blacklistee = await this.zephyr.fetchUser(blacklist.discordId);
+    const blacklistee = await Zephyr.fetchUser(blacklist.discordId);
     const blacklisteeProfile = await ProfileService.getProfile(
       blacklist.discordId
     );
 
-    const moderator = await this.zephyr.fetchUser(blacklist.moderator);
+    const moderator = await Zephyr.fetchUser(blacklist.moderator);
 
     // no reason to do this as far as I can tell
     /*const moderatorProfile = await ProfileService.getProfile(
@@ -47,7 +48,7 @@ export default class ViewCase extends BaseCommand {
     let quasher;
 
     if (!blacklist.active) {
-      const quasherUser = await this.zephyr.fetchUser(blacklist.quasher);
+      const quasherUser = await Zephyr.fetchUser(blacklist.quasher);
 
       quasher = quasherUser?.tag || blacklist.quasher;
     }

@@ -7,6 +7,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { GameDye } from "../../../structures/game/Dye";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 import { ReactionCollector } from "eris-collector";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ViewDyes extends BaseCommand {
   id = `untitled`;
@@ -26,7 +27,7 @@ export default class ViewDyes extends BaseCommand {
     } else if (!isNaN(parseInt(options[0]))) {
       if (options[0].length < 17) throw new ZephyrError.InvalidSnowflakeError();
 
-      const fetch = await this.zephyr.fetchUser(options[0]);
+      const fetch = await Zephyr.fetchUser(options[0]);
 
       if (!fetch) throw new ZephyrError.UserNotFoundError();
 
@@ -63,7 +64,7 @@ export default class ViewDyes extends BaseCommand {
       const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
         userId === msg.author.id;
 
-      const collector = new ReactionCollector(this.zephyr, sent, filter, {
+      const collector = new ReactionCollector(Zephyr, sent, filter, {
         time: 2 * 60 * 1000,
       });
 
@@ -91,7 +92,7 @@ export default class ViewDyes extends BaseCommand {
 
           await sent.edit({ embed });
 
-          if (checkPermission("manageMessages", msg.channel, this.zephyr))
+          if (checkPermission("manageMessages", msg.channel))
             await sent.removeReaction(emoji.name, userId);
         }
       );

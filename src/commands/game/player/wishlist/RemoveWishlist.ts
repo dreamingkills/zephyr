@@ -8,6 +8,7 @@ import { MessageCollector } from "eris-collector";
 import { GameIdol } from "../../../../structures/game/Idol";
 import { getGroupsByIdolId } from "../../../../lib/utility/text/TextUtils";
 import { WishlistError } from "../../../../structures/error/WishlistError";
+import { Zephyr } from "../../../../structures/client/Zephyr";
 
 export default class RemoveWishlist extends BaseCommand {
   id = `combat`;
@@ -24,7 +25,7 @@ export default class RemoveWishlist extends BaseCommand {
     const wishlist = await ProfileService.getWishlist(profile);
 
     if (wishlist.length === 0) {
-      const prefix = this.zephyr.getPrefix(msg.guildID);
+      const prefix = Zephyr.getPrefix(msg.guildID);
       throw new WishlistError.WishlistEmptyError(prefix);
     }
 
@@ -34,10 +35,9 @@ export default class RemoveWishlist extends BaseCommand {
 
     const matches: GameIdol[] = [];
 
-    this.zephyr
-      .getCards()
+    Zephyr.getCards()
       .filter((c) => `${c.group} ${c.name}`.toLowerCase().includes(nameQuery))
-      .map((c) => this.zephyr.getIdol(c.idolId))
+      .map((c) => Zephyr.getIdol(c.idolId))
       .filter((c) => c)
       .forEach((c) => {
         if (!matches.find((m) => m.id === c!.id)) matches.push(c!);
@@ -65,7 +65,7 @@ export default class RemoveWishlist extends BaseCommand {
       ).setDescription(
         `I found multiple matches for \`${nameQuery}\`.\nPlease choose a number corresponding to the desired idol.\n${matches
           .map((u, index) => {
-            const groups = getGroupsByIdolId(u.id, this.zephyr.getCards());
+            const groups = getGroupsByIdolId(u.id, Zephyr.getCards());
 
             return `— \`${index + 1}\` **${u.name}**${
               groups.length === 0 ? `` : ` (${groups.join(`, `)})`
@@ -82,15 +82,10 @@ export default class RemoveWishlist extends BaseCommand {
             matches[parseInt(m.content, 10) - 1] &&
             m.author.id === msg.author.id;
 
-          const collector = new MessageCollector(
-            this.zephyr,
-            msg.channel,
-            filter,
-            {
-              time: 30000,
-              max: 1,
-            }
-          );
+          const collector = new MessageCollector(Zephyr, msg.channel, filter, {
+            time: 30000,
+            max: 1,
+          });
 
           collector.on("error", async (e: Error) => {
             await this.handleError(msg, msg.author, e);
@@ -123,7 +118,7 @@ export default class RemoveWishlist extends BaseCommand {
 
     const exists = wishlist.find((wl) => wl.idolId === removalTarget.id);
 
-    const groups = getGroupsByIdolId(removalTarget.id, this.zephyr.getCards());
+    const groups = getGroupsByIdolId(removalTarget.id, Zephyr.getCards());
 
     if (!exists) throw new WishlistError.IdolNotOnWishlistError();
 

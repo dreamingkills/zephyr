@@ -11,8 +11,7 @@ export abstract class AutotagService {
   public static async autotag(
     profile: GameProfile,
     tags: GameTag[],
-    card: GameUserCard,
-    zephyr: Zephyr
+    card: GameUserCard
   ): Promise<{ tag: number | undefined }> {
     if (tags.length < 1) return { tag: undefined };
 
@@ -22,7 +21,7 @@ export abstract class AutotagService {
 
     if (autotags.length < 1) return { tag: undefined };
 
-    const baseCard = zephyr.getCard(card.baseCardId);
+    const baseCard = Zephyr.getCard(card.baseCardId);
 
     if (!baseCard) return { tag: undefined };
 

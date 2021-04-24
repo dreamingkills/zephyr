@@ -7,6 +7,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BadgeService } from "../../../lib/database/services/game/BadgeService";
 import dayjs from "dayjs";
 import { dateTimeDisplay } from "../../../lib/utility/time/TimeUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ShowBadges extends BaseCommand {
   id = `fly`;
@@ -29,7 +30,7 @@ export default class ShowBadges extends BaseCommand {
       !isNaN(parseInt(options[0])) &&
       [17, 18].includes(options[0].length)
     ) {
-      const fetchUser = await this.zephyr.fetchUser(options[0]);
+      const fetchUser = await Zephyr.fetchUser(options[0]);
 
       if (!fetchUser) throw new ZephyrError.UserNotFoundError();
 

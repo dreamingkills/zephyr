@@ -19,4 +19,4 @@ Object.defineProperty(Eris.Message.prototype, "textChannel", {
 
 events.captureRejections = true;
 
-Promise.all([DB.connect(), FontLoader.init()]).then(() => new Zephyr().start());
+Promise.all([DB.connect(), FontLoader.init()]).then(() => Zephyr.start());

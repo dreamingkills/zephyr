@@ -1,4 +1,3 @@
-import { Zephyr } from "../../structures/client/Zephyr";
 import { PrefabItem } from "../../structures/item/PrefabItem";
 import * as ZephyrError from "../../structures/error/ZephyrError";
 import { Message } from "eris";
@@ -13,13 +12,13 @@ import { AlbumService } from "../database/services/game/AlbumService";
 import { deleteMessage } from "../discord/message/deleteMessage";
 import { Stickers } from "../cosmetics/Stickers";
 import { Logger } from "../logger/Logger";
+import { Zephyr } from "../../structures/client/Zephyr";
 
 export async function useSticker(
   msg: Message,
   profile: GameProfile,
   parameters: string[],
-  item: PrefabItem,
-  zephyr: Zephyr
+  item: PrefabItem
 ): Promise<void> {
   const targetSticker = Stickers.getStickerByItemId(item.id);
 
@@ -40,7 +39,7 @@ export async function useSticker(
   if (cardStickers.length >= 3)
     throw new ZephyrError.TooManyStickersError(card);
 
-  const preview = await CardService.generateStickerPreview(card, zephyr);
+  const preview = await CardService.generateStickerPreview(card);
 
   const embed = new MessageEmbed(`Add Sticker`, msg.author)
     .setDescription(
@@ -64,7 +63,7 @@ export async function useSticker(
       parseInt(m.content) <= 20 &&
       m.author.id === msg.author.id;
 
-    const collector = new MessageCollector(zephyr, msg.channel, filter, {
+    const collector = new MessageCollector(Zephyr, msg.channel, filter, {
       time: 30000,
       max: 1,
     });
@@ -103,7 +102,7 @@ export async function useSticker(
     targetSticker,
     position
   );
-  const newCard = await CardService.updateCardCache(addedSticker, zephyr);
+  const newCard = await CardService.updateCardCache(addedSticker);
 
   const successEmbed = new MessageEmbed(`Add Sticker`, msg.author)
     .setDescription(

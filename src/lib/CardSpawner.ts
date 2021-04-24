@@ -5,7 +5,6 @@ import { GameProfile } from "../structures/game/Profile";
 import { ProfileService } from "./database/services/game/ProfileService";
 import { GameUserCard, MockUserCard } from "../structures/game/UserCard";
 import { Chance } from "chance";
-import { Zephyr } from "../structures/client/Zephyr";
 import { getTimeUntil } from "../lib/utility/time/TimeUtils";
 import dayjs from "dayjs";
 import { GuildService } from "./database/services/guild/GuildService";
@@ -18,22 +17,22 @@ import { AutotagService } from "./database/services/game/AutotagService";
 import { deleteMessage } from "./discord/message/deleteMessage";
 import { Frames } from "./cosmetics/Frames";
 import { Logger } from "./logger/Logger";
+import { Zephyr } from "../structures/client/Zephyr";
 
-export abstract class CardSpawner {
-  private static readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
-  private static readonly timeout = 5000;
-  private static readonly minSpawnThreshold = 250;
-  private static readonly spawnThreshold = CardSpawner.minSpawnThreshold * 2;
-  private static guildLevels: { [key: string]: number } = {};
-  private static grabbing: Set<string> = new Set();
+class DropHandler {
+  private readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
+  private readonly timeout = 5000;
+  private readonly minSpawnThreshold = 250;
+  private readonly spawnThreshold = this.minSpawnThreshold * 2;
+  private guildLevels: { [key: string]: number } = {};
+  private grabbing: Set<string> = new Set();
 
-  static userCooldowns: Set<string> = new Set();
-  static guildCooldowns: Set<string> = new Set();
+  userCooldowns: Set<string> = new Set();
+  guildCooldowns: Set<string> = new Set();
 
-  private static async fight(
+  private async fight(
     takers: Set<string>,
     card: MockUserCard,
-    zephyr: Zephyr,
     prefer?: GameProfile
   ): Promise<{ winner: GameProfile; card: GameUserCard }> {
     let winner;
@@ -44,20 +43,15 @@ export abstract class CardSpawner {
       winner = await ProfileService.getProfile(winnerId);
     }
 
-    const newCard = await CardService.createNewUserCard(
-      card.baseCard,
-      winner,
-      zephyr
-    );
+    const newCard = await CardService.createNewUserCard(card.baseCard, winner);
 
     return { winner, card: newCard };
   }
 
-  private static async dropCards(
+  private async dropCards(
     title: string,
     channel: TextChannel,
     cards: GameBaseCard[],
-    zephyr: Zephyr,
     prefer?: GameProfile
   ): Promise<void> {
     const start = Date.now();
@@ -130,7 +124,7 @@ export abstract class CardSpawner {
         const until = dayjs(profile.claimNext);
         if (until > now && !winners.has(profile.discordId)) {
           // Don't warn people more than once -- anti-spam
-          if (zephyr.flags.claimAlerts) {
+          if (Zephyr.flags.claimAlerts) {
             if (!warned.has(profile.discordId)) {
               await createMessage(
                 channel,
@@ -165,7 +159,6 @@ export abstract class CardSpawner {
           const fight = await this.fight(
             takers[num],
             droppedCards[num],
-            zephyr,
             prefer
           );
           winners.add(fight.winner.discordId);
@@ -201,7 +194,7 @@ export abstract class CardSpawner {
             } and claimed `;
           }
 
-          const baseCard = zephyr.getCard(fight.card.baseCardId)!;
+          const baseCard = Zephyr.getCard(fight.card.baseCardId)!;
 
           message +=
             `\`${fight.card.id.toString(36)}\` **${baseCard.name}**` +
@@ -244,8 +237,7 @@ export abstract class CardSpawner {
             const autotag = await AutotagService.autotag(
               fight.winner,
               tags,
-              fight.card,
-              zephyr
+              fight.card
             );
 
             if (autotag.tag) {
@@ -290,48 +282,40 @@ export abstract class CardSpawner {
     return;
   }
 
-  public static async forceDrop(
+  public async forceDrop(
     channel: TextChannel,
-    cards: GameBaseCard[],
-    zephyr: Zephyr
+    cards: GameBaseCard[]
   ): Promise<void> {
     return await this.dropCards(
       `— **${cards.length} cards** are dropping due to server activity!\n**NOTICE**: You need to manually react :one:, :two:, or :three: temporarily due to poor performance.`,
       channel,
-      cards,
-      zephyr
+      cards
     );
   }
 
-  public static async userDrop(
+  public async userDrop(
     channel: TextChannel,
     cards: GameBaseCard[],
-    profile: GameProfile,
-    zephyr: Zephyr
+    profile: GameProfile
   ): Promise<void> {
     return await this.dropCards(
       `— <@${profile.discordId}> is dropping **${cards.length} cards**!\n**NOTICE**: You need to manually react :one:, :two:, or :three: temporarily due to poor performance.`,
       channel,
       cards,
-      zephyr,
       profile
     );
   }
 
-  public static async activityDrop(
-    channel: TextChannel,
-    zephyr: Zephyr
-  ): Promise<void> {
-    const cards = zephyr.getRandomCards(3);
+  public async activityDrop(channel: TextChannel): Promise<void> {
+    const cards = Zephyr.getRandomCards(3);
     await this.dropCards(
       "— **3 cards** are dropping due to server activity!\n**NOTICE**: You need to manually react :one:, :two:, or :three: temporarily due to poor performance.",
       channel,
-      cards,
-      zephyr
+      cards
     );
   }
 
-  public static async processMessage(guild: Guild, user: User, zephyr: Zephyr) {
+  public async processMessage(guild: Guild, user: User) {
     if (this.userCooldowns.has(user.id) || this.guildCooldowns.has(guild.id))
       // If they're on cooldown, ignore.
       return;
@@ -368,15 +352,13 @@ export abstract class CardSpawner {
         (c) => c.id === channelId
       ) as TextChannel;
 
-      const reactPermission = checkPermission(`addReactions`, channel, zephyr);
-      const messagePermission = checkPermission(
-        `addReactions`,
-        channel,
-        zephyr
-      );
+      const reactPermission = checkPermission(`addReactions`, channel);
+      const messagePermission = checkPermission(`addReactions`, channel);
       if (!reactPermission || !messagePermission) return;
 
-      if (zephyr.flags.drops) await this.activityDrop(channel, zephyr);
+      if (Zephyr.flags.drops) await this.activityDrop(channel);
     }
   }
 }
+
+export const CardSpawner = new DropHandler();

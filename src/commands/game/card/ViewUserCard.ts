@@ -12,6 +12,7 @@ import {
 } from "../../../lib/utility/text/TextUtils";
 import { rgbToHex } from "../../../lib/utility/color/ColorUtils";
 import { checkPermission } from "../../../lib/ZephyrUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ViewUserCard extends BaseCommand {
   id = `confusion`;
@@ -26,16 +27,12 @@ export default class ViewUserCard extends BaseCommand {
     options: string[]
   ): Promise<void> {
     if (
-      msg.channel.id === this.zephyr.config.discord.main &&
-      !this.zephyr.flags.mainViewing
+      msg.channel.id === Zephyr.config.discord.main &&
+      !Zephyr.flags.mainViewing
     )
       throw new ZephyrError.MainViewingFlagDisabledError();
 
-    const attachPermission = checkPermission(
-      `attachFiles`,
-      msg.channel,
-      this.zephyr
-    );
+    const attachPermission = checkPermission(`attachFiles`, msg.channel);
 
     if (!attachPermission && msg.channel.type !== 1)
       throw new ZephyrError.CannotAttachFilesError();
@@ -48,13 +45,13 @@ export default class ViewUserCard extends BaseCommand {
       card = await CardService.getLastCard(profile);
     } else card = await CardService.getUserCardByIdentifier(rawIdentifier);
 
-    if (card.discordId === this.zephyr.user.id)
+    if (card.discordId === Zephyr.user.id)
       throw new ZephyrError.CardBurnedError(card);
 
     if (
       card.vaulted &&
       card.discordId !== msg.author.id &&
-      !canBypass(msg.author, this.zephyr)
+      !canBypass(msg.author)
     )
       throw new ZephyrError.CardVaultedError(card);
 
@@ -63,29 +60,22 @@ export default class ViewUserCard extends BaseCommand {
       targetProfile = await ProfileService.getProfile(card.discordId);
     } else targetProfile = profile;
 
-    const targetUser = await this.zephyr.fetchUser(targetProfile.discordId);
+    const targetUser = await Zephyr.fetchUser(targetProfile.discordId);
 
-    const baseCard = this.zephyr.getCard(card.baseCardId)!;
+    const baseCard = Zephyr.getCard(card.baseCardId)!;
     let image: Buffer;
 
     if (noText) {
       image = await CardService.generateCardImage(
         card,
-        this.zephyr,
         noText,
         profile.patron > 1
       );
     } else
-      image = await CardService.checkCacheForCard(
-        card,
-        this.zephyr,
-        profile.patron > 1
-      );
+      image = await CardService.checkCacheForCard(card, profile.patron > 1);
 
     const userTags = await ProfileService.getTags(targetProfile);
-    const cardDescription = (
-      await getDescriptions([card], this.zephyr, userTags)
-    )[0];
+    const cardDescription = (await getDescriptions([card], userTags))[0];
 
     const embed = new MessageEmbed(`View Card`, msg.author)
       .setDescription(
@@ -95,8 +85,7 @@ export default class ViewUserCard extends BaseCommand {
           `\nOwner: **${generateUserTag(
             msg.author,
             targetUser,
-            targetProfile,
-            this.zephyr
+            targetProfile
           )}**`
       )
       .setImage(`attachment://card.png`);

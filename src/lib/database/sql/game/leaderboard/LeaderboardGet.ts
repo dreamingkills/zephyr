@@ -1,4 +1,5 @@
 import { DB } from "../../..";
+import { Zephyr } from "../../../../../structures/client/Zephyr";
 import { GameProfile, Profile } from "../../../../../structures/game/Profile";
 
 export async function getBitLeaderboardCount(): Promise<number> {
@@ -35,24 +36,21 @@ export async function getDailyStreakLeaderboard(
   return query.map((p) => new GameProfile(p));
 }
 
-export async function getCardLeaderboardCount(
-  zephyrId: string
-): Promise<number> {
+export async function getCardLeaderboardCount(): Promise<number> {
   const query = (await DB.query(
     `SELECT COUNT(*) AS count FROM (SELECT profile.*, COUNT(*) AS count FROM profile LEFT JOIN user_card ON user_card.discord_id=profile.discord_id WHERE blacklisted=0 AND user_card.discord_id!=? GROUP BY profile.discord_id) q;`,
-    [zephyrId]
+    [Zephyr.user.id]
   )) as { count: number }[];
   return query[0].count;
 }
 
 export async function getCardLeaderboard(
-  page: number,
-  zephyrId: string
+  page: number
 ): Promise<{ profile: GameProfile; count: number }[]> {
   const offset = page * 10 - 10;
   const query = (await DB.query(
     `SELECT profile.*, COUNT(*) as count FROM profile LEFT JOIN user_card ON user_card.discord_id=profile.discord_id WHERE blacklisted=0 AND user_card.discord_id!=? GROUP BY profile.discord_id ORDER BY count DESC, user_card.discord_id LIMIT ? OFFSET ?;`,
-    [zephyrId, 10, offset]
+    [Zephyr.user.id, 10, offset]
   )) as (Profile & { count: number })[];
   return query.map((p) => {
     return { profile: new GameProfile(p), count: p.count };

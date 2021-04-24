@@ -7,6 +7,7 @@ import { ReactionCollector } from "eris-collector";
 import { GameItem } from "../../../structures/game/Item";
 import { checkPermission } from "../../../lib/ZephyrUtils";
 import { getItemById } from "../../../assets/Items";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ItemInventory extends BaseCommand {
   id = `ritual`;
@@ -20,7 +21,7 @@ export default class ItemInventory extends BaseCommand {
     const totalItems = await ProfileService.getNumberOfItems(profile);
     const maxPage = Math.ceil(totalItems / 10) || 1;
 
-    const prefix = this.zephyr.getPrefix(msg.guildID!);
+    const prefix = Zephyr.getPrefix(msg.guildID!);
     const embed = new MessageEmbed(`Items`, msg.author)
       .setTitle(`${msg.author.tag}'s items`)
       .setDescription(this.renderInventory(inventory, prefix))
@@ -32,7 +33,7 @@ export default class ItemInventory extends BaseCommand {
     if (maxPage > 1) {
       const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
         userId === msg.author.id;
-      const collector = new ReactionCollector(this.zephyr, sent, filter, {
+      const collector = new ReactionCollector(Zephyr, sent, filter, {
         time: 2 * 60 * 1000,
       });
       collector.on("error", async (e: Error) => {
@@ -53,7 +54,7 @@ export default class ItemInventory extends BaseCommand {
           embed.setFooter(`Page ${page} of ${maxPage} • ${totalItems} entries`);
           await sent.edit({ embed });
 
-          if (checkPermission("manageMessages", msg.channel, this.zephyr))
+          if (checkPermission("manageMessages", msg.channel))
             await sent.removeReaction(emoji.name, userId);
         }
       );

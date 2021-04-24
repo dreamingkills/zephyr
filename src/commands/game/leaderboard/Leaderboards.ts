@@ -5,8 +5,8 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { ReactionCollector } from "eris-collector";
 import { checkPermission } from "../../../lib/ZephyrUtils";
-import { Zephyr } from "../../../structures/client/Zephyr";
 import { escapeMarkdown } from "../../../lib/utility/text/TextUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class Leaderboards extends BaseCommand {
   id = `technologic`;
@@ -41,9 +41,7 @@ export default class Leaderboards extends BaseCommand {
       title = `Top players by daily streak length`;
     } else if (["cards", "c", "card"].includes(boardType)) {
       trueType = "cards";
-      totalEntries = await LeaderboardService.getCardLeaderboardCount(
-        this.zephyr
-      );
+      totalEntries = await LeaderboardService.getCardLeaderboardCount();
       title = `Top players by card collection`;
     } else if (["cubits", "cubit"].includes(boardType)) {
       trueType = "cubits";
@@ -70,7 +68,7 @@ export default class Leaderboards extends BaseCommand {
         })`
     );
     embed.setDescription(
-      await this.getLeaderboard(trueType, page, msg.author.id, this.zephyr)
+      await this.getLeaderboard(trueType, page, msg.author.id)
     );
     embed.setFooter(`Page ${page} of ${totalPages} • ${totalEntries} entries`);
     const board = await this.send(msg.channel, embed);
@@ -83,7 +81,7 @@ export default class Leaderboards extends BaseCommand {
 
     const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id;
-    const collector = new ReactionCollector(this.zephyr, board, filter, {
+    const collector = new ReactionCollector(Zephyr, board, filter, {
       time: 2 * 60 * 1000,
     });
     collector.on("error", async (e: Error) => {
@@ -106,14 +104,14 @@ export default class Leaderboards extends BaseCommand {
             })`
         );
         embed.setDescription(
-          await this.getLeaderboard(trueType, page, msg.author.id, this.zephyr)
+          await this.getLeaderboard(trueType, page, msg.author.id)
         );
         embed.setFooter(
           `Page ${page} of ${totalPages} • ${totalEntries} entries`
         );
         await board.edit({ embed });
 
-        if (checkPermission("manageMessages", msg.textChannel, this.zephyr)) {
+        if (checkPermission("manageMessages", msg.textChannel)) {
           await board.removeReaction(emoji.name, userId);
         }
       }
@@ -124,15 +122,14 @@ export default class Leaderboards extends BaseCommand {
   private async getLeaderboard(
     type: string,
     page: number,
-    authorId: string,
-    zephyr: Zephyr
+    authorId: string
   ): Promise<string> {
     let leaderboard = "";
     switch (type) {
       case "bits": {
         const board = await LeaderboardService.getBitLeaderboard(page);
         for (let profile of board) {
-          const user = await this.zephyr.fetchUser(profile.discordId);
+          const user = await Zephyr.fetchUser(profile.discordId);
           leaderboard += `\`#${
             board.indexOf(profile) + 1 + (page * 10 - 10)
           }\` `;
@@ -141,7 +138,7 @@ export default class Leaderboards extends BaseCommand {
           } else
             leaderboard += user ? escapeMarkdown(user.tag) : `*Unknown User*`;
           leaderboard += ` — ${
-            this.zephyr.config.discord.emoji.bits
+            Zephyr.config.discord.emoji.bits
           }**${profile.bits.toLocaleString()}**\n`;
         }
         break;
@@ -149,7 +146,7 @@ export default class Leaderboards extends BaseCommand {
       case "daily": {
         const board = await LeaderboardService.getDailyStreakLeaderboard(page);
         for (let profile of board) {
-          const user = await this.zephyr.fetchUser(profile.discordId);
+          const user = await Zephyr.fetchUser(profile.discordId);
           leaderboard += `\`#${
             board.indexOf(profile) + 1 + (page * 10 - 10)
           }\` `;
@@ -162,12 +159,9 @@ export default class Leaderboards extends BaseCommand {
         break;
       }
       case "cards": {
-        const board = await LeaderboardService.getCardLeaderboard(
-          page,
-          zephyr.user.id
-        );
+        const board = await LeaderboardService.getCardLeaderboard(page);
         for (let entry of board) {
-          const user = await this.zephyr.fetchUser(entry.profile.discordId);
+          const user = await Zephyr.fetchUser(entry.profile.discordId);
           leaderboard += `\`#${board.indexOf(entry) + 1 + (page * 10 - 10)}\` `;
           if (entry.profile.private && entry.profile.discordId !== authorId) {
             leaderboard += `*Private User*`;
@@ -180,7 +174,7 @@ export default class Leaderboards extends BaseCommand {
       case "cubits": {
         const board = await LeaderboardService.getCubitLeaderboard(page);
         for (let profile of board) {
-          const user = await this.zephyr.fetchUser(profile.discordId);
+          const user = await Zephyr.fetchUser(profile.discordId);
           leaderboard += `\`#${
             board.indexOf(profile) + 1 + (page * 10 - 10)
           }\` `;

@@ -3,6 +3,7 @@ import { Message } from "eris";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { getTimeUntil } from "../../../lib/utility/time/TimeUtils";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { Zephyr } from "../../../structures/client/Zephyr";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 export default class Cooldowns extends BaseCommand {
@@ -12,7 +13,7 @@ export default class Cooldowns extends BaseCommand {
   allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    const prefix = this.zephyr.getPrefix(msg.guildID);
+    const prefix = Zephyr.getPrefix(msg.guildID);
 
     const today = dayjs(Date.now());
     const todayFormat = today.format(`YYYY-MM-DD`);
@@ -43,7 +44,7 @@ export default class Cooldowns extends BaseCommand {
         await ProfileService.clearBooster(profile);
       } else {
         const timeUntilExpiration = getTimeUntil(now, expiry);
-        const group = this.zephyr.getGroupById(profile.boosterGroup);
+        const group = Zephyr.getGroupById(profile.boosterGroup);
 
         timerString += `\nYou have __${timeUntilExpiration}__ remaining on your boost for **${group}**.`;
       }

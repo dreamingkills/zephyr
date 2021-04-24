@@ -1,5 +1,6 @@
 import { Message } from "eris";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
+import { Zephyr } from "../../structures/client/Zephyr";
 import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 
@@ -21,7 +22,7 @@ export default class Rules extends BaseCommand {
 
     const embed = new MessageEmbed(`Rules`, msg.author).setDescription(rules);
 
-    const prefix = this.zephyr.getPrefix(msg.guildID);
+    const prefix = Zephyr.getPrefix(msg.guildID);
     embed.setFooter(
       `See "${prefix}help rules" to view the rules in other languages.`
     );

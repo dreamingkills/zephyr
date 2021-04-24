@@ -4,6 +4,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ViewTags extends BaseCommand {
   id = `campfire`;
@@ -26,7 +27,7 @@ export default class ViewTags extends BaseCommand {
       if (options[0].length < 17 || options[0].length > 18)
         throw new ZephyrError.InvalidSnowflakeError();
 
-      const fetchUser = await this.zephyr.fetchUser(options[0]);
+      const fetchUser = await Zephyr.fetchUser(options[0]);
       if (!fetchUser) throw new ZephyrError.UserNotFoundError();
 
       targetUser = fetchUser;
@@ -49,7 +50,7 @@ export default class ViewTags extends BaseCommand {
 
     if (userTags.length === 0) {
       if (targetUser.id === msg.author.id) {
-        const prefix = this.zephyr.getPrefix(msg.guildID);
+        const prefix = Zephyr.getPrefix(msg.guildID);
         embed.setDescription(
           `You have no tags!\nUse \`${prefix}createtag <tag name> <emoji>\` to make one.`
         );

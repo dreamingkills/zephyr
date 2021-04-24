@@ -3,6 +3,7 @@ import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
 import * as ZephyrError from "../../structures/error/ZephyrError";
+import { Zephyr } from "../../structures/client/Zephyr";
 
 export default class Help extends BaseCommand {
   id = `orion`;
@@ -18,11 +19,11 @@ export default class Help extends BaseCommand {
   ): Promise<void> {
     let prefix: string;
     if (msg.guildID) {
-      const guild = this.zephyr.guilds.get(msg.guildID!);
-      prefix = this.zephyr.getPrefix(guild!.id);
+      const guild = Zephyr.guilds.get(msg.guildID!);
+      prefix = Zephyr.getPrefix(guild!.id);
     } else prefix = ".";
 
-    const commands = this.zephyr.commandLib.commands;
+    const commands = Zephyr.commandLib.commands;
     const query = options[0]?.toLowerCase();
 
     if (query) {
@@ -68,7 +69,7 @@ export default class Help extends BaseCommand {
           description
         );
 
-        if (this.zephyr.config.developers.includes(msg.author.id)) {
+        if (Zephyr.config.developers.includes(msg.author.id)) {
           embed.setFooter(`Command ID: ${findCommand.id || `none`}`);
         }
 

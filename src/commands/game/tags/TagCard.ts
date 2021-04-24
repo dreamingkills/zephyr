@@ -6,6 +6,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { GameUserCard } from "../../../structures/game/UserCard";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class TagCard extends BaseCommand {
   id = `zeitgeist`;
@@ -24,7 +25,7 @@ export default class TagCard extends BaseCommand {
     const tags = await ProfileService.getTags(profile);
 
     if (tags.length === 0) {
-      const prefix = this.zephyr.getPrefix(msg.guildID);
+      const prefix = Zephyr.getPrefix(msg.guildID);
       throw new ZephyrError.NoTagsError(prefix);
     }
 

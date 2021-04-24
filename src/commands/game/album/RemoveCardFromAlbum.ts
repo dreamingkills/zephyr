@@ -35,11 +35,7 @@ export default class RemoveCardFromAlbum extends BaseCommand {
       Math.ceil(albumCards.find((c) => c.cardId === targetCard.id)!.slot / 8)
     );
 
-    await AlbumService.removeCardsFromAlbums(
-      [targetCard],
-      [isInAlbum],
-      this.zephyr
-    );
+    await AlbumService.removeCardsFromAlbums([targetCard], [isInAlbum]);
 
     await AlbumService.updateAlbumCache(
       isInAlbum,
@@ -49,8 +45,7 @@ export default class RemoveCardFromAlbum extends BaseCommand {
           c.slot >= page * 8 - 8 &&
           c.slot <= page * 8
       ),
-      page,
-      this.zephyr
+      page
     );
 
     const embed = new MessageEmbed(`Remove Card`, msg.author).setDescription(

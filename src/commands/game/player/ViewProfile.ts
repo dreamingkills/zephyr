@@ -5,6 +5,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ViewProfile extends BaseCommand {
   id = `reagan`;
@@ -25,7 +26,7 @@ export default class ViewProfile extends BaseCommand {
         const userId = options[0];
         if (userId.length < 17) throw new ZephyrError.InvalidSnowflakeError();
 
-        targetUser = await this.zephyr.fetchUser(userId);
+        targetUser = await Zephyr.fetchUser(userId);
       } else if (msg.mentions[0]) {
         targetUser = msg.mentions[0];
       } else throw new ZephyrError.InvalidMentionError();
@@ -41,8 +42,8 @@ export default class ViewProfile extends BaseCommand {
     if (
       target.private &&
       target.discordId !== msg.author.id &&
-      !this.zephyr.config.moderators.includes(msg.author.id) &&
-      !this.zephyr.config.developers.includes(msg.author.id)
+      !Zephyr.config.moderators.includes(msg.author.id) &&
+      !Zephyr.config.developers.includes(msg.author.id)
     )
       throw new ZephyrError.PrivateProfileError(targetUser.tag);
 
@@ -56,7 +57,7 @@ export default class ViewProfile extends BaseCommand {
         `**Blurb**` +
           `\n${target.blurb || "*No blurb set*"}` +
           `\n\n— ${targetIsSender ? `You have` : `${targetUser.tag} has`} ${
-            this.zephyr.config.discord.emoji.bits
+            Zephyr.config.discord.emoji.bits
           } **${target.bits.toLocaleString()}**.` +
           `\n— ${
             targetIsSender ? `You have` : `${targetUser.tag} has`

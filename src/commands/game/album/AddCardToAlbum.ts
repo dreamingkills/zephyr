@@ -93,8 +93,7 @@ export default class AddCardToAlbum extends BaseCommand {
     const buffer = await AlbumService.addCardToAlbum(
       targetAlbum,
       targetCard,
-      targetSlot,
-      this.zephyr
+      targetSlot
     );
 
     const embed = new MessageEmbed(`Album`, msg.author)

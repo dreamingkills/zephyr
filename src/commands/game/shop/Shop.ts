@@ -1,5 +1,6 @@
 import { Message } from "eris";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { Zephyr } from "../../../structures/client/Zephyr";
 import { BaseCommand } from "../../../structures/command/Command";
 
 export default class Shop extends BaseCommand {
@@ -9,7 +10,7 @@ export default class Shop extends BaseCommand {
   allowDm = true;
 
   async exec(msg: Message): Promise<void> {
-    const prefix = this.zephyr.getPrefix(msg.guildID);
+    const prefix = Zephyr.getPrefix(msg.guildID);
 
     const embed = new MessageEmbed(`Shop`, msg.author).setDescription(
       `**The shops have moved to new locations!**\n— You can use \`${prefix}stickershop\` to view the sticker shop.\n— You can use \`${prefix}itemshop\` to view the item shop.`

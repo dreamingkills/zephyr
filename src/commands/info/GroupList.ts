@@ -3,6 +3,7 @@ import { checkPermission } from "../../lib/ZephyrUtils";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 import { ReactionCollector } from "eris-collector";
+import { Zephyr } from "../../structures/client/Zephyr";
 
 export default class GroupList extends BaseCommand {
   id = `blister`;
@@ -13,7 +14,7 @@ export default class GroupList extends BaseCommand {
 
   async exec(msg: Message): Promise<void> {
     const groups: string[] = [];
-    this.zephyr.getCards().forEach((c) => {
+    Zephyr.getCards().forEach((c) => {
       if (c.group) {
         if (!groups.includes(c.group)) groups.push(c.group);
       }
@@ -49,7 +50,7 @@ export default class GroupList extends BaseCommand {
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id && [`⏮`, `◀`, `▶`, `⏭`].includes(emoji.name);
 
-    const collector = new ReactionCollector(this.zephyr, groupList, filter, {
+    const collector = new ReactionCollector(Zephyr, groupList, filter, {
       time: 2 * 60 * 1000,
     });
     collector.on("error", async (e: Error) => {
@@ -84,7 +85,7 @@ export default class GroupList extends BaseCommand {
         );
         await this.edit(groupList, embed);
 
-        if (checkPermission("manageMessages", msg.textChannel, this.zephyr))
+        if (checkPermission("manageMessages", msg.textChannel))
           await groupList.removeReaction(emoji.name, userId);
       }
     );

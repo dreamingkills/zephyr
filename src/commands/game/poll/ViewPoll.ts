@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import { Message } from "eris";
 import { PollService } from "../../../lib/database/services/meta/PollService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { Zephyr } from "../../../structures/client/Zephyr";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 
@@ -34,7 +35,7 @@ export default class ViewPoll extends BaseCommand {
       footer = `This poll will end at ${timestamp} UTC.`;
     } else footer = `This poll has no end date set.`;
 
-    const prefix = this.zephyr.getPrefix(msg.guildID);
+    const prefix = Zephyr.getPrefix(msg.guildID);
     const embed = new MessageEmbed(`Poll`, msg.author)
       .setTitle(`Poll #${poll.id}: ${poll.title}`)
       .setDescription(

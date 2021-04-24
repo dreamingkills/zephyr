@@ -8,6 +8,7 @@ import { AnticheatService } from "../../../lib/database/services/meta/AnticheatS
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { strToInt } from "../../../lib/utility/text/TextUtils";
 import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class Pay extends BaseCommand {
   id = `silvera`;
@@ -20,10 +21,7 @@ export default class Pay extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (
-      !this.zephyr.flags.transactions &&
-      !isDeveloper(msg.author, this.zephyr)
-    )
+    if (!Zephyr.flags.transactions && !isDeveloper(msg.author))
       throw new ZephyrError.TransactionFlagDisabledError();
 
     if (!msg.mentions[0]) throw new ZephyrError.InvalidMentionError();
@@ -48,7 +46,7 @@ export default class Pay extends BaseCommand {
 
     const embed = new MessageEmbed(`Pay`, msg.author).setDescription(
       `Really give ${
-        this.zephyr.config.discord.emoji.bits
+        Zephyr.config.discord.emoji.bits
       } **${amount.toLocaleString()}** to **${user.tag}**?`
     );
 
@@ -56,9 +54,9 @@ export default class Pay extends BaseCommand {
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
-      emoji.id === this.zephyr.config.discord.emojiId.check;
+      emoji.id === Zephyr.config.discord.emojiId.check;
 
-    const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
+    const collector = new ReactionCollector(Zephyr, confirmation, filter, {
       time: 30000,
       max: 1,
     });
@@ -93,13 +91,13 @@ export default class Pay extends BaseCommand {
         });
       }
 
-      if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+      if (checkPermission(`manageMessages`, msg.channel))
         await confirmation.removeReactions();
     });
 
     await this.react(
       confirmation,
-      `check:${this.zephyr.config.discord.emojiId.check}`
+      `check:${Zephyr.config.discord.emojiId.check}`
     );
     return;
   }

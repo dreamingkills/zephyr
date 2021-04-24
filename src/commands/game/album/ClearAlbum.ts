@@ -6,6 +6,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { ReactionCollector } from "eris-collector";
 import { checkPermission } from "../../../lib/ZephyrUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ClearAlbum extends BaseCommand {
   id = `arabella`;
@@ -46,17 +47,12 @@ export default class ClearAlbum extends BaseCommand {
     let confirmed: boolean = await new Promise(async (res, _req) => {
       const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
         userId === msg.author.id &&
-        emoji.id === this.zephyr.config.discord.emojiId.check;
+        emoji.id === Zephyr.config.discord.emojiId.check;
 
-      const collector = new ReactionCollector(
-        this.zephyr,
-        confirmation,
-        filter,
-        {
-          time: 15000,
-          max: 1,
-        }
-      );
+      const collector = new ReactionCollector(Zephyr, confirmation, filter, {
+        time: 15000,
+        max: 1,
+      });
 
       collector.on("error", async (e: Error) => {
         await this.handleError(msg, msg.author, e);
@@ -75,7 +71,7 @@ export default class ClearAlbum extends BaseCommand {
 
       await this.react(
         confirmation,
-        `check:${this.zephyr.config.discord.emojiId.check}`
+        `check:${Zephyr.config.discord.emojiId.check}`
       );
     });
 
@@ -85,7 +81,7 @@ export default class ClearAlbum extends BaseCommand {
         confirmationEmbed.setFooter(`🕒 This confirmation has expired.`)
       );
 
-      if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+      if (checkPermission(`manageMessages`, msg.channel))
         await confirmation.removeReactions();
 
       return;
@@ -93,11 +89,7 @@ export default class ClearAlbum extends BaseCommand {
 
     await this.delete(confirmation);
 
-    await AlbumService.removeCardsFromAlbums(
-      albumCards,
-      [targetAlbum],
-      this.zephyr
-    );
+    await AlbumService.removeCardsFromAlbums(albumCards, [targetAlbum]);
 
     const embed = new MessageEmbed(`Clear Album`, msg.author).setDescription(
       `All cards have been removed from \`${targetAlbum.name}\`.`

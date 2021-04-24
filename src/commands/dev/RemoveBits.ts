@@ -1,6 +1,7 @@
 import { Message } from "eris";
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
+import { Zephyr } from "../../structures/client/Zephyr";
 import { BaseCommand } from "../../structures/command/Command";
 import * as ZephyrError from "../../structures/error/ZephyrError";
 
@@ -25,7 +26,7 @@ export default class RemoveBits extends BaseCommand {
     const _target = await ProfileService.removeBitsFromProfile(target, amount);
     const embed = new MessageEmbed(`Remove Bits`, msg.author)
       .setDescription(
-        `Took ${this.zephyr.config.discord.emoji.bits}**${amount}** from **${targetUser.tag}**.`
+        `Took ${Zephyr.config.discord.emoji.bits}**${amount}** from **${targetUser.tag}**.`
       )
       .setFooter(`New balance: ${_target.bits.toLocaleString()}`);
 

@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { Chance } from "chance";
 import { getTimeUntil } from "../../../lib/utility/time/TimeUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class DailyReward extends BaseCommand {
   id = `uta`;
@@ -32,7 +33,7 @@ export default class DailyReward extends BaseCommand {
 
     if (last.format(`YYYY-MM-DD`) === todayFormat || last.isAfter(today)) {
       embed.setDescription(
-        `${this.zephyr.config.discord.emoji.clock} You've already claimed your daily reward today.`
+        `${Zephyr.config.discord.emoji.clock} You've already claimed your daily reward today.`
       );
     } else {
       const reward = new Chance().integer(this.bitsReward);
@@ -44,9 +45,9 @@ export default class DailyReward extends BaseCommand {
 
       _profile = await ProfileService.setDailyTimestamp(profile, todayFormat);
       embed.setDescription(
-        `${this.zephyr.config.discord.emoji.clock} You claimed your daily reward and got...` +
+        `${Zephyr.config.discord.emoji.clock} You claimed your daily reward and got...` +
           `\n— ${
-            this.zephyr.config.discord.emoji.bits
+            Zephyr.config.discord.emoji.bits
           }**${reward}** *(new balance: ${_profile.bits.toLocaleString()})*`
       );
     }

@@ -8,6 +8,7 @@ import { GameIdol } from "../../../../structures/game/Idol";
 import { MessageCollector } from "eris-collector";
 import { getGroupsByIdolId } from "../../../../lib/utility/text/TextUtils";
 import { WishlistError } from "../../../../structures/error/WishlistError";
+import { Zephyr } from "../../../../structures/client/Zephyr";
 
 export default class AddWishlist extends BaseCommand {
   id = `permatrip`;
@@ -26,15 +27,14 @@ export default class AddWishlist extends BaseCommand {
     const max = 5 + profile.patron * 5;
 
     if (wishlist.length > max) {
-      const prefix = this.zephyr.getPrefix(msg.guildID!);
+      const prefix = Zephyr.getPrefix(msg.guildID!);
       throw new WishlistError.WishlistFullError(prefix);
     }
 
     const nameQuery = options.join(" ").toLowerCase();
     const matches: GameIdol[] = [];
 
-    this.zephyr
-      .getCards()
+    Zephyr.getCards()
       .filter((c) => `${c.group} ${c.name}`.toLowerCase().includes(nameQuery))
       .forEach((m) => {
         if (!matches.find((match) => m.idolId === match.id))
@@ -59,7 +59,7 @@ export default class AddWishlist extends BaseCommand {
       const embed = new MessageEmbed(`Wishlist Add`, msg.author).setDescription(
         `I found multiple matches for \`${nameQuery}\`.\nPlease choose a number corresponding to the desired idol.\n${matches
           .map((u, index) => {
-            const groups = getGroupsByIdolId(u.id, this.zephyr.getCards());
+            const groups = getGroupsByIdolId(u.id, Zephyr.getCards());
 
             return `— \`${index + 1}\` **${u.name}**${
               groups.length === 0 ? `` : ` (${groups.join(`, `)})`
@@ -76,15 +76,10 @@ export default class AddWishlist extends BaseCommand {
             matches[parseInt(m.content, 10) - 1] &&
             m.author.id === msg.author.id;
 
-          const collector = new MessageCollector(
-            this.zephyr,
-            msg.channel,
-            filter,
-            {
-              time: 30000,
-              max: 1,
-            }
-          );
+          const collector = new MessageCollector(Zephyr, msg.channel, filter, {
+            time: 30000,
+            max: 1,
+          });
           collector.on("error", async (e: Error) => {
             await this.handleError(msg, msg.author, e);
           });
@@ -114,12 +109,12 @@ export default class AddWishlist extends BaseCommand {
       await this.delete(confirmation);
     }
 
-    const groups = getGroupsByIdolId(additionTarget.id, this.zephyr.getCards());
+    const groups = getGroupsByIdolId(additionTarget.id, Zephyr.getCards());
 
     const refetchWishlist = await ProfileService.getWishlist(profile);
 
     if (refetchWishlist.length >= max) {
-      const prefix = this.zephyr.getPrefix(msg.guildID);
+      const prefix = Zephyr.getPrefix(msg.guildID);
       throw new WishlistError.WishlistFullError(prefix);
     }
 
@@ -128,7 +123,7 @@ export default class AddWishlist extends BaseCommand {
     );
 
     if (exists) {
-      const prefix = this.zephyr.getPrefix(msg.guildID);
+      const prefix = Zephyr.getPrefix(msg.guildID);
       throw new WishlistError.WishlistDuplicateError(additionTarget, prefix);
     }
 

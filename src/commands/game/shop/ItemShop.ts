@@ -9,6 +9,7 @@ import { ShopError } from "../../../structures/error/ShopError";
 import { Shop } from "../../../lib/shop/Shop";
 import { GameShop } from "../../../structures/shop/Shop";
 import { Logger } from "../../../lib/logger/Logger";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ItemShop extends BaseCommand {
   id = `delusion`;
@@ -23,10 +24,10 @@ export default class ItemShop extends BaseCommand {
     options: string[]
   ): Promise<void> {
     const subcommand = options[0]?.toLowerCase();
-    const prefix = this.zephyr.getPrefix(msg.guildID);
+    const prefix = Zephyr.getPrefix(msg.guildID);
 
     if (subcommand) {
-      if (subcommand === `refresh` && isDeveloper(msg.author, this.zephyr)) {
+      if (subcommand === `refresh` && isDeveloper(msg.author)) {
         await Shop.init();
 
         const embed = new MessageEmbed(`Item Shop`, msg.author).setDescription(
@@ -65,7 +66,7 @@ export default class ItemShop extends BaseCommand {
             emoji.name === `☑` && userID === msg.author.id;
 
           const collector = new ReactionCollector(
-            this.zephyr,
+            Zephyr,
             confirmationMessage,
             filter,
             { time: 30000 }
@@ -145,12 +146,12 @@ export default class ItemShop extends BaseCommand {
 
     if (featuredPack) {
       featuredString = `🤩 __**Featured Item**__\n${
-        this.zephyr.config.discord.emoji.blank
+        Zephyr.config.discord.emoji.blank
       } ${
         featuredPack.item.names[0]
       } - **${featuredPack.price.toLocaleString()}** ${
         featuredPack.currency
-      }\n${this.zephyr.config.discord.emoji.blank} ${
+      }\n${Zephyr.config.discord.emoji.blank} ${
         featuredPack.item.description
           ? `*"${featuredPack.item.description}"*`
           : ``

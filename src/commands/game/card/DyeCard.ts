@@ -12,6 +12,7 @@ import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { MockUserCard } from "../../../structures/game/UserCard";
 import { Frames } from "../../../lib/cosmetics/Frames";
 import { GameFrame } from "../../../structures/game/Frame";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class DyeCard extends BaseCommand {
   id = `junkhead`;
@@ -25,7 +26,7 @@ export default class DyeCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.dyes && !isDeveloper(msg.author, this.zephyr))
+    if (!Zephyr.flags.dyes && !isDeveloper(msg.author))
       throw new ZephyrError.DyeFlagDisabledError();
 
     if (!options[0]?.startsWith("$"))
@@ -50,7 +51,7 @@ export default class DyeCard extends BaseCommand {
     const isInAlbum = await AlbumService.cardIsInAlbum(targetCard);
     if (isInAlbum) throw new ZephyrError.CardInAlbumError(targetCard);
 
-    const baseCard = this.zephyr.getCard(targetCard.baseCardId)!;
+    const baseCard = Zephyr.getCard(targetCard.baseCardId)!;
 
     let frame: GameFrame;
 
@@ -75,7 +76,7 @@ export default class DyeCard extends BaseCommand {
       .setDescription(
         `Really dye this card with \`$${targetDye.id.toString(36)}\` **${
           targetDye.name
-        }**?\n` + (await getDescriptions([targetCard], this.zephyr, userTags))
+        }**?\n` + (await getDescriptions([targetCard], userTags))
       )
       .setFooter(
         `$${targetDye.id.toString(36)} has ${targetDye.charges} charge${
@@ -83,7 +84,7 @@ export default class DyeCard extends BaseCommand {
         }.`
       );
 
-    const preview = await CardService.generateCardImage(mockCard, this.zephyr);
+    const preview = await CardService.generateCardImage(mockCard);
 
     const confirmation = await this.send(msg.channel, embed, {
       files: [{ file: preview, name: "dyepreview.png" }],
@@ -91,8 +92,8 @@ export default class DyeCard extends BaseCommand {
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
-      emoji.id === this.zephyr.config.discord.emojiId.check;
-    const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
+      emoji.id === Zephyr.config.discord.emojiId.check;
+    const collector = new ReactionCollector(Zephyr, confirmation, filter, {
       time: 15000,
       max: 1,
     });
@@ -124,7 +125,6 @@ export default class DyeCard extends BaseCommand {
 
       const dyedCardImage = await CardService.updateCardCache(
         dyedCard,
-        this.zephyr,
         false,
         true
       );
@@ -154,13 +154,13 @@ export default class DyeCard extends BaseCommand {
         });
       }
 
-      if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+      if (checkPermission(`manageMessages`, msg.channel))
         await confirmation.removeReactions();
     });
 
     await this.react(
       confirmation,
-      `check:${this.zephyr.config.discord.emojiId.check}`
+      `check:${Zephyr.config.discord.emojiId.check}`
     );
     return;
   }

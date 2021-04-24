@@ -904,14 +904,14 @@ eris-collector@^1.0.1:
   dependencies:
     events "^3.1.0"
 
-eris@0.13.4:
-  version "0.13.4"
-  resolved "https://registry.yarnpkg.com/eris/-/eris-0.13.4.tgz#06159ff619446046e392e28a70667d73c27aa631"
-  integrity sha512-IFA14nasCig8xp8cVCULvzBuJ0qpYqJ3XyEtm9OLdC177DYDCJ9QM2Aq+KOpejIVl7838n9AyRlLI6w9Eu3PiQ==
+eris@0.15.0:
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/eris/-/eris-0.15.0.tgz#d0744d993d508b2951bc6d0ab380ae39b63c0666"
+  integrity sha512-muBdi5XyMXdxFQ8xUG6yofq40/Z02CHlqJP7zIdHhpdDiHvFM/mybGiFAHuoSYcsVTTvEfbUaAJ+SDEmMjARYw==
   dependencies:
     ws "^7.2.1"
   optionalDependencies:
-    opusscript "^0.0.7"
+    opusscript "^0.0.8"
     tweetnacl "^1.0.1"
 
 escape-goat@^2.0.0:
@@ -1965,10 +1965,10 @@ optionator@^0.8.1:
     type-check "~0.3.2"
     word-wrap "~1.2.3"
 
-opusscript@^0.0.7:
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/opusscript/-/opusscript-0.0.7.tgz#7dd7ec55b302d26bf588e6fc3feb090b8c7da856"
-  integrity sha512-DcBadTdYTUuH9zQtepsLjQn4Ll6rs3dmeFvN+SD0ThPnxRBRm/WC1zXWPg+wgAJimB784gdZvUMA57gDP7FdVg==
+opusscript@^0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/opusscript/-/opusscript-0.0.8.tgz#00b49e81281b4d99092d013b1812af8654bd0a87"
+  integrity sha512-VSTi1aWFuCkRCVq+tx/BQ5q9fMnQ9pVZ3JU4UHKqTkf0ED3fKEPdr+gKAAl3IA2hj9rrP6iyq3hlcJq3HELtNQ==
 
 ora@^5.1.0:
   version "5.4.0"

@@ -6,6 +6,7 @@ import { ProfileService } from "../../../lib/database/services/game/ProfileServi
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import emoji from "node-emoji";
 import { GameTag } from "../../../structures/game/Tag";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class EditTag extends BaseCommand {
   id = `freeze`;
@@ -28,7 +29,7 @@ export default class EditTag extends BaseCommand {
     const tags = await ProfileService.getTags(profile);
 
     if (tags.length === 0) {
-      const prefix = this.zephyr.getPrefix(msg.guildID);
+      const prefix = Zephyr.getPrefix(msg.guildID);
       throw new ZephyrError.NoTagsError(prefix);
     }
 

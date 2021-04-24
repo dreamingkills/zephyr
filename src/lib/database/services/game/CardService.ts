@@ -9,7 +9,6 @@ import { Filter } from "../../sql/Filters";
 import { CardGet, WearSpread } from "../../sql/game/card/CardGet";
 import fs from "fs/promises";
 import { CardSet } from "../../sql/game/card/CardSet";
-import { Zephyr } from "../../../../structures/client/Zephyr";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { GameTag } from "../../../../structures/game/Tag";
 import gm from "gm";
@@ -25,6 +24,7 @@ import { Stickers } from "../../../cosmetics/Stickers";
 import { Frames } from "../../../cosmetics/Frames";
 import { Logger, loggerSettings } from "../../../logger/Logger";
 import { GameFrame } from "../../../../structures/game/Frame";
+import { Zephyr } from "../../../../structures/client/Zephyr";
 
 export abstract class CardService {
   // Used for card image generation
@@ -54,10 +54,9 @@ export abstract class CardService {
   */
   public static async createNewUserCard(
     card: GameBaseCard,
-    profile: GameProfile,
-    zephyr: Zephyr
+    profile: GameProfile
   ): Promise<GameUserCard> {
-    const newCard = await CardSet.createNewUserCard(card, profile, zephyr);
+    const newCard = await CardSet.createNewUserCard(card, profile);
     return newCard;
   }
 
@@ -97,7 +96,6 @@ export abstract class CardService {
 
   public static async generateCardImage(
     card: GameUserCard | MockUserCard,
-    zephyr: Zephyr,
     noText: boolean = false,
     large: boolean = false
   ): Promise<Buffer> {
@@ -105,7 +103,7 @@ export abstract class CardService {
 
     // Need information off the base card to do anything.
     if (card instanceof GameUserCard) {
-      baseCard = zephyr.getCard(card.baseCardId)!;
+      baseCard = Zephyr.getCard(card.baseCardId)!;
     } else baseCard = card.baseCard;
 
     const sizeCoefficient = large ? 2.2 : 1;
@@ -356,12 +354,11 @@ export abstract class CardService {
 
   public static async generateStickerPreview(
     card: GameUserCard,
-    zephyr: Zephyr,
     sticker?: GameSticker,
     position?: number,
     useOverlay: boolean = true
   ): Promise<Buffer> {
-    const cardBuffer = await CardService.checkCacheForCard(card, zephyr);
+    const cardBuffer = await CardService.checkCacheForCard(card);
 
     const canvas = createCanvas(350, 500);
     const ctx = canvas.getContext("2d");
@@ -396,11 +393,10 @@ export abstract class CardService {
 
   public static async changeCardFrame(
     card: GameUserCard,
-    frameId: number,
-    zephyr: Zephyr
+    frameId: number
   ): Promise<Buffer> {
     const newCard = await CardSet.setCardFrame(card, frameId);
-    return await this.updateCardCache(newCard, zephyr, false, true);
+    return await this.updateCardCache(newCard, false, true);
   }
 
   public static async transferCardsToUser(
@@ -413,11 +409,10 @@ export abstract class CardService {
 
   public static async burnCards(
     profile: GameProfile,
-    cards: GameUserCard[],
-    zephyr: Zephyr
+    cards: GameUserCard[]
   ): Promise<void> {
     await AnticheatService.logBurn(profile, cards);
-    return await CardSet.burnCards(cards, zephyr.user.id);
+    return await CardSet.burnCards(cards);
   }
 
   /*
@@ -425,11 +420,10 @@ export abstract class CardService {
   */
   public static async updateCardCache(
     card: GameUserCard,
-    zephyr: Zephyr,
     large: boolean = false,
     invalidate: boolean = false
   ): Promise<Buffer> {
-    const image = await this.generateCardImage(card, zephyr, false, large);
+    const image = await this.generateCardImage(card, false, large);
 
     const fileName = `${card.id}${large ? `_large` : ``}`;
     const tempFile = `./cache/cards/temp/${fileName}`;
@@ -503,7 +497,6 @@ export abstract class CardService {
 
   public static async checkCacheForCard(
     card: GameUserCard,
-    zephyr: Zephyr,
     large: boolean = false,
     invalidate: boolean = false
   ): Promise<Buffer> {
@@ -512,7 +505,7 @@ export abstract class CardService {
         `./cache/cards/${card.baseCardId}/${card.id}${large ? `_large` : ``}`
       );
     } catch (e) {
-      return await this.updateCardCache(card, zephyr, large, invalidate);
+      return await this.updateCardCache(card, large, invalidate);
     }
   }
 
@@ -527,19 +520,15 @@ export abstract class CardService {
     return await CardSet.unsetCardsTag(cards);
   }
 
-  public static async getNumberOfTopCollectors(
-    ids: number[],
-    zephyr: Zephyr
-  ): Promise<number> {
-    return await CardGet.getNumberOfTopCollectors(ids, zephyr.user.id);
+  public static async getNumberOfTopCollectors(ids: number[]): Promise<number> {
+    return await CardGet.getNumberOfTopCollectors(ids);
   }
 
   public static async getTopCollectorsByBaseIds(
     ids: number[],
-    zephyr: Zephyr,
     page: number = 1
   ): Promise<{ discordId: string; amount: number }[]> {
-    return await CardGet.getTopCollectorsByBaseIds(ids, zephyr.user.id, page);
+    return await CardGet.getTopCollectorsByBaseIds(ids, page);
   }
 
   public static async getNumberOfTopWishlisted(): Promise<number> {
@@ -574,10 +563,9 @@ export abstract class CardService {
   }
 
   public static async getTimesCardDestroyed(
-    card: GameBaseCard,
-    zephyr: Zephyr
+    card: GameBaseCard
   ): Promise<number> {
-    return await CardGet.getTimesCardDestroyed(card.id, zephyr.user.id);
+    return await CardGet.getTimesCardDestroyed(card.id);
   }
   public static async getTimesCardWishlisted(
     card: GameBaseCard
@@ -590,10 +578,9 @@ export abstract class CardService {
   }
 
   public static async getCardWearSpread(
-    card: GameBaseCard,
-    zephyr: Zephyr
+    card: GameBaseCard
   ): Promise<WearSpread> {
-    return await CardGet.getCardWearSpread(card.id, zephyr.user.id);
+    return await CardGet.getCardWearSpread(card.id);
   }
 
   public static async setCardDye(
@@ -624,12 +611,11 @@ export abstract class CardService {
 
   public static async removeCardSticker(
     card: GameUserCard,
-    zephyr: Zephyr,
     sticker: GameCardSticker
   ): Promise<Buffer> {
     await CardSet.removeCardSticker(sticker);
 
-    return await this.updateCardCache(card, zephyr, false, true);
+    return await this.updateCardCache(card, false, true);
   }
 
   public static async getLastCard(profile: GameProfile): Promise<GameUserCard> {

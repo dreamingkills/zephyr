@@ -6,13 +6,12 @@ import { deleteMessage } from "../discord/message/deleteMessage";
 import { editMessage } from "../discord/message/editMessage";
 import { MessageCollector } from "eris-collector";
 import * as ZephyrError from "../../structures/error/ZephyrError";
-import { Zephyr } from "../../structures/client/Zephyr";
 import { Stickers } from "../cosmetics/Stickers";
+import { Zephyr } from "../../structures/client/Zephyr";
 
 export async function removeSticker(
   msg: Message,
-  parameters: string[],
-  zephyr: Zephyr
+  parameters: string[]
 ): Promise<void> {
   const targetCard = await CardService.getUserCardByIdentifier(parameters[0]);
 
@@ -49,7 +48,7 @@ export async function removeSticker(
     const filter = (m: Message) =>
       targetStickers[parseInt(m.content) - 1] && m.author.id === msg.author.id;
 
-    const collector = new MessageCollector(zephyr, msg.channel, filter, {
+    const collector = new MessageCollector(Zephyr, msg.channel, filter, {
       time: 30000,
       max: 1,
     });
@@ -86,11 +85,7 @@ export async function removeSticker(
 
   if (!sticker) throw new ZephyrError.InvalidStickerError();
 
-  const newCardImage = await CardService.removeCardSticker(
-    targetCard,
-    zephyr,
-    sticker
-  );
+  const newCardImage = await CardService.removeCardSticker(targetCard, sticker);
 
   const embed = new MessageEmbed(`Remove Sticker`, msg.author)
     .setDescription(

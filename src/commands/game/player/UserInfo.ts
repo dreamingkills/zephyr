@@ -6,6 +6,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import dayjs from "dayjs";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class UserInfo extends BaseCommand {
   id = `ashes`;
@@ -26,7 +27,7 @@ export default class UserInfo extends BaseCommand {
       if (isNaN(parseInt(userId)) || options[0].length < 17)
         throw new ZephyrError.InvalidSnowflakeError();
 
-      targetUser = await this.zephyr.fetchUser(userId);
+      targetUser = await Zephyr.fetchUser(userId);
     } else targetUser = msg.author;
 
     if (!targetUser) throw new ZephyrError.UserNotFoundError();

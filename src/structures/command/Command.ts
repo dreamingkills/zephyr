@@ -4,7 +4,6 @@ import { createMessage } from "../../lib/discord/message/createMessage";
 import { deleteMessage } from "../../lib/discord/message/deleteMessage";
 import { editMessage } from "../../lib/discord/message/editMessage";
 import { MessageEmbed } from "../client/RichEmbed";
-import { Zephyr } from "../client/Zephyr";
 import { GameProfile } from "../game/Profile";
 
 export interface Command {
@@ -27,17 +26,13 @@ export abstract class BaseCommand implements Command {
   developerOnly: boolean = false;
   moderatorOnly: boolean = false;
 
-  zephyr!: Zephyr;
-
   abstract exec(
     msg: Message,
     profile: GameProfile,
     options: string[]
   ): Promise<void>;
 
-  public async run(msg: Message, profile: GameProfile, zephyr: Zephyr) {
-    this.zephyr = zephyr;
-
+  public async run(msg: Message, profile: GameProfile) {
     let options = [];
 
     for (const [index, option] of msg.content.split(` `).entries()) {

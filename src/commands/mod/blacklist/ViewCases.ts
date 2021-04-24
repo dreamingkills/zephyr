@@ -5,6 +5,7 @@ import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { BlacklistService } from "../../../lib/database/services/meta/BlacklistService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ViewCase extends BaseCommand {
   id = `fantasy`;
@@ -25,7 +26,7 @@ export default class ViewCase extends BaseCommand {
     if (isNaN(parseInt(mention)) || mention.length < 16 || mention.length > 18)
       throw new ZephyrError.InvalidMentionError();
 
-    const target = await this.zephyr.fetchUser(mention);
+    const target = await Zephyr.fetchUser(mention);
 
     if (!target) throw new ZephyrError.UserNotFoundError();
 

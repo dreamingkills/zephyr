@@ -4,6 +4,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { getItemByName, getItemIndex } from "../../../assets/Items";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ItemInfo extends BaseCommand {
   id = `nightvision`;
@@ -28,7 +29,7 @@ export default class ItemInfo extends BaseCommand {
 
     if (!targetItem) throw new ZephyrError.InvalidItemError();
 
-    const prefix = this.zephyr.getPrefix(msg.guildID);
+    const prefix = Zephyr.getPrefix(msg.guildID);
     const embed = new MessageEmbed(`Item Info`, msg.author).setDescription(
       `**${targetItem.names[0]}**` +
         (targetItem.names.length > 1

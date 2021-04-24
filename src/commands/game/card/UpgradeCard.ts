@@ -12,6 +12,7 @@ import { Dust } from "../../../structures/game/Dust";
 import { items } from "../../../assets/Items";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class UpgradeCard extends BaseCommand {
   id = `sunshine`;
@@ -25,7 +26,7 @@ export default class UpgradeCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.upgrades && !isDeveloper(msg.author, this.zephyr))
+    if (!Zephyr.flags.upgrades && !isDeveloper(msg.author))
       throw new ZephyrError.UpgradeFlagDisabledError();
 
     const reference = options[0];
@@ -71,11 +72,11 @@ export default class UpgradeCard extends BaseCommand {
     const embed = new MessageEmbed(`Upgrade`, msg.author)
       .setDescription(
         `Are you sure you want to upgrade this card?` +
-          `\n${await getDescriptions([card], this.zephyr, tags)}` +
+          `\n${await getDescriptions([card], tags)}` +
           `\n\nThis will cost...` +
           `\n— **${dustCost.toLocaleString()}x** \`${dustItem.names[0]}\`` +
           `\n— **${
-            this.zephyr.config.discord.emoji.bits
+            Zephyr.config.discord.emoji.bits
           } ${bitCost.toLocaleString()}**`
       )
       .setFooter(`🎲 Chance of success: ${successChance}%`);
@@ -86,15 +87,10 @@ export default class UpgradeCard extends BaseCommand {
       const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
         userId === msg.author.id && emoji.name === `☑️`;
 
-      const collector = new ReactionCollector(
-        this.zephyr,
-        confirmation,
-        filter,
-        {
-          time: 15000,
-          max: 1,
-        }
-      );
+      const collector = new ReactionCollector(Zephyr, confirmation, filter, {
+        time: 15000,
+        max: 1,
+      });
 
       collector.on("error", async (e: Error) => {
         await this.handleError(msg, msg.author, e);
@@ -118,7 +114,7 @@ export default class UpgradeCard extends BaseCommand {
         embed.setFooter(`🕒 This upgrade confirmation has expired.`)
       );
 
-      if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+      if (checkPermission(`manageMessages`, msg.channel))
         await confirmation.removeReactions();
       return;
     }
@@ -151,7 +147,7 @@ export default class UpgradeCard extends BaseCommand {
       });
     }
 
-    if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+    if (checkPermission(`manageMessages`, msg.channel))
       await confirmation.removeReactions();
 
     return;

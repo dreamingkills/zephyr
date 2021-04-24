@@ -20,8 +20,7 @@ export async function useFrame(
   msg: Message,
   profile: GameProfile,
   parameters: string[],
-  item: PrefabItem,
-  zephyr: Zephyr
+  item: PrefabItem
 ): Promise<void> {
   const cardIdentifier = parameters[0];
   if (!cardIdentifier) throw new ZephyrError.InvalidCardReferenceError();
@@ -39,7 +38,7 @@ export async function useFrame(
   const isInAlbum = await AlbumService.cardIsInAlbum(card);
   if (isInAlbum) throw new ZephyrError.CardInAlbumError(card);
 
-  const baseCard = zephyr.getCard(card.baseCardId)!;
+  const baseCard = Zephyr.getCard(card.baseCardId)!;
   const frame = Frames.getFrameByName(item.names[0]);
 
   if (frame!.id === card.frameId)
@@ -53,7 +52,7 @@ export async function useFrame(
     dye: card.dye,
   });
 
-  const preview = await CardService.generateCardImage(mockCard, zephyr);
+  const preview = await CardService.generateCardImage(mockCard);
 
   const embed = new MessageEmbed(`Apply Frame`, msg.author)
     .setDescription(
@@ -68,9 +67,9 @@ export async function useFrame(
   const confirmed: boolean = await new Promise(async (res, _req) => {
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
-      emoji.id === zephyr.config.discord.emojiId.check;
+      emoji.id === Zephyr.config.discord.emojiId.check;
 
-    const collector = new ReactionCollector(zephyr, confirmation, filter, {
+    const collector = new ReactionCollector(Zephyr, confirmation, filter, {
       time: 30000,
       max: 1,
     });
@@ -91,11 +90,11 @@ export async function useFrame(
 
     await addReaction(
       confirmation,
-      `check:${zephyr.config.discord.emojiId.check}`
+      `check:${Zephyr.config.discord.emojiId.check}`
     );
   });
 
-  if (checkPermission(`manageMessages`, msg.channel, zephyr))
+  if (checkPermission(`manageMessages`, msg.channel))
     await confirmation.removeReactions();
 
   if (!confirmed) {
@@ -112,7 +111,7 @@ export async function useFrame(
   if (refetchCard.discordId !== msg.author.id)
     throw new ZephyrError.NotOwnerOfCardError(refetchCard);
 
-  const newCard = await CardService.changeCardFrame(card, frame!.id, zephyr);
+  const newCard = await CardService.changeCardFrame(card, frame!.id);
 
   await ProfileService.removeItems(profile, [{ item: item, count: 1 }]);
 

@@ -6,6 +6,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { rgbToHex } from "../../../lib/utility/color/ColorUtils";
 import { createCanvas } from "canvas";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ViewDye extends BaseCommand {
   id = `faith`;
@@ -24,7 +25,7 @@ export default class ViewDye extends BaseCommand {
     const dyeId = options[0]?.toLowerCase();
     const dyeTarget = await ProfileService.getDyeByIdentifier(dyeId);
 
-    const dyeOwner = await this.zephyr.fetchUser(dyeTarget.discordId);
+    const dyeOwner = await Zephyr.fetchUser(dyeTarget.discordId);
     const dyeOwnerProfile = await ProfileService.getProfile(
       dyeOwner?.id || dyeTarget.discordId
     );

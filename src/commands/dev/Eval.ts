@@ -32,9 +32,7 @@ export default class DevEval extends BaseCommand {
       const embed = new MessageEmbed(`Eval`, msg.author).setDescription(
         `Evaluation complete — ${Date.now() - msg.createdAt}ms` +
           `\n\`\`\`xl` +
-          `\n${this.clean(evaled)
-            .slice(0, 1000)
-            .replace(this.zephyr.token!, `BOT_TOKEN`)}` +
+          `\n${this.clean(evaled).slice(0, 1000)}` +
           `\n\`\`\``
       );
       await this.send(msg.channel, embed);

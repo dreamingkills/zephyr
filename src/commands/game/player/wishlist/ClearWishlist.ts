@@ -5,6 +5,7 @@ import { BaseCommand } from "../../../../structures/command/Command";
 import { GameProfile } from "../../../../structures/game/Profile";
 import { ReactionCollector } from "eris-collector";
 import { WishlistError } from "../../../../structures/error/WishlistError";
+import { Zephyr } from "../../../../structures/client/Zephyr";
 
 export default class ClearWishlist extends BaseCommand {
   id = `handlebars`;
@@ -17,7 +18,7 @@ export default class ClearWishlist extends BaseCommand {
     const wishlist = await ProfileService.getWishlist(profile);
 
     if (wishlist.length === 0) {
-      const prefix = this.zephyr.getPrefix(msg.guildID);
+      const prefix = Zephyr.getPrefix(msg.guildID);
       throw new WishlistError.WishlistEmptyError(prefix);
     }
 
@@ -32,15 +33,10 @@ export default class ClearWishlist extends BaseCommand {
       const filter = (_m: Message, emoji: PartialEmoji, userID: string) =>
         emoji.name === `✅` && userID === msg.author.id;
 
-      const collector = new ReactionCollector(
-        this.zephyr,
-        confirmation,
-        filter,
-        {
-          time: 30000,
-          max: 1,
-        }
-      );
+      const collector = new ReactionCollector(Zephyr, confirmation, filter, {
+        time: 30000,
+        max: 1,
+      });
 
       collector.on("error", async (e: Error) => {
         await this.handleError(msg, msg.author, e);

@@ -11,6 +11,7 @@ import { AnticheatService } from "../../../lib/database/services/meta/AnticheatS
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { VaultError } from "../../../structures/error/VaultError";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class Trade extends BaseCommand {
   id = `rhinestone`;
@@ -23,7 +24,7 @@ export default class Trade extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.trades && !isDeveloper(msg.author, this.zephyr))
+    if (!Zephyr.flags.trades && !isDeveloper(msg.author))
       throw new ZephyrError.TradeFlagDisabledError();
 
     const targetUser = msg.mentions[0];
@@ -32,7 +33,7 @@ export default class Trade extends BaseCommand {
     const target = await ProfileService.getProfile(targetUser.id);
     if (
       target.discordId === msg.author.id ||
-      target.discordId === this.zephyr.user.id
+      target.discordId === Zephyr.user.id
     )
       throw new ZephyrError.UnacceptableTradeTargetError();
 
@@ -68,18 +69,18 @@ export default class Trade extends BaseCommand {
         36
       )}\` for \`${tradeeCard.id.toString(36)}\`?` +
         `\n\n__**${targetUser.username} receives:**__` +
-        `\n${await getDescriptions([traderCard], this.zephyr, traderTags)}` +
+        `\n${await getDescriptions([traderCard], traderTags)}` +
         `\n\n__**${msg.author.username} receives:**__` +
-        `\n${await getDescriptions([tradeeCard], this.zephyr, tradeeTags)}`
+        `\n${await getDescriptions([tradeeCard], tradeeTags)}`
     );
 
     const confirmation = await this.send(msg.channel, embed);
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       (userId === msg.author.id || userId === targetUser.id) &&
-      emoji.id === this.zephyr.config.discord.emojiId.check;
+      emoji.id === Zephyr.config.discord.emojiId.check;
 
-    const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
+    const collector = new ReactionCollector(Zephyr, confirmation, filter, {
       time: 30000,
     });
 
@@ -143,13 +144,13 @@ export default class Trade extends BaseCommand {
         });
       }
 
-      if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+      if (checkPermission(`manageMessages`, msg.channel))
         await confirmation.removeReactions();
     });
 
     await this.react(
       confirmation,
-      `check:${this.zephyr.config.discord.emojiId.check}`
+      `check:${Zephyr.config.discord.emojiId.check}`
     );
     return;
   }

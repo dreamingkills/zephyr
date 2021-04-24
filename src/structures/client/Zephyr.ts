@@ -1,6 +1,13 @@
 import chalk from "chalk";
 import stripAnsi from "strip-ansi";
-import { Client, Guild, PrivateChannel, TextChannel, User } from "eris";
+import {
+  Client,
+  Guild,
+  Message,
+  PrivateChannel,
+  TextChannel,
+  User,
+} from "eris";
 import config from "../../../config.json";
 import { CommandLib } from "../../lib/command/CommandLib";
 import { GuildService } from "../../lib/database/services/guild/GuildService";
@@ -27,9 +34,8 @@ import { Backgrounds } from "../../lib/cosmetics/Backgrounds";
 import { Shop } from "../../lib/shop/Shop";
 import { Logger, loggerSettings } from "../../lib/logger/Logger";
 
-export class Zephyr extends Client {
+class ZephyrClient extends Client {
   commandLib = new CommandLib();
-  dmHandler = new DMHandler();
   readonly config: typeof config;
   chance = new Chance();
   private prefixes: { [guildId: string]: string } = {};
@@ -107,7 +113,7 @@ export class Zephyr extends Client {
     this.webhookListener = new WebhookListener();
     this.dbl = new dblapi(this.config.topgg.token, this);
 
-    await this.webhookListener.init(this);
+    await this.webhookListener.init();
 
     if (this.config.topgg.postEnabled && this.flags.postServerCount) {
       await this.dbl.postStats(this.guilds.size);
@@ -153,7 +159,7 @@ export class Zephyr extends Client {
 
     this.once("ready", async () => {
       if (this.config.topgg.enabled) await this.startTopGg();
-      await this.commandLib.setup(this);
+      await this.commandLib.setup();
 
       const header = `===== ${chalk.hex(`#1fb7cf`)`PROJECT: ZEPHYR`} =====`;
       console.log(
@@ -189,7 +195,7 @@ export class Zephyr extends Client {
         }
       }, 300000);
 
-      await this.dmHandler.handle(this);
+      await DMHandler.handle();
 
       if (this.config.discord.logChannel) {
         const channel = await this.getRESTChannel(
@@ -203,8 +209,7 @@ export class Zephyr extends Client {
     });
 
     this.on("messageCreate", async (message) => {
-      if (!this.flags.processMessages && !isDeveloper(message.author, this))
-        return;
+      if (!this.flags.processMessages && !isDeveloper(message.author)) return;
 
       if (this.onCooldown.has(message.author.id)) return;
 
@@ -213,9 +218,12 @@ export class Zephyr extends Client {
 
       await this.fetchUser(message.author.id);
 
-      if (message.channel instanceof PrivateChannel && this.flags.dmCommands) {
-        await this.commandLib.process(message, this);
-        return;
+      if (
+        message.channel instanceof PrivateChannel &&
+        this.flags.dmCommands &&
+        this.flags.commands
+      ) {
+        await this.commandLib.process(message as Message<PrivateChannel>);
       }
 
       if (!(message.channel instanceof TextChannel)) return;
@@ -265,22 +273,30 @@ export class Zephyr extends Client {
       }
 
       // go ahead if we're allowed to speak
-      if (this.flags.commands) await this.commandLib.process(message, this);
+      if (this.flags.commands)
+        await this.commandLib.process(message as Message<TextChannel>);
 
       // message counter
       await CardSpawner.processMessage(
         this.guilds.find((g) => g.id === message.guildID!)!,
-        message.author,
-        this
+        message.author
       );
     });
 
     this.on("guildDelete", async (guild) => {
+      let trueGuild;
+
+      let findGuild = this.guilds.find((g) => guild.id === g.id);
+
+      if (!findGuild) {
+        trueGuild = await this.getRESTGuild(guild.id);
+      } else trueGuild = findGuild;
+
       if (this.logChannel) {
         try {
           await createMessage(
             this.logChannel,
-            `:outbox_tray: Zephyr left a server: **${guild.name}** (${guild.id}).\nMember count: **${guild.memberCount}**`
+            `:outbox_tray: Zephyr left a server: **${trueGuild.name}** (${trueGuild.id}).\nMember count: **${trueGuild.memberCount}**`
           );
         } catch (e) {
           Logger.error(
@@ -334,8 +350,8 @@ export class Zephyr extends Client {
         // Check if we can send messages...
         for (let channel of top) {
           if (
-            checkPermission(`sendMessages`, channel, this) &&
-            checkPermission(`readMessages`, channel, this)
+            checkPermission(`sendMessages`, channel) &&
+            checkPermission(`readMessages`, channel)
           ) {
             welcomeChannel = channel as TextChannel;
             break;
@@ -348,12 +364,12 @@ export class Zephyr extends Client {
 
       // No permission? Oh well...
       if (
-        !checkPermission(`sendMessages`, welcomeChannel, this) ||
-        !checkPermission(`readMessages`, welcomeChannel, this)
+        !checkPermission(`sendMessages`, welcomeChannel) ||
+        !checkPermission(`readMessages`, welcomeChannel)
       )
         return;
 
-      // Get the prefix just in case it's already different (bot previously in guild)
+      // Get the prefix just in case it's already diferent (bot previously in guild)
       const prefix = this.getPrefix(guild.id);
       const embed = new MessageEmbed(`Welcome | ${guild.name}`).setDescription(
         `**Thanks for inviting Zephyr!**` +
@@ -689,3 +705,5 @@ export class Zephyr extends Client {
     } catch {}
   }
 }
+
+export const Zephyr = new ZephyrClient();

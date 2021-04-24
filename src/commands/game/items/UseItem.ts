@@ -6,6 +6,7 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
 import { ReactionCollector } from "eris-collector";
 import { getItemByName } from "../../../assets/Items";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class UseItem extends BaseCommand {
   id = `superheroes`;
@@ -56,12 +57,12 @@ export default class UseItem extends BaseCommand {
     const parameters = options.slice(itemName.split(" ").length);
 
     if (parameters.length < (targetItem.requiredArguments || 0)) {
-      const prefix = this.zephyr.getPrefix(msg.guildID);
+      const prefix = Zephyr.getPrefix(msg.guildID);
       throw new ZephyrError.InvalidItemArgumentsError(targetItem, prefix);
     }
 
     if (!targetItem.confirmation) {
-      await targetItem.use(msg, profile, parameters, this.zephyr);
+      await targetItem.use(msg, profile, parameters);
       return;
     }
 
@@ -78,12 +79,10 @@ export default class UseItem extends BaseCommand {
     const confirmed = await new Promise(async (res, _req) => {
       const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
         userId === msg.author.id && emoji.name === "☑";
-      const collector = new ReactionCollector(
-        this.zephyr,
-        confirmation,
-        filter,
-        { time: 15000, max: 1 }
-      );
+      const collector = new ReactionCollector(Zephyr, confirmation, filter, {
+        time: 15000,
+        max: 1,
+      });
 
       collector.on("error", async (e: Error) => {
         res(false);
@@ -111,7 +110,7 @@ export default class UseItem extends BaseCommand {
 
     await this.delete(confirmation);
 
-    await targetItem.use(msg, profile, parameters, this.zephyr);
+    await targetItem.use(msg, profile, parameters);
     return;
   }
 }

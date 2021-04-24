@@ -3,6 +3,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import recipes from "../../../assets/recipes.json";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { renderRecipe } from "../../../lib/utility/text/TextUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class ShowRecipes extends BaseCommand {
   id = `voyager`;
@@ -13,7 +14,7 @@ export default class ShowRecipes extends BaseCommand {
   async exec(msg: Message): Promise<void> {
     const embed = new MessageEmbed(`Recipes`, msg.author);
 
-    const prefix = this.zephyr.getPrefix(msg.guildID!);
+    const prefix = Zephyr.getPrefix(msg.guildID!);
 
     for (let recipe of recipes) {
       embed.addField({

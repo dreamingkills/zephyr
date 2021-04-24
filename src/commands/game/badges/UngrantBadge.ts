@@ -5,6 +5,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BadgeService } from "../../../lib/database/services/game/BadgeService";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class UngrantBadge extends BaseCommand {
   names = [`ungrant`];
@@ -34,7 +35,7 @@ export default class UngrantBadge extends BaseCommand {
       )
         throw new ZephyrError.InvalidMentionError();
 
-      const fetchUser = await this.zephyr.fetchUser(options[0]);
+      const fetchUser = await Zephyr.fetchUser(options[0]);
 
       if (!fetchUser) throw new ZephyrError.UserNotFoundError();
 

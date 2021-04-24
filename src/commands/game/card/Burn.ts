@@ -14,6 +14,7 @@ import { PrefabItem } from "../../../structures/item/PrefabItem";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { VaultError } from "../../../structures/error/VaultError";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class BurnCard extends BaseCommand {
   id = `suffer`;
@@ -27,7 +28,7 @@ export default class BurnCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.burns && !isDeveloper(msg.author, this.zephyr))
+    if (!Zephyr.flags.burns && !isDeveloper(msg.author))
       throw new ZephyrError.BurnFlagDisabledError();
 
     const burnTargets: (GameUserCard | GameDye)[] = [];
@@ -160,7 +161,6 @@ export default class BurnCard extends BaseCommand {
 
     const targetDescriptions = await getDescriptions(
       burnTargets.slice(0, 5),
-      this.zephyr,
       tags
     );
     embedDescription += `\n${targetDescriptions.join("\n")}`;
@@ -169,7 +169,7 @@ export default class BurnCard extends BaseCommand {
     if (totalBitValue > 0)
       rewardsText.push(
         `:white_medium_small_square: ${
-          this.zephyr.config.discord.emoji.bits
+          Zephyr.config.discord.emoji.bits
         } **${totalBitValue.toLocaleString()}**`
       );
 
@@ -195,9 +195,9 @@ export default class BurnCard extends BaseCommand {
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
-      emoji.id === this.zephyr.config.discord.emojiId.check;
+      emoji.id === Zephyr.config.discord.emojiId.check;
 
-    const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
+    const collector = new ReactionCollector(Zephyr, confirmation, filter, {
       time: 15000,
       max: 1,
     });
@@ -224,7 +224,7 @@ export default class BurnCard extends BaseCommand {
 
       // Give the cards to the bot
       if (cardTargets.length > 0)
-        await CardService.burnCards(profile, cardTargets, this.zephyr);
+        await CardService.burnCards(profile, cardTargets);
       // Delete the dyes
       if (dyeTargets.length > 0) await ProfileService.burnDyes(dyeTargets);
 
@@ -263,13 +263,13 @@ export default class BurnCard extends BaseCommand {
         });
       }
 
-      if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+      if (checkPermission(`manageMessages`, msg.channel))
         await confirmation.removeReactions();
     });
 
     await this.react(
       confirmation,
-      `check:${this.zephyr.config.discord.emojiId.check}`
+      `check:${Zephyr.config.discord.emojiId.check}`
     );
     return;
   }

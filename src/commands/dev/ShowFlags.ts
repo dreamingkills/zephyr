@@ -1,6 +1,7 @@
 import { Message } from "eris";
 import { BaseCommand } from "../../structures/command/Command";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
+import { Zephyr } from "../../structures/client/Zephyr";
 
 export default class Flags extends BaseCommand {
   names = [`flags`];
@@ -9,7 +10,7 @@ export default class Flags extends BaseCommand {
   developerOnly = true;
 
   async exec(msg: Message): Promise<void> {
-    const flags = Object.entries(this.zephyr.flags);
+    const flags = Object.entries(Zephyr.flags);
 
     const flagValues = [];
 

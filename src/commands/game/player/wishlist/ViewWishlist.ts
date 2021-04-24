@@ -5,6 +5,7 @@ import { BaseCommand } from "../../../../structures/command/Command";
 import { GameProfile } from "../../../../structures/game/Profile";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { escapeMarkdown } from "../../../../lib/utility/text/TextUtils";
+import { Zephyr } from "../../../../structures/client/Zephyr";
 
 export default class ViewWishlist extends BaseCommand {
   id = `rise`;
@@ -27,7 +28,7 @@ export default class ViewWishlist extends BaseCommand {
         throw new ZephyrError.InvalidSnowflakeError();
       }
 
-      targetUser = await this.zephyr.fetchUser(options[0]);
+      targetUser = await Zephyr.fetchUser(options[0]);
       if (!targetUser) throw new ZephyrError.UserNotFoundError();
 
       targetProfile = await ProfileService.getProfile(targetUser.id);
@@ -44,9 +45,9 @@ export default class ViewWishlist extends BaseCommand {
     for (let idol of wishlist) {
       const groups: string[] = [];
 
-      const applicableCards = this.zephyr
-        .getCards()
-        .filter((c) => c.idolId === idol.idolId);
+      const applicableCards = Zephyr.getCards().filter(
+        (c) => c.idolId === idol.idolId
+      );
 
       for (let card of applicableCards) {
         if (groups.includes(card.group || `Soloist`)) continue;
@@ -58,7 +59,7 @@ export default class ViewWishlist extends BaseCommand {
         `\`${(wishlist.indexOf(idol) + 1)
           .toString()
           .padStart(leftPad, ` `)}\` **${
-          this.zephyr.getIdol(idol.idolId)?.name || `Unknown Idol`
+          Zephyr.getIdol(idol.idolId)?.name || `Unknown Idol`
         }** ${
           groups.length === 0 ? `` : `(${escapeMarkdown(groups.join(", "))})`
         }`
@@ -72,7 +73,7 @@ export default class ViewWishlist extends BaseCommand {
       );
 
     if (profile.patron < 5) {
-      const prefix = this.zephyr.getPrefix(msg.guildID);
+      const prefix = Zephyr.getPrefix(msg.guildID);
       embed.setFooter(
         `Want more slots? Become a patron!\nUse ${prefix}patreon to find out more!`
       );

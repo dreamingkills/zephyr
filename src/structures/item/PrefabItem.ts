@@ -1,5 +1,4 @@
 import { Message } from "eris";
-import { Zephyr } from "../client/Zephyr";
 import { GameProfile } from "../game/Profile";
 
 export interface PrefabItem {
@@ -15,7 +14,6 @@ export interface PrefabItem {
   use?: (
     msg: Message,
     profile: GameProfile,
-    parameters: string[],
-    zephyr: Zephyr
+    parameters: string[]
   ) => Promise<void>;
 }

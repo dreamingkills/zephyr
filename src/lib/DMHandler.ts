@@ -1,14 +1,14 @@
-import { Zephyr } from "../structures/client/Zephyr";
 import { ProfileService } from "./database/services/game/ProfileService";
 import dayjs from "dayjs";
 import { createMessage } from "./discord/message/createMessage";
 import { GameProfile } from "../structures/game/Profile";
 import { Logger, loggerSettings } from "./logger/Logger";
+import { Zephyr } from "../structures/client/Zephyr";
 
-export class DMHandler {
-  public async handle(zephyr: Zephyr): Promise<void> {
-    if (!zephyr.flags.reminders) {
-      setTimeout(() => this.handle(zephyr), 30000);
+class DMService {
+  public async handle(): Promise<void> {
+    if (!Zephyr.flags.reminders) {
+      setTimeout(() => this.handle(), 30000);
       return;
     }
 
@@ -80,7 +80,7 @@ export class DMHandler {
       }
 
       try {
-        const dmChannel = await zephyr.getDMChannel(p.discordId);
+        const dmChannel = await Zephyr.getDMChannel(p.discordId);
         await createMessage(
           dmChannel,
           `:bell: Hey, **${dmChannel.recipient.tag}**! You can now ${message}!` +
@@ -122,6 +122,8 @@ export class DMHandler {
       );
     }
 
-    setTimeout(() => this.handle(zephyr), 30000);
+    setTimeout(() => this.handle(), 30000);
   }
 }
+
+export const DMHandler = new DMService();

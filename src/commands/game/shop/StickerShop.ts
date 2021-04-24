@@ -10,6 +10,7 @@ import { GameStickerPack } from "../../../structures/shop/StickerPack";
 import { getItemById } from "../../../assets/Items";
 import { Stickers } from "../../../lib/cosmetics/Stickers";
 import { Logger } from "../../../lib/logger/Logger";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class Shop extends BaseCommand {
   id = `repentless`;
@@ -24,10 +25,10 @@ export default class Shop extends BaseCommand {
     options: string[]
   ): Promise<void> {
     const subcommand = options[0]?.toLowerCase();
-    const prefix = this.zephyr.getPrefix(msg.guildID);
+    const prefix = Zephyr.getPrefix(msg.guildID);
 
     if (subcommand) {
-      if (subcommand === `refresh` && isDeveloper(msg.author, this.zephyr)) {
+      if (subcommand === `refresh` && isDeveloper(msg.author)) {
         await Stickers.loadStickerPacks();
 
         const embed = new MessageEmbed(
@@ -48,8 +49,8 @@ export default class Shop extends BaseCommand {
 
         if (!targetPack) throw new ShopError.PackNotFoundError();
 
-        if (!targetPack.shoppable && !isDeveloper(msg.author, this.zephyr)) {
-          const prefix = this.zephyr.getPrefix(msg.guildID);
+        if (!targetPack.shoppable && !isDeveloper(msg.author)) {
+          const prefix = Zephyr.getPrefix(msg.guildID);
 
           throw new ShopError.PackNotForSaleError(prefix);
         }
@@ -79,7 +80,7 @@ export default class Shop extends BaseCommand {
             emoji.name === `☑` && userID === msg.author.id;
 
           const collector = new ReactionCollector(
-            this.zephyr,
+            Zephyr,
             confirmationMessage,
             filter,
             { time: 30000 }
@@ -163,10 +164,10 @@ export default class Shop extends BaseCommand {
 
       if (packItem) {
         featuredString = `🤩 __**Featured Sticker Pack**__\n${
-          this.zephyr.config.discord.emoji.blank
+          Zephyr.config.discord.emoji.blank
         } ${featuredPack.name} - **${featuredPack.price.toLocaleString()}** ${
           featuredPack.currency
-        } *(20% off!)*\n${this.zephyr.config.discord.emoji.blank} ${
+        } *(20% off!)*\n${Zephyr.config.discord.emoji.blank} ${
           packItem.description ? `*"${packItem.description}"*` : ``
         }`;
       }

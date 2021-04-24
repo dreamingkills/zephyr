@@ -8,6 +8,7 @@ import {
   escapeMarkdown,
   getGroupsByIdolId,
 } from "../../../lib/utility/text/TextUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class TopWishlist extends BaseCommand {
   id = `within`;
@@ -23,9 +24,9 @@ export default class TopWishlist extends BaseCommand {
     let description = "";
     const pad = `#${page * 10}`.length;
     for (let t of top) {
-      const idol = this.zephyr.getIdol(t.idol_id);
+      const idol = Zephyr.getIdol(t.idol_id);
 
-      const groups = getGroupsByIdolId(idol?.id || 0, this.zephyr.getCards());
+      const groups = getGroupsByIdolId(idol?.id || 0, Zephyr.getCards());
 
       description += `\`${(
         `#` + (page * 10 - 10 + top.indexOf(t) + 1).toString()
@@ -65,7 +66,7 @@ export default class TopWishlist extends BaseCommand {
 
     const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id;
-    const collector = new ReactionCollector(this.zephyr, board, filter, {
+    const collector = new ReactionCollector(Zephyr, board, filter, {
       time: 2 * 60 * 1000,
     });
     collector.on("error", async (e: Error) => {
@@ -93,7 +94,7 @@ export default class TopWishlist extends BaseCommand {
         );
         await board.edit({ embed });
 
-        if (checkPermission("manageMessages", msg.textChannel, this.zephyr))
+        if (checkPermission("manageMessages", msg.textChannel))
           await board.removeReaction(emoji.name, userId);
       }
     );

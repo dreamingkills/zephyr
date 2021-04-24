@@ -11,6 +11,7 @@ import { ReactionCollector } from "eris-collector";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
 import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { getItemById } from "../../../assets/Items";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class CraftItem extends BaseCommand {
   id = `crescendolls`;
@@ -25,7 +26,7 @@ export default class CraftItem extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!this.zephyr.flags.crafting && !isDeveloper(msg.author, this.zephyr))
+    if (!Zephyr.flags.crafting && !isDeveloper(msg.author))
       throw new ZephyrError.CraftingFlagDisabledError();
 
     if (!options[0]) throw new ZephyrError.UnspecifiedRecipeError();
@@ -70,9 +71,9 @@ export default class CraftItem extends BaseCommand {
 
     const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
       userId === msg.author.id &&
-      emoji.id === this.zephyr.config.discord.emojiId.check;
+      emoji.id === Zephyr.config.discord.emojiId.check;
 
-    const collector = new ReactionCollector(this.zephyr, confirmation, filter, {
+    const collector = new ReactionCollector(Zephyr, confirmation, filter, {
       time: 30000,
       max: 1,
     });
@@ -112,13 +113,13 @@ export default class CraftItem extends BaseCommand {
         });
       }
 
-      if (checkPermission(`manageMessages`, msg.channel, this.zephyr))
+      if (checkPermission(`manageMessages`, msg.channel))
         await confirmation.removeReactions();
     });
 
     await this.react(
       confirmation,
-      `check:${this.zephyr.config.discord.emojiId.check}`
+      `check:${Zephyr.config.discord.emojiId.check}`
     );
     return;
   }
