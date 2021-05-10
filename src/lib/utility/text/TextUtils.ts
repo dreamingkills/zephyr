@@ -188,3 +188,21 @@ export function canBypass(user: User): boolean {
 
   return false;
 }
+
+export function getConditionString(
+  condition: 0 | 1 | 2 | 3 | 4 | 5,
+  capital: boolean = true
+): string {
+  const conditionString = [
+    `Damaged`,
+    `Poor`,
+    `Average`,
+    `Good`,
+    `Great`,
+    `Mint`,
+  ][condition];
+
+  if (capital) {
+    return conditionString;
+  } else return conditionString.toLowerCase();
+}

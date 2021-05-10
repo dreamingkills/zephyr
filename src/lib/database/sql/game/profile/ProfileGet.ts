@@ -41,6 +41,7 @@ export async function getItems(
   )) as Item[];
   return query.map((i) => new GameItem(i));
 }
+
 export async function getItem(
   discordId: string,
   itemId: number,
@@ -50,6 +51,7 @@ export async function getItem(
     `SELECT * FROM user_item WHERE discord_id=? AND item_id=? AND quantity>0 GROUP BY item_id;`,
     [discordId, itemId]
   )) as Item[];
+
   if (!query[0]) throw new ZephyrError.NoItemInInventoryError(name);
   return new GameItem(query[0]);
 }

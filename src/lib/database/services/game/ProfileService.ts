@@ -390,9 +390,9 @@ export abstract class ProfileService {
   public static async setBooster(
     profile: GameProfile,
     groupId: number,
-    expiry: string
+    count: number
   ): Promise<GameProfile> {
-    await ProfileSet.setBooster(profile, groupId, expiry);
+    await ProfileSet.setBooster(profile, groupId, count);
 
     return await profile.fetch();
   }

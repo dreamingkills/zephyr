@@ -310,6 +310,7 @@ export async function createTag(
 
 export async function deleteTag(tagId: number): Promise<void> {
   await DB.query(`DELETE FROM card_tag WHERE id=?;`, [tagId]);
+  await DB.query(`DELETE FROM autotag WHERE tag_id=?;`, [tagId]);
   await DB.query(`UPDATE user_card SET tag_id=NULL WHERE tag_id=?;`, [tagId]);
 
   return;
@@ -530,11 +531,11 @@ export async function removeCubits(
 export async function setBooster(
   profile: GameProfile,
   groupId: number,
-  expiry: string
+  count: number
 ): Promise<void> {
   await DB.query(
-    `UPDATE profile SET booster_group=?, booster_expiry=? WHERE discord_id=?;`,
-    [groupId, expiry, profile.discordId]
+    `UPDATE profile SET booster_group=?, booster_uses=? WHERE discord_id=?;`,
+    [groupId, count, profile.discordId]
   );
 
   return;
@@ -542,7 +543,7 @@ export async function setBooster(
 
 export async function clearBooster(profile: GameProfile): Promise<void> {
   await DB.query(
-    `UPDATE profile SET booster_group=NULL, booster_expiry=NULL WHERE discord_id=?;`,
+    `UPDATE profile SET booster_group=NULL, booster_count=NULL WHERE discord_id=?;`,
     [profile.discordId]
   );
 

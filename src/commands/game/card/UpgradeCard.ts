@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
@@ -84,8 +84,8 @@ export default class UpgradeCard extends BaseCommand {
     const confirmation = await this.send(msg.channel, embed);
 
     const confirmed: boolean = await new Promise(async (res) => {
-      const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
-        userId === msg.author.id && emoji.name === `☑️`;
+      const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+        user.id === msg.author.id && emoji.name === `☑️`;
 
       const collector = new ReactionCollector(Zephyr, confirmation, filter, {
         time: 15000,

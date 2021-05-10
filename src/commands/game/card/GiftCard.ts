@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
@@ -13,6 +13,7 @@ import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { VaultError } from "../../../structures/error/VaultError";
 import { Zephyr } from "../../../structures/client/Zephyr";
+import { AutotagService } from "../../../lib/database/services/game/AutotagService";
 
 export default class GiftCard extends BaseCommand {
   id = `stunna`;
@@ -79,9 +80,10 @@ export default class GiftCard extends BaseCommand {
 
     const confirmation = await this.send(msg.channel, embed);
 
-    const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
-      userId === msg.author.id &&
+    const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+      user.id === msg.author.id &&
       emoji.id === Zephyr.config.discord.emojiId.check;
+
     const collector = new ReactionCollector(Zephyr, confirmation, filter, {
       time: 30000,
       max: 1,
@@ -104,6 +106,13 @@ export default class GiftCard extends BaseCommand {
         cards,
         msg.guildID!
       );
+
+      const tags = await gifteeProfile.getTags();
+      if (tags.length > 0) {
+        for (let card of cards) {
+          await AutotagService.autotag(gifteeProfile, tags, await card.fetch());
+        }
+      }
 
       await confirmation.edit({
         embed: embed.setFooter(

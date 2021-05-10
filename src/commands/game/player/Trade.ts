@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
@@ -12,6 +12,7 @@ import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { VaultError } from "../../../structures/error/VaultError";
 import { Zephyr } from "../../../structures/client/Zephyr";
+import { AutotagService } from "../../../lib/database/services/game/AutotagService";
 
 export default class Trade extends BaseCommand {
   id = `rhinestone`;
@@ -76,8 +77,8 @@ export default class Trade extends BaseCommand {
 
     const confirmation = await this.send(msg.channel, embed);
 
-    const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
-      (userId === msg.author.id || userId === targetUser.id) &&
+    const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+      (user.id === msg.author.id || user.id === targetUser.id) &&
       emoji.id === Zephyr.config.discord.emojiId.check;
 
     const collector = new ReactionCollector(Zephyr, confirmation, filter, {
@@ -92,8 +93,8 @@ export default class Trade extends BaseCommand {
 
     collector.on(
       "collect",
-      async (_m: Message, _emoji: PartialEmoji, userId: string) => {
-        if (!confirmed.includes(userId)) confirmed.push(userId);
+      async (_m: Message, _emoji: PartialEmoji, user: User) => {
+        if (!confirmed.includes(user.id)) confirmed.push(user.id);
 
         if (confirmed.length === 2) {
           const recheckTraderCard = await traderCard.fetch();
@@ -118,6 +119,24 @@ export default class Trade extends BaseCommand {
 
           await CardService.transferCardsToUser([traderCard], target);
           await CardService.transferCardsToUser([tradeeCard], profile);
+
+          const senderTags = await profile.getTags();
+          const receiverTags = await target.getTags();
+
+          if (senderTags.length > 0) {
+            await AutotagService.autotag(
+              profile,
+              senderTags,
+              await tradeeCard.fetch()
+            );
+          }
+          if (receiverTags.length > 0) {
+            await AutotagService.autotag(
+              target,
+              receiverTags,
+              await traderCard.fetch()
+            );
+          }
 
           await AnticheatService.logTrade(
             profile,

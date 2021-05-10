@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { checkPermission } from "../../lib/ZephyrUtils";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
@@ -47,8 +47,8 @@ export default class GroupList extends BaseCommand {
     if (totalPages > 1) await this.react(groupList, `▶`);
     if (totalPages > 2) await this.react(groupList, `⏭`);
 
-    const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
-      userId === msg.author.id && [`⏮`, `◀`, `▶`, `⏭`].includes(emoji.name);
+    const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+      user.id === msg.author.id && [`⏮`, `◀`, `▶`, `⏭`].includes(emoji.name);
 
     const collector = new ReactionCollector(Zephyr, groupList, filter, {
       time: 2 * 60 * 1000,
@@ -59,7 +59,7 @@ export default class GroupList extends BaseCommand {
 
     collector.on(
       "collect",
-      async (_m: Message, emoji: PartialEmoji, userId: string) => {
+      async (_m: Message, emoji: PartialEmoji, user: User) => {
         if (emoji.name === "⏮" && page !== 1) page = 1;
         if (emoji.name === "◀" && page !== 1) page--;
         // numbers
@@ -86,7 +86,7 @@ export default class GroupList extends BaseCommand {
         await this.edit(groupList, embed);
 
         if (checkPermission("manageMessages", msg.textChannel))
-          await groupList.removeReaction(emoji.name, userId);
+          await groupList.removeReaction(emoji.name, user.id);
       }
     );
     return;

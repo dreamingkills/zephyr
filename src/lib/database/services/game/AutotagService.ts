@@ -16,7 +16,7 @@ export abstract class AutotagService {
     if (tags.length < 1) return { tag: undefined };
 
     const autotags = [...(await this.getAutotags(profile))].sort(
-      (a, b) => b.priority - a.priority
+      (a, b) => a.priority - b.priority
     );
 
     if (autotags.length < 1) return { tag: undefined };
@@ -79,9 +79,10 @@ export abstract class AutotagService {
     profile: GameProfile,
     key: AutotagKey,
     value: number,
+    tag: GameTag,
     priority: number
   ): Promise<GameAutotag> {
-    return await AutotagSet.createAutotag(profile, key, value, priority);
+    return await AutotagSet.createAutotag(profile, key, value, tag, priority);
   }
 
   public static async deleteAutotag(autotag: GameAutotag): Promise<void> {

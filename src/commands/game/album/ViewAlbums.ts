@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
@@ -87,8 +87,8 @@ export default class ViewAlbums extends BaseCommand {
 
     if (maxPage === 1) return;
 
-    const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
-      userId === msg.author.id;
+    const filter = (_m: Message, _emoji: PartialEmoji, user: User) =>
+      user.id === msg.author.id;
 
     const collector = new ReactionCollector(Zephyr, albumsMessage, filter, {
       time: 2 * 60 * 1000,
@@ -96,7 +96,7 @@ export default class ViewAlbums extends BaseCommand {
 
     collector.on(
       "collect",
-      async (_m: Message, emoji: PartialEmoji, userId: string) => {
+      async (_m: Message, emoji: PartialEmoji, user: User) => {
         if (emoji.name === "⏮" && page !== 1) page = 1;
         if (emoji.name === "◀" && page !== 1) page--;
         // numbers
@@ -114,7 +114,7 @@ export default class ViewAlbums extends BaseCommand {
         await albumsMessage.edit({ embed });
 
         if (checkPermission("manageMessages", msg.textChannel))
-          await albumsMessage.removeReaction(emoji.name, userId);
+          await albumsMessage.removeReaction(emoji.name, user.id);
       }
     );
 

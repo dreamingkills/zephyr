@@ -12,6 +12,7 @@ import { transferItems } from "../../../lib/command/multitrade/TransferItems";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { Zephyr } from "../../../structures/client/Zephyr";
+import { Logger } from "../../../lib/logger/Logger";
 
 export default class MultiTrade extends BaseCommand {
   id = `inhuman`;
@@ -39,8 +40,9 @@ export default class MultiTrade extends BaseCommand {
     );
 
     const requestConfirmed: boolean = await new Promise(async (res, _req) => {
-      const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
-        userId === targetUser.id && emoji.name === "☑";
+      const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+        user.id === targetUser.id && emoji.name === "☑";
+
       const collector = new ReactionCollector(Zephyr, tradeMessage, filter, {
         time: 15000,
         max: 1,
@@ -154,13 +156,10 @@ export default class MultiTrade extends BaseCommand {
         await this.edit(tradeMessage, tradeInterfaceEmbed);
       });
 
-      const reactionFilter = (
-        _m: Message,
-        emoji: PartialEmoji,
-        userId: string
-      ) =>
-        [targetUser.id, msg.author.id].includes(userId) &&
+      const reactionFilter = (_m: Message, emoji: PartialEmoji, user: User) =>
+        [targetUser.id, msg.author.id].includes(user.id) &&
         ["❌", "🔒", "✅"].includes(emoji.name);
+
       const reactionCollector = new ReactionCollector(
         Zephyr,
         tradeMessage,
@@ -170,15 +169,17 @@ export default class MultiTrade extends BaseCommand {
         }
       );
 
-      reactionCollector.on(
-        "error",
-        async (e: Error) => await this.handleError(msg, msg.author, e)
-      );
+      reactionCollector.on("error", async (e: Error) => {
+        Logger.error(e);
+        await this.handleError(msg, msg.author, e);
+
+        return;
+      });
 
       reactionCollector.on(
         "collect",
-        async (_m: Message, emoji: PartialEmoji, userId: string) => {
-          const isSender = this.isSender(msg.author, userId);
+        async (_m: Message, emoji: PartialEmoji, user: User) => {
+          const isSender = this.isSender(msg.author, user.id);
 
           switch (emoji.name) {
             case "❌": {
@@ -244,15 +245,21 @@ export default class MultiTrade extends BaseCommand {
         }
       );
 
-      messageCollector.on("end", async (_collected: any, reason: string) => {
-        reactionCollector.stop();
-        if (reason === "time") res(false);
-      });
+      messageCollector.on(
+        "end",
+        async (_collected: unknown, reason: string) => {
+          reactionCollector.stop();
+          if (reason === "time") res(false);
+        }
+      );
 
-      reactionCollector.on("end", async (_collected: any, reason: string) => {
-        messageCollector.stop();
-        if (reason === "time") res(false);
-      });
+      reactionCollector.on(
+        "end",
+        async (_collected: unknown, reason: string) => {
+          messageCollector.stop();
+          if (reason === "time") res(false);
+        }
+      );
     });
 
     if (!tradeConfirmed) {
@@ -304,6 +311,7 @@ export default class MultiTrade extends BaseCommand {
         );
       }
     } catch (e) {
+      Logger.error(e);
       await this.edit(
         tradeMessage,
         tradeInterfaceEmbed

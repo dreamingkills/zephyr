@@ -53,19 +53,15 @@ export default class DropCards extends BaseCommand {
     const wishlist = await ProfileService.getWishlist(profile);
     let boost;
 
-    if (profile.boosterGroup) {
-      const expiry = dayjs(profile.boosterExpiry);
-      const now = dayjs();
-      if (now > expiry) {
+    if (profile.boosterGroup && profile.boosterUses) {
+      if (profile.boosterUses < 0) {
         await ProfileService.clearBooster(profile);
-      } else {
-        boost = profile.boosterGroup;
-      }
+      } else boost = profile.boosterGroup;
     }
 
-    const restricted = dayjs(msg.author.createdAt) > dayjs().subtract(7, `day`);
+    // const restricted = dayjs(msg.author.createdAt) > dayjs().subtract(7, `day`);
 
-    const cards = Zephyr.getRandomCards(3, wishlist, boost, restricted);
+    const cards = Zephyr.getRandomCards(3, wishlist, boost, false);
 
     await ProfileService.setDropTimestamp(
       profile,

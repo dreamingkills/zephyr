@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import { CardService } from "../../../lib/database/services/game/CardService";
@@ -107,21 +107,13 @@ export default class BurnCard extends BaseCommand {
       (t) => t instanceof GameUserCard
     ) as GameUserCard[];
 
-    /*let totalBitValue = 0;
+    let totalBitValue = 0;
 
     for (let card of cardTargets) {
       const bitValue = await CardService.calculateBurnValue(card);
 
       totalBitValue += bitValue;
-    }*/
-
-    const individualRewards = [
-      0,
-      ...cardTargets.map((c) => {
-        return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
-      }),
-    ];
-    const totalBitValue = individualRewards.reduce((acc, bits) => acc + bits);
+    }
 
     const dustItems = items.filter((i) =>
       i.names[0].includes("Dust")
@@ -193,8 +185,8 @@ export default class BurnCard extends BaseCommand {
 
     const confirmation = await this.send(msg.channel, embed);
 
-    const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
-      userId === msg.author.id &&
+    const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+      user.id === msg.author.id &&
       emoji.id === Zephyr.config.discord.emojiId.check;
 
     const collector = new ReactionCollector(Zephyr, confirmation, filter, {

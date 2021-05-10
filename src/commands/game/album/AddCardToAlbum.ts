@@ -30,11 +30,7 @@ export default class AddCardToAlbum extends BaseCommand {
 
     if (!options[1]) throw new ZephyrError.InvalidCardReferenceError();
 
-    const albumCardsAmount = await AlbumService.getNumberOfCardsByAlbum(
-      targetAlbum
-    );
-
-    if (albumCardsAmount >= targetAlbum.pages * 8)
+    if (targetAlbumCards.length >= targetAlbum.pages * 8)
       throw new ZephyrError.AlbumFullError();
 
     const targetCard = await CardService.getUserCardByIdentifier(options[1]);
@@ -62,10 +58,13 @@ export default class AddCardToAlbum extends BaseCommand {
         if (targetAlbumCards.find((c) => c.slot === trueSlot))
           throw new ZephyrError.AlbumSlotTakenError();
 
-        targetSlot = slot;
+        targetSlot = trueSlot;
       } else {
         const firstSlot = this.getFirstFreeSlot(
-          targetAlbumCards.slice(targetPage * 8 - 8, targetPage * 8)
+          targetAlbumCards.filter(
+            (a) => a.slot >= page * 8 - 8 && a.slot <= page * 8
+          ),
+          page
         );
 
         if (!firstSlot) throw new ZephyrError.AlbumPageFullError();
@@ -81,19 +80,22 @@ export default class AddCardToAlbum extends BaseCommand {
       targetPage = firstFreePage;
 
       const firstFreeSlot = this.getFirstFreeSlot(
-        targetAlbumCards.slice(targetPage * 8 - 8, targetPage * 8)
+        targetAlbumCards.filter(
+          (a) => a.slot >= firstFreePage * 8 - 8 && a.slot <= firstFreePage * 8
+        ),
+        targetPage
       );
 
-      if (!firstFreeSlot) throw new ZephyrError.AlbumFullError();
-      targetSlot = firstFreeSlot;
-    }
+      if (firstFreeSlot === undefined) throw new ZephyrError.AlbumFullError();
 
-    targetSlot += targetPage * 8 - 8 - 1;
+      targetSlot = firstFreeSlot!;
+    }
 
     const buffer = await AlbumService.addCardToAlbum(
       targetAlbum,
       targetCard,
-      targetSlot
+      targetSlot,
+      targetPage
     );
 
     const embed = new MessageEmbed(`Album`, msg.author)
@@ -127,19 +129,29 @@ export default class AddCardToAlbum extends BaseCommand {
     album: GameAlbum,
     cards: GameAlbumCard[]
   ): number | undefined {
-    for (let i = 0; i < album.pages; i++) {
+    for (let page = 1; page <= album.pages; page++) {
       const firstFreeSlot = this.getFirstFreeSlot(
-        cards.slice(i * 8 - 8, i * 8)
+        cards.filter((a) => a.slot >= page * 8 - 8 && a.slot <= page * 8),
+        page
       );
 
-      if (firstFreeSlot) return Math.ceil(firstFreeSlot);
+      if (firstFreeSlot !== undefined && firstFreeSlot >= 0) {
+        return page;
+      }
     }
   }
 
-  private getFirstFreeSlot(cards: GameAlbumCard[]): number | undefined {
-    for (let i = 0; i < 8; i++) {
-      if (!cards.find((c) => c.slot === i)) {
-        return i + 1;
+  private getFirstFreeSlot(
+    cards: GameAlbumCard[],
+    page: number
+  ): number | undefined {
+    const cardsOnPage = cards.filter(
+      (a) => a.slot >= page * 8 - 8 && a.slot <= page * 8
+    );
+
+    for (let i = page * 8 - 8; i <= page * 8; i++) {
+      if (!cardsOnPage.find((c) => c.slot === i)) {
+        return i;
       }
     }
     return;

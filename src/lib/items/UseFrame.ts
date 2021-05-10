@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { Zephyr } from "../../structures/client/Zephyr";
 import { GameProfile } from "../../structures/game/Profile";
@@ -65,8 +65,8 @@ export async function useFrame(
   });
 
   const confirmed: boolean = await new Promise(async (res, _req) => {
-    const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
-      userId === msg.author.id &&
+    const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+      user.id === msg.author.id &&
       emoji.id === Zephyr.config.discord.emojiId.check;
 
     const collector = new ReactionCollector(Zephyr, confirmation, filter, {

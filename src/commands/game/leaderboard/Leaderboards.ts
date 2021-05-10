@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { LeaderboardService } from "../../../lib/database/services/game/LeaderboardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
@@ -79,8 +79,9 @@ export default class Leaderboards extends BaseCommand {
     if (totalPages > 1) await this.react(board, `▶`);
     if (totalPages > 2) await this.react(board, `⏭`);
 
-    const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
-      userId === msg.author.id;
+    const filter = (_m: Message, _emoji: PartialEmoji, user: User) =>
+      user.id === msg.author.id;
+
     const collector = new ReactionCollector(Zephyr, board, filter, {
       time: 2 * 60 * 1000,
     });
@@ -90,7 +91,7 @@ export default class Leaderboards extends BaseCommand {
 
     collector.on(
       "collect",
-      async (_m: Message, emoji: PartialEmoji, userId: string) => {
+      async (_m: Message, emoji: PartialEmoji, user: User) => {
         if (emoji.name === "⏮" && page !== 1) page = 1;
         if (emoji.name === "◀" && page !== 1) page--;
         // numbers
@@ -112,7 +113,7 @@ export default class Leaderboards extends BaseCommand {
         await board.edit({ embed });
 
         if (checkPermission("manageMessages", msg.textChannel)) {
-          await board.removeReaction(emoji.name, userId);
+          await board.removeReaction(emoji.name, user.id);
         }
       }
     );

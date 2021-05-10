@@ -70,6 +70,8 @@ class ZephyrClient extends Client {
     mainViewing: true /* Viewing cards in #zephyr-main */,
     debugMessages: true /* Debug messages in console */,
     claimAlerts: false /* "You must wait X to claim" */,
+    daily: false /* Claiming daily reward */,
+    mysteryBox: false /* Opening the Mystery Box */,
   };
 
   /* These are some numbers that affect various things around Zephyr. */
@@ -478,6 +480,12 @@ class ZephyrClient extends Client {
     return this.idols[id];
   }
 
+  public getIdolsByName(name: string): GameIdol[] {
+    return Object.values(this.idols).filter(
+      (idol) => idol.name.toLowerCase() === name.toLowerCase()
+    );
+  }
+
   public getGroupById(id: number): string | undefined {
     return Object.values(this.cards).find((c) => c.groupId === id)?.group;
   }
@@ -528,9 +536,9 @@ class ZephyrClient extends Client {
       let weight = 100;
 
       // Calculate relative weighting based on serial number
-      const relativeMultiplier = Math.min(
-        1,
-        (median / Math.max(1, c.serialTotal)) * 1.025
+      const relativeMultiplier = Math.max(
+        0.00001,
+        Math.min(1, (median / Math.max(1, c.serialTotal)) * 1.025)
       );
 
       weight *= relativeMultiplier;

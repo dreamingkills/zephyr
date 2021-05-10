@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
@@ -76,8 +76,8 @@ export default class Shop extends BaseCommand {
         await this.react(confirmationMessage, `☑`);
 
         const confirmed = await new Promise((res) => {
-          const filter = (_m: Message, emoji: PartialEmoji, userID: string) =>
-            emoji.name === `☑` && userID === msg.author.id;
+          const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+            emoji.name === `☑` && user.id === msg.author.id;
 
           const collector = new ReactionCollector(
             Zephyr,
@@ -97,7 +97,7 @@ export default class Shop extends BaseCommand {
             res(true);
           });
 
-          collector.on(`end`, (reason: string) => {
+          collector.on(`end`, (_collected: unknown, reason: string) => {
             if (reason === `time`) res(false);
           });
         });

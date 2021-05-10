@@ -37,16 +37,13 @@ export default class Cooldowns extends BaseCommand {
     }__
     `;
 
-    if (profile.boosterGroup && profile.boosterExpiry) {
-      const expiry = dayjs(profile.boosterExpiry);
-
-      if (expiry < now) {
+    if (profile.boosterGroup && profile.boosterUses) {
+      if (profile.boosterUses === 0) {
         await ProfileService.clearBooster(profile);
       } else {
-        const timeUntilExpiration = getTimeUntil(now, expiry);
         const group = Zephyr.getGroupById(profile.boosterGroup);
 
-        timerString += `\nYou have __${timeUntilExpiration}__ remaining on your boost for **${group}**.`;
+        timerString += `\nYou have __${profile.boosterUses} uses__ remaining on your boost for **${group}**.`;
       }
     }
 

@@ -4,9 +4,11 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import dayjs from "dayjs";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
-import { Chance } from "chance";
 import { getTimeUntil } from "../../../lib/utility/time/TimeUtils";
 import { Zephyr } from "../../../structures/client/Zephyr";
+import { getItemById } from "../../../assets/Items";
+import * as ZephyrError from "../../../structures/error/ZephyrError";
+import { isDeveloper } from "../../../lib/ZephyrUtils";
 
 export default class DailyReward extends BaseCommand {
   id = `uta`;
@@ -15,10 +17,11 @@ export default class DailyReward extends BaseCommand {
   allowDm = true;
 
   private dayFormat = `YYYY-MM-DD`;
-  private bitsReward = { min: 50, max: 100 };
-  // private streakMultiplier = 2;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
+    if (!Zephyr.flags.daily && !isDeveloper(msg.author))
+      throw new ZephyrError.DailyFlagDisabledError();
+
     const today = dayjs(Date.now());
     const todayFormat = today.format(this.dayFormat);
     const last = dayjs(profile.dailyLast);
@@ -36,19 +39,29 @@ export default class DailyReward extends BaseCommand {
         `${Zephyr.config.discord.emoji.clock} You've already claimed your daily reward today.`
       );
     } else {
-      const reward = new Chance().integer(this.bitsReward);
-      await ProfileService.addBitsToProfile(profile, reward);
+      const keyPrefab = getItemById(47);
+
+      if (!keyPrefab) throw new ZephyrError.KeyItemNotFoundError();
 
       if (streakBroken) {
         await ProfileService.resetDailyStreak(profile);
       } else await ProfileService.incrementDailyStreak(profile);
 
+      const count = profile.dailyStreak + (1 % 7) === 0 ? 3 : 1;
+
+      await ProfileService.addItems(profile, [
+        { item: keyPrefab, count: count },
+      ]);
+      // TESTING ONLY
+      await ProfileService.addBitsToProfile(profile, 10000);
+
       _profile = await ProfileService.setDailyTimestamp(profile, todayFormat);
+      const keyItem = await ProfileService.getItem(profile, 47, `Key`);
+
+      const prefix = Zephyr.getPrefix(msg.guildID);
       embed.setDescription(
         `${Zephyr.config.discord.emoji.clock} You claimed your daily reward and got...` +
-          `\n— ${
-            Zephyr.config.discord.emoji.bits
-          }**${reward}** *(new balance: ${_profile.bits.toLocaleString()})*`
+          `\n— **${count}x Key** 🔑 *(${keyItem.quantity} total)*\n\n**TIP**: Keys can be used to open the \`${prefix}mysterybox\`!`
       );
     }
 
@@ -56,7 +69,8 @@ export default class DailyReward extends BaseCommand {
       `Your daily reward is available in ${getTimeUntil(
         today,
         dayjs(today).add(1, "day").startOf(`day`)
-      )}.` + `\nYour current streak is ${_profile.dailyStreak.toLocaleString()}`
+      )}.` +
+        `\nYour current daily streak is ${_profile.dailyStreak.toLocaleString()}.`
     );
 
     await this.send(msg.channel, embed);

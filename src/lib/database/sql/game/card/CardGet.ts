@@ -310,7 +310,7 @@ export async function getTimesCardWishlisted(
 
 export async function getAverageClaimTime(cardId: number): Promise<number> {
   const query = (await DB.query(
-    `SELECT AVG(claim_time) AS average FROM user_card WHERE claim_time>0 AND card_id=?;`,
+    `SELECT AVG(claim.claimed_after) AS average FROM claim LEFT JOIN user_card ON user_card.id=claim.card_id WHERE claim.claimed_after>0 AND user_card.card_id=?;`,
     [cardId]
   )) as { average: number }[];
   return query[0].average;

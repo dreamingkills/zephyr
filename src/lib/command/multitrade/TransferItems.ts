@@ -1,6 +1,7 @@
 import { GameDye } from "../../../structures/game/Dye";
 import { GameProfile } from "../../../structures/game/Profile";
 import { GameUserCard } from "../../../structures/game/UserCard";
+import { AutotagService } from "../../database/services/game/AutotagService";
 import { CardService } from "../../database/services/game/CardService";
 import { ProfileService } from "../../database/services/game/ProfileService";
 import {
@@ -30,7 +31,16 @@ export async function transferItems(
   const { cubits } =
     (tradeItems.find((i) => isCubitItem(i)) as InteractableCubits) || 0;
 
-  if (cards.length > 0) await CardService.transferCardsToUser(cards, receiver);
+  if (cards.length > 0) {
+    await CardService.transferCardsToUser(cards, receiver);
+
+    const tags = await receiver.getTags();
+    if (tags.length > 0) {
+      for (let card of cards) {
+        await AutotagService.autotag(receiver, tags, await card.fetch());
+      }
+    }
+  }
   if (items.length > 0) {
     await ProfileService.removeItems(giver, items);
     await ProfileService.addItems(receiver, items);

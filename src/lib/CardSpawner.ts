@@ -85,8 +85,8 @@ class DropHandler {
       ],
     });
 
-    const filter = (_m: Message, emoji: PartialEmoji, userID: string) =>
-      this.emojis.includes(emoji.name) && userID !== channel.client.user.id;
+    const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+      this.emojis.includes(emoji.name) && user.id !== channel.client.user.id;
 
     const collector = new ReactionCollector(channel.client, drop, filter);
 
@@ -107,14 +107,14 @@ class DropHandler {
 
     collector.on(
       "collect",
-      async (_: Message, emoji: PartialEmoji, userId: string) => {
+      async (_: Message, emoji: PartialEmoji, user: User) => {
         // If this card has already been claimed, ignore.
         const num = this.emojis.indexOf(emoji.name);
         if (finished[num]) return;
+        
+        if (this.grabbing.has(user.id)) return;
 
-        if (this.grabbing.has(userId)) return;
-
-        const profile = await ProfileService.getProfile(userId, true);
+        const profile = await ProfileService.getProfile(user.id, true);
 
         // Do not allow blacklisted users to claim cards.
         if (profile.blacklisted) return;
@@ -128,7 +128,7 @@ class DropHandler {
             if (!warned.has(profile.discordId)) {
               await createMessage(
                 channel,
-                `<@${userId}>, you must wait **${getTimeUntil(
+                `<@${user.id}>, you must wait **${getTimeUntil(
                   now,
                   until
                 )}** before claiming another card.`

@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { ProfileService } from "../../../../lib/database/services/game/ProfileService";
 import { MessageEmbed } from "../../../../structures/client/RichEmbed";
 import { BaseCommand } from "../../../../structures/command/Command";
@@ -30,8 +30,8 @@ export default class ClearWishlist extends BaseCommand {
     await this.react(confirmation, `✅`);
 
     const confirmed: boolean = await new Promise(async (res, _req) => {
-      const filter = (_m: Message, emoji: PartialEmoji, userID: string) =>
-        emoji.name === `✅` && userID === msg.author.id;
+      const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+        emoji.name === `✅` && user.id === msg.author.id;
 
       const collector = new ReactionCollector(Zephyr, confirmation, filter, {
         time: 30000,

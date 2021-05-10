@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
@@ -99,9 +99,10 @@ export default class BurnUntagged extends BaseCommand {
 
     const confirmation = await this.send(msg.channel, embed);
 
-    const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
-      userId === msg.author.id &&
+    const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+      user.id === msg.author.id &&
       emoji.id === Zephyr.config.discord.emojiId.check;
+
     const collector = new ReactionCollector(Zephyr, confirmation, filter, {
       time: 30000,
       max: 1,

@@ -61,8 +61,8 @@ export default class ViewDyes extends BaseCommand {
     const sent = await this.send(msg.channel, embed);
 
     if (maxPage > 1) {
-      const filter = (_m: Message, _emoji: PartialEmoji, userId: string) =>
-        userId === msg.author.id;
+      const filter = (_m: Message, _emoji: PartialEmoji, user: User) =>
+        user.id === msg.author.id;
 
       const collector = new ReactionCollector(Zephyr, sent, filter, {
         time: 2 * 60 * 1000,
@@ -74,7 +74,7 @@ export default class ViewDyes extends BaseCommand {
 
       collector.on(
         "collect",
-        async (_m: Message, emoji: PartialEmoji, userId: string) => {
+        async (_m: Message, emoji: PartialEmoji, user: User) => {
           if (emoji.name === "⏮" && page !== 1) page = 1;
           if (emoji.name === "◀" && page !== 1) page--;
           // numbers
@@ -93,7 +93,7 @@ export default class ViewDyes extends BaseCommand {
           await sent.edit({ embed });
 
           if (checkPermission("manageMessages", msg.channel))
-            await sent.removeReaction(emoji.name, userId);
+            await sent.removeReaction(emoji.name, user.id);
         }
       );
 

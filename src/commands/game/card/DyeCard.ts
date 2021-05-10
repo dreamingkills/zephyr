@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
@@ -90,9 +90,10 @@ export default class DyeCard extends BaseCommand {
       files: [{ file: preview, name: "dyepreview.png" }],
     });
 
-    const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
-      userId === msg.author.id &&
+    const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+      user.id === msg.author.id &&
       emoji.id === Zephyr.config.discord.emojiId.check;
+
     const collector = new ReactionCollector(Zephyr, confirmation, filter, {
       time: 15000,
       max: 1,

@@ -1,4 +1,4 @@
-import { Message, PartialEmoji } from "eris";
+import { Message, PartialEmoji, User } from "eris";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { Filter } from "../../../lib/database/sql/Filters";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
@@ -117,8 +117,8 @@ export default class CardInventory extends BaseCommand {
     const sent = await this.send(msg.channel, embed);
     if (totalPages < 2) return;
 
-    const filter = (_m: Message, emoji: PartialEmoji, userId: string) =>
-      userId === msg.author.id && [`⏮`, `◀`, `▶`, `⏭`].includes(emoji.name);
+    const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+      user.id === msg.author.id && [`⏮`, `◀`, `▶`, `⏭`].includes(emoji.name);
 
     const collector = new ReactionCollector(Zephyr, sent, filter, {
       time: 2 * 60 * 1000,
@@ -131,7 +131,7 @@ export default class CardInventory extends BaseCommand {
 
     collector.on(
       "collect",
-      async (_m: Message, emoji: PartialEmoji, userId: string) => {
+      async (_m: Message, emoji: PartialEmoji, user: User) => {
         if (emoji.name === "⏮" && page !== 1) page = 1;
         if (emoji.name === "◀" && page !== 1) page--;
         // numbers
@@ -152,7 +152,7 @@ export default class CardInventory extends BaseCommand {
         await editMessage(sent, embed);
 
         if (checkPermission("manageMessages", msg.textChannel))
-          await sent.removeReaction(emoji.name, userId);
+          await sent.removeReaction(emoji.name, user.id);
       }
     );
 

@@ -740,6 +740,12 @@ export class NotEnoughAlbumPagesError extends ZephyrError {
   }
 }
 
+export class AlbumMaxPagesError extends ZephyrError {
+  constructor() {
+    super(`You cannot add any more pages to that album.`);
+  }
+}
+
 export class AlbumFullError extends ZephyrError {
   constructor() {
     super(`That album is full!`);
@@ -838,9 +844,9 @@ export class TooManyError extends ZephyrError {
     Boosters
               */
 export class BoosterActiveError extends ZephyrError {
-  constructor(expiry: string) {
+  constructor(remaining: number) {
     super(
-      `You already have a booster active.\nIt expires at **${expiry} UTC**.`
+      `You already have a booster active.\nIt has **${remaining} uses** remaining.`
     );
   }
 }
@@ -1090,6 +1096,22 @@ export class UserLacksBadgeError extends ZephyrError {
 /*
     Flags
 */
+export class DailyFlagDisabledError extends ZephyrError {
+  constructor() {
+    super(
+      `Sorry, but daily rewards are temporarily disabled.\nPlease join [Zephyr Community](https://discord.gg/zephyr) to stay up to date.`
+    );
+  }
+}
+
+export class MysteryBoxDisabledError extends ZephyrError {
+  constructor() {
+    super(
+      `Sorry, but the Mystery Box is currently disabled.\nPlease join [Zephyr Community](https://discord.gg/zephyr) to stay up to date.`
+    );
+  }
+}
+
 export class DropFlagDisabledError extends ZephyrError {
   constructor() {
     super(
@@ -1203,5 +1225,19 @@ export class ItemSoulboundError extends ZephyrError {
 export class CardVaultedError extends ZephyrError {
   constructor(card: GameUserCard) {
     super(`\`${renderIdentifier(card)}\` is currently in someone's vault.`);
+  }
+}
+
+export class KeyItemNotFoundError extends ZephyrError {
+  constructor() {
+    super(
+      `I could not find the Key item. Please report this to the developer.`
+    );
+  }
+}
+
+export class UnexpectedWheelError extends ZephyrError {
+  constructor() {
+    super(`An unexpected error occurred. Your key has been returned.`);
   }
 }

@@ -1,4 +1,5 @@
 import { ProfileService } from "../../lib/database/services/game/ProfileService";
+import { GameTag } from "./Tag";
 
 export interface Profile {
   /* Currencies */
@@ -17,7 +18,7 @@ export interface Profile {
   readonly discord_id: string;
   readonly private: boolean;
   readonly blurb: string;
-  readonly patron: number;
+  readonly patron: 0 | 1 | 2 | 3 | 4 | 5;
   readonly blacklisted: boolean;
 
   /* Timestamps */
@@ -36,7 +37,7 @@ export interface Profile {
 
   /* Boosters */
   readonly booster_group: number | null;
-  readonly booster_expiry: string | null;
+  readonly booster_uses: number | null;
 
   /* Other */
   readonly daily_streak: number;
@@ -60,7 +61,7 @@ export class GameProfile {
   readonly discordId: string;
   readonly private: boolean;
   readonly blurb: string;
-  readonly patron: number;
+  readonly patron: 0 | 1 | 2 | 3 | 4 | 5;
   readonly blacklisted: boolean;
 
   /* Timestamps */
@@ -79,7 +80,7 @@ export class GameProfile {
 
   /* Boosters */
   readonly boosterGroup?: number;
-  readonly boosterExpiry?: string;
+  readonly boosterUses?: number;
 
   /* Other */
   readonly dailyStreak: number;
@@ -121,7 +122,7 @@ export class GameProfile {
 
     /* Boosters */
     this.boosterGroup = data.booster_group || undefined;
-    this.boosterExpiry = data.booster_expiry || undefined;
+    this.boosterUses = data.booster_uses || undefined;
 
     /* Other */
     this.dailyStreak = data.daily_streak;
@@ -130,5 +131,9 @@ export class GameProfile {
 
   public async fetch(): Promise<GameProfile> {
     return await ProfileService.getProfile(this.discordId, false);
+  }
+
+  public async getTags(): Promise<GameTag[]> {
+    return await ProfileService.getTags(this);
   }
 }

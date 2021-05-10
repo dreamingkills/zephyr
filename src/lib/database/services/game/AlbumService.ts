@@ -64,15 +64,16 @@ export abstract class AlbumService {
   public static async addCardToAlbum(
     album: GameAlbum,
     card: GameUserCard,
-    slot: number
+    slot: number,
+    page: number
   ): Promise<Buffer> {
     await AlbumSet.addCardToAlbum(album, card, slot);
 
-    const page = Math.max(1, Math.ceil(slot / 8));
     const cards = await this.getCardsByAlbum(album);
+
     return await this.updateAlbumCache(
       album,
-      cards.slice(page * 8 - 8, page * 8),
+      cards.filter((a) => a.slot + 1 >= page * 8 - 8 && a.slot + 1 <= page * 8),
       page
     );
   }
@@ -95,7 +96,7 @@ export abstract class AlbumService {
   public static async generateAlbumImage(
     album: GameAlbum,
     cards: GameAlbumCard[],
-    _page: number
+    page: number
   ): Promise<Buffer> {
     const canvas = createCanvas(1024, 700);
     const ctx = canvas.getContext("2d");
@@ -104,8 +105,13 @@ export abstract class AlbumService {
     ctx.drawImage(image, 0, 0, 1024, 700);
 
     for (let card of cards) {
-      const posX = 22 + 245 * (card.slot - Math.floor(card.slot / 4) * 4); // 25 + 350x
-      const posY = 350 * Math.floor(card.slot / 4);
+      const posX =
+        22 +
+        245 *
+          (card.slot -
+            (page * 8 - 8) -
+            Math.floor((card.slot - (page * 8 - 8)) / 4) * 4); // 25 + 350x
+      const posY = 350 * Math.floor((card.slot - (page * 8 - 8)) / 4);
 
       const gameCard = await CardService.getUserCardById(card.cardId);
 
