@@ -17,6 +17,8 @@ setup.sql
 
 cache/
 
+.DS_Store
+
 # Logs
 logs
 *.log
