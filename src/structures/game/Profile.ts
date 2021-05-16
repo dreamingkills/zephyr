@@ -42,6 +42,7 @@ export interface Profile {
   /* Other */
   readonly daily_streak: number;
   readonly created_at: string;
+  readonly active_card: number;
 }
 
 export class GameProfile {
@@ -85,6 +86,7 @@ export class GameProfile {
   /* Other */
   readonly dailyStreak: number;
   readonly createdAt: string;
+  readonly activeCard: number;
 
   constructor(data: Profile) {
     /* Currencies */
@@ -127,6 +129,7 @@ export class GameProfile {
     /* Other */
     this.dailyStreak = data.daily_streak;
     this.createdAt = data.created_at;
+    this.activeCard = data.active_card;
   }
 
   public async fetch(): Promise<GameProfile> {

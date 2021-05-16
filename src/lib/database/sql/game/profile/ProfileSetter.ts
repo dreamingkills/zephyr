@@ -11,6 +11,7 @@ import dayjs from "dayjs";
 import { PrefabItem } from "../../../../../structures/item/PrefabItem";
 import { GameTag } from "../../../../../structures/game/Tag";
 import { VaultError } from "../../../../../structures/error/VaultError";
+import { GameUserCard } from "../../../../../structures/game/UserCard";
 
 /*
       Profile
@@ -562,4 +563,16 @@ export async function setProfileCreationDate(
   return;
 }
 
-export * as ProfileSet from "./ProfileSet";
+export async function setActiveCard(
+  profile: GameProfile,
+  card: GameUserCard
+): Promise<GameProfile> {
+  await DB.query(`UPDATE profile SET active_card=? WHERE discord_id=?;`, [
+    card.id,
+    profile.discordId,
+  ]);
+
+  return await profile.fetch();
+}
+
+export * as ProfileSetter from "./ProfileSetter";

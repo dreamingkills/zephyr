@@ -38,7 +38,7 @@ export default class ViewUserCard extends BaseCommand {
       throw new ZephyrError.CannotAttachFilesError();
 
     const rawIdentifier = options[0];
-    let noText = options[1]?.toLowerCase().replace(`—`, `--`) === "--notext";
+    // let noText = options[1]?.toLowerCase().replace(`—`, `--`) === "--notext";
 
     let card;
     if (!rawIdentifier) {
@@ -65,14 +65,17 @@ export default class ViewUserCard extends BaseCommand {
     const baseCard = Zephyr.getCard(card.baseCardId)!;
     let image: Buffer;
 
-    if (noText) {
-      image = await CardService.generateCardImage(
-        card,
-        noText,
-        profile.patron > 1
-      );
-    } else
+    if (
+      card.frame.id === 1 &&
+      card.dye.r === -1 &&
+      card.dye.g === -1 &&
+      card.dye.b === -1 &&
+      targetProfile.patron < 2
+    ) {
+      image = await CardService.getPrefabFromCache(baseCard);
+    } else {
       image = await CardService.checkCacheForCard(card, profile.patron > 1);
+    }
 
     const userTags = await ProfileService.getTags(targetProfile);
     const cardDescription = (await getDescriptions([card], userTags))[0];

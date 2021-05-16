@@ -17,9 +17,13 @@ class FrameService {
         frame: await loadImage(
           frame.frame_url || `./src/assets/frames/default/frame-default.png`
         ),
+        frameUrl:
+          frame.frame_url || `./src/assets/frames/default/frame-default.png`,
         mask: await fs.readFile(
           frame.dye_mask_url || `./src/assets/frames/default/mask-default.png`
         ),
+        maskUrl:
+          frame.dye_mask_url || `./src/assets/frames/default/mask-default.png`,
         overlay: frame.overlay,
         textColor: frame.text_color_hex || `FFFFFF`,
       };

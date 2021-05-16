@@ -347,17 +347,9 @@ export async function getCardStickers(
 export async function getLastCard(profile: GameProfile): Promise<GameUserCard> {
   const query = (await DB.query(
     `SELECT
-        user_card.*,
-        card_frame.id AS frame_id,
-        card_frame.frame_name,
-        card_frame.frame_url,
-        card_frame.dye_mask_url
+        user_card.*
       FROM
         user_card 
-      LEFT JOIN
-        card_frame
-      ON
-        user_card.frame=card_frame.id
       WHERE
         user_card.discord_id=?
       ORDER BY updated_at DESC;`,

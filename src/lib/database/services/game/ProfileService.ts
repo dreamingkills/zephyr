@@ -4,7 +4,7 @@ import { GameProfile } from "../../../../structures/game/Profile";
 import { GameTag } from "../../../../structures/game/Tag";
 import { GameWishlist } from "../../../../structures/game/Wishlist";
 import { ProfileGet } from "../../sql/game/profile/ProfileGet";
-import { ProfileSet } from "../../sql/game/profile/ProfileSet";
+import { ProfileSetter } from "../../sql/game/profile/ProfileSetter";
 import { PrefabItem } from "../../../../structures/item/PrefabItem";
 import { items } from "../../../../assets/Items";
 
@@ -25,13 +25,13 @@ export abstract class ProfileService {
   public static async createProfile(
     discordId: string | number
   ): Promise<GameProfile> {
-    return await ProfileSet.createNewProfile(discordId as string);
+    return await ProfileSetter.createNewProfile(discordId as string);
   }
 
   public static async togglePrivateProfile(
     profile: GameProfile
   ): Promise<GameProfile> {
-    await ProfileSet.togglePrivateProfile(profile.discordId);
+    await ProfileSetter.togglePrivateProfile(profile.discordId);
     return await profile.fetch();
   }
 
@@ -39,7 +39,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     blurb: string
   ): Promise<GameProfile> {
-    await ProfileSet.setBlurb(profile.discordId, blurb);
+    await ProfileSetter.setBlurb(profile.discordId, blurb);
     return await profile.fetch();
   }
 
@@ -53,18 +53,18 @@ export abstract class ProfileService {
     profile: GameProfile,
     idolId: number
   ): Promise<void> {
-    return await ProfileSet.addToWishlist(profile.discordId, idolId);
+    return await ProfileSetter.addToWishlist(profile.discordId, idolId);
   }
 
   public static async removeFromWishlist(
     profile: GameProfile,
     idolId: number
   ): Promise<void> {
-    return await ProfileSet.removeFromWishlist(profile.discordId, idolId);
+    return await ProfileSetter.removeFromWishlist(profile.discordId, idolId);
   }
 
   public static async clearWishlist(profile: GameProfile): Promise<void> {
-    return await ProfileSet.clearWishlist(profile.discordId);
+    return await ProfileSetter.clearWishlist(profile.discordId);
   }
 
   /*
@@ -74,7 +74,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    await ProfileSet.addBits(profile, amount);
+    await ProfileSetter.addBits(profile, amount);
     return await profile.fetch();
   }
 
@@ -82,7 +82,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    await ProfileSet.removeBits(profile, amount);
+    await ProfileSetter.removeBits(profile, amount);
     return await profile.fetch();
   }
 
@@ -90,7 +90,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    await ProfileSet.addBitsToVault(profile, amount);
+    await ProfileSetter.addBitsToVault(profile, amount);
     return await profile.fetch();
   }
 
@@ -99,7 +99,7 @@ export abstract class ProfileService {
     amount: number,
     prefix: string
   ): Promise<GameProfile> {
-    await ProfileSet.removeBitsFromVault(profile, amount, prefix);
+    await ProfileSetter.removeBitsFromVault(profile, amount, prefix);
     return await profile.fetch();
   }
 
@@ -107,7 +107,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    await ProfileSet.addCubitsToVault(profile, amount);
+    await ProfileSetter.addCubitsToVault(profile, amount);
     return await profile.fetch();
   }
 
@@ -116,7 +116,7 @@ export abstract class ProfileService {
     amount: number,
     prefix: string
   ): Promise<GameProfile> {
-    await ProfileSet.removeCubitsFromVault(profile, amount, prefix);
+    await ProfileSetter.removeCubitsFromVault(profile, amount, prefix);
     return await profile.fetch();
   }
 
@@ -127,21 +127,21 @@ export abstract class ProfileService {
     profile: GameProfile,
     timestamp: string
   ): Promise<GameProfile> {
-    await ProfileSet.setDailyTimestamp(profile.discordId, timestamp);
+    await ProfileSetter.setDailyTimestamp(profile.discordId, timestamp);
     return await profile.fetch();
   }
 
   public static async incrementDailyStreak(
     profile: GameProfile
   ): Promise<GameProfile> {
-    await ProfileSet.incrementDailyStreak(profile.discordId);
+    await ProfileSetter.incrementDailyStreak(profile.discordId);
     return await profile.fetch();
   }
 
   public static async resetDailyStreak(
     profile: GameProfile
   ): Promise<GameProfile> {
-    await ProfileSet.resetDailyStreak(profile.discordId);
+    await ProfileSetter.resetDailyStreak(profile.discordId);
     return await profile.fetch();
   }
 
@@ -149,7 +149,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     timestamp: string
   ): Promise<GameProfile> {
-    await ProfileSet.setDropTimestamp(profile.discordId, timestamp);
+    await ProfileSetter.setDropTimestamp(profile.discordId, timestamp);
     return await profile.fetch();
   }
 
@@ -157,7 +157,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     timestamp: string
   ): Promise<GameProfile> {
-    await ProfileSet.setClaimTimestamp(profile.discordId, timestamp);
+    await ProfileSetter.setClaimTimestamp(profile.discordId, timestamp);
     return await profile.fetch();
   }
 
@@ -187,14 +187,14 @@ export abstract class ProfileService {
     profile: GameProfile,
     items: { item: PrefabItem; count: number }[]
   ): Promise<void> {
-    return await ProfileSet.addItems(profile.discordId, items);
+    return await ProfileSetter.addItems(profile.discordId, items);
   }
 
   public static async removeItems(
     profile: GameProfile,
     items: { item: PrefabItem; count: number }[]
   ): Promise<void> {
-    return await ProfileSet.removeItems(profile, items);
+    return await ProfileSetter.removeItems(profile, items);
   }
 
   /*
@@ -205,7 +205,7 @@ export abstract class ProfileService {
     name: string,
     emoji: string
   ): Promise<GameTag> {
-    return await ProfileSet.createTag(profile.discordId, name, emoji);
+    return await ProfileSetter.createTag(profile.discordId, name, emoji);
   }
 
   public static async getTags(profile: GameProfile): Promise<GameTag[]> {
@@ -213,7 +213,7 @@ export abstract class ProfileService {
   }
 
   public static async deleteTag(tag: GameTag): Promise<void> {
-    return await ProfileSet.deleteTag(tag.id);
+    return await ProfileSetter.deleteTag(tag.id);
   }
 
   public static async editTag(
@@ -221,7 +221,7 @@ export abstract class ProfileService {
     name?: string,
     emoji?: string
   ): Promise<GameTag> {
-    return await ProfileSet.editTag(tag, name, emoji);
+    return await ProfileSetter.editTag(tag, name, emoji);
   }
 
   public static async getTagById(tagId: number): Promise<GameTag> {
@@ -239,25 +239,25 @@ export abstract class ProfileService {
   public static async setUserClaimReminded(
     profiles: GameProfile[]
   ): Promise<void> {
-    return await ProfileSet.setUserClaimReminded(profiles);
+    return await ProfileSetter.setUserClaimReminded(profiles);
   }
 
   public static async setUserDropReminded(
     profiles: GameProfile[]
   ): Promise<void> {
-    return await ProfileSet.setUserDropReminded(profiles);
+    return await ProfileSetter.setUserDropReminded(profiles);
   }
 
   public static async setUserVoteReminded(
     profiles: GameProfile[]
   ): Promise<void> {
-    return await ProfileSet.setUserVoteReminded(profiles);
+    return await ProfileSetter.setUserVoteReminded(profiles);
   }
 
   public static async toggleDropReminders(
     profiles: GameProfile[]
   ): Promise<void> {
-    return await ProfileSet.toggleDropReminders(
+    return await ProfileSetter.toggleDropReminders(
       profiles.map((p) => p.discordId)
     );
   }
@@ -265,7 +265,7 @@ export abstract class ProfileService {
   public static async toggleClaimReminders(
     profiles: GameProfile[]
   ): Promise<void> {
-    return await ProfileSet.toggleClaimReminders(
+    return await ProfileSetter.toggleClaimReminders(
       profiles.map((p) => p.discordId)
     );
   }
@@ -273,13 +273,15 @@ export abstract class ProfileService {
   public static async toggleVoteReminders(
     profiles: GameProfile[]
   ): Promise<void> {
-    return await ProfileSet.toggleVoteReminders(
+    return await ProfileSetter.toggleVoteReminders(
       profiles.map((p) => p.discordId)
     );
   }
 
   public static async disableReminders(profiles: GameProfile[]): Promise<void> {
-    return await ProfileSet.disableReminders(profiles.map((p) => p.discordId));
+    return await ProfileSetter.disableReminders(
+      profiles.map((p) => p.discordId)
+    );
   }
 
   /*
@@ -289,7 +291,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     color: { r: number; g: number; b: number }
   ): Promise<GameDye> {
-    return await ProfileSet.addDye(profile.discordId, color);
+    return await ProfileSetter.addDye(profile.discordId, color);
   }
 
   public static async getUserDyes(
@@ -307,7 +309,7 @@ export abstract class ProfileService {
     dye: GameDye,
     amount: number = 1
   ): Promise<GameDye> {
-    await ProfileSet.addChargesToDye(dye.id, amount);
+    await ProfileSetter.addChargesToDye(dye.id, amount);
     return await dye.fetch();
   }
 
@@ -315,7 +317,7 @@ export abstract class ProfileService {
     dye: GameDye,
     amount: number = 1
   ): Promise<GameDye> {
-    await ProfileSet.removeChargesFromDye(dye.id, amount);
+    await ProfileSetter.removeChargesFromDye(dye.id, amount);
     return await dye.fetch();
   }
 
@@ -329,40 +331,40 @@ export abstract class ProfileService {
   }
 
   public static async burnDyes(dyes: GameDye[]): Promise<void> {
-    return await ProfileSet.burnDyes(dyes);
+    return await ProfileSetter.burnDyes(dyes);
   }
 
   public static async transferDyesToUser(
     dyes: GameDye[],
     profile: GameProfile
   ): Promise<void> {
-    return await ProfileSet.transferDyesToUser(dyes, profile);
+    return await ProfileSetter.transferDyesToUser(dyes, profile);
   }
 
   public static async setPatronTier(
     profile: GameProfile,
     tier: number
   ): Promise<void> {
-    return await ProfileSet.setPatronTier(profile, tier);
+    return await ProfileSetter.setPatronTier(profile, tier);
   }
 
   public static async blacklistUser(
     profile: GameProfile
   ): Promise<GameProfile> {
-    return await ProfileSet.blacklistUser(profile);
+    return await ProfileSetter.blacklistUser(profile);
   }
 
   public static async unblacklistUser(
     profile: GameProfile
   ): Promise<GameProfile> {
-    return await ProfileSet.unblacklistUser(profile);
+    return await ProfileSetter.unblacklistUser(profile);
   }
 
   public static async addVote(
     voter: GameProfile,
     isWeekend: boolean
   ): Promise<GameProfile> {
-    await ProfileSet.addVote(voter, isWeekend);
+    await ProfileSetter.addVote(voter, isWeekend);
     return await voter.fetch();
   }
 
@@ -370,7 +372,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    await ProfileSet.addCubits(profile, amount);
+    await ProfileSetter.addCubits(profile, amount);
 
     return await profile.fetch();
   }
@@ -378,7 +380,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     amount: number
   ): Promise<GameProfile> {
-    await ProfileSet.removeCubits(profile, amount);
+    await ProfileSetter.removeCubits(profile, amount);
 
     return await profile.fetch();
   }
@@ -392,13 +394,13 @@ export abstract class ProfileService {
     groupId: number,
     count: number
   ): Promise<GameProfile> {
-    await ProfileSet.setBooster(profile, groupId, count);
+    await ProfileSetter.setBooster(profile, groupId, count);
 
     return await profile.fetch();
   }
 
   public static async clearBooster(profile: GameProfile): Promise<GameProfile> {
-    await ProfileSet.clearBooster(profile);
+    await ProfileSetter.clearBooster(profile);
 
     return await profile.fetch();
   }
@@ -407,7 +409,7 @@ export abstract class ProfileService {
     profile: GameProfile,
     date: string
   ): Promise<GameProfile> {
-    await ProfileSet.setProfileCreationDate(profile, date);
+    await ProfileSetter.setProfileCreationDate(profile, date);
 
     return await profile.fetch();
   }

@@ -1,3 +1,4 @@
+import { Frames } from "../../lib/cosmetics/Frames";
 import { CardService } from "../../lib/database/services/game/CardService";
 import { GameBaseCard } from "./BaseCard";
 import { GameFrame } from "./Frame";
@@ -8,9 +9,7 @@ export interface UserCard {
   readonly serial_number: number;
   readonly discord_id: string;
   readonly wear: 0 | 1 | 2 | 3 | 4 | 5;
-  readonly frame_id: number;
-  readonly frame_name: string;
-  readonly frame_url: string;
+  readonly frame: number;
   readonly text_color_hex: Buffer;
   readonly dye_mask_url: string;
   readonly dye_r: number | null;
@@ -27,9 +26,7 @@ export class GameUserCard {
   readonly serialNumber: number;
   readonly discordId: string;
   readonly wear: 0 | 1 | 2 | 3 | 4 | 5;
-  readonly frameId: number;
-  readonly frameName: string;
-  readonly frameUrl: string;
+  readonly frame: GameFrame;
   readonly textColor: string;
   readonly dyeMaskUrl: string;
   readonly dye: {
@@ -48,9 +45,8 @@ export class GameUserCard {
     this.serialNumber = data.serial_number;
     this.discordId = data.discord_id;
     this.wear = data.wear;
-    this.frameId = data.frame_id;
-    this.frameName = data.frame_name;
-    this.frameUrl = data.frame_url;
+
+    this.frame = Frames.getFrameById(data.frame || 1)!;
     this.textColor = data.text_color_hex?.toString() || `000000`;
     this.dyeMaskUrl = data.dye_mask_url;
     this.vaulted = data.vaulted;

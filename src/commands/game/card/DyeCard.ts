@@ -3,15 +3,16 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
-import { CardService } from "../../../lib/database/services/game/CardService";
+import {
+  CardService,
+  generateCardImage,
+} from "../../../lib/database/services/game/CardService";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ReactionCollector } from "eris-collector";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { MockUserCard } from "../../../structures/game/UserCard";
-import { Frames } from "../../../lib/cosmetics/Frames";
-import { GameFrame } from "../../../structures/game/Frame";
 import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class DyeCard extends BaseCommand {
@@ -53,21 +54,11 @@ export default class DyeCard extends BaseCommand {
 
     const baseCard = Zephyr.getCard(targetCard.baseCardId)!;
 
-    let frame: GameFrame;
-
-    const findFrame = Frames.getFrameById(targetCard.frameId || 1);
-
-    if (findFrame) {
-      frame = findFrame;
-    } else {
-      frame = Frames.getFrames()[0];
-    }
-
     const mockCard = new MockUserCard({
       id: targetCard.id,
       baseCard: baseCard,
       serialNumber: targetCard.serialNumber,
-      frame: frame,
+      frame: targetCard.frame,
       dye: { r: targetDye.dyeR, g: targetDye.dyeG, b: targetDye.dyeB },
     });
 
@@ -84,7 +75,7 @@ export default class DyeCard extends BaseCommand {
         }.`
       );
 
-    const preview = await CardService.generateCardImage(mockCard);
+    const preview = await generateCardImage(mockCard, false);
 
     const confirmation = await this.send(msg.channel, embed, {
       files: [{ file: preview, name: "dyepreview.png" }],

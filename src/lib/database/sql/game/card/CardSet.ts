@@ -24,15 +24,13 @@ export async function createNewUserCard(
     [12.5, 25, 35, 23.6, 14.6, 4]
   );
 
-  const luck = chance.floating({ min: 0, max: 1 });
-
   let issue = await IssueHandler.queueIssueGeneration(card);
   let tries = 0;
   while (true) {
     try {
       const query = (await DB.query(
-        `INSERT INTO user_card (card_id, serial_number, discord_id, wear, luck_coeff) VALUES (?, ?, ?, ?, ?)`,
-        [card.id, issue, profile.discordId, wear, luck]
+        `INSERT INTO user_card (card_id, serial_number, discord_id, wear) VALUES (?, ?, ?, ?)`,
+        [card.id, issue, profile.discordId, wear]
       )) as { insertId: number };
 
       Zephyr.incrementBaseCardSerialNumber(card);

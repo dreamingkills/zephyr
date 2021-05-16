@@ -3,7 +3,10 @@ import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { Zephyr } from "../../structures/client/Zephyr";
 import { GameProfile } from "../../structures/game/Profile";
 import { PrefabItem } from "../../structures/item/PrefabItem";
-import { CardService } from "../database/services/game/CardService";
+import {
+  CardService,
+  generateCardImage,
+} from "../database/services/game/CardService";
 import { ProfileService } from "../database/services/game/ProfileService";
 import * as ZephyrError from "../../structures/error/ZephyrError";
 import { createMessage } from "../discord/message/createMessage";
@@ -41,7 +44,7 @@ export async function useFrame(
   const baseCard = Zephyr.getCard(card.baseCardId)!;
   const frame = Frames.getFrameByName(item.names[0]);
 
-  if (frame!.id === card.frameId)
+  if (frame!.id === card.frame.id)
     throw new ZephyrError.DuplicateFrameError(card, frame!);
 
   const mockCard = new MockUserCard({
@@ -52,7 +55,7 @@ export async function useFrame(
     dye: card.dye,
   });
 
-  const preview = await CardService.generateCardImage(mockCard);
+  const preview = await generateCardImage(mockCard, false);
 
   const embed = new MessageEmbed(`Apply Frame`, msg.author)
     .setDescription(

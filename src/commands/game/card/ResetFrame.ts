@@ -29,10 +29,10 @@ export default class ResetFrame extends BaseCommand {
     if (card.discordId !== msg.author.id)
       throw new ZephyrError.NotOwnerOfCardError(card);
 
-    if (card.frameName?.includes("Default"))
+    if (card.frame.name?.includes("Default"))
       throw new ZephyrError.FrameAlreadyDefaultError(card);
 
-    if (card.frameName?.includes("Signature"))
+    if (card.frame.name?.includes("Signature"))
       throw new ZephyrError.CannotRemoveFrameError();
 
     const confirmation = await this.send(
