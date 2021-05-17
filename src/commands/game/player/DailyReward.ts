@@ -4,7 +4,7 @@ import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
 import dayjs from "dayjs";
 import { ProfileService } from "../../../lib/database/services/game/ProfileService";
-import { getTimeUntil } from "../../../lib/utility/time/TimeUtils";
+import { getTimeUntilNextDay } from "../../../lib/utility/time/TimeUtils";
 import { Zephyr } from "../../../structures/client/Zephyr";
 import { getItemById } from "../../../assets/Items";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
@@ -66,10 +66,7 @@ export default class DailyReward extends BaseCommand {
     }
 
     embed.setFooter(
-      `Your daily reward is available in ${getTimeUntil(
-        today,
-        dayjs(today).add(1, "day").startOf(`day`)
-      )}.` +
+      `Your daily reward is available in ${getTimeUntilNextDay()}.` +
         `\nYour current daily streak is ${_profile.dailyStreak.toLocaleString()}.`
     );
 

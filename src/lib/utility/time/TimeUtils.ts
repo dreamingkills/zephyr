@@ -38,3 +38,9 @@ export function getTimeUntil(from: Dayjs, to: Dayjs): string {
     ).trim();
   }
 }
+
+export function getTimeUntilNextDay(): string {
+  const today = dayjs();
+
+  return getTimeUntil(today, today.add(1, `day`).startOf(`day`));
+}

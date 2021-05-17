@@ -33,6 +33,7 @@ import { Frames } from "../../lib/cosmetics/Frames";
 import { Backgrounds } from "../../lib/cosmetics/Backgrounds";
 import { Shop } from "../../lib/shop/Shop";
 import { Logger, loggerSettings } from "../../lib/logger/Logger";
+import { Quests } from "../../lib/quest/Quest";
 
 class ZephyrClient extends Client {
   commandLib = new CommandLib();
@@ -86,6 +87,9 @@ class ZephyrClient extends Client {
     perUserRateLimit: 0 /* Message processing: rate limit, in ms, per user */,
     perChannelRateLimit: 0 /* Message processing: rate limit, in ms, per channel */,
     perGuildRateLimit: 0 /* Message processing: rate limit, in ms, per guild */,
+
+    dailyQuestLimit: 5 /* Quests: number of maximum active daily quests per user */,
+    weeklyQuestLimit: 2 /* Quests: number of maximum active weekly quests per user */,
   };
 
   /* Rate limit sets */
@@ -128,6 +132,8 @@ class ZephyrClient extends Client {
   }
 
   public async start() {
+    const startTime = Date.now();
+
     await this.cachePrefixes();
     await this.cacheCards();
 
@@ -142,7 +148,7 @@ class ZephyrClient extends Client {
 
     await this.generatePrefabs();
 
-    const startTime = Date.now();
+    Quests.loadQuests();
 
     this.on("debug", (msg: string, _id: number) => {
       if (this.flags.debugMessages) {
