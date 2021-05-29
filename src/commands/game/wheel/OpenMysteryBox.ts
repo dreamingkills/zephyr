@@ -9,7 +9,6 @@ import { ReactionCollector } from "eris-collector";
 import { Logger } from "../../../lib/logger/Logger";
 import { getItemById, getItemByName } from "../../../assets/Items";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { isDeveloper } from "../../../lib/ZephyrUtils";
 
 export default class OpenMysteryBox extends BaseCommand {
   id = `ramona`;
@@ -19,9 +18,6 @@ export default class OpenMysteryBox extends BaseCommand {
   allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!Zephyr.flags.mysteryBox && !isDeveloper(msg.author))
-      throw new ZephyrError.MysteryBoxDisabledError();
-
     const keyPrefab = getItemByName(`Key`);
 
     if (!keyPrefab) {

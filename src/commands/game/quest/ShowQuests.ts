@@ -1,13 +1,15 @@
+import dayjs from "dayjs";
 import { Message } from "eris";
 import { QuestGetter } from "../../../lib/database/sql/game/quest/QuestGetter";
-import { QuestSetter } from "../../../lib/database/sql/game/quest/QuestSetter";
-import { Quests } from "../../../lib/quest/Quest";
-import { getTimeUntilNextDay } from "../../../lib/utility/time/TimeUtils";
+import { initQuests } from "../../../lib/database/sql/game/quest/QuestSetter";
+import {
+  getTimeUntil,
+  getTimeUntilNextDay,
+} from "../../../lib/utility/time/TimeUtils";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { Zephyr } from "../../../structures/client/Zephyr";
 import { BaseCommand } from "../../../structures/command/Command";
 import { GameProfile } from "../../../structures/game/Profile";
-import { BaseQuest } from "../../../structures/game/quest/BaseQuest";
 
 export default class ShowQuests extends BaseCommand {
   id = `hypnotize`;
@@ -19,31 +21,11 @@ export default class ShowQuests extends BaseCommand {
   async exec(msg: Message, profile: GameProfile): Promise<void> {
     let quests = await QuestGetter.getActiveQuests(profile);
 
-    if (quests.length === 0) {
-      const dailyQuests: BaseQuest[] = [];
-      const weeklyQuests: BaseQuest[] = [];
+    const dailyQuestLimit = Zephyr.modifiers.dailyQuestLimit;
+    const weeklyQuestLimit = Zephyr.modifiers.weeklyQuestLimit;
 
-      while (dailyQuests.length < Zephyr.modifiers.dailyQuestLimit) {
-        const eligibleQuests = Quests.getQuests().filter(
-          (q) => !dailyQuests.find((_q) => _q.id === q.id) && q.type === `daily`
-        );
-
-        dailyQuests.push(Zephyr.chance.pickone(eligibleQuests));
-      }
-
-      while (weeklyQuests.length < Zephyr.modifiers.weeklyQuestLimit) {
-        const eligibleQuests = Quests.getQuests().filter(
-          (q) =>
-            !dailyQuests.find((_q) => _q.id === q.id) && q.type === `weekly`
-        );
-
-        weeklyQuests.push(Zephyr.chance.pickone(eligibleQuests));
-      }
-
-      quests = await QuestSetter.populateQuests(profile, [
-        ...dailyQuests,
-        ...weeklyQuests,
-      ]);
+    if (quests.length < dailyQuestLimit + weeklyQuestLimit) {
+      quests = await initQuests(profile, quests);
     }
 
     const weeklyQuestStrings: string[] = [];
@@ -54,11 +36,15 @@ export default class ShowQuests extends BaseCommand {
 
       if (!baseQuest) continue;
 
-      const questString = `**[${quest.progress}/${
-        quest.completion
-      }]** ${baseQuest.description
-        .replace(`%n`, `**${quest.completion}**`)
-        .replace(`%p`, quest.completion === 1 ? `` : `s`)}`;
+      let questString = baseQuest.description
+        .replace(`%n`, `**${quest.completion.toLocaleString()}**`)
+        .replace(`%p`, quest.completion === 1 ? `` : `s`);
+
+      if (quest.progress === quest.completion) {
+        questString = `:white_check_mark: ${questString}`;
+      } else {
+        questString = `:white_medium_small_square: ${questString} **[${quest.progress.toLocaleString()}/${quest.completion.toLocaleString()}]**`;
+      }
 
       if (baseQuest.type === `daily`) {
         dailyQuestStrings.push(questString);
@@ -69,11 +55,12 @@ export default class ShowQuests extends BaseCommand {
 
     const embed = new MessageEmbed(`Quests`, msg.author)
       .setDescription(
-        `:calendar_spiral: **Weekly Quests**\n\n${weeklyQuestStrings.join(
+        `:alarm_clock: **Daily Quests** — *resets in ${getTimeUntilNextDay()}*\n\n${dailyQuestStrings.join(
           `\n`
-        )}\n\n:calendar_spiral: **Daily Quests**\n\n${dailyQuestStrings.join(
-          `\n`
-        )}`
+        )}\n\n:calendar_spiral: **Weekly Quests** — *resets in ${getTimeUntil(
+          dayjs(),
+          dayjs().startOf(`week`).add(7, `day`)
+        )}*\n\n${weeklyQuestStrings.join(`\n`)}`
       )
       .setFooter(`Your daily quests will refresh in ${getTimeUntilNextDay()}`);
 

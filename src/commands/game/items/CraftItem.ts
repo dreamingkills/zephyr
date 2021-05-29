@@ -9,7 +9,7 @@ import { renderRecipe } from "../../../lib/utility/text/TextUtils";
 import { Recipe } from "../../../structures/game/Recipe";
 import { ReactionCollector } from "eris-collector";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
-import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 import { getItemById } from "../../../assets/Items";
 import { Zephyr } from "../../../structures/client/Zephyr";
 
@@ -26,9 +26,6 @@ export default class CraftItem extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!Zephyr.flags.crafting && !isDeveloper(msg.author))
-      throw new ZephyrError.CraftingFlagDisabledError();
-
     if (!options[0]) throw new ZephyrError.UnspecifiedRecipeError();
 
     const recipeQuery = recipes.filter(

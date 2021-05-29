@@ -1,5 +1,5 @@
 import { QuestObjective } from "./QuestObjective";
-import { QuestReward } from "./QuestReward";
+import { QuestReward, RewardCount } from "./QuestReward";
 
 export interface BaseQuest {
   id: number;
@@ -7,6 +7,7 @@ export interface BaseQuest {
   description: string;
   objective: QuestObjective;
   completion: number[];
+  xpReward: RewardCount;
   rewards: QuestReward[];
 }
 

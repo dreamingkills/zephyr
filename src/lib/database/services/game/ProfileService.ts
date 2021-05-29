@@ -405,6 +405,12 @@ export abstract class ProfileService {
     return await profile.fetch();
   }
 
+  public static async decrementBooster(
+    profile: GameProfile
+  ): Promise<GameProfile> {
+    return await ProfileSetter.decrementBooster(profile);
+  }
+
   public static async setProfileCreationDate(
     profile: GameProfile,
     date: string

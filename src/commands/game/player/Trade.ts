@@ -9,10 +9,14 @@ import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { ReactionCollector } from "eris-collector";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
-import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 import { VaultError } from "../../../structures/error/VaultError";
 import { Zephyr } from "../../../structures/client/Zephyr";
 import { AutotagService } from "../../../lib/database/services/game/AutotagService";
+import { QuestGetter } from "../../../lib/database/sql/game/quest/QuestGetter";
+import { QuestSetter } from "../../../lib/database/sql/game/quest/QuestSetter";
+import { QuestObjective } from "../../../structures/game/quest/QuestObjective";
+import { QuestProgression } from "../../../structures/game/quest/QuestProgression";
 
 export default class Trade extends BaseCommand {
   id = `rhinestone`;
@@ -25,9 +29,6 @@ export default class Trade extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!Zephyr.flags.trades && !isDeveloper(msg.author))
-      throw new ZephyrError.TradeFlagDisabledError();
-
     const targetUser = msg.mentions[0];
     if (!targetUser) throw new ZephyrError.InvalidMentionError();
 
@@ -117,8 +118,8 @@ export default class Trade extends BaseCommand {
             return;
           }
 
-          await CardService.transferCardsToUser([traderCard], target);
-          await CardService.transferCardsToUser([tradeeCard], profile);
+          await CardService.transferCardsToUser([traderCard], profile, target);
+          await CardService.transferCardsToUser([tradeeCard], target, profile);
 
           const senderTags = await profile.getTags();
           const receiverTags = await target.getTags();
@@ -136,6 +137,31 @@ export default class Trade extends BaseCommand {
               receiverTags,
               await traderCard.fetch()
             );
+          }
+
+          const progressableQuestsSender = await QuestGetter.checkAvailableQuestsForProgress(
+            profile,
+            QuestObjective.TRADE
+          );
+          const progressableQuestsReceiver = await QuestGetter.checkAvailableQuestsForProgress(
+            target,
+            QuestObjective.TRADE
+          );
+
+          if (progressableQuestsSender.length > 0) {
+            const progressions = progressableQuestsSender.map((q) => {
+              return { ...q, increment: 1 } as QuestProgression;
+            });
+
+            await QuestSetter.progressQuests(progressions, profile);
+          }
+
+          if (progressableQuestsReceiver.length > 0) {
+            const progressions = progressableQuestsReceiver.map((q) => {
+              return { ...q, increment: 1 } as QuestProgression;
+            });
+
+            await QuestSetter.progressQuests(progressions, target);
           }
 
           await AnticheatService.logTrade(

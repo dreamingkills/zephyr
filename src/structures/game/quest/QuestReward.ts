@@ -1,9 +1,11 @@
 import { PrefabItem } from "../../item/PrefabItem";
 
-type RewardCount = { min: number; max: number };
+export type RewardCount = { min: number; max: number };
 
-export type BaseQuestReward =
-  | { xp: RewardCount }
-  | { item: PrefabItem; count: RewardCount };
+export type XPReward = { xp: RewardCount };
+export type ItemReward = { item: PrefabItem; count: RewardCount };
 
-export type QuestReward = BaseQuestReward & { chance: number };
+export type BaseQuestReward = XPReward | ItemReward;
+export type RewardChance = { chance: number };
+
+export type QuestReward = BaseQuestReward & RewardChance;

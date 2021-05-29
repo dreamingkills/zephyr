@@ -5,9 +5,11 @@ import { GameAlbumCard } from "../../../structures/game/Album";
 import { GameBaseCard } from "../../../structures/game/BaseCard";
 import { GameDye } from "../../../structures/game/Dye";
 import { GameProfile } from "../../../structures/game/Profile";
+import { GameDBQuest } from "../../../structures/game/quest/database/DBQuest";
 import { Recipe } from "../../../structures/game/Recipe";
 import { GameTag } from "../../../structures/game/Tag";
 import { GameUserCard } from "../../../structures/game/UserCard";
+import { CardService } from "../../database/services/game/CardService";
 
 export function strToInt(text: string): number {
   let result = parseInt(text.replace(/[, ]+/g, ""), 10);
@@ -43,10 +45,37 @@ export function renderRecipe(recipe: Recipe): string {
     .join("\n")}\n\`\`\``;
 }
 
+export function getTruncatedDescription(card: GameUserCard): string {
+  let description = ``;
+
+  description += `${
+    Zephyr.config.discord.emoji[
+      getConditionString(
+        card.wear
+      ).toLowerCase() as keyof typeof Zephyr.config.discord.emoji
+    ]
+  } `;
+
+  description += `\`${card.id.toString(36)}\` `;
+
+  const baseCard = Zephyr.getCard(card.baseCardId);
+
+  if (!baseCard) {
+    return description + `**Unknown Card**`;
+  }
+
+  description += `**${baseCard.group || `Soloist`}** `;
+  description += `${baseCard.name} `;
+  if (baseCard.subgroup) description += `**(${baseCard.subgroup})**`;
+
+  return description;
+}
+
 export async function getDescriptions(
   targets: (GameUserCard | GameDye)[],
   tags: GameTag[] = [],
   showSubgroup: boolean = false,
+  showSerial: boolean = false,
   albumCards: GameAlbumCard[] = []
 ): Promise<string[]> {
   const descriptions = [];
@@ -71,14 +100,18 @@ export async function getDescriptions(
 
   const padLeft = Math.max(longestCardIdentifier, longestDyeIdentifier);
 
-  const longestIssue =
-    [...onlyCards]
-      .sort((a, b) =>
-        a.serialNumber.toString().length < b.serialNumber.toString().length
-          ? 1
-          : -1
-      )[0]
-      ?.serialNumber.toString().length + 1 || 1;
+  const longestLevel =
+    onlyCards.length > 0
+      ? CardService.getLevel(
+          [...onlyCards].sort((a, b) =>
+            CardService.getLevel(a).level.toString().length <
+            CardService.getLevel(b).level.toString().length
+              ? 1
+              : -1
+          )[0]
+        ).level.toString().length + 2
+      : 1;
+
   const longestCharge =
     [...onlyDyes]
       .sort((a, b) =>
@@ -86,7 +119,7 @@ export async function getDescriptions(
       )[0]
       ?.charges.toString().length || 1;
 
-  const padRight = Math.max(longestIssue, longestCharge);
+  const padRight = Math.max(longestLevel, longestCharge);
 
   for (let t of targets) {
     if (t instanceof GameUserCard) {
@@ -95,22 +128,24 @@ export async function getDescriptions(
         (tag) => tag.id === (<GameUserCard>t).tagId
       )[0];
 
-      descriptions.push(
-        `${hasTag?.emoji || `:white_medium_small_square:`} \`${renderIdentifier(
-          t
-        ).padStart(padLeft, " ")}\` : \`${"★"
-          .repeat(t.wear)
-          .padEnd(5, "☆")}\` : \`${(`#` + t.serialNumber.toString(10)).padEnd(
+      const desc =
+        `${hasTag?.emoji || `:white_medium_small_square:`} ` +
+        `\`${renderIdentifier(t).padStart(padLeft, ` `)}\` ` +
+        `: \`${`★`.repeat(t.wear).padEnd(5, `☆`)}\` ` +
+        `: \`${(`LV` + CardService.getLevel(t).level.toString(10)).padEnd(
           padRight,
-          " "
-        )}\`` +
-          ` **${baseCard.group || `Soloist`}** ${baseCard.name}` +
-          (baseCard.emoji ? ` ${baseCard.emoji}` : ``) +
-          (showSubgroup && baseCard.subgroup
-            ? ` **(${baseCard.subgroup})**`
-            : ``) +
-          (albumCards.find((c) => c.cardId === t.id) ? ` 🔖` : ``)
-      );
+          ` `
+        )}\` ` +
+        `**${baseCard.group || `Soloist`}** ` +
+        `${baseCard.name} ` +
+        `${baseCard.emoji ? `${baseCard.emoji} ` : ``}` +
+        `${
+          showSubgroup && baseCard.subgroup ? `**(${baseCard.subgroup})** ` : ``
+        }` +
+        `${showSerial ? `\`#${t.serialNumber}\` ` : ``}` +
+        `${albumCards.find((c) => c.cardId === t.id) ? ` 🔖` : ``}`;
+
+      descriptions.push(desc);
     } else if (t instanceof GameDye) {
       descriptions.push(
         `:white_medium_small_square: \`${`$${renderIdentifier(t)}`.padStart(
@@ -205,4 +240,14 @@ export function getConditionString(
   if (capital) {
     return conditionString;
   } else return conditionString.toLowerCase();
+}
+
+export function formatQuest(quest: GameDBQuest): string {
+  const description = quest.quest?.description;
+
+  if (!description) return `Unknown Quest`;
+
+  return description
+    .replace(`%n`, `**${quest.completion}**`)
+    .replace(`%p`, quest.completion === 1 ? `` : `s`);
 }

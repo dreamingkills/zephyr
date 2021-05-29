@@ -12,9 +12,13 @@ import { GameDye } from "../../../structures/game/Dye";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
-import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 import { VaultError } from "../../../structures/error/VaultError";
 import { Zephyr } from "../../../structures/client/Zephyr";
+import { QuestGetter } from "../../../lib/database/sql/game/quest/QuestGetter";
+import { QuestObjective } from "../../../structures/game/quest/QuestObjective";
+import { QuestProgression } from "../../../structures/game/quest/QuestProgression";
+import { QuestSetter } from "../../../lib/database/sql/game/quest/QuestSetter";
 
 export default class BurnCard extends BaseCommand {
   id = `suffer`;
@@ -28,9 +32,6 @@ export default class BurnCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!Zephyr.flags.burns && !isDeveloper(msg.author))
-      throw new ZephyrError.BurnFlagDisabledError();
-
     const burnTargets: (GameUserCard | GameDye)[] = [];
 
     if (options.length === 0) {
@@ -216,7 +217,7 @@ export default class BurnCard extends BaseCommand {
 
       // Give the cards to the bot
       if (cardTargets.length > 0)
-        await CardService.burnCards(profile, cardTargets);
+        await CardService.burnCards(cardTargets, profile);
       // Delete the dyes
       if (dyeTargets.length > 0) await ProfileService.burnDyes(dyeTargets);
 
@@ -245,6 +246,20 @@ export default class BurnCard extends BaseCommand {
       await confirmation.edit({
         embed: embed.setFooter(`${footer} been destroyed.`),
       });
+
+      const progressableQuests = await QuestGetter.checkAvailableQuestsForProgress(
+        profile,
+        QuestObjective.BURN_CARD
+      );
+
+      if (progressableQuests.length > 0) {
+        const progressions = progressableQuests.map((q) => {
+          return { ...q, increment: cardTargets.length } as QuestProgression;
+        });
+
+        await QuestSetter.progressQuests(progressions, profile);
+      }
+
       return;
     });
 

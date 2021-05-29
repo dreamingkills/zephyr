@@ -10,9 +10,13 @@ import { verifyMultitradeItems } from "../../../lib/command/multitrade/VerifyIte
 import { renderMultitradeInventory } from "../../../lib/command/multitrade/RenderInventory";
 import { transferItems } from "../../../lib/command/multitrade/TransferItems";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
-import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 import { Zephyr } from "../../../structures/client/Zephyr";
 import { Logger } from "../../../lib/logger/Logger";
+import { QuestGetter } from "../../../lib/database/sql/game/quest/QuestGetter";
+import { QuestSetter } from "../../../lib/database/sql/game/quest/QuestSetter";
+import { QuestObjective } from "../../../structures/game/quest/QuestObjective";
+import { QuestProgression } from "../../../structures/game/quest/QuestProgression";
 
 export default class MultiTrade extends BaseCommand {
   id = `inhuman`;
@@ -20,9 +24,6 @@ export default class MultiTrade extends BaseCommand {
   description = `Initiates a multitrade.`;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!Zephyr.flags.trades && !isDeveloper(msg.author))
-      throw new ZephyrError.TradeFlagDisabledError();
-
     const targetUser = msg.mentions[0];
     if (!targetUser) throw new ZephyrError.InvalidMentionError();
 
@@ -295,6 +296,31 @@ export default class MultiTrade extends BaseCommand {
           await transferItems(senderItems, targetProfile, profile);
         if (recipientItems.length > 0)
           await transferItems(recipientItems, profile, targetProfile);
+
+        const progressableQuestsSender = await QuestGetter.checkAvailableQuestsForProgress(
+          profile,
+          QuestObjective.TRADE
+        );
+        const progressableQuestsReceiver = await QuestGetter.checkAvailableQuestsForProgress(
+          targetProfile,
+          QuestObjective.TRADE
+        );
+
+        if (progressableQuestsSender.length > 0) {
+          const progressions = progressableQuestsSender.map((q) => {
+            return { ...q, increment: 1 } as QuestProgression;
+          });
+
+          await QuestSetter.progressQuests(progressions, profile);
+        }
+
+        if (progressableQuestsReceiver.length > 0) {
+          const progressions = progressableQuestsReceiver.map((q) => {
+            return { ...q, increment: 1 } as QuestProgression;
+          });
+
+          await QuestSetter.progressQuests(progressions, targetProfile);
+        }
 
         await AnticheatService.logMultitrade(
           senderItems,

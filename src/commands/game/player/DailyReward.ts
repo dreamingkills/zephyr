@@ -8,7 +8,6 @@ import { getTimeUntilNextDay } from "../../../lib/utility/time/TimeUtils";
 import { Zephyr } from "../../../structures/client/Zephyr";
 import { getItemById } from "../../../assets/Items";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
-import { isDeveloper } from "../../../lib/ZephyrUtils";
 
 export default class DailyReward extends BaseCommand {
   id = `uta`;
@@ -19,9 +18,6 @@ export default class DailyReward extends BaseCommand {
   private dayFormat = `YYYY-MM-DD`;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!Zephyr.flags.daily && !isDeveloper(msg.author))
-      throw new ZephyrError.DailyFlagDisabledError();
-
     const today = dayjs(Date.now());
     const todayFormat = today.format(this.dayFormat);
     const last = dayjs(profile.dailyLast);
@@ -52,8 +48,9 @@ export default class DailyReward extends BaseCommand {
       await ProfileService.addItems(profile, [
         { item: keyPrefab, count: count },
       ]);
-      // TESTING ONLY
-      await ProfileService.addBitsToProfile(profile, 10000);
+
+      if (Zephyr.config.testing)
+        await ProfileService.addBitsToProfile(profile, 10000);
 
       _profile = await ProfileService.setDailyTimestamp(profile, todayFormat);
       const keyItem = await ProfileService.getItem(profile, 47, `Key`);

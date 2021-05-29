@@ -12,9 +12,12 @@ import dayjs from "dayjs";
 import { BlacklistService } from "../database/services/meta/BlacklistService";
 import { AnticheatService } from "../database/services/meta/AnticheatService";
 import { Logger } from "../logger/Logger";
+import { getActiveQuests } from "../database/sql/game/quest/QuestGetter";
+import { initQuests } from "../database/sql/game/quest/QuestSetter";
 
 export class CommandLib {
-  commands: BaseCommand[] = [];
+  commands: Map<string, BaseCommand> = new Map();
+  aliases: Map<string, string> = new Map();
 
   async setup(): Promise<void> {
     const _glob = promisify(glob);
@@ -27,7 +30,15 @@ export class CommandLib {
         if (!cmdExport.default) continue;
 
         const cmd = new cmdExport.default(Zephyr) as BaseCommand;
-        this.commands.push(cmd);
+
+        cmd.path = f;
+
+        const primaryName = cmd.names[0];
+        this.commands.set(primaryName, cmd);
+
+        for (let name of cmd.names.slice(1)) {
+          this.aliases.set(name, primaryName);
+        }
       } catch {
         continue;
       }
@@ -37,69 +48,60 @@ export class CommandLib {
   async process(message: Message): Promise<void> {
     const isDm = !message.guildID;
 
-    let prefix = Zephyr.config.discord.defaultPrefix;
+    let prefix = Zephyr.getPrefix(message.guildID).toLowerCase();
 
-    if (!isDm) {
-      prefix = Zephyr.getPrefix(message.guildID);
-    }
+    if (!message.content.toLowerCase().startsWith(prefix)) return;
 
-    const commandNameRegExp = new RegExp(
-      `^(${prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})(\\S+)`,
-      `g`
-    ).exec(message.content.toLowerCase());
-    if (!commandNameRegExp) return;
+    const commandNameQuery = message.content
+      .toLowerCase()
+      .split(` `)[0]
+      .slice(prefix.length);
 
-    const commandName = commandNameRegExp[0].slice(prefix.length);
+    const command = this.getCommand(commandNameQuery);
 
-    const commandMatch = this.commands.filter((c) =>
-      c.names.includes(commandName)
-    );
-    if (!commandMatch[0]) return;
+    if (!command) return;
 
-    if (commandMatch.length > 1)
-      console.warn(`Duplicate command found: ${commandName}`);
-
-    const command = commandMatch[0];
-
-    if (isDm && !command.allowDm) {
-      const embed = new MessageEmbed(`Error`, message.author).setDescription(
-        `You cannot use that command in DMs.`
-      );
-
-      await createMessage(message.channel, embed);
-      return;
-    }
-
-    if (
-      command.developerOnly &&
-      !Zephyr.config.developers.includes(message.author.id)
-    ) {
-      const embed = new MessageEmbed(`Error`, message.author).setDescription(
-        `This command is only usable by the developer.`
-      );
-
-      try {
-        await createMessage(message.channel, embed);
-      } catch {}
-
-      return;
-    } else if (
-      command.moderatorOnly &&
-      !Zephyr.config.moderators.includes(message.author.id) &&
-      !Zephyr.config.developers.includes(message.author.id)
-    ) {
-      const embed = new MessageEmbed(`Error`, message.author).setDescription(
-        `This command is only usable by Zephyr staff.`
-      );
-
-      try {
-        await createMessage(message.channel, embed);
-      } catch {}
-
-      return;
-    }
+    const isDeveloper = Zephyr.config.developers.includes(message.author.id);
+    const isMod = Zephyr.config.moderators.includes(message.author.id);
 
     try {
+      if (Zephyr.maintenance.enabled && !isDeveloper && !isMod)
+        throw new ZephyrError.MaintenanceError(``);
+
+      if (command.disabled && !isDeveloper && !isMod)
+        throw new ZephyrError.CommandDisabledError(command.disabledMessage);
+
+      if (isDm && !command.allowDm) {
+        const embed = new MessageEmbed(`Error`, message.author).setDescription(
+          `You cannot use that command in DMs.`
+        );
+
+        await createMessage(message.channel, embed);
+        return;
+      }
+
+      if (command.developerOnly && !isDeveloper) {
+        const embed = new MessageEmbed(`Error`, message.author).setDescription(
+          `This command is only usable by the developer.`
+        );
+
+        try {
+          await createMessage(message.channel, embed);
+        } catch {}
+
+        return;
+      } else if (command.moderatorOnly && !isDeveloper && !isMod) {
+        const embed = new MessageEmbed(`Error`, message.author).setDescription(
+          `This command is only usable by Zephyr staff.`
+        );
+
+        try {
+          await createMessage(message.channel, embed);
+        } catch {}
+
+        return;
+      }
+
       let profile: GameProfile;
       try {
         profile = await ProfileService.getProfile(message.author.id);
@@ -153,7 +155,7 @@ export class CommandLib {
         throw new ZephyrError.AccountBlacklistedError(blacklist);
       }
 
-      if (!Zephyr.config.moderators.includes(message.author.id)) {
+      if (!isMod) {
         if (Zephyr.onCooldown.has(message.author.id)) return;
 
         Zephyr.onCooldown.add(message.author.id);
@@ -162,6 +164,14 @@ export class CommandLib {
           Zephyr.modifiers.globalRateLimit
         );
       }
+
+      const quests = await getActiveQuests(profile);
+
+      if (
+        quests.length <
+        Zephyr.modifiers.dailyQuestLimit + Zephyr.modifiers.weeklyQuestLimit
+      )
+        await initQuests(profile, quests);
 
       await command.run(message, profile);
 
@@ -175,9 +185,11 @@ export class CommandLib {
       }
     } catch (e) {
       if (e.isClientFacing) {
-        const embed = new MessageEmbed(`Error`, message.author).setDescription(
-          e.message
-        );
+        const embed = new MessageEmbed(
+          e.header || `Error`,
+          message.author
+        ).setDescription(e.message);
+
         try {
           await createMessage(message.channel, embed);
         } catch {}
@@ -203,6 +215,43 @@ export class CommandLib {
           true
         );
       }
+    }
+  }
+
+  public getCommand(name: string): BaseCommand | undefined {
+    if (this.commands.has(name)) return this.commands.get(name);
+
+    const alias = this.aliases.get(name);
+
+    if (!alias) return;
+
+    return this.commands.get(alias);
+  }
+
+  public reloadCommand(command: BaseCommand): void {
+    if (!command.path) throw new ZephyrError.InvalidCommandPathError();
+
+    delete require.cache[require.resolve(command.path)];
+
+    const newCommandExport = require(command.path);
+
+    if (!newCommandExport.default) throw new ZephyrError.NoDefaultExportError();
+
+    const newCommand = new newCommandExport.default(Zephyr) as BaseCommand;
+
+    newCommand.path = command.path;
+
+    this.commands.delete(command.names[0]);
+
+    for (let name of command.names) {
+      this.aliases.delete(name);
+    }
+
+    const primaryName = newCommand.names[0];
+    this.commands.set(primaryName, newCommand);
+
+    for (let name of newCommand.names.slice(1)) {
+      this.aliases.set(name, primaryName);
     }
   }
 }

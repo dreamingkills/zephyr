@@ -13,7 +13,19 @@ export default class Ping extends BaseCommand {
     const embed = new MessageEmbed(`Ping`, msg.author).setDescription(
       `:satellite: Response time: ${responseTime}ms (inaccurate)`
     );
-    await this.send(msg.channel, embed);
+
+    await msg.channel.createMessage({
+      embed,
+      components: [
+        {
+          type: 1,
+          components: [
+            { type: 2, custom_id: `test`, style: 1, label: `Hello World!` },
+          ],
+        },
+      ],
+    });
+
     return;
   }
 }

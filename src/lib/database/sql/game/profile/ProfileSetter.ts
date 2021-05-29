@@ -542,6 +542,24 @@ export async function setBooster(
   return;
 }
 
+export async function decrementBooster(
+  profile: GameProfile
+): Promise<GameProfile> {
+  await DB.query(
+    `
+    UPDATE
+      profile
+    SET
+      booster_uses = booster_uses - 1
+    WHERE
+      discord_id = ?;
+    `,
+    [profile.discordId]
+  );
+
+  return await profile.fetch();
+}
+
 export async function clearBooster(profile: GameProfile): Promise<void> {
   await DB.query(
     `UPDATE profile SET booster_group=NULL, booster_count=NULL WHERE discord_id=?;`,
@@ -571,6 +589,24 @@ export async function setActiveCard(
     card.id,
     profile.discordId,
   ]);
+
+  return await profile.fetch();
+}
+
+export async function unsetActiveCard(
+  profile: GameProfile
+): Promise<GameProfile> {
+  await DB.query(
+    `
+    UPDATE
+      profile
+    SET
+      active_card = NULL
+    WHERE
+      discord_id = ?;
+    `,
+    [profile.discordId]
+  );
 
   return await profile.fetch();
 }

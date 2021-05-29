@@ -13,6 +13,7 @@ import {
 } from "../../../../../structures/game/Sticker";
 import * as ZephyrError from "../../../../../structures/error/ZephyrError";
 import { AlbumService } from "../../../services/game/AlbumService";
+import { ProfileSetter } from "../profile/ProfileSetter";
 
 export async function createNewUserCard(
   card: GameBaseCard,
@@ -56,7 +57,8 @@ export async function setCardFrame(
 
 export async function transferCardsToUser(
   cards: GameUserCard[],
-  discordId: string
+  giver: GameProfile,
+  receiver: GameProfile
 ): Promise<void> {
   for (let card of cards) {
     const refetchCard = await card.fetch();
@@ -67,16 +69,22 @@ export async function transferCardsToUser(
     const isInAlbum = await AlbumService.cardIsInAlbum(refetchCard);
 
     if (isInAlbum) throw new ZephyrError.CardInAlbumError(refetchCard);
+
+    if (giver.activeCard === card.id)
+      await ProfileSetter.unsetActiveCard(giver);
   }
 
   await DB.query(
     `UPDATE user_card SET discord_id=?,tag_id=NULL WHERE id IN (?);`,
-    [discordId, cards.map((c) => c.id)]
+    [receiver.discordId, cards.map((c) => c.id)]
   );
   return;
 }
 
-export async function burnCards(cards: GameUserCard[]): Promise<void> {
+export async function burnCards(
+  cards: GameUserCard[],
+  burner: GameProfile
+): Promise<void> {
   for (let card of cards) {
     const refetchCard = await card.fetch();
 
@@ -86,6 +94,9 @@ export async function burnCards(cards: GameUserCard[]): Promise<void> {
     const isInAlbum = await AlbumService.cardIsInAlbum(refetchCard);
 
     if (isInAlbum) throw new ZephyrError.CardInAlbumError(refetchCard);
+
+    if (burner.activeCard === card.id)
+      await ProfileSetter.unsetActiveCard(burner);
   }
 
   await DB.query(
@@ -196,6 +207,26 @@ export async function unsetCardsVaulted(cards: GameUserCard[]): Promise<void> {
   );
 
   return;
+}
+
+export async function addExperience(
+  card: GameUserCard,
+  amount: number
+): Promise<GameUserCard> {
+  await DB.query(
+    `
+    UPDATE
+      user_card
+    SET
+      experience = experience + ?,
+      updated_at = updated_at
+    WHERE
+      id = ?;
+    `,
+    [amount, card.id]
+  );
+
+  return await card.fetch();
 }
 
 export * as CardSet from "./CardSet";

@@ -265,25 +265,17 @@ export async function getUntaggedCards(
 ): Promise<GameUserCard[]> {
   const query = (await DB.query(
     `
-      SELECT
-        user_card.*,
-        card_frame.id AS frame_id,
-        card_frame.frame_name,
-        card_frame.frame_url,
-        card_frame.dye_mask_url
-      FROM
-        user_card
-      LEFT JOIN
-        card_frame
-      ON
-        user_card.frame=card_frame.id
-      WHERE
-        user_card.tag_id IS NULL
-      AND
-        user_card.discord_id=?
-      AND
-        user_card.vaulted=0;
-      `,
+    SELECT
+      user_card.*
+    FROM
+      user_card
+    WHERE
+      user_card.tag_id IS NULL
+    AND
+      user_card.discord_id=?
+    AND
+      user_card.vaulted=0;
+    `,
     [discordId]
   )) as UserCard[];
   return query.map((c) => new GameUserCard(c));

@@ -32,7 +32,7 @@ export async function transferItems(
     (tradeItems.find((i) => isCubitItem(i)) as InteractableCubits) || 0;
 
   if (cards.length > 0) {
-    await CardService.transferCardsToUser(cards, receiver);
+    await CardService.transferCardsToUser(cards, giver, receiver);
 
     const tags = await receiver.getTags();
     if (tags.length > 0) {

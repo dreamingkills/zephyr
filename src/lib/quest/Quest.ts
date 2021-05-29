@@ -1,5 +1,11 @@
 import { quests } from "../../assets/quests";
 import { BaseQuest } from "../../structures/game/quest/BaseQuest";
+import {
+  ItemReward,
+  QuestReward,
+  RewardChance,
+  XPReward,
+} from "../../structures/game/quest/QuestReward";
 import { Logger, loggerSettings } from "../logger/Logger";
 
 class QuestService {
@@ -43,6 +49,16 @@ class QuestService {
 
   public getQuests(): BaseQuest[] {
     return this.quests;
+  }
+
+  public isXpReward(reward: QuestReward): reward is XPReward & RewardChance {
+    return (reward as XPReward).xp !== undefined;
+  }
+
+  public isItemReward(
+    reward: QuestReward
+  ): reward is ItemReward & RewardChance {
+    return (reward as ItemReward).item !== undefined;
   }
 }
 

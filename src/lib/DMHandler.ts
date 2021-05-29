@@ -7,7 +7,7 @@ import { Zephyr } from "../structures/client/Zephyr";
 
 class DMService {
   public async handle(): Promise<void> {
-    if (!Zephyr.flags.reminders) {
+    if (!Zephyr.flags.reminders || Zephyr.maintenance.enabled) {
       setTimeout(() => this.handle(), 30000);
       return;
     }

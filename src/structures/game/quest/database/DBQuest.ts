@@ -1,3 +1,4 @@
+import { QuestGetter } from "../../../../lib/database/sql/game/quest/QuestGetter";
 import { Quests } from "../../../../lib/quest/Quest";
 import { BaseQuest, QuestType } from "../BaseQuest";
 
@@ -29,5 +30,9 @@ export class GameDBQuest {
     this.quest = Quests.getQuestById(quest.quest_id);
     this.progress = quest.progress;
     this.completion = quest.completion;
+  }
+
+  public async fetch(): Promise<GameDBQuest> {
+    return await QuestGetter.getDBQuestById(this.id);
   }
 }

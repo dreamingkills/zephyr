@@ -22,9 +22,14 @@ export abstract class BaseCommand implements Command {
   description: string = "This command has no description!";
   usage: string[] = [];
   subcommands: string[] = [];
-  allowDm: boolean = false;
-  developerOnly: boolean = false;
-  moderatorOnly: boolean = false;
+  allowDm = false;
+  developerOnly = false;
+  moderatorOnly = false;
+
+  path: string | undefined; // Used for "hot-swapping" commands... weird?
+
+  disabled = false;
+  disabledMessage = `This command is currently disabled.`;
 
   abstract exec(
     msg: Message,

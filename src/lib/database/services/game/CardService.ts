@@ -24,15 +24,17 @@ import { Logger, loggerSettings } from "../../../logger/Logger";
 import { Zephyr } from "../../../../structures/client/Zephyr";
 import { exec } from "child_process";
 import { promisify } from "util";
+import { Stickers } from "../../../cosmetics/Stickers";
 
 export const _exec = promisify(exec);
 
 export async function generateCardImage(
   card: GameUserCard | MockUserCard,
-  large: boolean
+  large: boolean,
+  output?: string
 ): Promise<Buffer> {
-  console.log(Date.now());
   let baseCard: GameBaseCard;
+
   let frame = card.frame;
 
   if (card instanceof GameUserCard) {
@@ -56,7 +58,7 @@ export async function generateCardImage(
   let idolImage = baseCard.image;
   let frameImage = frame.frameUrl;
   let maskImage = frame.maskUrl;
-  let outPath = `./cache/cards/${baseCard.id}/${card.id}`;
+  let outPath = output || `./cache/cards/${baseCard.id}/${card.id}`;
 
   if (!large) {
     idolImage = idolImage.slice(0, -4) + `_small.png`;
@@ -73,9 +75,6 @@ export async function generateCardImage(
     await fs.mkdir(`./cache/cards/${baseCard.id}`);
   }
 
-  console.log(outPath);
-  console.log(card.dye);
-
   await _exec(
     `./envision_card "${baseCard.name}" ${
       card.serialNumber
@@ -90,10 +89,46 @@ export async function generateCardImage(
     } ${textColor.b} "${outPath}"`
   );
 
-  console.log(outPath);
+  let cardImage = await fs.readFile(outPath);
 
-  const cardImage = await fs.readFile(outPath);
-  console.log(Date.now());
+  const stickers = await CardService.getCardStickers(card);
+
+  if (stickers.length > 0) {
+    const sizeCoefficient = large ? 2.2 : 1;
+
+    const canvas = createCanvas(large ? 770 : 350, large ? 1100 : 500);
+    const ctx = canvas.getContext(`2d`);
+
+    const img = await loadImage(cardImage);
+    ctx.drawImage(img, 0, 0);
+
+    for (let sticker of stickers) {
+      const size = 64 * sizeCoefficient;
+      const gameSticker = Stickers.getStickerById(sticker.stickerId);
+      if (!gameSticker) continue;
+
+      const posX =
+        82 * sizeCoefficient +
+        (sticker.position - 1 - Math.floor((sticker.position - 1) / 4) * 4) *
+          (62 * sizeCoefficient);
+      const posY =
+        90 * sizeCoefficient +
+        Math.floor((sticker.position - 1) / 4) * (68 * sizeCoefficient);
+
+      ctx.save();
+
+      ctx.translate(posX, posY);
+      ctx.drawImage(gameSticker.image, -size / 2, -size / 2, size, size);
+
+      ctx.restore();
+    }
+
+    const buf = canvas.toBuffer();
+    await fs.writeFile(outPath, buf);
+
+    return buf;
+  }
+
   return cardImage;
 }
 
@@ -304,18 +339,19 @@ export abstract class CardService {
 
   public static async transferCardsToUser(
     cards: GameUserCard[],
-    profile: GameProfile
+    giver: GameProfile,
+    receiver: GameProfile
   ): Promise<void> {
-    await CardSet.transferCardsToUser(cards, profile.discordId);
+    await CardSet.transferCardsToUser(cards, giver, receiver);
     return;
   }
 
   public static async burnCards(
-    profile: GameProfile,
-    cards: GameUserCard[]
+    cards: GameUserCard[],
+    burner: GameProfile
   ): Promise<void> {
-    await AnticheatService.logBurn(profile, cards);
-    return await CardSet.burnCards(cards);
+    await AnticheatService.logBurn(burner, cards);
+    return await CardSet.burnCards(cards, burner);
   }
 
   /*
@@ -528,6 +564,8 @@ export abstract class CardService {
   public static async calculateBurnValue(card: GameUserCard): Promise<number> {
     const claimRecord = await AnticheatService.getClaimInformation(card);
 
+    if (!claimRecord) return 0;
+
     let base = 10;
 
     if (card.wear === 5) {
@@ -548,5 +586,34 @@ export abstract class CardService {
 
   public static async unsetCardsVaulted(cards: GameUserCard[]): Promise<void> {
     return await CardSet.unsetCardsVaulted(cards);
+  }
+
+  public static async addExperience(
+    card: GameUserCard,
+    amount: number
+  ): Promise<GameUserCard> {
+    return await CardSet.addExperience(card, amount);
+  }
+
+  private static level2Exp = 20;
+
+  public static getLevel(card: GameUserCard): { level: number; next: number } {
+    let lastLast = 0;
+    let last = 0;
+    let level = 1;
+
+    while (card.experience >= last && level <= 100) {
+      const prev = last;
+
+      if (level === 1) {
+        last = this.level2Exp;
+      } else last = last + (last - lastLast + 15);
+
+      lastLast = prev;
+
+      level++;
+    }
+
+    return { level: level - 1 || 1, next: level - 1 === 100 ? -1 : last };
   }
 }

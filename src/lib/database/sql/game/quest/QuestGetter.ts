@@ -4,6 +4,29 @@ import {
   DBQuest,
   GameDBQuest,
 } from "../../../../../structures/game/quest/database/DBQuest";
+import { QuestObjective } from "../../../../../structures/game/quest/QuestObjective";
+
+export async function getDBQuestById(id: number): Promise<GameDBQuest> {
+  const quests = (await DB.query(
+    `
+    SELECT
+        quest.id,
+        quest.discord_id,
+        quest.created_at,
+        quest.quest_id,
+        quest.quest_type,
+        quest.progress,
+        quest.completion
+    FROM
+        quest
+    WHERE
+        quest.id = ?;
+    `,
+    [id]
+  )) as DBQuest[];
+
+  return quests.map((q) => new GameDBQuest(q))[0];
+}
 
 export async function getQuests(profile: GameProfile): Promise<GameDBQuest[]> {
   const quests = (await DB.query(
@@ -63,6 +86,21 @@ export async function getActiveQuests(
   )) as DBQuest[];
 
   return quests.map((q) => new GameDBQuest(q));
+}
+
+export async function checkAvailableQuestsForProgress(
+  profile: GameProfile,
+  action: QuestObjective
+): Promise<GameDBQuest[]> {
+  const activeQuests = await getActiveQuests(profile);
+
+  if (activeQuests.length < 1) return [];
+
+  const eligibleQuests = activeQuests.filter(
+    (q) => q.progress < q.completion && q.quest?.objective === action
+  );
+
+  return eligibleQuests;
 }
 
 export * as QuestGetter from "./QuestGetter";

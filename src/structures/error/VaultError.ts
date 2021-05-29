@@ -1,106 +1,108 @@
 import { renderIdentifier } from "../../lib/utility/text/TextUtils";
 import { GameUserCard } from "../game/UserCard";
-import { ZephyrError } from "./ZephyrError";
+import { BaseError } from "./BaseError";
 
-export class InvalidVaultTypeError extends ZephyrError {
+export class InvalidVaultTypeError extends BaseError {
   constructor(prefix: string) {
-    super(
-      `**Please type something to add to your vault!**\nValid types are \`bits\`, \`cubits\`, and \`cards\`!\n*See \`${prefix}help va\` for more information!*`
-    );
+    super();
+
+    this.message = `**Please type something to add to your vault!**\nValid types are \`bits\`, \`cubits\`, and \`cards\`!\n*See \`${prefix}help va\` for more information!*`;
   }
 }
 
-export class InvalidVaultBitsQuantityError extends ZephyrError {
+export class InvalidVaultBitsQuantityError extends BaseError {
   constructor(prefix: string) {
-    super(
-      `**Please enter a valid number of bits!**\n*See \`${prefix}help va\` for more information!*`
-    );
+    super();
+
+    this.message = `**Please enter a valid number of bits!**\n*See \`${prefix}help va\` for more information!*`;
   }
 }
 
-export class InvalidVaultCubitsQuantityError extends ZephyrError {
+export class InvalidVaultCubitsQuantityError extends BaseError {
   constructor(prefix: string) {
-    super(
-      `**Please enter a valid number of cubits!**\n*See \`${prefix}help va\` for more information!*`
-    );
+    super();
+
+    this.message = `**Please enter a valid number of cubits!**\n*See \`${prefix}help va\` for more information!*`;
   }
 }
 
-export class InvalidVaultCardIdentifierError extends ZephyrError {
+export class InvalidVaultCardIdentifierError extends BaseError {
   constructor(prefix: string) {
-    super(
-      `**Please enter a valid card code!**\n*See \`${prefix}help va\` for more information!*`
-    );
+    super();
+
+    `**Please enter a valid card code!**\n*See \`${prefix}help va\` for more information!*`;
   }
 }
 
-export class BitsVaultFullError extends ZephyrError {
+export class BitsVaultFullError extends BaseError {
   constructor(prefix: string) {
-    super(
-      `**Your bits vault is full!**\nYou can withdraw some by using \`${prefix}vr bits <number>\`!`
-    );
+    super();
+
+    this.message = `**Your bits vault is full!**\nYou can withdraw some by using \`${prefix}vr bits <number>\`!`;
   }
 }
 
-export class CubitsVaultFullError extends ZephyrError {
+export class CubitsVaultFullError extends BaseError {
   constructor(prefix: string) {
-    super(
-      `**Your cubits vault is full!**\nYou can withdraw some by using \`${prefix}vr cubits <number>\`!`
-    );
+    super();
+
+    this.message = `**Your cubits vault is full!**\nYou can withdraw some by using \`${prefix}vr cubits <number>\`!`;
   }
 }
 
-export class CardsVaultFullError extends ZephyrError {
+export class CardsVaultFullError extends BaseError {
   constructor(prefix: string) {
-    super(
-      `**Your card vault is full!**\nYou can withdraw some by using \`${prefix}vr cards <cards>\`!`
-    );
+    super();
+
+    this.message = `**Your card vault is full!**\nYou can withdraw some by using \`${prefix}vr cards <cards>\`!`;
   }
 }
 
-export class NotEnoughBitsInVaultError extends ZephyrError {
+export class NotEnoughBitsInVaultError extends BaseError {
   constructor(prefix: string) {
-    super(
-      `**You don't have enough bits in your vault to do that!**\nYou can add some by using \`${prefix}va bits <number>\`!`
-    );
+    super();
+
+    this.message = `**You don't have enough bits in your vault to do that!**\nYou can add some by using \`${prefix}va bits <number>\`!`;
   }
 }
 
-export class NotEnoughCubitsInVaultError extends ZephyrError {
+export class NotEnoughCubitsInVaultError extends BaseError {
   constructor(prefix: string) {
-    super(
-      `**You don't have enough cubits in your vault to do that!**\nYou can add some by using \`${prefix}va cubits <number>\`!`
-    );
+    super();
+
+    this.message = `**You don't have enough cubits in your vault to do that!**\nYou can add some by using \`${prefix}va cubits <number>\`!`;
   }
 }
 
-export class CardNotInVaultError extends ZephyrError {
+export class CardNotInVaultError extends BaseError {
   constructor(prefix: string, card: GameUserCard) {
-    super(
-      `**The card** \`${card.id.toString(
-        36
-      )}\` **is not in your vault!**\nYou can add it by using \`${prefix}va cards ${card.id.toString(
-        36
-      )}\`!`
-    );
+    super();
+
+    this.message = `**The card** \`${card.id.toString(
+      36
+    )}\` **is not in your vault!**\nYou can add it by using \`${prefix}va cards ${card.id.toString(
+      36
+    )}\`!`;
   }
 }
 
-export class CardAlreadyInVaultError extends ZephyrError {
+export class CardAlreadyInVaultError extends BaseError {
   constructor(prefix: string, card: GameUserCard) {
-    super(
-      `**The card** \`${card.id.toString(
-        36
-      )}\` **is already in your vault!**\nYou can remove it by using \`${prefix}vr cards ${card.id.toString(
-        36
-      )}\`!`
-    );
+    super();
+
+    this.message = `**The card** \`${card.id.toString(
+      36
+    )}\` **is already in your vault!**\nYou can remove it by using \`${prefix}vr cards ${card.id.toString(
+      36
+    )}\`!`;
   }
 }
 
-export class CardInVaultError extends ZephyrError {
+export class CardInVaultError extends BaseError {
   constructor(card: GameUserCard) {
-    super(`\`${renderIdentifier(card)}\` is currently in your vault!`);
+    super();
+
+    this.message = `\`${renderIdentifier(card)}\` is currently in your vault!`;
   }
 }
 

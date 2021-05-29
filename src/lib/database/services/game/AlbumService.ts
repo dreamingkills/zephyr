@@ -171,6 +171,7 @@ export abstract class AlbumService {
     await AlbumSet.removeCardsFromAlbum(cards);
     for (let album of albums) {
       const albumCards = await this.getCardsByAlbum(album);
+
       await this.updateAlbumCache(album, albumCards, 1);
     }
   }

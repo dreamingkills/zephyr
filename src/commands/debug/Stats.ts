@@ -56,7 +56,7 @@ export default class Stats extends BaseCommand {
         inline: true,
       })
       .setFooter(
-        `Made with ❤️ by RTFL#8058`,
+        `Made with ❤️ by ${rtfl?.tag || `Luca`}`,
         rtfl ? rtfl.dynamicAvatarURL("png") : ""
       );
 

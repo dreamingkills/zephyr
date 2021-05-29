@@ -6,6 +6,7 @@ import { GameProfile } from "../../../structures/game/Profile";
 import * as ZephyrError from "../../../structures/error/ZephyrError";
 import { CardService } from "../../../lib/database/services/game/CardService";
 import { Zephyr } from "../../../structures/client/Zephyr";
+import { getTruncatedDescription } from "../../../lib/utility/text/TextUtils";
 
 export default class ViewProfile extends BaseCommand {
   id = `reagan`;
@@ -51,25 +52,36 @@ export default class ViewProfile extends BaseCommand {
 
     const targetIsSender = target.discordId === msg.author.id;
 
+    let description =
+      `**Blurb**` +
+      `\n${target.blurb || "*No blurb set*"}` +
+      `\n\n— ${targetIsSender ? `You have` : `${targetUser.tag} has`} ${
+        Zephyr.config.discord.emoji.bits
+      } **${target.bits.toLocaleString()}**.` +
+      `\n— ${
+        targetIsSender ? `You have` : `${targetUser.tag} has`
+      } **${target.cubits.toLocaleString()}** cubit${
+        target.cubits === 1 ? `` : `s`
+      }.` +
+      `\n— ${
+        targetIsSender ? `You have` : `${targetUser.tag} has`
+      } **${cardsAmount.toLocaleString()}** card${
+        cardsAmount === 1 ? `` : `s`
+      }.`;
+
+    if (target.activeCard) {
+      const card = await CardService.getUserCardById(target.activeCard);
+
+      description += `\n\n**Active Card**\n${getTruncatedDescription(card)}`;
+    } else {
+      const prefix = Zephyr.getPrefix(msg.guildID);
+
+      description += `\n\n**Active Card**\nNo active card set!\nUse \`${prefix}setactive <card>\` to start gaining XP!`;
+    }
+
     const embed = new MessageEmbed(`Profile`, msg.author)
       .setTitle(`${targetUser.tag}'s Profile`)
-      .setDescription(
-        `**Blurb**` +
-          `\n${target.blurb || "*No blurb set*"}` +
-          `\n\n— ${targetIsSender ? `You have` : `${targetUser.tag} has`} ${
-            Zephyr.config.discord.emoji.bits
-          } **${target.bits.toLocaleString()}**.` +
-          `\n— ${
-            targetIsSender ? `You have` : `${targetUser.tag} has`
-          } **${target.cubits.toLocaleString()}** cubit${
-            target.cubits === 1 ? `` : `s`
-          }.` +
-          `\n— ${
-            targetIsSender ? `You have` : `${targetUser.tag} has`
-          } **${cardsAmount.toLocaleString()}** card${
-            cardsAmount === 1 ? `` : `s`
-          }.`
-      );
+      .setDescription(description);
 
     let footer = `User ID: ${targetUser.id}`;
 

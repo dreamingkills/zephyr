@@ -2,7 +2,6 @@ import { Message } from "eris";
 import { CardService } from "../../../../lib/database/services/game/CardService";
 import { ProfileService } from "../../../../lib/database/services/game/ProfileService";
 import { renderIdentifier } from "../../../../lib/utility/text/TextUtils";
-import { isDeveloper } from "../../../../lib/ZephyrUtils";
 import { MessageEmbed } from "../../../../structures/client/RichEmbed";
 import { Zephyr } from "../../../../structures/client/Zephyr";
 import { BaseCommand } from "../../../../structures/command/Command";
@@ -22,9 +21,6 @@ export default class VaultRemove extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!Zephyr.flags.transactions && !isDeveloper(msg.author))
-      throw new ZephyrError.TransactionFlagDisabledError();
-
     const type = options[0]?.toLowerCase();
     const prefix = Zephyr.getPrefix(msg.guildID);
 

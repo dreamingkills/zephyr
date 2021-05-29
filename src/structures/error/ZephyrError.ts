@@ -1,5 +1,6 @@
 import { User } from "eris";
 import { renderIdentifier } from "../../lib/utility/text/TextUtils";
+import { Zephyr } from "../client/Zephyr";
 import { GameAlbum } from "../game/Album";
 import { GameBadge } from "../game/Badge";
 import { GameBlacklist } from "../game/blacklist/Blacklist";
@@ -12,12 +13,38 @@ import { GamePoll } from "../poll/Poll";
 
 export abstract class ZephyrError extends Error {
   name = "ZephyrError";
-  message: string;
+  message: string = `An unexpected error occurred.`;
   isClientFacing = true;
   header = "Error";
+
   constructor(message: string) {
     super();
     this.message = message;
+  }
+}
+
+export class MaintenanceError extends ZephyrError {
+  message = Zephyr.maintenance.message;
+  header = Zephyr.maintenance.header;
+}
+
+export class CommandDisabledError extends ZephyrError {
+  header = `Command Disabled`;
+
+  constructor(reason: string) {
+    super(reason);
+  }
+}
+
+export class InvalidCommandPathError extends ZephyrError {
+  constructor() {
+    super(`That command has an invalid or unset path.`);
+  }
+}
+
+export class NoDefaultExportError extends ZephyrError {
+  constructor() {
+    super(`That command does not have a default export.`);
   }
 }
 

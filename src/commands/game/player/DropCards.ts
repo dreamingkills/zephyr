@@ -10,7 +10,10 @@ import { GuildService } from "../../../lib/database/services/guild/GuildService"
 import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { StatsD } from "../../../lib/StatsD";
 import { Zephyr } from "../../../structures/client/Zephyr";
-// import childProcess from "child_process";
+import { QuestGetter } from "../../../lib/database/sql/game/quest/QuestGetter";
+import { QuestObjective } from "../../../structures/game/quest/QuestObjective";
+import { QuestSetter } from "../../../lib/database/sql/game/quest/QuestSetter";
+import { QuestProgression } from "../../../structures/game/quest/QuestProgression";
 
 export default class DropCards extends BaseCommand {
   id = `stylo`;
@@ -59,16 +62,36 @@ export default class DropCards extends BaseCommand {
       } else boost = profile.boosterGroup;
     }
 
-    // const restricted = dayjs(msg.author.createdAt) > dayjs().subtract(7, `day`);
+    const restricted = dayjs(msg.author.createdAt) > dayjs().subtract(7, `day`);
 
-    const cards = Zephyr.getRandomCards(3, wishlist, boost, false);
+    const cards = Zephyr.getRandomCards(3, wishlist, boost, restricted);
 
     await ProfileService.setDropTimestamp(
       profile,
       dayjs(new Date()).add(30, "minute").format(`YYYY/MM/DD HH:mm:ss`)
     );
 
-    await CardSpawner.userDrop(<TextChannel>msg.channel, cards, profile);
+    await CardSpawner.userDrop(
+      <TextChannel>msg.channel,
+      cards,
+      profile,
+      !!boost
+    );
+
+    if (boost) await ProfileService.decrementBooster(profile);
+
+    const progressable = await QuestGetter.checkAvailableQuestsForProgress(
+      profile,
+      QuestObjective.DROP
+    );
+
+    if (progressable.length > 0) {
+      const progressions = progressable.map((q) => {
+        return { ...q, increment: 1 } as QuestProgression;
+      });
+
+      await QuestSetter.progressQuests(progressions, profile);
+    }
 
     const timeEnd = Date.now();
 

@@ -34,6 +34,12 @@ import { Backgrounds } from "../../lib/cosmetics/Backgrounds";
 import { Shop } from "../../lib/shop/Shop";
 import { Logger, loggerSettings } from "../../lib/logger/Logger";
 import { Quests } from "../../lib/quest/Quest";
+import { QuestGetter } from "../../lib/database/sql/game/quest/QuestGetter";
+import { QuestSetter } from "../../lib/database/sql/game/quest/QuestSetter";
+import { QuestObjective } from "../game/quest/QuestObjective";
+import { QuestProgression } from "../game/quest/QuestProgression";
+import { SlashCreator, GatewayServer } from "slash-create";
+import path from "path";
 
 class ZephyrClient extends Client {
   commandLib = new CommandLib();
@@ -53,26 +59,26 @@ class ZephyrClient extends Client {
   webhookListener: WebhookListener | undefined;
   dbl: dblapi | undefined;
 
+  slash: SlashCreator | undefined;
+
+  maintenance = {
+    enabled: true,
+    header: `Starting Up`,
+    message: `The bot is still starting up! Please allow us a few moments...`,
+  };
+
   // These are toggles that control what bot functions are enabled or disabled.
   public flags = {
-    processMessages: true /* this.on("message", ()=>{}) listener - DANGEROUS */,
+    processMessages: true /* this.on("message", ()=>{}) listener */,
     commands: true /* General commands */,
-    drops: false /* Card drops (user+activity) */,
-    trades: false /* Multitrade, normal trade, gift */,
-    reminders: false /* DM reminders */,
-    transactions: false /* Paying bits, withdrawing from bank, shop */,
-    dyes: false /* Dyeing cards */,
-    upgrades: false /* Upgrading cards */,
-    burns: false /* Burning cards */,
-    crafting: false /* Crafting recipes and recipe viewer */,
-    dmCommands: false /* Use of commands in DM channels */,
+    drops: true /* Card drops (user+activity) */,
+    reminders: true /* DM reminders */,
+    dmCommands: true /* Use of commands in DM channels */,
     useConfiscatedToken: false /* Use of the confiscated card token */,
     postServerCount: true /* Post server count to Top.gg */,
     mainViewing: true /* Viewing cards in #zephyr-main */,
     debugMessages: true /* Debug messages in console */,
-    claimAlerts: false /* "You must wait X to claim" */,
-    daily: false /* Claiming daily reward */,
-    mysteryBox: false /* Opening the Mystery Box */,
+    claimAlerts: true /* "You must wait X to claim" */,
   };
 
   /* These are some numbers that affect various things around Zephyr. */
@@ -112,7 +118,7 @@ class ZephyrClient extends Client {
     super(config.discord.token, { restMode: true, maxShards: `auto` });
     this.config = config;
     this.users.limit = 50000;
-    this.setMaxListeners(500);
+    // this.setMaxListeners(500);
   }
 
   public async startTopGg(): Promise<void> {
@@ -182,7 +188,7 @@ class ZephyrClient extends Client {
           )`${this.users.size.toLocaleString()}`} user(s)` +
           `\n- ${chalk.hex(
             `1794E6`
-          )`${this.commandLib.commands.length}`} commands registered` +
+          )`${this.commandLib.commands.size}`} commands registered` +
           `\n- ${chalk.hex(`1794E6`)`${
             Object.keys(this.cards).length
           }`} cards registered` +
@@ -410,6 +416,33 @@ class ZephyrClient extends Client {
           err ? `  with error: ${err}\n${err?.stack}` : `. No error was given.`
         }`
       );
+    });
+
+    this.slash = new SlashCreator({
+      applicationID: `779966699780702208`,
+      publicKey: `44f15ff26a8ef781d97335f616d4dfccaebd0c59214b19e0430d1b5ea5ea6d40`,
+      token: this.config.discord.token,
+    });
+
+    this.slash
+      .withServer(
+        new GatewayServer((handler: any) =>
+          this.on(`rawWS`, (event) => {
+            if (event.t === `INTERACTION_CREATE`) handler(event.d);
+          })
+        )
+      )
+      .registerCommandsIn(path.join(__dirname, `commands`))
+      .syncCommands();
+
+    this.slash.on(`componentInteraction`, async (ctx) => {
+      if (ctx.customID === `drop1`) {
+        await CardSpawner.handleClaim(ctx.message.id, 1, ctx);
+      } else if (ctx.customID === `drop2`) {
+        await CardSpawner.handleClaim(ctx.message.id, 2, ctx);
+      } else if (ctx.customID === `drop3`) {
+        await CardSpawner.handleClaim(ctx.message.id, 3, ctx);
+      }
     });
 
     this.connect();
@@ -704,6 +737,19 @@ class ZephyrClient extends Client {
 
     await ProfileService.addVote(profile, isWeekend);
     await AnticheatService.logVote(profile, isWeekend);
+
+    const progressableQuests = await QuestGetter.checkAvailableQuestsForProgress(
+      profile,
+      QuestObjective.VOTE
+    );
+
+    if (progressableQuests.length > 0) {
+      const progressions = progressableQuests.map((q) => {
+        return { ...q, increment: 1 } as QuestProgression;
+      });
+
+      await QuestSetter.progressQuests(progressions, profile);
+    }
 
     if (!voter || profile.blacklisted) return;
 

@@ -1,4 +1,4 @@
-import { Message } from "eris";
+import { Message, User } from "eris";
 import { MessageEmbed } from "../../structures/client/RichEmbed";
 import { BaseCommand } from "../../structures/command/Command";
 import { GameProfile } from "../../structures/game/Profile";
@@ -7,9 +7,9 @@ import { Zephyr } from "../../structures/client/Zephyr";
 
 export default class Help extends BaseCommand {
   id = `orion`;
-  names = ["help"];
-  description = "Shows you the help center.";
-  usage = ["$CMD$", "$CMD$ [command/topic]"];
+  names = [`help`];
+  description = `Shows you the help center.`;
+  usage = [`$CMD$`, `$CMD$ [command/topic]`];
   allowDm = true;
 
   async exec(
@@ -18,71 +18,37 @@ export default class Help extends BaseCommand {
     options: string[]
   ): Promise<void> {
     let prefix: string;
+
     if (msg.guildID) {
       const guild = Zephyr.guilds.get(msg.guildID!);
       prefix = Zephyr.getPrefix(guild!.id);
-    } else prefix = ".";
+    } else prefix = `.`;
 
-    const commands = Zephyr.commandLib.commands;
+    const commandLib = Zephyr.commandLib;
+
     const query = options[0]?.toLowerCase();
+    if (!query) {
+      await this.send(msg.channel, this.generateHelpCenter(prefix, msg.author));
 
-    if (query) {
-      const findCommand = commands.filter((c) => c.names.includes(query))[0];
-      if (findCommand) {
-        let description = `**${findCommand.names[0]}**\n${findCommand.description}\n`;
-        if (findCommand.developerOnly)
-          description += `**Developer-only command!**\n`;
-
-        if (findCommand.usage.length > 0) {
-          description +=
-            `\n**Usage**` +
-            `\n\`\`\`` +
-            `\n${findCommand.usage
-              .map(
-                (u) =>
-                  `${u.replace(/\$CMD\$/g, `${prefix}${findCommand.names[0]}`)}`
-              )
-              .join("\n")}` +
-            `\n\`\`\``;
-        }
-        if (findCommand.subcommands.length > 0) {
-          description +=
-            `\n**Subcommands**` +
-            `\n\`\`\`` +
-            `\n${findCommand.subcommands
-              .map((s) => `${prefix}${findCommand.names[0]} ${s}`)
-              .join("\n")}` +
-            `\n\`\`\``;
-        }
-        if (findCommand.names.length > 1) {
-          description +=
-            `\n**Aliases**` +
-            `\n\`\`\`` +
-            `\n${findCommand.names
-              .slice(1)
-              .map((n) => `${prefix}${n}`)
-              .join(", ")}` +
-            `\n\`\`\``;
-        }
-
-        const embed = new MessageEmbed(`Help`, msg.author).setDescription(
-          description
-        );
-
-        if (Zephyr.config.developers.includes(msg.author.id)) {
-          embed.setFooter(`Command ID: ${findCommand.id || `none`}`);
-        }
-
-        await this.send(msg.channel, embed);
-        return;
-      } else throw new ZephyrError.InvalidHelpQueryError();
+      return;
     }
 
-    const embed = new MessageEmbed(`Help`, msg.author)
+    const command = commandLib.getCommand(query);
+    if (!command) throw new ZephyrError.InvalidHelpQueryError();
+
+    const embed = this.generateCommandHelp(prefix, command, msg.author);
+
+    await this.send(msg.channel, embed);
+
+    return;
+  }
+
+  private generateHelpCenter(prefix: string, user: User): MessageEmbed {
+    return new MessageEmbed(`Help`, user)
       .setDescription(
         `Type \`${prefix}help command\` to see more information about a command.\n**Need more help or just want to chat?** Join __Zephyr Community__ by [clicking here](https://discord.gg/zephyr)!`
       )
-      .setFooter(`User ID: ${msg.author.id}`)
+      .setFooter(`User ID: ${user.id}`)
       .addField({
         name: "Basic",
         value: `\`daily\`, \`drop\`, \`burn\`, \`profile\`, \`balance\``,
@@ -138,8 +104,53 @@ export default class Help extends BaseCommand {
         value: `\`setchannel\`, \`prefix\``,
         inline: true,
       });
+  }
 
-    await this.send(msg.channel, embed);
-    return;
+  private generateCommandHelp(
+    prefix: string,
+    command: BaseCommand,
+    user: User
+  ): MessageEmbed {
+    let description = `**${command.names[0]}**\n${command.description}\n`;
+    if (command.developerOnly) description += `**Developer-only command!**\n`;
+
+    if (command.usage.length > 0) {
+      description +=
+        `\n**Usage**` +
+        `\n\`\`\`` +
+        `\n${command.usage
+          .map(
+            (u) => `${u.replace(/\$CMD\$/g, `${prefix}${command.names[0]}`)}`
+          )
+          .join("\n")}` +
+        `\n\`\`\``;
+    }
+    if (command.subcommands.length > 0) {
+      description +=
+        `\n**Subcommands**` +
+        `\n\`\`\`` +
+        `\n${command.subcommands
+          .map((s) => `${prefix}${command.names[0]} ${s}`)
+          .join("\n")}` +
+        `\n\`\`\``;
+    }
+    if (command.names.length > 1) {
+      description +=
+        `\n**Aliases**` +
+        `\n\`\`\`` +
+        `\n${command.names
+          .slice(1)
+          .map((n) => `${prefix}${n}`)
+          .join(", ")}` +
+        `\n\`\`\``;
+    }
+
+    const embed = new MessageEmbed(`Help`, user).setDescription(description);
+
+    if (Zephyr.config.developers.includes(user.id)) {
+      embed.setFooter(`Command ID: ${command.id || `none`}`);
+    }
+
+    return embed;
   }
 }

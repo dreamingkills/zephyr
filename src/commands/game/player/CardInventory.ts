@@ -109,7 +109,13 @@ export default class CardInventory extends BaseCommand {
     const embed = new MessageEmbed(`Inventory`, msg.author)
       .setTitle(`${targetUser.tag}'s cards`)
       .setDescription(
-        await this.renderInventory(inventory, userTags, verbose, cardsInAlbum)
+        await this.renderInventory(
+          inventory,
+          userTags,
+          verbose,
+          verbose,
+          cardsInAlbum
+        )
       )
       .setFooter(
         `Page ${page.toLocaleString()} of ${totalPages.toLocaleString()} • ${size} cards`
@@ -146,7 +152,13 @@ export default class CardInventory extends BaseCommand {
         );
 
         embed.setDescription(
-          await this.renderInventory(newCards, userTags, verbose, cardsInAlbum)
+          await this.renderInventory(
+            newCards,
+            userTags,
+            verbose,
+            verbose,
+            cardsInAlbum
+          )
         );
         embed.setFooter(`Page ${page} of ${totalPages} • ${size} entries`);
         await editMessage(sent, embed);
@@ -166,6 +178,7 @@ export default class CardInventory extends BaseCommand {
     cards: GameUserCard[],
     tags: GameTag[],
     showSubgroup: boolean = false,
+    showSerials: boolean = false,
     cardsInAlbum: GameAlbumCard[]
   ): Promise<string> {
     if (cards.length === 0) return "No cards here!";
@@ -174,6 +187,7 @@ export default class CardInventory extends BaseCommand {
       cards,
       tags,
       showSubgroup,
+      showSerials,
       cardsInAlbum
     );
 

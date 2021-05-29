@@ -11,9 +11,12 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { ReactionCollector } from "eris-collector";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
-import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
 import { MockUserCard } from "../../../structures/game/UserCard";
 import { Zephyr } from "../../../structures/client/Zephyr";
+import { QuestGetter } from "../../../lib/database/sql/game/quest/QuestGetter";
+import { QuestObjective } from "../../../structures/game/quest/QuestObjective";
+import { QuestSetter } from "../../../lib/database/sql/game/quest/QuestSetter";
+import { QuestProgression } from "../../../structures/game/quest/QuestProgression";
 
 export default class DyeCard extends BaseCommand {
   id = `junkhead`;
@@ -27,9 +30,6 @@ export default class DyeCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!Zephyr.flags.dyes && !isDeveloper(msg.author))
-      throw new ZephyrError.DyeFlagDisabledError();
-
     if (!options[0]?.startsWith("$"))
       throw new ZephyrError.InvalidDyeIdentifierError();
     const targetDye = await ProfileService.getDyeByIdentifier(options[0]);
@@ -75,7 +75,11 @@ export default class DyeCard extends BaseCommand {
         }.`
       );
 
-    const preview = await generateCardImage(mockCard, false);
+    const preview = await generateCardImage(
+      mockCard,
+      false,
+      `./cache/tmp/${mockCard.id}`
+    );
 
     const confirmation = await this.send(msg.channel, embed, {
       files: [{ file: preview, name: "dyepreview.png" }],
@@ -136,6 +140,20 @@ export default class DyeCard extends BaseCommand {
       await this.send(msg.channel, successEmbed, {
         files: [{ file: dyedCardImage, name: "dyesuccess.png" }],
       });
+
+      const progressableQuests = await QuestGetter.checkAvailableQuestsForProgress(
+        profile,
+        QuestObjective.DYE
+      );
+
+      if (progressableQuests.length > 0) {
+        const progressions = progressableQuests.map((q) => {
+          return { ...q, increment: 1 } as QuestProgression;
+        });
+
+        await QuestSetter.progressQuests(progressions, profile);
+      }
+
       return;
     });
 
@@ -145,9 +163,6 @@ export default class DyeCard extends BaseCommand {
           embed: embed.setFooter(`🕒 This dye confirmation has expired.`),
         });
       }
-
-      if (checkPermission(`manageMessages`, msg.channel))
-        await confirmation.removeReactions();
     });
 
     await this.react(

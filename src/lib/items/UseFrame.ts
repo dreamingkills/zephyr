@@ -55,7 +55,11 @@ export async function useFrame(
     dye: card.dye,
   });
 
-  const preview = await generateCardImage(mockCard, false);
+  const preview = await generateCardImage(
+    mockCard,
+    false,
+    `./cache/tmp/${mockCard.id}`
+  );
 
   const embed = new MessageEmbed(`Apply Frame`, msg.author)
     .setDescription(

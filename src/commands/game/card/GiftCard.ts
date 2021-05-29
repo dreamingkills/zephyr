@@ -10,10 +10,14 @@ import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { AnticheatService } from "../../../lib/database/services/meta/AnticheatService";
 import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
-import { checkPermission, isDeveloper } from "../../../lib/ZephyrUtils";
+import { checkPermission } from "../../../lib/ZephyrUtils";
 import { VaultError } from "../../../structures/error/VaultError";
 import { Zephyr } from "../../../structures/client/Zephyr";
 import { AutotagService } from "../../../lib/database/services/game/AutotagService";
+import { QuestGetter } from "../../../lib/database/sql/game/quest/QuestGetter";
+import { QuestSetter } from "../../../lib/database/sql/game/quest/QuestSetter";
+import { QuestObjective } from "../../../structures/game/quest/QuestObjective";
+import { QuestProgression } from "../../../structures/game/quest/QuestProgression";
 
 export default class GiftCard extends BaseCommand {
   id = `stunna`;
@@ -25,9 +29,6 @@ export default class GiftCard extends BaseCommand {
     profile: GameProfile,
     options: string[]
   ): Promise<void> {
-    if (!Zephyr.flags.trades && !isDeveloper(msg.author))
-      throw new ZephyrError.TradeFlagDisabledError();
-
     const identifiers = options.filter((o) => !o.includes(`<@`));
     const cards: GameUserCard[] = [];
     if (identifiers.length === 0) {
@@ -99,13 +100,26 @@ export default class GiftCard extends BaseCommand {
           throw new ZephyrError.NotOwnerOfCardError(refetchCard);
       }
 
-      await CardService.transferCardsToUser(cards, gifteeProfile);
+      await CardService.transferCardsToUser(cards, profile, gifteeProfile);
       await AnticheatService.logGift(
         profile,
         gifteeProfile,
         cards,
         msg.guildID!
       );
+
+      const progressableQuests = await QuestGetter.checkAvailableQuestsForProgress(
+        profile,
+        QuestObjective.GIFT
+      );
+
+      if (progressableQuests.length > 0) {
+        const progressions = progressableQuests.map((q) => {
+          return { ...q, increment: 1 } as QuestProgression;
+        });
+
+        await QuestSetter.progressQuests(progressions, profile);
+      }
 
       const tags = await gifteeProfile.getTags();
       if (tags.length > 0) {
@@ -121,6 +135,7 @@ export default class GiftCard extends BaseCommand {
           } been gifted.`
         ),
       });
+
       return;
     });
 

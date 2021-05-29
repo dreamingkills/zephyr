@@ -1,36 +1,45 @@
-import { Guild, Message, PartialEmoji, TextChannel, User } from "eris";
+import { Guild, TextChannel, User } from "eris";
 import { CardService } from "./database/services/game/CardService";
-import { ReactionCollector } from "eris-collector";
 import { GameProfile } from "../structures/game/Profile";
 import { ProfileService } from "./database/services/game/ProfileService";
-import { GameUserCard, MockUserCard } from "../structures/game/UserCard";
-import { Chance } from "chance";
+import { MockUserCard } from "../structures/game/UserCard";
 import { getTimeUntil } from "../lib/utility/time/TimeUtils";
 import dayjs from "dayjs";
 import { GuildService } from "./database/services/guild/GuildService";
 import { GameBaseCard } from "../structures/game/BaseCard";
 import { AnticheatService } from "./database/services/meta/AnticheatService";
-import { createMessage } from "./discord/message/createMessage";
-// import { addReaction } from "./discord/message/addReaction";
 import { checkPermission } from "./ZephyrUtils";
 import { AutotagService } from "./database/services/game/AutotagService";
-import { deleteMessage } from "./discord/message/deleteMessage";
 import { Frames } from "./cosmetics/Frames";
 import { Logger } from "./logger/Logger";
 import { Zephyr } from "../structures/client/Zephyr";
+import { QuestObjective } from "../structures/game/quest/QuestObjective";
+import { QuestProgression } from "../structures/game/quest/QuestProgression";
+import { QuestGetter } from "./database/sql/game/quest/QuestGetter";
+import { QuestSetter } from "./database/sql/game/quest/QuestSetter";
+import { MessageInteractionContext } from "slash-create";
 
 class DropHandler {
-  private readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
-  private readonly timeout = 5000;
+  // private readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
+  // private readonly timeout = 5000;
   private readonly minSpawnThreshold = 250;
   private readonly spawnThreshold = this.minSpawnThreshold * 2;
   private guildLevels: { [key: string]: number } = {};
-  private grabbing: Set<string> = new Set();
+  // private grabbing: Set<string> = new Set();
 
   userCooldowns: Set<string> = new Set();
   guildCooldowns: Set<string> = new Set();
 
-  private async fight(
+  public activeDrops: Map<
+    string,
+    {
+      cards: (GameBaseCard & { claimed: boolean })[];
+      dropper: GameProfile | undefined;
+      timestamp: number;
+    }
+  > = new Map();
+
+  /*private async fight(
     takers: Set<string>,
     card: MockUserCard,
     prefer?: GameProfile
@@ -46,7 +55,7 @@ class DropHandler {
     const newCard = await CardService.createNewUserCard(card.baseCard, winner);
 
     return { winner, card: newCard };
-  }
+  }*/
 
   private async dropCards(
     title: string,
@@ -56,7 +65,7 @@ class DropHandler {
   ): Promise<void> {
     const start = Date.now();
     const droppedCards: MockUserCard[] = [];
-    let deleted = false;
+    // let deleted = false;
 
     for (let card of cards) {
       droppedCards.push(
@@ -76,16 +85,53 @@ class DropHandler {
 
     const collage = await CardService.generateCardCollage(droppedCards);
 
-    const drop = await createMessage(channel, `${title}\n`, {
-      files: [
-        {
-          file: collage,
-          name: "collage.png",
-        },
-      ],
+    const drop = await channel.createMessage(
+      {
+        content: `${title}\n`,
+        components: [
+          {
+            type: 1,
+            components: [
+              {
+                type: 2,
+                custom_id: `drop1`,
+                style: 1,
+                label: `Claim ${cards[0].name}`,
+              },
+              {
+                type: 2,
+                custom_id: `drop2`,
+                style: 1,
+                label: `Claim ${cards[1].name}`,
+              },
+              {
+                type: 2,
+                custom_id: `drop3`,
+                style: 1,
+                label: `Claim ${cards[2].name}`,
+              },
+            ],
+          },
+        ],
+      },
+      { file: collage, name: `collage.png` }
+    );
+
+    this.activeDrops.set(drop.id, {
+      cards: cards.map((c) => {
+        return { ...c, claimed: false };
+      }),
+      dropper: prefer,
+      timestamp: start,
     });
 
-    const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
+    setTimeout(async () => {
+      await drop.delete();
+
+      this.activeDrops.delete(drop.id);
+    }, 30000);
+
+    /*const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
       this.emojis.includes(emoji.name) && user.id !== channel.client.user.id;
 
     const collector = new ReactionCollector(channel.client, drop, filter);
@@ -111,7 +157,7 @@ class DropHandler {
         // If this card has already been claimed, ignore.
         const num = this.emojis.indexOf(emoji.name);
         if (finished[num]) return;
-        
+
         if (this.grabbing.has(user.id)) return;
 
         const profile = await ProfileService.getProfile(user.id, true);
@@ -128,10 +174,7 @@ class DropHandler {
             if (!warned.has(profile.discordId)) {
               await createMessage(
                 channel,
-                `<@${user.id}>, you must wait **${getTimeUntil(
-                  now,
-                  until
-                )}** before claiming another card.`
+                
               );
               warned.add(profile.discordId);
             }
@@ -164,6 +207,19 @@ class DropHandler {
           winners.add(fight.winner.discordId);
 
           const countExl = takers[num].size - 1;
+
+          const progressableQuests = await QuestGetter.checkAvailableQuestsForProgress(
+            fight.winner,
+            QuestObjective.CLAIM_CARD
+          );
+
+          if (progressableQuests.length > 0) {
+            const progressions = progressableQuests.map((q) => {
+              return { ...q, increment: 1 } as QuestProgression;
+            });
+
+            await QuestSetter.progressQuests(progressions, profile);
+          }
 
           await AnticheatService.logClaim(
             fight.winner,
@@ -231,7 +287,7 @@ class DropHandler {
 
           /*
               Autotag
-          */
+          * /
           const tags = await ProfileService.getTags(fight.winner);
           if (tags.length > 0) {
             const autotag = await AutotagService.autotag(
@@ -275,10 +331,10 @@ class DropHandler {
     await addReaction(drop, this.emojis[0]);
     await addReaction(drop, this.emojis[1]);
     await addReaction(drop, this.emojis[2]);
-    */
+    * /
 
     setTimeout(() => collector.stop(), 30000);
-
+    */
     return;
   }
 
@@ -296,10 +352,13 @@ class DropHandler {
   public async userDrop(
     channel: TextChannel,
     cards: GameBaseCard[],
-    profile: GameProfile
+    profile: GameProfile,
+    boosted: boolean
   ): Promise<void> {
     return await this.dropCards(
-      `— <@${profile.discordId}> is dropping **${cards.length} cards**!\n**NOTICE**: You need to manually react :one:, :two:, or :three: temporarily due to poor performance.`,
+      `— <@${profile.discordId}> is dropping **${cards.length} cards**!${
+        boosted ? ` *This drop is boosted!* :sparkles:` : ``
+      }\n**NOTICE**: You need to manually react :one:, :two:, or :three: temporarily due to poor performance.`,
       channel,
       cards,
       profile
@@ -358,6 +417,139 @@ class DropHandler {
 
       if (Zephyr.flags.drops) await this.activityDrop(channel);
     }
+  }
+
+  public async handleClaim(
+    dropId: string,
+    button: 1 | 2 | 3,
+    context: MessageInteractionContext
+  ): Promise<void> {
+    const drop = CardSpawner.activeDrops.get(dropId);
+
+    if (!drop) {
+      Logger.error(
+        `[Drop ID: ${dropId}] Claim failed, drop is undefined in map!`
+      );
+      return;
+    }
+
+    const pickedCard = drop.cards[button - 1];
+
+    if (pickedCard.claimed) {
+      context.send(
+        `Sorry, but **${pickedCard.group || `Soloist`}** ${pickedCard.name}${
+          pickedCard.subgroup ? ` **(${pickedCard.subgroup})**` : ``
+        } has already been claimed.`,
+        { ephemeral: true }
+      );
+
+      return;
+    }
+
+    const profile = await ProfileService.getProfile(context.user.id);
+
+    const now = dayjs(Date.now());
+    const until = dayjs(profile.claimNext);
+
+    if (until > now) {
+      await context.send(
+        `<@${context.user.id}>, you must wait **${getTimeUntil(
+          now,
+          until
+        )}** before claiming another card.`,
+        { ephemeral: true }
+      );
+
+      return;
+    }
+
+    pickedCard.claimed = true;
+
+    const newCard = await CardService.createNewUserCard(pickedCard, profile);
+
+    await ProfileService.setClaimTimestamp(
+      profile,
+      dayjs().add(10, `minute`).format(`YYYY/MM/DD HH:mm:ss`)
+    );
+
+    const progressableQuests = await QuestGetter.checkAvailableQuestsForProgress(
+      profile,
+      QuestObjective.CLAIM_CARD
+    );
+
+    if (progressableQuests.length > 0) {
+      const progressions = progressableQuests.map((q) => {
+        return { ...q, increment: 1 } as QuestProgression;
+      });
+
+      await QuestSetter.progressQuests(progressions, profile);
+    }
+
+    await AnticheatService.logClaim(
+      profile,
+      drop.dropper,
+      newCard,
+      Date.now(),
+      drop.timestamp,
+      context.guildID!,
+      0,
+      Date.now() - drop.timestamp
+    );
+
+    let claimMessage = `<@${context.user.id}> claimed \`${newCard.id.toString(
+      36
+    )}\` **${pickedCard.group}** ${pickedCard.name} **(${
+      pickedCard.subgroup
+    })**!`;
+
+    /*
+    Autotag
+    */
+    const tags = await ProfileService.getTags(profile);
+    if (tags.length > 0) {
+      const autotag = await AutotagService.autotag(profile, tags, newCard);
+
+      if (autotag.tag) {
+        const targetTag = tags.find((t) => t.id === autotag.tag);
+
+        if (!targetTag) {
+          Logger.error(
+            `Unexpected autotag behavior: targetTag undefined where Tag ${autotag.tag}`
+          );
+        } else {
+          claimMessage += ` It was autotagged ${targetTag.emoji} **${targetTag.name}**.`;
+        }
+      }
+    }
+
+    await CardService.incrementGenerated(drop.cards);
+
+    switch (newCard.wear) {
+      case 0: {
+        claimMessage += ` This card is **damaged**...`;
+        break;
+      }
+      case 1: {
+        claimMessage += ` It's in **poor** condition.`;
+        break;
+      }
+      case 3: {
+        claimMessage += ` It looks **good**.`;
+        break;
+      }
+      case 4: {
+        claimMessage += ` This card is looking **great**!`;
+        break;
+      }
+      case 5: {
+        claimMessage += ` Wow, this card is in **mint** condition!`;
+        break;
+      }
+    }
+
+    await context.send(claimMessage);
+
+    return;
   }
 }
 

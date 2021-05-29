@@ -11,8 +11,11 @@ import { getDescriptions } from "../../../lib/utility/text/TextUtils";
 import { PrefabItem } from "../../../structures/item/PrefabItem";
 import { AlbumService } from "../../../lib/database/services/game/AlbumService";
 import { GameUserCard } from "../../../structures/game/UserCard";
-import { isDeveloper } from "../../../lib/ZephyrUtils";
 import { Zephyr } from "../../../structures/client/Zephyr";
+import { QuestGetter } from "../../../lib/database/sql/game/quest/QuestGetter";
+import { QuestSetter } from "../../../lib/database/sql/game/quest/QuestSetter";
+import { QuestObjective } from "../../../structures/game/quest/QuestObjective";
+import { QuestProgression } from "../../../structures/game/quest/QuestProgression";
 
 export default class BurnUntagged extends BaseCommand {
   id = `firefox`;
@@ -22,9 +25,6 @@ export default class BurnUntagged extends BaseCommand {
   allowDm = true;
 
   async exec(msg: Message, profile: GameProfile): Promise<void> {
-    if (!Zephyr.flags.burns && !isDeveloper(msg.author))
-      throw new ZephyrError.BurnFlagDisabledError();
-
     const cardsRaw = await CardService.getUntaggedCards(profile);
 
     const cards: GameUserCard[] = [];
@@ -43,13 +43,11 @@ export default class BurnUntagged extends BaseCommand {
       totalBitValue += bitValue;
     }*/
 
-    const individualRewards = [
-      0,
-      ...cards.map((c) => {
-        return Math.round(15 * c.luckCoefficient * ((c.wear || 1) * 1.25));
-      }),
-    ];
-    const totalBitValue = individualRewards.reduce((acc, bits) => acc + bits);
+    let totalBitValue = 0;
+
+    for (let card of cards) {
+      totalBitValue += await CardService.calculateBurnValue(card);
+    }
 
     const dustRewards: { item: PrefabItem; count: number }[] = [];
 
@@ -121,7 +119,7 @@ export default class BurnUntagged extends BaseCommand {
       }
 
       // Give the card to the bot
-      await CardService.burnCards(profile, cards);
+      await CardService.burnCards(cards, profile);
 
       // Give the user their dust
       await ProfileService.addItems(profile, dustRewards);
@@ -130,6 +128,19 @@ export default class BurnUntagged extends BaseCommand {
         profile,
         totalBitValue
       );
+
+      const progressableQuests = await QuestGetter.checkAvailableQuestsForProgress(
+        profile,
+        QuestObjective.BURN_CARD
+      );
+
+      if (progressableQuests.length > 0) {
+        const progressions = progressableQuests.map((q) => {
+          return { ...q, increment: cards.length } as QuestProgression;
+        });
+
+        await QuestSetter.progressQuests(progressions, profile);
+      }
 
       await confirmation.edit({
         embed: embed.setFooter(
