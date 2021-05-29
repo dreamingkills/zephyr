@@ -17,6 +17,8 @@ setup.sql
 
 cache/
 
+envision*
+
 .DS_Store
 
 # Logs
