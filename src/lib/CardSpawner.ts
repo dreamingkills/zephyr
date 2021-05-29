@@ -1,4 +1,4 @@
-import { Guild, TextChannel, User } from "eris";
+import { Button, Guild, TextChannel, User } from "eris";
 import { CardService } from "./database/services/game/CardService";
 import { GameProfile } from "../structures/game/Profile";
 import { ProfileService } from "./database/services/game/ProfileService";
@@ -17,7 +17,7 @@ import { QuestObjective } from "../structures/game/quest/QuestObjective";
 import { QuestProgression } from "../structures/game/quest/QuestProgression";
 import { QuestGetter } from "./database/sql/game/quest/QuestGetter";
 import { QuestSetter } from "./database/sql/game/quest/QuestSetter";
-import { MessageInteractionContext } from "slash-create";
+import { AnyComponentButton, MessageInteractionContext } from "slash-create";
 
 class DropHandler {
   // private readonly emojis = ["1️⃣", "2️⃣", "3️⃣"];
@@ -91,26 +91,11 @@ class DropHandler {
         components: [
           {
             type: 1,
-            components: [
-              {
-                type: 2,
-                custom_id: `drop1`,
-                style: 1,
-                label: `Claim ${cards[0].name}`,
-              },
-              {
-                type: 2,
-                custom_id: `drop2`,
-                style: 1,
-                label: `Claim ${cards[1].name}`,
-              },
-              {
-                type: 2,
-                custom_id: `drop3`,
-                style: 1,
-                label: `Claim ${cards[2].name}`,
-              },
-            ],
+            components: this.generateButtons(
+              cards.map((c) => {
+                return { ...c, claimed: false };
+              })
+            ),
           },
         ],
       },
@@ -433,10 +418,25 @@ class DropHandler {
       return;
     }
 
+    if (
+      drop.timestamp + 5000 > Date.now() &&
+      drop.dropper?.discordId !== context.user.id
+    ) {
+      context.send(
+        `Hold up! You need to wait **${(
+          (drop.timestamp + 5000 - Date.now()) /
+          1000
+        ).toFixed(2)}** seconds before claiming from this drop!`,
+        { ephemeral: true }
+      );
+
+      return;
+    }
+
     const pickedCard = drop.cards[button - 1];
 
     if (pickedCard.claimed) {
-      context.send(
+      await context.send(
         `Sorry, but **${pickedCard.group || `Soloist`}** ${pickedCard.name}${
           pickedCard.subgroup ? ` **(${pickedCard.subgroup})**` : ``
         } has already been claimed.`,
@@ -550,6 +550,62 @@ class DropHandler {
     await context.send(claimMessage);
 
     return;
+  }
+
+  public generateButtons(
+    cards: (GameBaseCard & { claimed: boolean })[]
+  ): Button[] {
+    return [
+      {
+        type: 2,
+        custom_id: `drop1`,
+        style: 1,
+        label: `Claim ${cards[0].name}`,
+        disabled: cards[0].claimed,
+      },
+      {
+        type: 2,
+        custom_id: `drop2`,
+        style: 1,
+        label: `Claim ${cards[1].name}`,
+        disabled: cards[1].claimed,
+      },
+      {
+        type: 2,
+        custom_id: `drop3`,
+        style: 1,
+        label: `Claim ${cards[2].name}`,
+        disabled: cards[2].claimed,
+      },
+    ];
+  }
+
+  public generateComponentButtons(
+    cards: (GameBaseCard & { claimed: boolean })[]
+  ): AnyComponentButton[] {
+    return [
+      {
+        type: 2,
+        custom_id: `drop1`,
+        style: 1,
+        label: `Claim ${cards[0].name}`,
+        disabled: cards[0].claimed,
+      },
+      {
+        type: 2,
+        custom_id: `drop2`,
+        style: 1,
+        label: `Claim ${cards[1].name}`,
+        disabled: cards[1].claimed,
+      },
+      {
+        type: 2,
+        custom_id: `drop3`,
+        style: 1,
+        label: `Claim ${cards[2].name}`,
+        disabled: cards[2].claimed,
+      },
+    ];
   }
 }
 

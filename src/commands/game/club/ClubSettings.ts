@@ -36,7 +36,7 @@ export default class ClubSettings extends BaseCommand {
     const setting = args.split(`,`)[1]?.trim().toLowerCase();
     const value = args.split(`,`).slice(2).join(`,`)?.trim();
 
-    if (!clubName || clubName.length > 20)
+    if (!clubName || clubName.length > 32)
       throw new ClubError.InvalidClubNameInViewerError();
 
     let club = await getClubByName(clubName);
