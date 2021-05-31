@@ -433,19 +433,6 @@ class DropHandler {
       return;
     }
 
-    const pickedCard = drop.cards[button - 1];
-
-    if (pickedCard.claimed) {
-      await context.send(
-        `Sorry, but **${pickedCard.group || `Soloist`}** ${pickedCard.name}${
-          pickedCard.subgroup ? ` **(${pickedCard.subgroup})**` : ``
-        } has already been claimed.`,
-        { ephemeral: true }
-      );
-
-      return;
-    }
-
     const profile = await ProfileService.getProfile(context.user.id);
 
     const now = dayjs(Date.now());
@@ -457,6 +444,19 @@ class DropHandler {
           now,
           until
         )}** before claiming another card.`,
+        { ephemeral: true }
+      );
+
+      return;
+    }
+
+    const pickedCard = drop.cards[button - 1];
+
+    if (pickedCard.claimed) {
+      await context.send(
+        `Sorry, but **${pickedCard.group || `Soloist`}** ${pickedCard.name}${
+          pickedCard.subgroup ? ` **(${pickedCard.subgroup})**` : ``
+        } has already been claimed.`,
         { ephemeral: true }
       );
 
@@ -498,7 +498,7 @@ class DropHandler {
 
     let claimMessage = `<@${context.user.id}> claimed \`${newCard.id.toString(
       36
-    )}\` **${pickedCard.group}** ${pickedCard.name} **(${
+    )}\` **${pickedCard.group || `Soloist`}** ${pickedCard.name} **(${
       pickedCard.subgroup
     })**!`;
 
@@ -560,21 +560,21 @@ class DropHandler {
         type: 2,
         custom_id: `drop1`,
         style: 1,
-        label: `Claim ${cards[0].name}`,
+        label: `${cards[0].name}`,
         disabled: cards[0].claimed,
       },
       {
         type: 2,
         custom_id: `drop2`,
         style: 1,
-        label: `Claim ${cards[1].name}`,
+        label: `${cards[1].name}`,
         disabled: cards[1].claimed,
       },
       {
         type: 2,
         custom_id: `drop3`,
         style: 1,
-        label: `Claim ${cards[2].name}`,
+        label: `${cards[2].name}`,
         disabled: cards[2].claimed,
       },
     ];
@@ -588,21 +588,21 @@ class DropHandler {
         type: 2,
         custom_id: `drop1`,
         style: 1,
-        label: `Claim ${cards[0].name}`,
+        label: `${cards[0].name}`,
         disabled: cards[0].claimed,
       },
       {
         type: 2,
         custom_id: `drop2`,
         style: 1,
-        label: `Claim ${cards[1].name}`,
+        label: `${cards[1].name}`,
         disabled: cards[1].claimed,
       },
       {
         type: 2,
         custom_id: `drop3`,
         style: 1,
-        label: `Claim ${cards[2].name}`,
+        label: `${cards[2].name}`,
         disabled: cards[2].claimed,
       },
     ];
