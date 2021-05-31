@@ -130,7 +130,7 @@ export async function getDescriptions(
         (tag) => tag.id === (<GameUserCard>t).tagId
       )[0];
 
-      let desc =
+      const desc =
         `${hasTag?.emoji || `:white_medium_small_square:`} ` +
         `\`${renderIdentifier(t).padStart(padLeft, ` `)}\` ` +
         `: \`${`★`.repeat(t.wear).padEnd(5, `☆`)}\` ` +
@@ -138,16 +138,16 @@ export async function getDescriptions(
           padRight,
           ` `
         )}\` ` +
+        (t.unusual ? `*` : ``) +
         `**${baseCard.group || `Soloist`}** ` +
         `${baseCard.name} ` +
         `${baseCard.emoji ? `${baseCard.emoji} ` : ``}` +
         `${
           showSubgroup && baseCard.subgroup ? `**(${baseCard.subgroup})** ` : ``
         }` +
+        (t.unusual ? `*` : ``) +
         `${showSerial ? `\`#${t.serialNumber}\` ` : ``}` +
         `${albumCards.find((c) => c.cardId === t.id) ? ` 🔖` : ``}`;
-
-      if (t.unusual) desc = `*${desc.trim()}*`;
 
       descriptions.push(desc);
     } else if (t instanceof GameDye) {
