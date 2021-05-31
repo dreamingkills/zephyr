@@ -168,17 +168,27 @@ export async function completeQuest(
   if (xpReward > 0 && profile.activeCard) {
     activeCard = await CardService.getUserCardById(profile.activeCard);
 
+    const multiplier = activeCard.unusual ? 2 : 1;
+
     const previousLevel = CardService.getLevel(activeCard);
 
     if (profile.discordId === activeCard.discordId) {
-      activeCard = await CardService.addExperience(activeCard, xpReward);
+      activeCard = await CardService.addExperience(
+        activeCard,
+        xpReward * multiplier
+      );
 
       const newLevel = CardService.getLevel(activeCard);
 
       if (newLevel.level > previousLevel.level)
         levelUp = { leveledUp: true, leveledTo: newLevel.level };
 
-      rewardStrings.push(`**${xpReward.toLocaleString()} XP**`);
+      let baseReward = `**${xpReward.toLocaleString()} XP**`;
+
+      if (activeCard.unusual)
+        baseReward += ` *(**+${xpReward.toLocaleString()}** unusual bonus XP)*`;
+
+      rewardStrings.push(baseReward);
     }
   }
 

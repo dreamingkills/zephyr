@@ -25,13 +25,17 @@ export async function createNewUserCard(
     [12.5, 25, 35, 23.6, 14.6, 4]
   );
 
+  const isUnusual = chance.bool({
+    likelihood: card.totalGenerated < 500 ? 5 : 0.5,
+  });
+
   let issue = await IssueHandler.queueIssueGeneration(card);
   let tries = 0;
   while (true) {
     try {
       const query = (await DB.query(
-        `INSERT INTO user_card (card_id, serial_number, discord_id, wear) VALUES (?, ?, ?, ?)`,
-        [card.id, issue, profile.discordId, wear]
+        `INSERT INTO user_card (card_id, serial_number, discord_id, wear, unusual) VALUES (?, ?, ?, ?, ?)`,
+        [card.id, issue, profile.discordId, wear, isUnusual]
       )) as { insertId: number };
 
       Zephyr.incrementBaseCardSerialNumber(card);

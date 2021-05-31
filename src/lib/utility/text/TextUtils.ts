@@ -68,6 +68,8 @@ export function getTruncatedDescription(card: GameUserCard): string {
   description += `${baseCard.name} `;
   if (baseCard.subgroup) description += `**(${baseCard.subgroup})**`;
 
+  if (card.unusual) description += ` :sparkles:`;
+
   return description;
 }
 
@@ -136,13 +138,15 @@ export async function getDescriptions(
           padRight,
           ` `
         )}\` ` +
+        (t.unusual ? `*` : ``) +
         `**${baseCard.group || `Soloist`}** ` +
-        `${baseCard.name} ` +
-        `${baseCard.emoji ? `${baseCard.emoji} ` : ``}` +
+        `${baseCard.name}` +
+        `${baseCard.emoji ? ` ${baseCard.emoji}` : ``}` +
         `${
-          showSubgroup && baseCard.subgroup ? `**(${baseCard.subgroup})** ` : ``
+          showSubgroup && baseCard.subgroup ? ` **(${baseCard.subgroup})**` : ``
         }` +
-        `${showSerial ? `\`#${t.serialNumber}\` ` : ``}` +
+        (t.unusual ? `*` : ``) +
+        `${showSerial ? ` \`#${t.serialNumber}\` ` : ``}` +
         `${albumCards.find((c) => c.cardId === t.id) ? ` 🔖` : ``}`;
 
       descriptions.push(desc);
