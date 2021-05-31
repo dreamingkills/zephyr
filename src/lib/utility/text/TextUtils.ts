@@ -128,7 +128,7 @@ export async function getDescriptions(
         (tag) => tag.id === (<GameUserCard>t).tagId
       )[0];
 
-      const desc =
+      let desc =
         `${hasTag?.emoji || `:white_medium_small_square:`} ` +
         `\`${renderIdentifier(t).padStart(padLeft, ` `)}\` ` +
         `: \`${`★`.repeat(t.wear).padEnd(5, `☆`)}\` ` +
@@ -144,6 +144,8 @@ export async function getDescriptions(
         }` +
         `${showSerial ? `\`#${t.serialNumber}\` ` : ``}` +
         `${albumCards.find((c) => c.cardId === t.id) ? ` 🔖` : ``}`;
+
+      if (t.unusual) desc = `*${desc}*`;
 
       descriptions.push(desc);
     } else if (t instanceof GameDye) {
