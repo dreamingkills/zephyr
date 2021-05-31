@@ -68,6 +68,8 @@ export function getTruncatedDescription(card: GameUserCard): string {
   description += `${baseCard.name} `;
   if (baseCard.subgroup) description += `**(${baseCard.subgroup})**`;
 
+  if (card.unusual) description += ` :sparkles: **Unusual**`;
+
   return description;
 }
 
