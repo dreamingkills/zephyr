@@ -141,12 +141,12 @@ export async function getDescriptions(
         (t.unusual ? `*` : ``) +
         `**${baseCard.group || `Soloist`}** ` +
         `${baseCard.name} ` +
-        `${baseCard.emoji ? `${baseCard.emoji} ` : ``}` +
+        `${baseCard.emoji ? `${baseCard.emoji}` : ``}` +
         `${
-          showSubgroup && baseCard.subgroup ? `**(${baseCard.subgroup})** ` : ``
+          showSubgroup && baseCard.subgroup ? ` **(${baseCard.subgroup})**` : ``
         }` +
         (t.unusual ? `*` : ``) +
-        `${showSerial ? `\`#${t.serialNumber}\` ` : ``}` +
+        `${showSerial ? ` \`#${t.serialNumber}\` ` : ``}` +
         `${albumCards.find((c) => c.cardId === t.id) ? ` 🔖` : ``}`;
 
       descriptions.push(desc);
