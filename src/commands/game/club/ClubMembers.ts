@@ -35,35 +35,37 @@ export default class ClubMembers extends BaseCommand {
     if (!clubMembers.find((m) => m.discordId === msg.author.id))
       throw new ClubError.NotMemberOfClubError();
 
-    const memberStrings = [];
+    const owners = [];
+    const moderators = [];
+    const members = [];
 
-    for (let member of clubMembers.sort((a) => {
-      if (a.discordId === club.ownerId) return 0;
-      if (a.isMod) return 1;
-      return 2;
-    })) {
+    for (let member of clubMembers) {
       const user = await Zephyr.fetchUser(member.discordId);
 
-      let type = `Member`;
+      const isOwner = member.discordId === club.ownerId;
+      const isMod = member.isMod;
+
       let emoji = `bust_in_silhouette`;
-      if (member.discordId === club.ownerId) {
-        type = `Owner`;
+      if (isOwner) {
         emoji = `crown`;
-      } else if (member.isMod) {
-        type = `Moderator`;
+      } else if (isMod) {
         emoji = `shield`;
       }
 
-      memberStrings.push(
-        `:${emoji}: **${escapeMarkdown(
-          user?.tag || `Unknown User`
-        )}** - ${type}`
-      );
+      const final =
+        `:${emoji}: **${escapeMarkdown(user?.tag || `Unknown User`)}**` +
+        (member.discordId === msg.author.id ? ` :point_left:` : ``);
+
+      if (isOwner) {
+        owners.push(final);
+      } else if (isMod) {
+        moderators.push(final);
+      } else members.push(final);
     }
 
     const embed = new MessageEmbed(`Club Members`, msg.author)
       .setTitle(`Members of ${club.name}`)
-      .setDescription(memberStrings.join(`\n`));
+      .setDescription([...owners, ...moderators, ...members].join(`\n`));
 
     await this.send(msg.channel, embed);
 
