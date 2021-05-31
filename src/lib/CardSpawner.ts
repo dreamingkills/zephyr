@@ -547,6 +547,9 @@ class DropHandler {
       }
     }
 
+    if (newCard.unusual)
+      claimMessage += ` :sparkles: **Something is unusual about this card...**`;
+
     await context.send(claimMessage);
 
     return;
