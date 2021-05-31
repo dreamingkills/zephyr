@@ -2,7 +2,7 @@ import { Frames } from "../../lib/cosmetics/Frames";
 import { CardService } from "../../lib/database/services/game/CardService";
 import { GameBaseCard } from "./BaseCard";
 import { GameFrame } from "./Frame";
-// ALTER TABLE user_card ADD COLUMN experience INT(11) DEFAULT 0;
+
 export interface UserCard {
   readonly id: number;
   readonly card_id: number;
@@ -18,6 +18,7 @@ export interface UserCard {
   readonly tag_id: number | null;
   readonly vaulted: boolean;
   readonly experience: number;
+  readonly unusual: boolean;
 }
 
 export class GameUserCard {
@@ -35,7 +36,9 @@ export class GameUserCard {
     b: number;
   };
   readonly vaulted: boolean;
+
   readonly experience: number;
+  readonly unusual: boolean;
 
   readonly tagId: number | undefined;
 
@@ -50,7 +53,9 @@ export class GameUserCard {
     this.textColor = data.text_color_hex?.toString() || `000000`;
     this.dyeMaskUrl = data.dye_mask_url;
     this.vaulted = data.vaulted;
+
     this.experience = data.experience;
+    this.unusual = data.unusual;
 
     this.tagId = data.tag_id || undefined;
 
