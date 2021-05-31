@@ -140,8 +140,8 @@ export async function getDescriptions(
         )}\` ` +
         (t.unusual ? `*` : ``) +
         `**${baseCard.group || `Soloist`}** ` +
-        `${baseCard.name} ` +
-        `${baseCard.emoji ? `${baseCard.emoji}` : ``}` +
+        `${baseCard.name}` +
+        `${baseCard.emoji ? ` ${baseCard.emoji}` : ``}` +
         `${
           showSubgroup && baseCard.subgroup ? ` **(${baseCard.subgroup})**` : ``
         }` +
