@@ -64,7 +64,9 @@ export default class ClubMembers extends BaseCommand {
     }
 
     const embed = new MessageEmbed(`Club Members`, msg.author)
-      .setTitle(`Members of ${club.name}`)
+      .setTitle(
+        `Members of ${club.name} (${members.length}/${club.memberLimit})`
+      )
       .setDescription([...owners, ...moderators, ...members].join(`\n`));
 
     await this.send(msg.channel, embed);
