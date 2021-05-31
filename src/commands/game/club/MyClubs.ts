@@ -65,7 +65,9 @@ export default class MyClubs extends BaseCommand {
       }
     }
 
-    embed.setDescription([...owner, ...moderator, ...member].join(`\n`));
+    embed
+      .setTitle(`${msg.author.tag}'s clubs`)
+      .setDescription([...owner, ...moderator, ...member].join(`\n`));
 
     await this.send(msg.channel, embed);
     return;
