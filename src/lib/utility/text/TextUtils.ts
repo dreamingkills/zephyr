@@ -147,7 +147,7 @@ export async function getDescriptions(
         `${showSerial ? `\`#${t.serialNumber}\` ` : ``}` +
         `${albumCards.find((c) => c.cardId === t.id) ? ` 🔖` : ``}`;
 
-      if (t.unusual) desc = `*${desc}*`;
+      if (t.unusual) desc = `*${desc.trim()}*`;
 
       descriptions.push(desc);
     } else if (t instanceof GameDye) {
