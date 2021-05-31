@@ -8,6 +8,8 @@ export interface StickerPack {
   readonly item_id: number;
   readonly featured: boolean;
   readonly shoppable: boolean;
+  readonly selection: boolean;
+  readonly pulls: number;
 }
 
 export class GameStickerPack {
@@ -18,6 +20,8 @@ export class GameStickerPack {
   readonly itemId: number;
   readonly featured: boolean;
   readonly shoppable: boolean;
+  readonly selection: boolean;
+  readonly pulls: number;
 
   readonly stickers: GameSticker[];
 
@@ -30,6 +34,8 @@ export class GameStickerPack {
     this.featured = data.featured;
     this.shoppable = data.shoppable;
     this.itemId = data.item_id;
+    this.selection = data.selection;
+    this.pulls = data.pulls;
 
     this.stickers = stickers;
   }
