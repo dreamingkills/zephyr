@@ -26,7 +26,7 @@ export async function createNewUserCard(
   );
 
   const isUnusual = chance.bool({
-    likelihood: 100, //card.totalGenerated < 500 ? 5 : 0.5,
+    likelihood: card.totalGenerated < 500 ? 5 : 0.5,
   });
 
   let issue = await IssueHandler.queueIssueGeneration(card);
