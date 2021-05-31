@@ -255,3 +255,13 @@ export function formatQuest(quest: GameDBQuest): string {
     .replace(`%n`, `**${quest.completion}**`)
     .replace(`%p`, quest.completion === 1 ? `` : `s`);
 }
+
+export function makeAndString(strings: string[]): string {
+  if (strings.length === 1) return strings[0];
+
+  const firsts = strings.slice(0, strings.length - 1);
+
+  const last = strings[strings.length - 1];
+
+  return firsts.join(`, `) + ` and ` + last;
+}

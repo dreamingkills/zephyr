@@ -14,7 +14,9 @@ export async function getStickerPacks(): Promise<StickerPack[]> {
         sticker_pack.currency,
         sticker_pack.item_id,
         sticker_pack.featured,
-        sticker_pack.shoppable
+        sticker_pack.shoppable,
+        sticker_pack.selection,
+        sticker_pack.pulls
     FROM
         sticker_pack;
       `

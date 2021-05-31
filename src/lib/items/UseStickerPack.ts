@@ -8,6 +8,7 @@ import { getItemById } from "../../assets/Items";
 import * as ZephyrError from "../../structures/error/ZephyrError";
 import { Stickers } from "../cosmetics/Stickers";
 import { Zephyr } from "../../structures/client/Zephyr";
+import { makeAndString } from "../utility/text/TextUtils";
 
 export async function useStickerPack(
   msg: Message,
@@ -18,20 +19,36 @@ export async function useStickerPack(
 
   if (!targetPack) throw new ZephyrError.NoPackBoundToItemError();
 
-  const selectedSticker = Zephyr.chance.weighted(
-    targetPack.stickers,
-    targetPack.stickers.map((s) => s.rarity)
-  );
+  const pulls: { item: PrefabItem; count: number }[] = [];
 
-  const stickerItem = getItemById(selectedSticker.itemId);
+  const weightings = targetPack.stickers.map((s) => s.rarity);
 
-  if (!stickerItem) throw new ZephyrError.NoStickerItemError();
+  while (pulls.reduce((a, b) => (a += b.count), 0) < targetPack.pulls) {
+    const pull = Zephyr.chance.weighted(targetPack.stickers, weightings);
+
+    const item = getItemById(pull.itemId);
+
+    if (!item) continue;
+
+    const alreadyRolled = pulls.find((i) => i.item.id === item.id);
+    if (alreadyRolled) {
+      alreadyRolled.count += 1;
+    } else {
+      pulls.push({ item, count: 1 });
+    }
+  }
+
+  pulls.sort((a, b) => b.count - a.count);
 
   await ProfileService.removeItems(profile, [{ item: packItem, count: 1 }]);
-  await ProfileService.addItems(profile, [{ item: stickerItem, count: 1 }]);
+  await ProfileService.addItems(profile, pulls);
+
+  const pullStrings = pulls.map((p) => `**${p.count}x ${p.item.names[0]}**`);
 
   const embed = new MessageEmbed(`Sticker Pack`, msg.author).setDescription(
-    `🎉 You opened the **${targetPack.name}** and received...\n\n1x __**${selectedSticker.name}**__!`
+    `:tada: You opened the **${targetPack.name}** and received ${makeAndString(
+      pullStrings
+    )}!`
   );
 
   await createMessage(msg.channel, embed);
