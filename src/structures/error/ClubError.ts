@@ -128,9 +128,9 @@ export class NotMemberOfClubError extends ZephyrError {
 }
 
 export class OwnerCannotLeaveClubError extends ZephyrError {
-  constructor() {
+  constructor(prefix: string) {
     super(
-      `**You are the owner of that club!**\nOwners cannot abandon their clubs at this time.`
+      `**You are the owner of that club!**\nIf you'd like to abandon your club, use \`${prefix}abandon\`.`
     );
   }
 }

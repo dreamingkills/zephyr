@@ -9,6 +9,7 @@ import {
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { kickUserFromClub } from "../../../lib/database/sql/game/club/ClubSetter";
 import { escapeMarkdown } from "../../../lib/utility/text/TextUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class LeaveClub extends BaseCommand {
   id = `drive`;
@@ -37,8 +38,11 @@ export default class LeaveClub extends BaseCommand {
 
     if (!membership) throw new ClubError.NotMemberOfClubError();
 
-    if (club.ownerId === msg.author.id)
-      throw new ClubError.OwnerCannotLeaveClubError();
+    if (club.ownerId === msg.author.id) {
+      const prefix = Zephyr.getPrefix(msg.guildID);
+
+      throw new ClubError.OwnerCannotLeaveClubError(prefix);
+    }
 
     await kickUserFromClub(membership);
 
