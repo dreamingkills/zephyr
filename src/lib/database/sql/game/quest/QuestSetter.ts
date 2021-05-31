@@ -183,7 +183,12 @@ export async function completeQuest(
       if (newLevel.level > previousLevel.level)
         levelUp = { leveledUp: true, leveledTo: newLevel.level };
 
-      rewardStrings.push(`**${(xpReward * multiplier).toLocaleString()} XP**`);
+      let baseReward = `**${xpReward.toLocaleString()} XP**`;
+
+      if (activeCard.unusual)
+        baseReward += ` *(**+${xpReward.toLocaleString()}** unusual bonus XP)*`;
+
+      rewardStrings.push(baseReward);
     }
   }
 
