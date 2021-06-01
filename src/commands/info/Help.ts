@@ -66,7 +66,7 @@ export default class Help extends BaseCommand {
       })
       .addField({
         name: `Information`,
-        value: `\`timers\`, \`reminders\`, \`lookup\`, \`recipes\`, \`iteminfo\`, \`previewframe\`, \`previewsticker\`, \`top\`, \`topwishlist\`, \`grouplist\`, \`birthdays\``,
+        value: `\`timers\`, \`reminders\`, \`lookup\`, \`recipes\`, \`iteminfo\`, \`previewsticker\`, \`topwishlist\`, \`grouplist\`, \`birthdays\``,
         inline: true,
       })
       .addField({
