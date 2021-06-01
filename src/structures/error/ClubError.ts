@@ -1,5 +1,14 @@
+import { Zephyr } from "../client/Zephyr";
 import { GameDBClub } from "../game/club/database/DBClub";
 import { ZephyrError } from "./ZephyrError";
+
+export class NotEnoughBitsToCreateClubError extends ZephyrError {
+  constructor() {
+    super(
+      `**You don't have enough bits to do that!**\nCreating a club costs **${Zephyr.modifiers.clubCreationPrice.toLocaleString()}** bits.`
+    );
+  }
+}
 
 export class InvalidClubNameInCreationError extends ZephyrError {
   constructor() {

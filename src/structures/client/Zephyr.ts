@@ -96,6 +96,8 @@ class ZephyrClient extends Client {
 
     dailyQuestLimit: 5 /* Quests: number of maximum active daily quests per user */,
     weeklyQuestLimit: 2 /* Quests: number of maximum active weekly quests per user */,
+
+    clubCreationPrice: 5000 /* Price in bits to create a club */,
   };
 
   /* Rate limit sets */
