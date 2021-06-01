@@ -226,12 +226,18 @@ class ZephyrClient extends Client {
     });
 
     this.on("messageCreate", async (message) => {
+      StatsD.timing(
+        `discord.message.receivetime`,
+        Date.now() - message.createdAt,
+        1
+      );
+      StatsD.increment(`discord.message.received`, 1, 1);
+
       if (!this.flags.processMessages && !isDeveloper(message.author)) return;
 
       if (this.onCooldown.has(message.author.id)) return;
 
       if (message.author.bot || !message.channel) return;
-      StatsD.increment(`zephyr.message.receive`, 1);
 
       await this.fetchUser(message.author.id);
 

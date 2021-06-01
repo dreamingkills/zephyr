@@ -25,6 +25,7 @@ import { Zephyr } from "../../../../structures/client/Zephyr";
 import { exec } from "child_process";
 import { promisify } from "util";
 import { Stickers } from "../../../cosmetics/Stickers";
+import { StatsD } from "../../../StatsD";
 
 export const _exec = promisify(exec);
 
@@ -33,6 +34,9 @@ export async function generateCardImage(
   large: boolean,
   output?: string
 ): Promise<Buffer> {
+  StatsD.increment(`zephyr.image.card.count`, 1);
+  const start = Date.now();
+
   let baseCard: GameBaseCard;
 
   let frame = card.frame;
@@ -81,6 +85,8 @@ export async function generateCardImage(
     await fs.mkdir(`./cache/cards/${baseCard.id}`);
   }
 
+  const startExec = Date.now();
+
   await _exec(
     `./envision_card "${baseCard.name}" ${
       card.serialNumber
@@ -93,7 +99,13 @@ export async function generateCardImage(
     } ${textColor.b} ${frame.overlay} "${outPath}"`
   );
 
+  StatsD.timing(`zephyr.card.image.godraw`, Date.now() - startExec);
+
+  const beforeRead = Date.now();
+
   let cardImage = await fs.readFile(outPath);
+
+  StatsD.timing(`zephyr.card.image.fsread`, Date.now() - beforeRead);
 
   const stickers = await CardService.getCardStickers(card);
 
@@ -132,6 +144,8 @@ export async function generateCardImage(
 
     return buf;
   }
+
+  StatsD.timing(`zephyr.image.card.drawtime`, Date.now() - start);
 
   return cardImage;
 }
@@ -246,35 +260,6 @@ export abstract class CardService {
     }
   }*/
 
-  public static async drawCardFromPrefab(
-    card: GameBaseCard,
-    serial: number
-  ): Promise<Buffer> {
-    let prefab: Buffer;
-
-    try {
-      prefab = await fs.readFile(`./cache/cards/prefab/${card.id}`);
-    } catch (e) {
-      prefab = await this.updatePrefabCache(card);
-    }
-
-    // Create the card canvas
-    const canvas = createCanvas(350, 500);
-    const ctx = canvas.getContext(`2d`);
-
-    // Load the base card image
-    let img = await loadImage(prefab);
-
-    // Draw the base image
-    ctx.drawImage(img, 0, 0, 350, 500);
-
-    // Draw the serial number
-    ctx.font = "20px AlteHaasGroteskBold";
-    ctx.fillText(`#${serial}`, 50, 421);
-
-    return canvas.toBuffer(`image/png`);
-  }
-
   public static async generateCardCollage(
     cards: MockUserCard[]
   ): Promise<Buffer> {
@@ -366,6 +351,8 @@ export abstract class CardService {
     large: boolean = false,
     invalidate: boolean = false
   ): Promise<Buffer> {
+    StatsD.increment(`zephyr.image.cache.card.update`, 1);
+
     const image = await generateCardImage(card, large);
 
     const fileName = `${card.id}${large ? `` : `_small`}`;
@@ -438,9 +425,13 @@ export abstract class CardService {
     invalidate: boolean = false
   ): Promise<Buffer> {
     try {
-      return await fs.readFile(
+      const file = await fs.readFile(
         `./cache/cards/${card.baseCardId}/${card.id}${large ? `` : `_small`}`
       );
+
+      StatsD.increment(`zephyr.image.cache.card.read`, 1);
+
+      return file;
     } catch (e) {
       return await this.updateCardCache(card, large, invalidate);
     }

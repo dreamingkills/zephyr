@@ -14,6 +14,7 @@ import { AnticheatService } from "../database/services/meta/AnticheatService";
 import { Logger } from "../logger/Logger";
 import { getActiveQuests } from "../database/sql/game/quest/QuestGetter";
 import { initQuests } from "../database/sql/game/quest/QuestSetter";
+import { StatsD } from "../StatsD";
 
 export class CommandLib {
   commands: Map<string, BaseCommand> = new Map();
@@ -108,6 +109,8 @@ export class CommandLib {
       } catch {
         profile = await ProfileService.getProfile(message.author.id, true);
 
+        StatsD.increment(`zephyr.profile.created`, 1);
+
         try {
           const dmChannel = await message.author.getDMChannel();
 
@@ -173,7 +176,15 @@ export class CommandLib {
       )
         await initQuests(profile, quests);
 
+      const startExec = Date.now();
+
       await command.run(message, profile);
+
+      StatsD.timing(
+        `zephyr.command.responsetime`,
+        Date.now() - message.createdAt
+      );
+      StatsD.timing(`zephyr.command.execute`, Date.now() - startExec);
 
       if (command.id) {
         await AnticheatService.logCommand(
