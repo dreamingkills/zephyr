@@ -345,7 +345,7 @@ class DropHandler {
     return await this.dropCards(
       `— <@${profile.discordId}> is dropping **${cards.length} cards**!${
         boosted ? ` *This drop is boosted!* :sparkles:` : ``
-      }\n**NOTICE**: You need to manually react :one:, :two:, or :three: temporarily due to poor performance.`,
+      }`,
       channel,
       cards,
       profile
@@ -355,7 +355,7 @@ class DropHandler {
   public async activityDrop(channel: TextChannel): Promise<void> {
     const cards = Zephyr.getRandomCards(3);
     await this.dropCards(
-      "— **3 cards** are dropping due to server activity!\n**NOTICE**: You need to manually react :one:, :two:, or :three: temporarily due to poor performance.",
+      `— **${cards.length} cards** are dropping due to server activity!`,
       channel,
       cards
     );
