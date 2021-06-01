@@ -12,7 +12,7 @@ import { CardSet } from "../../sql/game/card/CardSet";
 import * as ZephyrError from "../../../../structures/error/ZephyrError";
 import { GameTag } from "../../../../structures/game/Tag";
 import { GameDye } from "../../../../structures/game/Dye";
-import { hexToRgb } from "../../../utility/color/ColorUtils";
+import { hexToRgb, rgbToCmy } from "../../../utility/color/ColorUtils";
 import {
   BuiltSticker,
   GameCardSticker,
@@ -60,6 +60,12 @@ export async function generateCardImage(
   let maskImage = frame.maskUrl;
   let outPath = output || `./cache/cards/${baseCard.id}/${card.id}`;
 
+  const colorCmy = rgbToCmy(
+    card.dye.r < 0 ? 185 : card.dye.r,
+    card.dye.g < 0 ? 185 : card.dye.g,
+    card.dye.b < 0 ? 185 : card.dye.b
+  );
+
   if (!large) {
     idolImage = idolImage.slice(0, -4) + `_small.png`;
     frameImage = frameImage.slice(0, -4) + `_small.png`;
@@ -80,13 +86,11 @@ export async function generateCardImage(
       card.serialNumber
     } ${!!baseCard.group} "${idolImage}" "${groupUrl}" "${frameImage}" "${maskImage}" ${
       card.id
-    } ${card.dye.r < 0 ? 185 : card.dye.r} ${
-      card.dye.g < 0 ? 185 : card.dye.g
-    } ${
-      card.dye.b < 0 ? 185 : card.dye.b
+    } ${colorCmy.c} ${colorCmy.m} ${
+      colorCmy.y
     } ${large} "./src/assets/fonts/AlteHaasGroteskBold.ttf" ${textColor.r} ${
       textColor.g
-    } ${textColor.b} "${outPath}"`
+    } ${textColor.b} ${frame.overlay} "${outPath}"`
   );
 
   let cardImage = await fs.readFile(outPath);
