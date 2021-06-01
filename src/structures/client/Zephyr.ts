@@ -422,8 +422,8 @@ class ZephyrClient extends Client {
     });
 
     this.slash = new SlashCreator({
-      applicationID: `779966699780702208`,
-      publicKey: `44f15ff26a8ef781d97335f616d4dfccaebd0c59214b19e0430d1b5ea5ea6d40`,
+      applicationID: this.config.discord.applicationId,
+      publicKey: this.config.discord.publicKey,
       token: this.config.discord.token,
     });
 
