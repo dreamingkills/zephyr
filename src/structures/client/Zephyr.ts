@@ -439,6 +439,8 @@ class ZephyrClient extends Client {
       .syncCommands();
 
     this.slash.on(`componentInteraction`, async (ctx) => {
+      await ctx.defer(true);
+
       if (ctx.customID === `drop1`) {
         await CardSpawner.handleClaim(ctx.message.id, 1, ctx);
       } else if (ctx.customID === `drop2`) {
