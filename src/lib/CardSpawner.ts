@@ -366,6 +366,8 @@ class DropHandler {
       // If they're on cooldown, ignore.
       return;
 
+    if (Zephyr.maintenance.enabled) return;
+
     if (!this.guildLevels[guild.id]) {
       this.guildLevels[guild.id] = 1;
       return;
