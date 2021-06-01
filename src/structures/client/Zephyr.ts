@@ -429,9 +429,9 @@ class ZephyrClient extends Client {
 
     this.slash
       .withServer(
-        new GatewayServer((handler: any) =>
-          this.on(`rawWS`, (event) => {
-            if (event.t === `INTERACTION_CREATE`) handler(event.d);
+        new GatewayServer(async (handler: any) =>
+          this.on(`rawWS`, async (event) => {
+            if (event.t === `INTERACTION_CREATE`) await handler(event.d);
           })
         )
       )

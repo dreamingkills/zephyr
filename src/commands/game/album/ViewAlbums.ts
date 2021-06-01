@@ -122,10 +122,10 @@ export default class ViewAlbums extends BaseCommand {
       await this.handleError(msg, msg.author, e);
     });
 
-    if (maxPage > 2) await this.react(albumsMessage, `⏮`);
+    // if (maxPage > 2) await this.react(albumsMessage, `⏮`);
     if (maxPage > 1) await this.react(albumsMessage, `◀`);
     if (maxPage > 1) await this.react(albumsMessage, `▶`);
-    if (maxPage > 2) await this.react(albumsMessage, `⏭`);
+    // if (maxPage > 2) await this.react(albumsMessage, `⏭`);
   }
 
   private async renderAlbums(albums: GameAlbum[]): Promise<string[]> {

@@ -138,11 +138,11 @@ export default class CardInventory extends BaseCommand {
     collector.on(
       "collect",
       async (_m: Message, emoji: PartialEmoji, user: User) => {
-        if (emoji.name === "⏮" && page !== 1) page = 1;
+        // if (emoji.name === "⏮" && page !== 1) page = 1;
         if (emoji.name === "◀" && page !== 1) page--;
         // numbers
         if (emoji.name === "▶" && page !== totalPages) page++;
-        if (emoji.name === "⏭" && page !== totalPages) page = totalPages;
+        // if (emoji.name === "⏭" && page !== totalPages) page = totalPages;
 
         filters["page"] = page;
         const newCards = await CardService.getUserInventory(

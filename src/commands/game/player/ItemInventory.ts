@@ -44,11 +44,11 @@ export default class ItemInventory extends BaseCommand {
       collector.on(
         "collect",
         async (_m: Message, emoji: PartialEmoji, user: User) => {
-          if (emoji.name === "⏮" && page !== 1) page = 1;
+          // if (emoji.name === "⏮" && page !== 1) page = 1;
           if (emoji.name === "◀" && page !== 1) page--;
           // numbers
           if (emoji.name === "▶" && page !== maxPage) page++;
-          if (emoji.name === "⏭" && page !== maxPage) page = maxPage;
+          // if (emoji.name === "⏭" && page !== maxPage) page = maxPage;
 
           const newItems = await ProfileService.getItems(profile, page);
           embed.setDescription(this.renderInventory(newItems, prefix));

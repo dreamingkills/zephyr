@@ -59,10 +59,10 @@ export default class TopWishlist extends BaseCommand {
 
     if (totalPages < 2) return;
 
-    if (totalPages > 2) await this.react(board, `⏮`);
+    // if (totalPages > 2) await this.react(board, `⏮`);
     if (totalPages > 1) await this.react(board, `◀`);
     if (totalPages > 1) await this.react(board, `▶`);
-    if (totalPages > 2) await this.react(board, `⏭`);
+    // if (totalPages > 2) await this.react(board, `⏭`);
 
     const filter = (_m: Message, _emoji: PartialEmoji, user: User) =>
       user.id === msg.author.id;
