@@ -445,6 +445,12 @@ class DropHandler {
 
     const profile = await ProfileService.getProfile(context.user.id);
 
+    if (profile.blacklisted) {
+      await context.send(`You cannot claim cards because you are blacklisted.`);
+
+      return;
+    }
+
     const now = dayjs(Date.now());
     const until = dayjs(profile.claimNext);
 
