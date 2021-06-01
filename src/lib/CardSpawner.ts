@@ -426,7 +426,9 @@ class DropHandler {
         `Hold up! You need to wait **${(
           (drop.timestamp + 5000 - Date.now()) /
           1000
-        ).toFixed(2)}** seconds before claiming from this drop!`,
+        ).toFixed(
+          2
+        )}** seconds before claiming from this drop to allow for the dropper to claim a card.`,
         { ephemeral: true }
       );
 
