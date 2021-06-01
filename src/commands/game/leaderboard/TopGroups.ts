@@ -18,6 +18,9 @@ export default class TopGroup extends BaseCommand {
   allowDm = true;
   developerOnly = true;
 
+  disabled = true;
+  disabledMessage = `This command is currently disabled due to performance concerns.\nJoin [Zephyr Community](https://discord.gg/zephyr) to stay updated!`;
+
   async exec(
     msg: Message,
     profile: GameProfile,

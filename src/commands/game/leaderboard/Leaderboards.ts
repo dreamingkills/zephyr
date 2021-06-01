@@ -16,6 +16,9 @@ export default class Leaderboards extends BaseCommand {
   allowDm = true;
   developerOnly = true;
 
+  disabled = true;
+  disabledMessage = `This command is currently disabled due to performance concerns.\nJoin [Zephyr Community](https://discord.gg/zephyr) to stay updated!`;
+
   private leaderboardTypes = ["bits", "daily", "cards", "cubits"];
 
   async exec(
