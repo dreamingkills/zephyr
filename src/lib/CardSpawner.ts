@@ -112,9 +112,11 @@ class DropHandler {
 
     setTimeout(async () => {
       await drop.delete();
-
-      this.activeDrops.delete(drop.id);
     }, 30000);
+
+    setTimeout(async () => {
+      this.activeDrops.delete(drop.id);
+    }, 900000);
 
     /*const filter = (_m: Message, emoji: PartialEmoji, user: User) =>
       this.emojis.includes(emoji.name) && user.id !== channel.client.user.id;
