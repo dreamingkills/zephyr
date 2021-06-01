@@ -8,6 +8,7 @@ import {
 } from "../../../lib/database/sql/game/club/ClubSetter";
 import {
   getClubByName,
+  getUserClubMembership,
   isIllegalClubName,
 } from "../../../lib/database/sql/game/club/ClubGetter";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
@@ -29,6 +30,11 @@ export default class CreateClub extends BaseCommand {
   ): Promise<void> {
     if (profile.bits < Zephyr.modifiers.clubCreationPrice)
       throw new ClubError.NotEnoughBitsToCreateClubError();
+
+    const userMembership = await getUserClubMembership(profile);
+
+    if (userMembership.length > Zephyr.modifiers.userClubMembershipLimit)
+      throw new ClubError.ClubLimitError();
 
     const clubName = options.join(` `);
 

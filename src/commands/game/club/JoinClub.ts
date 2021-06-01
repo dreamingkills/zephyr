@@ -5,10 +5,12 @@ import { ClubError } from "../../../structures/error/ClubError";
 import {
   getClubByName,
   getClubMembers,
+  getUserClubMembership,
 } from "../../../lib/database/sql/game/club/ClubGetter";
 import { MessageEmbed } from "../../../structures/client/RichEmbed";
 import { addUserToClub } from "../../../lib/database/sql/game/club/ClubSetter";
 import { escapeMarkdown } from "../../../lib/utility/text/TextUtils";
+import { Zephyr } from "../../../structures/client/Zephyr";
 
 export default class JoinClub extends BaseCommand {
   id = `jumpsuit`;
@@ -38,6 +40,11 @@ export default class JoinClub extends BaseCommand {
     if (!club.open) throw new ClubError.ClubClosedError();
     if (clubMembers.length >= club.memberLimit)
       throw new ClubError.ClubAtCapacityError();
+
+    const userMembership = await getUserClubMembership(profile);
+
+    if (userMembership.length > Zephyr.modifiers.userClubMembershipLimit)
+      throw new ClubError.ClubLimitError();
 
     await addUserToClub(club, profile);
 

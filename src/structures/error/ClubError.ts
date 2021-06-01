@@ -10,6 +10,14 @@ export class NotEnoughBitsToCreateClubError extends ZephyrError {
   }
 }
 
+export class ClubLimitError extends ZephyrError {
+  constructor() {
+    super(
+      `**You can't join any more clubs!**\nYou'll need to leave one first to join another.`
+    );
+  }
+}
+
 export class InvalidClubNameInCreationError extends ZephyrError {
   constructor() {
     super(
