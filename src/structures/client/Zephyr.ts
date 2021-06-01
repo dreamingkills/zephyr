@@ -450,6 +450,10 @@ class ZephyrClient extends Client {
       }
     });
 
+    this.slash.on(`error`, (err) => {
+      Logger.error(`slash-create error: ${err}`);
+    });
+
     this.connect();
   }
 
