@@ -51,7 +51,7 @@ export default class Help extends BaseCommand {
       .setFooter(`User ID: ${user.id}`)
       .addField({
         name: "Basic",
-        value: `\`daily\`, \`drop\`, \`burn\`, \`profile\`, \`balance\``,
+        value: `\`daily\`, \`drop\`, \`burn\`, \`profile\`, \`balance\`, \`quests\`, \`mysterybox\``,
         inline: true,
       })
       .addField({
@@ -61,7 +61,7 @@ export default class Help extends BaseCommand {
       })
       .addField({
         name: `Tags`,
-        value: `\`viewtags\`, \`createtag\`, \`deletetag\`, \`edittag\`, \`tag\`, \`untag\`, \`burntag\`, \`burnuntagged\``,
+        value: `\`viewtags\`, \`createtag\`, \`deletetag\`, \`edittag\`, \`tag\`, \`untag\`, \`burntag\`, \`burnuntagged\`, \`createautotag\`, \`deleteautotag\`, \`autotags\`, \`changepriority\``,
         inline: true,
       })
       .addField({
@@ -92,6 +92,11 @@ export default class Help extends BaseCommand {
       .addField({
         name: `Album`,
         value: `\`album\`, \`albums\`, \`renamealbum\`, \`addcardtoalbum\`, \`removecardfromalbum\`, \`clearalbum\``,
+        inline: true,
+      })
+      .addField({
+        name: `Clubs`,
+        value: `\`abandon\`, \`members\`, \`clubsettings\`, \`createclub\`, \`demote\`, \`join\`, \`kick\`, \`leave\`, \`myclubs\`, \`promote\`, \`club\``,
         inline: true,
       })
       .addField({
