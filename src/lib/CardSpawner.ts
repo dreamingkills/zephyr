@@ -417,6 +417,10 @@ class DropHandler {
       Logger.error(
         `[Drop ID: ${dropId}] Claim failed, drop is undefined in map!`
       );
+
+      await context.send(
+        `An error occurred attempting to claim this card (undefined in map).`
+      );
       return;
     }
 
@@ -424,7 +428,7 @@ class DropHandler {
       drop.timestamp + 5000 > Date.now() &&
       drop.dropper?.discordId !== context.user.id
     ) {
-      context.send(
+      await context.send(
         `Hold up! You need to wait **${(
           (drop.timestamp + 5000 - Date.now()) /
           1000
