@@ -16,14 +16,6 @@ export default class Ping extends BaseCommand {
 
     await msg.channel.createMessage({
       embed,
-      components: [
-        {
-          type: 1,
-          components: [
-            { type: 2, custom_id: `test`, style: 1, label: `Hello World!` },
-          ],
-        },
-      ],
     });
 
     return;
