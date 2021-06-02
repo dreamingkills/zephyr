@@ -87,7 +87,7 @@ export async function generateCardImage(
 
   const startExec = Date.now();
 
-  await _exec(
+  const out = await _exec(
     `./envision_card "${baseCard.name}" ${
       card.serialNumber
     } ${!!baseCard.group} "${idolImage}" "${groupUrl}" "${frameImage}" "${maskImage}" ${
@@ -101,9 +101,9 @@ export async function generateCardImage(
 
   StatsD.timing(`zephyr.card.image.godraw`, Date.now() - startExec);
 
-  const beforeRead = Date.now();
+  const buffer = Buffer.from(out.stdout, `base64`);
 
-  let cardImage = await fs.readFile(outPath);
+  const beforeRead = Date.now();
 
   StatsD.timing(`zephyr.card.image.fsread`, Date.now() - beforeRead);
 
@@ -115,7 +115,7 @@ export async function generateCardImage(
     const canvas = createCanvas(large ? 770 : 350, large ? 1100 : 500);
     const ctx = canvas.getContext(`2d`);
 
-    const img = await loadImage(cardImage);
+    const img = await loadImage(buffer);
     ctx.drawImage(img, 0, 0);
 
     for (let sticker of stickers) {
@@ -147,7 +147,7 @@ export async function generateCardImage(
 
   StatsD.timing(`zephyr.image.card.drawtime`, Date.now() - start);
 
-  return cardImage;
+  return buffer;
 }
 
 export async function generateCardPrefab(card: GameBaseCard): Promise<void> {
