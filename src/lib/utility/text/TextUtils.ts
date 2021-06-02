@@ -139,7 +139,7 @@ export async function getDescriptions(
           ` `
         )}\` ` +
         (t.unusual ? `*` : ``) +
-        `**${baseCard.group || `Soloist`}** ` +
+        `**${escapeMarkdown(baseCard.group || `Soloist`)}** ` +
         `${baseCard.name}` +
         `${baseCard.emoji ? ` ${baseCard.emoji}` : ``}` +
         `${
