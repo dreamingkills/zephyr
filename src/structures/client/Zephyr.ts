@@ -226,6 +226,12 @@ class ZephyrClient extends Client {
     });
 
     this.on("messageCreate", async (message) => {
+      if (this.config.developers.includes(message.author.id)) {
+        console.log(
+          `Dev message received in ${Date.now() - message.createdAt}`
+        );
+      }
+
       StatsD.timing(
         `discord.message.receivetime`,
         Date.now() - message.createdAt,
