@@ -1,14 +1,14 @@
 # zephyr
 
-Zephyr is a fast, scalable, and open-source Discord gacha bot.
+Zephyr is an open-source Discord bot.
 
 # Usage
 
-Zephyr is not intended to be self-hosted, thus we cannot offer support to users looking to do this.
+TODO
 
 # Documentation
 
-Coming soon.
+TODO...?
 
 # Stuff we used
 
