@@ -16,6 +16,7 @@ cache/
 envision*
 
 .DS_Store
+src/.DS_Store
 
 # Logs
 logs
