@@ -1,0 +1,74 @@
+{
+    "developers": ["USER_ID"],
+    "moderators": ["USER_ID"],
+    "statsdEnabled": false,
+    "discord": {
+        "logChannel": "TEXT_CHANNEL_ID",
+        "defaultPrefix": ".",
+        "token": "YOUR_BOT_TOKEN",
+        "secondaryChannels": ["TEXT_CHANNEL_ID", "TEXT_CHANNEL_ID", "TEXT_CHANNEL_ID"],
+        "main": "TEXT_CHANNEL_ID",
+        "emoji": {
+            "bits": "<:emoji:EMOJI_ID>",
+            "bank": "<:emoji:EMOJI_ID>",
+            "clock": "<:emoji:EMOJI_ID>",
+            "star":"<:emoji:EMOJI_ID>",
+            "warn":"<:emoji:EMOJI_ID>",
+            "check":"<:emoji:EMOJI_ID>",
+            "blank": "<:emoji:EMOJI_ID>"
+        },
+        "emojiId": {
+            "bits": "EMOJI_ID",
+            "bank": "EMOJI_ID",
+            "clock": "EMOJI_ID",
+            "star":"EMOJI_ID",
+            "warn":"EMOJI_ID",
+            "check":"EMOJI_ID",
+            "blank": "EMOJI_ID"
+        },
+        "shardNames": [
+            "Allium",
+            "Aster",
+            "Camellia",
+            "Catmint",
+            "Chrysanthemum",
+            "Cosmos",
+            "Dahlia",
+            "Delphinium",
+            "Foxglove",
+            "Hollyhock",
+            "Hyacinth",
+            "Hydrangea",
+            "Iris",
+            "Lavender",
+            "Lily",
+            "Moonflower",
+            "Peony",
+            "Poppy",
+            "Primrose",
+            "Rhododendron",
+            "Salvia",
+            "Snapdragon",
+            "Snowdrop",
+            "Tulip",
+            "Wisteria"
+        ]
+    },
+    "mariadb": {
+        "host": "HOST",
+        "port": 3306,
+        "user": "USERNAME",
+        "password": "PASSWORD",
+        "database": "DATABASE",
+        "charset": "utf8mb4"
+    },
+    "topgg": {
+        "enabled": false,
+        "postEnabled": false,
+        "token": "TOP.GG_TOKEN",
+        "webhook": {
+            "port": 3000,
+            "auth": "TOP.GG_AUTH"
+        }
+    }
+}
