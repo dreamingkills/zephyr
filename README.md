@@ -1,18 +1,6 @@
 # Deprecated
 
-This repository is deprecated and no longer serves as the official codebase of Zephyr. It's out of date, volatile, and contains a lot of poor-quality code.
-
-# zephyr
-
-Zephyr is an open-source Discord bot.
-
-# Usage
-
-TODO
-
-# Documentation
-
-TODO...?
+THIS CODE SERIOUSLY SUCKS!!!!!!!! DON'T USE THIS REPO!! I'll probably rewrite it eventually...
 
 # Stuff we used
 
