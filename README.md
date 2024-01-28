@@ -1,12 +1,5 @@
-# Deprecated
+# Zephyr 1.0
 
-THIS CODE SERIOUSLY SUCKS!!!!!!!! DON'T USE THIS REPO!! I'll probably rewrite it eventually...
+This repository is home to the now-long-outdated code that ran Zephyr 1.0. This code is only here for archival purposes and should not be taken seriously.
 
-# Stuff we used
-
-- [Eris](https://github.com/abalabahaha/eris)
-- [eris-collector](https://github.com/barbarbar338/eris-collector/)
-- [dayjs](https://github.com/iamkun/dayjs)
-- [color-name-list](https://www.npmjs.com/package/color-name-list)
-- [chroma.js](https://github.com/gka/chroma.js/)
-- [nearest-color](https://www.npmjs.com/package/nearest-color)
+If you'd like to keep up with the ongoing development of Zephyr 2.0, please join the [Discord](https://discord.gg/zephyrlabs) or check out the [website](https://zephyr.bot).
